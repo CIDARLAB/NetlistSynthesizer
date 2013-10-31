@@ -4,7 +4,15 @@
  */
 package netsynth;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,22 +35,74 @@ public class NetSynth {
         Global.wirecount = 0;
         Global.espinp =0;
         Global.espout =0;
-        //testnetlistmodule();
-        runEspresso();
+        testnetlistmodule();
+        testEspresso();
+        
+            
+        
     }
     
-    public static void runEspresso() {
+    
+    public static void testEspresso()
+    {
+        
+        List<String> espressoOut = new ArrayList<String>();
+        espressoOut = runEspresso();
+        
+        List<Gate> SOPgates = new ArrayList<Gate>();
+        SOPgates = parseEspressoOutput(espressoOut);
+        
+    }
+    
+    
+   
+    
+    public static List<String> runEspresso() {
+    
+        
+        List<String> espressoOutput = new ArrayList<String>();
+        String x = System.getProperty("os.name");
+        StringBuilder commandBuilder = null;
+        //if("Linux".equals(x))
+        //{
+            commandBuilder = new StringBuilder("./src/resources/espresso.linux src/resources/A0.txt");
+        //}
+        
+        //System.out.println(commandBuilder);
+        String command = commandBuilder.toString();
+        //System.out.println("So this is what is happening: "+command);
+        
+        Runtime runtime = Runtime.getRuntime();
+        Process proc = null;
         try {
-            Runtime rt = Runtime.getRuntime();
-            Process proc = rt.exec("./espresso.exe A0.txt>javafile.txt");
-            //Process p = Runtime.getRuntime().exec("/espresso.exe A0.txt>javafile.txt");
-            int waitFor = proc.waitFor();
-
+            proc = runtime.exec(command);
         } catch (IOException ex) {
-            //Validate the case the file can't be accesed (not enought permissions)
-        } catch (InterruptedException ex) {
-            //Validate the case the process is being stopped by some external situation     
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
+        try {
+            String filestring = "";
+            filestring += "src/resources/write";
+            filestring += Global.espout;
+            filestring += ".txt";
+            File fbool = new File(filestring);
+            Writer output = new BufferedWriter(new FileWriter(fbool));
+            InputStream in = proc.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String line = null;
+            
+            while((line = br.readLine())!= null)
+            {  
+                espressoOutput.add(line);
+                line += "\n";
+                output.write(line);
+            }
+            output.close();
+            fbool.deleteOnExit();
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         
+        return espressoOutput;
     }
     
     
@@ -60,8 +120,6 @@ public class NetSynth {
         testgateType = GateType.XOR2;
         Gate gtest = new Gate(testgateType,inputWires,outp);
         
-        
-        
         List<Gate> test = new ArrayList<Gate>();
         test = GatetoNORNOT(gtest);
 
@@ -77,24 +135,19 @@ public class NetSynth {
     }
     
     
-    public static String netlist(Gate g)
-    {
-        String netbuilder="";
-        netbuilder += g.gtype;
-            netbuilder += "(";
-            netbuilder += g.output.name;
-            
-            for(Wire x:g.input)
-            {
-                netbuilder += ",";
-                netbuilder += x.name;
-            }
-            netbuilder += ")";
-            //netbuilder += "  Stage:";
-            //netbuilder += g.gatestage;
-        return netbuilder;
-    }
     
+     public static List<Gate> parseEspressoOutput(List<String> espinp)
+    {
+        List<Gate> sopexp = new ArrayList<Gate>();
+        
+        
+        
+        return sopexp;
+    }
+    //public static List<Gate> createandgates(List<String> gatenames)
+    //{
+        
+    //}
     
     public static List<Gate> GatetoNOR(Gate g)
     {
@@ -551,5 +604,22 @@ public class NetSynth {
     }  
     
     
+    public static String netlist(Gate g)
+    {
+        String netbuilder="";
+        netbuilder += g.gtype;
+            netbuilder += "(";
+            netbuilder += g.output.name;
+            
+            for(Wire x:g.input)
+            {
+                netbuilder += ",";
+                netbuilder += x.name;
+            }
+            netbuilder += ")";
+            //netbuilder += "  Stage:";
+            //netbuilder += g.gatestage;
+        return netbuilder;
+    }
     
 }
