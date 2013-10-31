@@ -4,10 +4,13 @@
  */
 package netsynth;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import netsynth.Gate.GateType;
-
+import netsynth.Wire.WireType;
 
 
 /**
@@ -22,30 +25,45 @@ public class NetSynth {
     public static void main(String[] args) {
         // TODO code application logic here
         Global.wirecount = 0;
-        testnetlistmodule();
+        Global.espinp =0;
+        Global.espout =0;
+        //testnetlistmodule();
+        runEspresso();
     }
     
-    public static void extractExpression(String x)
-    {
-        
+    public static void runEspresso() {
+        try {
+            Runtime rt = Runtime.getRuntime();
+            Process proc = rt.exec("./espresso.exe A0.txt>javafile.txt");
+            //Process p = Runtime.getRuntime().exec("/espresso.exe A0.txt>javafile.txt");
+            int waitFor = proc.waitFor();
+
+        } catch (IOException ex) {
+            //Validate the case the file can't be accesed (not enought permissions)
+        } catch (InterruptedException ex) {
+            //Validate the case the process is being stopped by some external situation     
+        }
     }
+    
     
     public static void testnetlistmodule()
     {
         Gate and = new Gate();
-        Wire w1 = new Wire();
-        w1.name = "A";
-        Wire w2 = new Wire();
-        w2.name = "B";
-        Wire outp = new Wire();
-        outp.name = "O";
+        Wire w1 = new Wire("A",WireType.input);
+        Wire w2 = new Wire("B",WireType.input);
+        Wire outp = new Wire("outP",WireType.output);
+        List<Wire> inputWires = new ArrayList<Wire>();
+        inputWires.add(w1);
+        inputWires.add(w2);
         
-        and.gtype = GateType.NAND2;
-        and.input.add(w1);
-        and.input.add(w2);
-        and.output = outp;
+        GateType testgateType;
+        testgateType = GateType.XOR2;
+        Gate gtest = new Gate(testgateType,inputWires,outp);
+        
+        
+        
         List<Gate> test = new ArrayList<Gate>();
-        test = GatetoNORNOT(and);
+        test = GatetoNORNOT(gtest);
 
         for(Gate gout:test)
         {
@@ -57,6 +75,7 @@ public class NetSynth {
          
         
     }
+    
     
     public static String netlist(Gate g)
     {
@@ -71,8 +90,11 @@ public class NetSynth {
                 netbuilder += x.name;
             }
             netbuilder += ")";
+            //netbuilder += "  Stage:";
+            //netbuilder += g.gatestage;
         return netbuilder;
     }
+    
     
     public static List<Gate> GatetoNOR(Gate g)
     {
@@ -87,6 +109,7 @@ public class NetSynth {
            nor1.input.add(g.input.get(0));
            
            nor1.output = g.output;
+           nor1.calculateStage();
            nor_eq.add(nor1);
            
        }
@@ -114,6 +137,10 @@ public class NetSynth {
            nor3.input.add(outp1);
            nor3.input.add(outp2);
            nor3.output = g.output;
+           
+           nor1.calculateStage();
+           nor2.calculateStage();
+           nor3.calculateStage();
            
            nor_eq.add(nor1);
            nor_eq.add(nor2);
@@ -153,6 +180,11 @@ public class NetSynth {
            nor4.input.add(outp3);
            nor4.output = g.output;
            
+           nor1.calculateStage();
+           nor2.calculateStage();
+           nor3.calculateStage();
+           nor4.calculateStage();
+           
            nor_eq.add(nor1);
            nor_eq.add(nor2);
            nor_eq.add(nor3);
@@ -177,6 +209,9 @@ public class NetSynth {
            nor2.input.add(outp1);
            nor2.output = g.output;
           
+           nor1.calculateStage();
+           nor2.calculateStage();
+           
            nor_eq.add(nor1);
            nor_eq.add(nor2);
            
@@ -184,6 +219,7 @@ public class NetSynth {
        
        else if(g.gtype == GateType.NOR2)
        {
+           g.calculateStage();
            nor_eq.add(g);
        }
        
@@ -226,6 +262,12 @@ public class NetSynth {
            nor5.input.add(outp3);
            nor5.input.add(outp4);
            nor5.output = g.output;
+           
+           nor1.calculateStage();
+           nor2.calculateStage();
+           nor3.calculateStage();
+           nor4.calculateStage();
+           nor5.calculateStage();
            
            nor_eq.add(nor1);
            nor_eq.add(nor2);
@@ -273,6 +315,12 @@ public class NetSynth {
            nor5.input.add(outp3);
            nor5.input.add(outp4);
            nor5.output = g.output;
+
+           nor1.calculateStage();
+           nor2.calculateStage();
+           nor3.calculateStage();
+           nor4.calculateStage();
+           nor5.calculateStage();
            
            nor_eq.add(nor1);
            nor_eq.add(nor2);
@@ -290,6 +338,7 @@ public class NetSynth {
        
        if(g.gtype == GateType.NOT)
        {
+           g.calculateStage();
            nor_eq.add(g);
        }
        
@@ -314,6 +363,10 @@ public class NetSynth {
            nor1.input.add(outp1);
            nor1.input.add(outp2);
            nor1.output = g.output;
+           
+           not1.calculateStage();
+           not2.calculateStage();
+           nor1.calculateStage();
            
            nor_eq.add(not1);
            nor_eq.add(not2);
@@ -350,6 +403,11 @@ public class NetSynth {
            not3.input.add(outp3);
            not3.output = g.output;
            
+           not1.calculateStage();
+           not2.calculateStage();
+           nor1.calculateStage();
+           not3.calculateStage();
+           
            nor_eq.add(not1);
            nor_eq.add(not2);
            nor_eq.add(nor1);
@@ -373,6 +431,9 @@ public class NetSynth {
            not1.input.add(outp1);
            not1.output = g.output;
           
+           nor1.calculateStage();
+           not1.calculateStage();
+           
            nor_eq.add(nor1);
            nor_eq.add(not1);
            
@@ -380,6 +441,7 @@ public class NetSynth {
        
        else if(g.gtype == GateType.NOR2)
        {
+           g.calculateStage();
            nor_eq.add(g);
        }
        
@@ -420,6 +482,12 @@ public class NetSynth {
            nor3.input.add(outp3);
            nor3.input.add(outp4);
            nor3.output = g.output;
+           
+           not1.calculateStage();
+           not2.calculateStage();
+           nor1.calculateStage();
+           nor2.calculateStage();
+           nor3.calculateStage();
            
            nor_eq.add(not1);
            nor_eq.add(not2);
@@ -465,6 +533,13 @@ public class NetSynth {
            nor3.input.add(outp3);
            nor3.input.add(outp4);
            nor3.output = g.output;
+
+           not1.calculateStage();
+           not2.calculateStage();
+           nor1.calculateStage();
+           nor2.calculateStage();
+           nor3.calculateStage();
+
            
            nor_eq.add(not1);
            nor_eq.add(not2);
@@ -474,5 +549,7 @@ public class NetSynth {
        }
        return nor_eq;
     }  
+    
+    
     
 }

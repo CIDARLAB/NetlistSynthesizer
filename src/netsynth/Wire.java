@@ -10,5 +10,30 @@ package netsynth;
  */
 public class Wire {
    
-   String name; 
+    
+     String name; 
+     public enum WireType{
+         input,
+         output, 
+         connector;
+     }
+     WireType wtype;
+     int wirestage;
+     Wire()
+     {
+         name = "";
+         wtype = WireType.connector;  
+     }
+     Wire(String wirename,WireType wType)
+     {
+         if(wType == WireType.input)
+         {
+            this.wirestage = 0;
+         }
+         this.name = wirename;
+         this.wtype = wType;
+
+     }
+     
+     
 }
