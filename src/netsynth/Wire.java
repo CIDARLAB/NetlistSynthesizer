@@ -24,6 +24,10 @@ public class Wire {
          name = "";
          wtype = WireType.connector;  
      }
+     Wire(String wirename)
+     {
+        this.name = wirename;
+     }
      Wire(String wirename,WireType wType)
      {
          if(wType == WireType.input)

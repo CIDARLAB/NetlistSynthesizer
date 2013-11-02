@@ -35,7 +35,7 @@ public class NetSynth {
         Global.wirecount = 0;
         Global.espinp =0;
         Global.espout =0;
-        testnetlistmodule();
+        //testnetlistmodule();
         testEspresso();
         
             
@@ -117,7 +117,7 @@ public class NetSynth {
         inputWires.add(w2);
         
         GateType testgateType;
-        testgateType = GateType.XOR2;
+        testgateType = GateType.XNOR2;
         Gate gtest = new Gate(testgateType,inputWires,outp);
         
         List<Gate> test = new ArrayList<Gate>();
@@ -136,13 +136,80 @@ public class NetSynth {
     
     
     
-     public static List<Gate> parseEspressoOutput(List<String> espinp)
+    public static List<Gate> parseEspressoOutput(List<String> espinp)
     {
         List<Gate> sopexp = new ArrayList<Gate>();
+        List<Wire> input_testing = new ArrayList<Wire>();
         
+         String xwire = "Wire" + Global.wirecount++;
+        input_testing.add(new Wire(xwire));
+        input_testing.add(new Wire("A",WireType.input));
+        input_testing.add(new Wire("B",WireType.input));
+        input_testing.add(new Wire("C",WireType.input));
+        input_testing.add(new Wire("D",WireType.input));
+        input_testing.add(new Wire("E",WireType.input));
         
-        
+       
+        sopexp = andGates(input_testing);
         return sopexp;
+    }
+    public static List<Gate> andGates(List<Wire> andWires)
+    {
+        if (andWires.size() == 0)
+        {    return null;}
+        List<Gate> minterm = new ArrayList<Gate>();
+        List<Wire> nextLevelWires = new ArrayList<Wire>();
+        List<Wire> temp = new ArrayList<Wire>();
+        
+        int wireCount,indx;
+        nextLevelWires.addAll(andWires);
+        wireCount = andWires.size();
+        
+        while(wireCount > 1)
+        {
+            temp = new ArrayList<Wire>();
+            temp.addAll(nextLevelWires);
+            nextLevelWires = new ArrayList<Wire>();
+            indx = 0;
+            while((indx+2)<= (wireCount))
+            {
+                
+                List<Wire> ainp = new ArrayList<Wire>();
+                ainp.add(temp.get(indx));
+                ainp.add(temp.get(indx+1));
+                String Wirename = "Wire" + Global.wirecount++;
+                
+                Wire aout = new Wire(Wirename);
+                nextLevelWires.add(aout);
+                Gate andG = new Gate(GateType.AND2,ainp,aout);
+                minterm.add(andG);
+                indx+=2;
+            
+            }
+            if(temp.size() %2 != 0)
+            {
+                nextLevelWires.add(temp.get(wireCount-1));
+            }
+            wireCount = nextLevelWires.size();
+            if(wireCount == 2)
+            {
+                List<Wire> ainp = new ArrayList<Wire>();
+                ainp.add(nextLevelWires.get(0));
+                ainp.add(nextLevelWires.get(1));
+                String Wirename = "Wire" + Global.wirecount++;
+                Wire aout = new Wire(Wirename);
+                Gate andG = new Gate(GateType.AND2,ainp,aout);
+                minterm.add(andG);
+                break;
+            }
+        }
+        for(Gate gmin:minterm)
+        {
+            String x = netlist(gmin);
+            System.out.println(x);
+            //System.out.println(gmin.gatestage);
+        }
+        return minterm;
     }
     //public static List<Gate> createandgates(List<String> gatenames)
     //{
@@ -198,6 +265,7 @@ public class NetSynth {
            nor_eq.add(nor1);
            nor_eq.add(nor2);
            nor_eq.add(nor3);
+       
        }
        
        
