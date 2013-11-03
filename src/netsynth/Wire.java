@@ -14,7 +14,9 @@ public class Wire {
      String name; 
      public enum WireType{
          input,
-         output, 
+         output,
+         GND,
+         Source,
          connector;
      }
      WireType wtype;

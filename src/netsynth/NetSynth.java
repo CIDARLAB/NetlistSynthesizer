@@ -30,11 +30,17 @@ public class NetSynth {
     /**
      * @param args the command line arguments
      */
+    public static Wire one;
+    public static Wire zero;
+    public static boolean functionOutp;
     public static void main(String[] args) {
         // TODO code application logic here
         Global.wirecount = 0;
         Global.espinp =0;
         Global.espout =0;
+        functionOutp = false;
+        one = new Wire("_one",WireType.Source);
+        zero = new Wire("_zero",WireType.GND);
         //testnetlistmodule();
         testEspresso();
         
@@ -51,10 +57,20 @@ public class NetSynth {
         
         List<Gate> SOPgates = new ArrayList<Gate>();
         SOPgates = parseEspressoOutput(espressoOut);
-        for(Gate g:SOPgates)
+        if(functionOutp)
         {
-            String gateString = netlist(g);
-            System.out.println(gateString);
+                String gateString = netlist(SOPgates.get(0));
+                System.out.println(gateString);
+            
+        }
+        else
+        {
+            for(Gate g:SOPgates)
+            {
+                POStoNOR(g);
+                String gateString = netlist(g);
+                System.out.println(gateString);
+            }
         }
     }
     
@@ -69,7 +85,7 @@ public class NetSynth {
         StringBuilder commandBuilder = null;
         //if("Linux".equals(x))
         //{
-            commandBuilder = new StringBuilder("./src/resources/espresso.linux src/resources/A0.txt");
+            commandBuilder = new StringBuilder("./src/resources/espresso.linux -epos src/resources/test.txt");
         //}
         
         //System.out.println(commandBuilder);
@@ -129,6 +145,7 @@ public class NetSynth {
 
         for(Gate gout:test)
         {
+            
             String netbuilder = "";
             netbuilder = netlist(gout);
             System.out.println(netbuilder);
@@ -138,33 +155,121 @@ public class NetSynth {
         
     }
     
-    
+    public static void POStoNOR(Gate g)
+    {
+        if(g.gtype == GateType.NOT)
+        {return;}
+        else if(g.gtype == GateType.AND2 || g.gtype == GateType.OR2)
+        {
+            g.gtype = GateType.NOR2;
+        }
+            
+    }
     
     public static List<Gate> parseEspressoOutput(List<String> espinp)
     {
         List<Gate> sopexp = new ArrayList<Gate>();
-        String inpNames = (espinp.get(2).substring(5));
         List<Wire> wireInputs = new ArrayList<Wire>();
         List<Wire> wireOutputs = new ArrayList<Wire>();
         List<Gate> inpInv = new ArrayList<Gate>();
+        String inpNames = "";
+        String outNames = "";
+        boolean POSmode = false;
+        int numberOfMinterms=0;
+        int expInd=0;        
+        for(int i=0;i<espinp.size();i++)
+        {
+            if(espinp.get(i).startsWith(".ilb"))
+            {
+                inpNames = (espinp.get(i).substring(5));
+            }
+            else if(espinp.get(i).startsWith(".ob"))
+            {
+                outNames = (espinp.get(i).substring(4));
+            }
+            else if(espinp.get(i).startsWith("#.phase"))
+            {
+                POSmode = true;
+            }
+            else if(espinp.get(i).startsWith(".p"))
+            {
+                numberOfMinterms = Integer.parseInt(espinp.get(i).substring(3));
+                expInd = i+1;
+                break;
+            }
+        }
+        List<Wire> invWires = new ArrayList<Wire>();
         
         for(String splitInp:inpNames.split(" "))
         {
+            if(splitInp.equals(one.name) || splitInp.equals(zero.name))
+                splitInp += "I";
             wireInputs.add(new Wire(splitInp,WireType.input));
         }
         inpInv = notGates(wireInputs);
-        
-        String outNames = (espinp.get(3).substring(4));
+        for(Gate gnots:inpInv)
+        {
+            invWires.add(gnots.output);
+        }
         for(String splitInp:outNames.split(" "))
         {
+            if(splitInp.equals(one.name) || splitInp.equals(zero.name))
+                splitInp += "O";
             wireOutputs.add(new Wire(splitInp,WireType.output));
         }
-        int numberOfMinterms = Integer.parseInt(espinp.get(4).substring(3));
+        
+        if(numberOfMinterms == 0)
+        {
+            functionOutp = true;
+            List<Wire> inp01 = new ArrayList<Wire>();
+            
+            if(POSmode)
+            {
+                inp01.add(one);
+            }
+            else
+            {
+                inp01.add(zero);
+            }
+            sopexp.add(new Gate(GateType.BUF,inp01,wireOutputs.get(0)));
+            return sopexp;
+        }
+        else if(numberOfMinterms == 1)
+        {
+            String oneMinT = espinp.get(expInd).substring(0, (wireInputs.size()));
+            int flag =0;
+            for(int j=0;j<wireInputs.size();j++)
+            {
+                if(oneMinT.charAt(j) != '-')
+                {
+                    flag =1;
+                    break;
+                }
+            }
+            if(flag == 0)
+            {
+            functionOutp = true;
+            List<Wire> inp01 = new ArrayList<Wire>();
+            
+            if(POSmode)
+            {
+                inp01.add(zero);
+            }
+                //functionOutp = ;
+            else
+            {
+                inp01.add(one);
+            }
+            sopexp.add(new Gate(GateType.BUF,inp01,wireOutputs.get(0)));
+            return sopexp;    
+            }
+                
+        }
+        
         List<Wire> minTemp = new ArrayList<Wire>();
         List<Wire> orWires = new ArrayList<Wire>();
-        
         List<Gate> prodGates;
-        for(int i=5;i<(5+numberOfMinterms);i++)
+        for(int i=expInd;i<(expInd+numberOfMinterms);i++)
         {
             
             //List<Wire> minTemp = new ArrayList<Wire>();
@@ -179,27 +284,99 @@ public class NetSynth {
                     continue;
                 else if(minT.charAt(j) == '0')
                 {
-                    if(!sopexp.contains(inpInv.get(j)))
+                    if(POSmode)
                     {
-                        sopexp.add(inpInv.get(j));
-                        
-                        //System.out.println(i);
+                        minTemp.add(wireInputs.get(j));
                     }
-                    minTemp.add(inpInv.get(j).output);
+                    else
+                    {
+                        if(!sopexp.contains(inpInv.get(j)))
+                        {
+                            sopexp.add(inpInv.get(j));                        
+                        }
+                        minTemp.add(inpInv.get(j).output);
+                    }
+                    
                 }
                 else if(minT.charAt(j) == '1')
-                    minTemp.add(wireInputs.get(j));
+                {
+                    if(POSmode)
+                    {
+                        if(!sopexp.contains(inpInv.get(j)))
+                        {
+                            sopexp.add(inpInv.get(j));                        
+                        }
+                        minTemp.add(inpInv.get(j).output);
+                    }
+                    else
+                    {
+                        minTemp.add(wireInputs.get(j));
+                    }
+                }
+                    
                 
             }
-            prodGates = AndORGates(minTemp,GateType.AND2);
-         
-            orWires.add(prodGates.get(prodGates.size()-1).output);
+            boolean pos_one_inv = false;
+            if(minTemp.size() == 1)
+            {
+                if(POSmode)
+                {
+                    
+                    if(!invWires.contains(minTemp.get(0)))
+                    {
+                            minTemp.add(zero);
+                            //System.out.println(minTemp.get(0).name);
+                    }
+                    else
+                    {
+                        //System.out.println("Nor gate");
+                        //minTemp.remove(i);
+                        Wire tempW = new Wire();
+                        int invIndx = invWires.indexOf(minTemp.get(0));
+                        tempW = inpInv.get(invIndx).input.get(0);
+                        minTemp.remove(0);
+                        minTemp.add(tempW);
+                        pos_one_inv = true;
+                        
+                    }
+                    
+                }
+                else
+                {
+                    minTemp.add(one);
+                }
+            }
+            
+            if(POSmode)
+            {
+                if(!pos_one_inv)
+                    prodGates = AndORGates(minTemp,GateType.OR2);         
+            }
+            else
+            {
+                prodGates = AndORGates(minTemp,GateType.AND2);         
+            }
+            if(!pos_one_inv)
+                orWires.add(prodGates.get(prodGates.size()-1).output);
+            else
+                orWires.add(minTemp.get(0));
+            
             sopexp.addAll(prodGates);
             //System.out.println(minT);
         }
+        if((orWires.size() == 1) && POSmode)
+            orWires.add(zero);
         prodGates = new ArrayList<Gate>();
-        prodGates = AndORGates(orWires,GateType.OR2);
+        if(POSmode)
+        {
+            prodGates = AndORGates(orWires,GateType.AND2);
+        }
+        else
+        {
+            prodGates = AndORGates(orWires,GateType.OR2);
+        }
         sopexp.addAll(prodGates);
+        sopexp.get(sopexp.size()-1).output = wireOutputs.get(0);
         //System.out.println(netlist(sopexp.get(0)));
         return sopexp;
     }

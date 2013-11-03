@@ -15,6 +15,7 @@ public class Gate {
     String gname;
     public enum GateType{
            NOT,
+           BUF,
            NOR2, 
            NOR3,
            NAND2, 
