@@ -372,7 +372,13 @@ public class NetSynth {
             prodGates = AndORGates(orWires,GateType.OR2);
         }
         sopexp.addAll(prodGates);
-        sopexp.get(sopexp.size()-1).output = wireOutputs.get(0);
+        if(sopexp.isEmpty())
+        {
+            Gate bufgate = new Gate(GateType.BUF,orWires,wireOutputs.get(0));
+            sopexp.add(bufgate);
+        }
+        else
+            sopexp.get(sopexp.size()-1).output = wireOutputs.get(0);
         return sopexp;
     }
     
