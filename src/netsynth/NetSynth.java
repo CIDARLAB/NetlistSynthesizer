@@ -31,13 +31,16 @@ public class NetSynth {
      * @param args the command line arguments
      */
     public static Wire one;
+    public static boolean POSmode;
     public static Wire zero;
     public static boolean functionOutp;
+    
     public static void main(String[] args) {
         // TODO code application logic here
         Global.wirecount = 0;
         Global.espinp =0;
         Global.espout =0;
+        POSmode = false;
         functionOutp = false;
         one = new Wire("_one",WireType.Source);
         zero = new Wire("_zero",WireType.GND);
@@ -56,7 +59,12 @@ public class NetSynth {
         espressoOut = runEspresso();
         
         List<Gate> SOPgates = new ArrayList<Gate>();
+        List<Gate> NORgates = new ArrayList<Gate>();
+        
         SOPgates = parseEspressoOutput(espressoOut);
+        
+        System.out.println("POS format : ");
+        
         if(functionOutp)
         {
                 String gateString = netlist(SOPgates.get(0));
@@ -67,7 +75,25 @@ public class NetSynth {
         {
             for(Gate g:SOPgates)
             {
-                //POStoNOR(g);
+               
+                String gateString = netlist(g);
+                System.out.println(gateString);
+            }
+        }
+        
+        NORgates = parseEspressoToNORNAND(espressoOut);
+        System.out.println("\nUniversal Gates : ");
+        if(functionOutp)
+        {
+                String gateString = netlist(NORgates.get(0));
+                System.out.println(gateString);
+            
+        }
+        else
+        {
+            for(Gate g:NORgates)
+            {
+               
                 String gateString = netlist(g);
                 System.out.println(gateString);
             }
@@ -155,6 +181,8 @@ public class NetSynth {
         
     }
     
+    
+    
     public static void POStoNOR(Gate g)
     {
         if(g.gtype == GateType.NOT)
@@ -183,14 +211,14 @@ public class NetSynth {
         List<Wire> wireOutputs = new ArrayList<Wire>();
         List<Wire> invWires = new ArrayList<Wire>();
         List<Gate> inpInv = new ArrayList<Gate>();
-        
+        functionOutp = false;
         String inpNames = "";
         String outNames = "";
-        boolean POSmode = false;
+        POSmode = false;
         int numberOfMinterms=0;
         int expInd=0;        
 
-        // <editor-fold desc="Extract Input output and minterm lines from Espresso Output">
+        // <editor-fold defaultstate="collapsed" desc="Extract Input output and minterm lines from Espresso Output">
         for(int i=0;i<espinp.size();i++)
         {
             if(espinp.get(i).startsWith(".ilb"))
@@ -214,7 +242,7 @@ public class NetSynth {
         }
         // </editor-fold>
                 
-        // <editor-fold desc="Get Input Names">
+        // <editor-fold defaultstate="collapsed" desc="Get Input Names">
         for(String splitInp:inpNames.split(" "))
         {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
@@ -223,7 +251,7 @@ public class NetSynth {
         }
         // </editor-fold>
         
-        // <editor-fold desc="Create Not gates and NOT wires">
+        // <editor-fold defaultstate="collapsed" desc="Create Not gates and NOT wires">
         inpInv = notGates(wireInputs);
         for(Gate gnots:inpInv)
         {
@@ -231,7 +259,7 @@ public class NetSynth {
         }
         // </editor-fold>
         
-        // <editor-fold desc="Get Output Names">
+        // <editor-fold defaultstate="collapsed" desc="Get Output Names">
         for(String splitInp:outNames.split(" "))
         {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
@@ -240,7 +268,7 @@ public class NetSynth {
         }
         // </editor-fold>        
         
-        // <editor-fold desc="Minterms = 0 and Output = 1 or 0">
+        // <editor-fold defaultstate="collapsed" desc="Minterms = 0 and Output = 1 or 0">
         if(numberOfMinterms == 0)
         {
             functionOutp = true;
@@ -259,7 +287,7 @@ public class NetSynth {
         }
         // </editor-fold>
         
-        // <editor-fold desc="Minterm = 1 and Output = 1 or 0">
+        // <editor-fold defaultstate="collapsed" desc="Minterm = 1 and Output = 1 or 0">
         else if(numberOfMinterms == 1)
         {
             String oneMinT = espinp.get(expInd).substring(0, (wireInputs.size()));
@@ -304,7 +332,7 @@ public class NetSynth {
             prodGates = new ArrayList<Gate>();
             minTemp = new ArrayList<Wire>();
             
-            // <editor-fold desc="Find a Minterm/Maxterm">
+            // <editor-fold defaultstate="collapsed" desc="Find a Minterm/Maxterm">
             for(int j=0;j<wireInputs.size();j++)
             {
                 if(minT.charAt(j)=='-')
@@ -384,17 +412,24 @@ public class NetSynth {
     
     
     
-    public static List<Gate> parseEspressoToNOR(List<String> espinp)
+    public static List<Gate> parseEspressoToNORNAND(List<String> espinp)
     {
-        List<Gate> sopexp = new ArrayList<Gate>();
+      List<Gate> sopexp = new ArrayList<Gate>();
         List<Wire> wireInputs = new ArrayList<Wire>();
         List<Wire> wireOutputs = new ArrayList<Wire>();
+        List<Wire> invWires = new ArrayList<Wire>();
         List<Gate> inpInv = new ArrayList<Gate>();
+        List<Boolean> notGateexists = new ArrayList<Boolean>();
+        List<Boolean> notGateAdd = new ArrayList<Boolean>();
+        
+        functionOutp = false;
         String inpNames = "";
         String outNames = "";
-        boolean POSmode = false;
+        POSmode = false;
         int numberOfMinterms=0;
         int expInd=0;        
+
+        // <editor-fold defaultstate="collapsed" desc="Extract Input output and minterm lines from Espresso Output">
         for(int i=0;i<espinp.size();i++)
         {
             if(espinp.get(i).startsWith(".ilb"))
@@ -416,26 +451,38 @@ public class NetSynth {
                 break;
             }
         }
-        List<Wire> invWires = new ArrayList<Wire>();
-        
+        // </editor-fold>
+                
+        // <editor-fold defaultstate="collapsed" desc="Get Input Names">
         for(String splitInp:inpNames.split(" "))
         {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
                 splitInp += "I";
             wireInputs.add(new Wire(splitInp,WireType.input));
         }
+        // </editor-fold>
+        
+        // <editor-fold defaultstate="collapsed" desc="Create Not gates and NOT wires">
         inpInv = notGates(wireInputs);
+        
         for(Gate gnots:inpInv)
         {
+            notGateexists.add(false);
+            notGateAdd.add(false);
             invWires.add(gnots.output);
         }
+        // </editor-fold>
+        
+        // <editor-fold defaultstate="collapsed" desc="Get Output Names">
         for(String splitInp:outNames.split(" "))
         {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
                 splitInp += "O";
             wireOutputs.add(new Wire(splitInp,WireType.output));
         }
+        // </editor-fold>        
         
+        // <editor-fold defaultstate="collapsed" desc="Minterms = 0 and Output = 1 or 0">
         if(numberOfMinterms == 0)
         {
             functionOutp = true;
@@ -452,6 +499,9 @@ public class NetSynth {
             sopexp.add(new Gate(GateType.BUF,inp01,wireOutputs.get(0)));
             return sopexp;
         }
+        // </editor-fold>
+        
+        // <editor-fold defaultstate="collapsed" desc="Minterm = 1 and Output = 1 or 0">
         else if(numberOfMinterms == 1)
         {
             String oneMinT = espinp.get(expInd).substring(0, (wireInputs.size()));
@@ -482,6 +532,8 @@ public class NetSynth {
             }
                 
         }
+        // </editor-fold>
+        
         
         List<Wire> minTemp = new ArrayList<Wire>();
         List<Wire> orWires = new ArrayList<Wire>();
@@ -489,14 +541,13 @@ public class NetSynth {
         for(int i=expInd;i<(expInd+numberOfMinterms);i++)
         {
             
-            //List<Wire> minTemp = new ArrayList<Wire>();
             String minT = espinp.get(i).substring(0, (wireInputs.size()));
             prodGates = new ArrayList<Gate>();
             minTemp = new ArrayList<Wire>();
             
+            // <editor-fold defaultstate="collapsed" desc="Find a Minterm/Maxterm">
             for(int j=0;j<wireInputs.size();j++)
             {
-                
                 if(minT.charAt(j)=='-')
                     continue;
                 else if(minT.charAt(j) == '0')
@@ -507,21 +558,24 @@ public class NetSynth {
                     }
                     else
                     {
-                        if(!sopexp.contains(inpInv.get(j)))
+                        if(!notGateexists.get(j))
                         {
-                            sopexp.add(inpInv.get(j));                        
+                            sopexp.add(inpInv.get(j));
+                            notGateAdd.set(j, true);
+                            notGateexists.set(j, true);
                         }
                         minTemp.add(inpInv.get(j).output);
-                    }
-                    
+                    }   
                 }
                 else if(minT.charAt(j) == '1')
                 {
                     if(POSmode)
                     {
-                        if(!sopexp.contains(inpInv.get(j)))
+                        if(!notGateexists.get(j))
                         {
-                            sopexp.add(inpInv.get(j));                        
+                            sopexp.add(inpInv.get(j));
+                            notGateAdd.set(j, true);
+                            notGateexists.set(j, true);
                         }
                         minTemp.add(inpInv.get(j).output);
                     }
@@ -529,78 +583,107 @@ public class NetSynth {
                     {
                         minTemp.add(wireInputs.get(j));
                     }
-                }
-                    
-                
+                } 
             }
-            boolean pos_one_inv = false;
+            // </editor-fold>
+
+            
             if(minTemp.size() == 1)
             {
                 if(POSmode)
                 {
-                    
-                    if(!invWires.contains(minTemp.get(0)))
+                    if(numberOfMinterms != 1)
                     {
-                        Wire tempW = new Wire();
-                        int invIndx = wireInputs.indexOf(minTemp.get(0));
-                        tempW = invWires.get(invIndx);
-                        if(!sopexp.contains(inpInv.get(invIndx)))
+                        if(wireInputs.contains(minTemp.get(0)))
                         {
-                            sopexp.add(inpInv.get(invIndx));                        
+                            int xInd = wireInputs.indexOf(minTemp.get(0));
+                            if(!notGateexists.get(xInd))
+                            {
+                                sopexp.add(inpInv.get(xInd));
+                                notGateAdd.set(xInd, true);
+                                notGateexists.set(xInd, true);
+                            }
+                            Wire tempmin = inpInv.get(xInd).output;
+                            minTemp.remove(0);
+                            minTemp.add(tempmin);
                         }
-                        minTemp.remove(0);
-                        minTemp.add(tempW);
-                        pos_one_inv = true;
+                        else
+                        {
+                            int xInd = invWires.indexOf(minTemp.get(0));
+                            if(notGateAdd.get(xInd))
+                            {
+                                sopexp.remove(inpInv.get(xInd));
+                                notGateAdd.set(xInd, false);
+                                notGateexists.set(xInd, false);
+                            }
+                            Wire tempmin = wireInputs.get(xInd);
+                            minTemp.remove(0);
+                            minTemp.add(tempmin);
+                        }
                     }
-                    else
-                    {
-                        Wire tempW = new Wire();
-                        int invIndx = invWires.indexOf(minTemp.get(0));
-                        tempW = wireInputs.get(invIndx);
-                        minTemp.remove(0);
-                        minTemp.add(tempW);
-                        pos_one_inv = true;
-                        
-                    }
-                    
+                    orWires.add(minTemp.get(0));
+                    //if(notGateAdd.get(i))
                 }
                 else
                 {
-                    minTemp.add(one);
+                    orWires.add(minTemp.get(0));
                 }
-            }
-            
-            if(POSmode)
-            {
-                if(!pos_one_inv)
-                    prodGates = AndORGates(minTemp,GateType.OR2);         
+                
+                
             }
             else
             {
-                prodGates = AndORGates(minTemp,GateType.AND2);         
-            }
-            if(!pos_one_inv)
+                if(POSmode)
+                {
+                    prodGates = AndORGates(minTemp,GateType.NOR2);         
+                }
+                else
+                {
+                    prodGates = AndORGates(minTemp,GateType.NAND2);         
+                }
                 orWires.add(prodGates.get(prodGates.size()-1).output);
-            else
-                orWires.add(minTemp.get(0));
-            
-            sopexp.addAll(prodGates);
-            //System.out.println(minT);
+                sopexp.addAll(prodGates);
+            }
         }
-        if((orWires.size() == 1) && POSmode)
-            orWires.add(zero);
+        boolean no2ndstageGate = false;
         prodGates = new ArrayList<Gate>();
         if(POSmode)
         {
-            prodGates = AndORGates(orWires,GateType.AND2);
+            prodGates = AndORGates(orWires,GateType.NOR2);
+            
+            if(prodGates.isEmpty())
+            {
+                no2ndstageGate = true;
+            }
+                
         }
         else
         {
-            prodGates = AndORGates(orWires,GateType.OR2);
+            prodGates = AndORGates(orWires,GateType.NAND2);
         }
         sopexp.addAll(prodGates);
-        sopexp.get(sopexp.size()-1).output = wireOutputs.get(0);
-        //System.out.println(netlist(sopexp.get(0)));
+        if(sopexp.isEmpty())
+        {
+            Gate bufgate = new Gate(GateType.BUF,orWires,wireOutputs.get(0));
+            sopexp.add(bufgate);
+        }
+        else
+        {
+            if(no2ndstageGate)
+            {
+                if(!((numberOfMinterms == 1) && (minTemp.size() == 1)))
+                {
+                String Wirename = "Wire" + Global.wirecount++;
+                Wire aout = new Wire(Wirename);
+                List<Wire> notfinalinp = new ArrayList<Wire>();
+                notfinalinp.add(sopexp.get(sopexp.size()-1).output);
+                Gate notfinal = new Gate(GateType.NOT, notfinalinp ,aout);
+                sopexp.add(notfinal);
+                }
+            }
+            sopexp.get(sopexp.size()-1).output = wireOutputs.get(0);
+            
+        }
         return sopexp;
     }
     
@@ -627,6 +710,15 @@ public class NetSynth {
         if (andWires.isEmpty())
         {    return null;}
         List<Gate> minterm = new ArrayList<Gate>();
+        
+        /*if((andWires.size() == 1) && ((gOrAnd == GateType.NOR2)||(gOrAnd == GateType.NAND2)))
+        {
+            String Wirename = "Wire" + Global.wirecount++;
+            Wire aout = new Wire(Wirename);
+            Gate notInp = new Gate(GateType.NOT,andWires,aout);
+            minterm.add(notInp);
+            return minterm;
+        }*/
         List<Wire> nextLevelWires = new ArrayList<Wire>();
         List<Wire> temp = new ArrayList<Wire>();
         
