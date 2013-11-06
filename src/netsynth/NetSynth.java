@@ -14,9 +14,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import netsynth.DagGraph.DAGType;
 import netsynth.Gate.GateType;
 import netsynth.Wire.WireType;
 
@@ -82,6 +86,8 @@ public class NetSynth {
         }
         
         NORgates = parseEspressoToNORNAND(espressoOut);
+        List<DagGraph> dglist = new ArrayList<DagGraph>();
+        dglist = CreateDAG(NORgates);
         System.out.println("\nUniversal Gates : ");
         if(functionOutp)
         {
@@ -96,9 +102,35 @@ public class NetSynth {
                 String gateString = netlist(g);
                 System.out.println(gateString);
             }
+            System.out.println("\n\n DAG Graph: \n");
+            for(DagGraph dg:dglist)
+            {
+                String dagstring = printDAG(dg);
+                System.out.println(dagstring);
+            }
         }
+        
     }
     
+    public static String printDAG(DagGraph dg)
+    {
+        String outp="";
+        outp += "Index : ";
+        outp += (dg.Index + "\n");
+        outp += ("Vertex Name : " + dg.V.name + "\n");
+        outp += ("Vertex Type : " + dg.V.vertexD + "\n");
+        if(!dg.C.isEmpty())
+        {
+        for(DagGraph.Child ech: dg.C)
+        {
+            outp+= "Child Name : " + ech.name + "\n" ;
+            outp+= "Child Type : " + ech.childD + "\n";
+            
+        }
+        }
+        outp+= "\n";
+        return outp;
+    }
     
    
     
@@ -1228,6 +1260,149 @@ public class NetSynth {
        return nor_eq;
     }  
     
+    public static List<DagGraph> CreateDAG(List<Gate> netlist)
+    {
+        List<DagGraph> finalDag = new ArrayList<DagGraph>();
+        int Dindx = 0;
+        HashMap<String,Wire> Inputs = new HashMap<String,Wire>();
+        for(int i=(netlist.size()-1);i>=0;i--)
+        {
+            Gate g = netlist.get(i);
+            DagGraph x = new DagGraph();
+            x.Index = Dindx;
+            if(g.output.wtype == WireType.output)
+            {
+                x.V.name = g.output.name;
+                DAGType child = DAGType.NOT;
+                String childname;
+                if(g.gtype == GateType.NOT)
+                {
+                    x.V.vertexD = DAGType.OUTPUT;
+                }
+                else if(g.gtype == GateType.NOR2)
+                {
+                    x.V.vertexD = DAGType.OUTPUT_OR;
+                }
+                child = calcDagType(g.gtype);
+                childname = child.toString();
+                DagGraph.Child e = new DagGraph.Child();
+                e.childD = child;
+                e.name = childname;
+                x.C.add(e);
+                finalDag.add(x);
+                Dindx++;
+                x = new DagGraph();
+                x.Index = Dindx;
+                x.V.name = e.name;
+                x.V.vertexD = e.childD;
+                
+                // <editor-fold defaultstate="collapsed" desc="Calculate Child of DAG Graph"> 
+                for(Wire inp:g.input)
+                {
+                    DagGraph.Child einp = new DagGraph.Child();
+                    if(inp.wtype == WireType.input)
+                    {
+                        Inputs.put(inp.name, inp);
+                        einp.name = inp.name;
+                        einp.childD = DAGType.INPUT;
+                    } 
+                    else
+                    {
+                        for(Gate gf:netlist)
+                        {
+                            if(gf.output == inp)
+                            {
+                                einp.childD = calcDagType(gf.gtype);
+                                einp.name = einp.childD.toString();
+                            }
+                        }
+                    }
+                    x.C.add(einp);
+                }
+                // </editor-fold>
+                
+                finalDag.add(x);
+            }
+            else
+            {
+                x.V.vertexD = calcDagType(g.gtype);
+                x.V.name = x.V.vertexD.toString();        
+                // <editor-fold defaultstate="collapsed" desc="Calculate Child of DAG Graph"> 
+                for(Wire inp:g.input)
+                {
+                    DagGraph.Child einp = new DagGraph.Child();
+                    if(inp.wtype == WireType.input)
+                    {
+                        Inputs.put(inp.name, inp);
+                        einp.name = inp.name;
+                        einp.childD = DAGType.INPUT;
+                    } 
+                    else
+                    {
+                        for(Gate gf:netlist)
+                        {
+                            if(gf.output == inp)
+                            {
+                                einp.childD = calcDagType(gf.gtype);
+                                einp.name = einp.childD.toString();
+                            }
+                        }
+                    }
+                    x.C.add(einp);
+                }
+                // </editor-fold>
+                
+                finalDag.add(x);
+            }
+            
+            Dindx++;
+        }
+        
+        Iterator it = Inputs.entrySet().iterator();
+        while(it.hasNext())
+        {
+            Map.Entry pairs = (Map.Entry)it.next();
+            Wire xinp = (Wire)pairs.getValue();
+            DagGraph x = new DagGraph();
+            x.V.name = xinp.name;
+            x.V.vertexD = DAGType.INPUT;
+            x.Index = Dindx;
+            Dindx++;
+            finalDag.add(x);
+        }
+        return finalDag;
+        
+    }
+    
+    public static DAGType calcDagType(GateType gt)
+    {
+        DAGType out = null;
+        if(gt == GateType.AND2)
+            out = DAGType.AND;
+        else if(gt == GateType.AND3)
+            out = DAGType.AND;
+        else if(gt == GateType.OR2)
+            out = DAGType.OR;
+        else if(gt == GateType.OR3)
+            out = DAGType.OR;
+        else if(gt == GateType.NOT)
+            out = DAGType.NOT;
+        else if(gt == GateType.NOR2)
+            out = DAGType.NOR;
+        else if(gt == GateType.NOR3)
+            out = DAGType.NOR;
+        else if(gt == GateType.NAND2)
+            out = DAGType.NAND;
+        else if(gt == GateType.NAND3)
+            out = DAGType.NAND;
+        else if(gt == GateType.XNOR2)
+            out = DAGType.XNOR;
+        else if(gt == GateType.XOR2)
+            out = DAGType.XOR;
+        else if(gt == GateType.BUF)
+            out = DAGType.INPUT;                
+        return out;
+    }
     
     public static String netlist(Gate g)
     {
@@ -1246,5 +1421,6 @@ public class NetSynth {
             //netbuilder += g.gatestage;
         return netbuilder;
     }
+    
     
 }
