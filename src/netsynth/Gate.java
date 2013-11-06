@@ -4,6 +4,7 @@
  */
 package netsynth;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  * @author prashantvaidyanathan
  */
 
-public class Gate {
+public class Gate implements Serializable{
     String gname;
     public enum GateType{
            NOT,
@@ -31,7 +32,7 @@ public class Gate {
     public List<Wire> input;
     public Wire output;
     public int gatestage;
-    
+    public float dagstage;
     Gate()
     {      
          input = new ArrayList<Wire>();
@@ -45,12 +46,19 @@ public class Gate {
         output = outputWire;        
         if(!input.isEmpty())
         {
+            float totInpWires=0;
+            int tot=0;
             int maxStage = input.get(0).wirestage;
             for(Wire w:input)
             {
+                totInpWires++;
+                tot+= w.dagstage;    
                 if(maxStage<w.wirestage)
                     maxStage = w.wirestage;
             }
+            this.dagstage = (tot/totInpWires);
+            this.output.dagstage = (tot/totInpWires);
+            maxStage++;
             maxStage++;
             output.wirestage = maxStage;
             gatestage = maxStage;
@@ -66,12 +74,19 @@ public class Gate {
         gname = gName;
         if(!input.isEmpty())
         {
+            float totInpWires=0;
+            int tot=0;
             int maxStage = input.get(0).wirestage;
             for(Wire w:input)
             {
+                totInpWires++;
+                tot+= w.dagstage;
                 if(maxStage<w.wirestage)
                     maxStage = w.wirestage;
             }
+            this.dagstage = (tot/totInpWires);
+            this.output.dagstage = (tot/totInpWires);
+            maxStage++;
             maxStage++;
             output.wirestage = maxStage;
             gatestage = maxStage;
@@ -83,12 +98,18 @@ public class Gate {
     {
         if(!this.input.isEmpty())
         {
+            float totInpWires=0;
+            int tot=0;
             int maxStage = this.input.get(0).wirestage;
             for(Wire w:this.input)
             {
+                totInpWires++;
+                tot+= w.dagstage;
                 if(maxStage<w.wirestage)
                     maxStage = w.wirestage;
             }
+            this.dagstage = (tot/totInpWires);
+            this.output.dagstage = (tot/totInpWires);
             maxStage++;
             this.output.wirestage = maxStage;
             this.gatestage = maxStage;

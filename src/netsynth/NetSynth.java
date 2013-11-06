@@ -92,8 +92,7 @@ public class NetSynth {
         else
         {
             for(Gate g:NORgates)
-            {
-               
+            {  
                 String gateString = netlist(g);
                 System.out.println(gateString);
             }

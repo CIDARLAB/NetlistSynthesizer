@@ -4,11 +4,13 @@
  */
 package netsynth;
 
+import java.io.Serializable;
+
 /**
  *
  * @author prashantvaidyanathan
  */
-public class Wire {
+public class Wire implements Serializable {
    
     
      String name; 
@@ -21,6 +23,7 @@ public class Wire {
      }
      WireType wtype;
      int wirestage;
+     float dagstage;
      Wire()
      {
          name = "";
@@ -35,6 +38,7 @@ public class Wire {
          if(wType == WireType.input)
          {
             this.wirestage = 0;
+            this.dagstage = 0;
          }
          this.name = wirename;
          this.wtype = wType;
