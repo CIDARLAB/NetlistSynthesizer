@@ -38,6 +38,7 @@ public class NetSynth {
     public static boolean POSmode;
     public static Wire zero;
     public static boolean functionOutp;
+    public static String Filepath;
     public static void main(String[] args) {
         // TODO code application logic here
         Global.wirecount = 0;
@@ -48,7 +49,7 @@ public class NetSynth {
         one = new Wire("_one",WireType.Source);
         zero = new Wire("_zero",WireType.GND);
         //testnetlistmodule();
-        
+        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         testEspresso();
         
             
@@ -142,8 +143,18 @@ public class NetSynth {
         StringBuilder commandBuilder = null;
         //if("Linux".equals(x))
         //{
-            commandBuilder = new StringBuilder("./src/resources/espresso.linux -epos src/resources/test.txt");
-        //}
+            //commandBuilder = new StringBuilder("./src/resources/espresso.linux -epos src/resources/test.txt");
+        //System.out.println(Filepath);
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        
+        //System.out.println(Filepath);
+         
+            commandBuilder = new StringBuilder(Filepath+"src/resources/espresso.linux -epos "+ Filepath+"src/resources/test.txt");
+       
+            //}
         
         //System.out.println(commandBuilder);
         String command = commandBuilder.toString();
@@ -158,7 +169,9 @@ public class NetSynth {
         }
         try {
             String filestring = "";
-            filestring += "src/resources/write";
+            
+            
+            filestring += Filepath+ "src/resources/write";
             filestring += Global.espout;
             filestring += ".txt";
             File fbool = new File(filestring);
