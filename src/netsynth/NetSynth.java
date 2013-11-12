@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import netsynth.DagGraph.DAGType;
+import netsynth.DagGraph_PV.DAGType;
 import netsynth.Gate.GateType;
 import netsynth.Wire.WireType;
-import precomputation.Input;
+import precomputation.PreCompute;
 
 
 /**
@@ -65,7 +65,7 @@ public class NetSynth {
     {
        
         List<List<Gate>> precomp;
-        precomp = Input.parseNetlistFile();
+        precomp = PreCompute.parseNetlistFile();
         
     }
     
@@ -99,7 +99,7 @@ public class NetSynth {
         }
         
         NORgates = parseEspressoToNORNAND(espressoOut);
-        List<DagGraph> dglist = new ArrayList<DagGraph>();
+        List<DagGraph_PV> dglist = new ArrayList<DagGraph_PV>();
         dglist = CreateDAG(NORgates);
         System.out.println("\nUniversal Gates : ");
         if(functionOutp)
@@ -116,7 +116,7 @@ public class NetSynth {
                 System.out.println(gateString);
             }
             System.out.println("\n\n DAG Graph: \n");
-            for(DagGraph dg:dglist)
+            for(DagGraph_PV dg:dglist)
             {
                 String dagstring = printDAG(dg);
                 System.out.println(dagstring);
@@ -125,7 +125,7 @@ public class NetSynth {
         
     }
     
-    public static String printDAG(DagGraph dg)
+    public static String printDAG(DagGraph_PV dg)
     {
         String outp="";
         outp += "Index : ";
@@ -134,7 +134,7 @@ public class NetSynth {
         outp += ("Vertex Type : " + dg.V.vertexD + "\n");
         if(!dg.C.isEmpty())
         {
-        for(DagGraph.Child ech: dg.C)
+        for(DagGraph_PV.Child ech: dg.C)
         {
             outp+= "Child Name : " + ech.name + "\n" ;
             outp+= "Child Type : " + ech.childD + "\n";
@@ -801,15 +801,15 @@ public class NetSynth {
   
     
    
-    public static List<DagGraph> CreateDAG(List<Gate> netlist)
+    public static List<DagGraph_PV> CreateDAG(List<Gate> netlist)
     {
-        List<DagGraph> finalDag = new ArrayList<DagGraph>();
+        List<DagGraph_PV> finalDag = new ArrayList<DagGraph_PV>();
         int Dindx = 0;
         HashMap<String,Wire> Inputs = new HashMap<String,Wire>();
         for(int i=(netlist.size()-1);i>=0;i--)
         {
             Gate g = netlist.get(i);
-            DagGraph x = new DagGraph();
+            DagGraph_PV x = new DagGraph_PV();
             x.Index = Dindx;
             if(g.output.wtype == WireType.output)
             {
@@ -826,13 +826,13 @@ public class NetSynth {
                 }
                 child = calcDagType(g.gtype);
                 childname = child.toString();
-                DagGraph.Child e = new DagGraph.Child();
+                DagGraph_PV.Child e = new DagGraph_PV.Child();
                 e.childD = child;
                 e.name = childname;
                 x.C.add(e);
                 finalDag.add(x);
                 Dindx++;
-                x = new DagGraph();
+                x = new DagGraph_PV();
                 x.Index = Dindx;
                 x.V.name = e.name;
                 x.V.vertexD = e.childD;
@@ -840,7 +840,7 @@ public class NetSynth {
                 // <editor-fold defaultstate="collapsed" desc="Calculate Child of DAG Graph"> 
                 for(Wire inp:g.input)
                 {
-                    DagGraph.Child einp = new DagGraph.Child();
+                    DagGraph_PV.Child einp = new DagGraph_PV.Child();
                     if(inp.wtype == WireType.input)
                     {
                         Inputs.put(inp.name, inp);
@@ -871,7 +871,7 @@ public class NetSynth {
                 // <editor-fold defaultstate="collapsed" desc="Calculate Child of DAG Graph"> 
                 for(Wire inp:g.input)
                 {
-                    DagGraph.Child einp = new DagGraph.Child();
+                    DagGraph_PV.Child einp = new DagGraph_PV.Child();
                     if(inp.wtype == WireType.input)
                     {
                         Inputs.put(inp.name, inp);
@@ -904,7 +904,7 @@ public class NetSynth {
         {
             Map.Entry pairs = (Map.Entry)it.next();
             Wire xinp = (Wire)pairs.getValue();
-            DagGraph x = new DagGraph();
+            DagGraph_PV x = new DagGraph_PV();
             x.V.name = xinp.name;
             x.V.vertexD = DAGType.INPUT;
             x.Index = Dindx;
