@@ -21,19 +21,19 @@ public class Wire implements Serializable {
          Source,
          connector;
      }
-     WireType wtype;
+     public WireType wtype;
      int wirestage;
      float dagstage;
-     Wire()
+     public Wire()
      {
          name = "";
          wtype = WireType.connector;  
      }
-     Wire(String wirename)
+     public Wire(String wirename)
      {
         this.name = wirename;
      }
-     Wire(String wirename,WireType wType)
+     public Wire(String wirename,WireType wType)
      {
          if(wType == WireType.input)
          {

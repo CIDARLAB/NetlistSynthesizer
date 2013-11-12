@@ -34,12 +34,12 @@ public class Gate implements Serializable{
     public int gatestage;
     public float dagstage;
     
-    Gate()
+    public Gate()
     {      
          input = new ArrayList<Wire>();
          output = new Wire();
     }
-    Gate(GateType gType, List<Wire> inputWires, Wire outputWire)
+    public Gate(GateType gType, List<Wire> inputWires, Wire outputWire)
     {
         input = new ArrayList<Wire>();
         input.addAll(inputWires);
@@ -66,7 +66,7 @@ public class Gate implements Serializable{
         }
         
     }
-    Gate(GateType gType, String gName, List<Wire> inputWires, Wire outputWire)
+    public Gate(GateType gType, String gName, List<Wire> inputWires, Wire outputWire)
     {
         input = new ArrayList<Wire>();
         input.addAll(inputWires);

@@ -13,9 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import netsynth.*;
 import netsynth.Gate;
 import netsynth.Gate.GateType;
 import netsynth.Wire;
+import netsynth.Wire.WireType;
 
 /**
  *
@@ -86,22 +88,73 @@ public class Input {
                 string_netlists.add(snetlist);
             }
         }
-         
-        for(String xs:string_netlists.get(1))
+        int cnt=1;
+        for(int i=0;i<string_netlists.size();i++)
         {
-            System.out.println(xs);
+            List<Gate> set = new ArrayList<Gate>();
+            for(String xs:string_netlists.get(i))
+            {
+                Gate xg1 = parseNorGate(xs);
+                set.add(xg1);
+            }
+            if(!set.isEmpty())
+            {
+                set.get(set.size()-1).output.wtype = WireType.output;
+                //System.out.println("Found" + cnt++);
+            }
+            
+            all_netlists.add(set);
         }
-         
+        
         return all_netlists;
     }
     
-    public static Gate parseNorGate(String x)
+    public static Gate parseNorGate(String xg)
     {
-       Gate xgate = null ;
-        Wire outw = null;
-        List<Wire> inp = new ArrayList<Wire>();
-       //xgate = new Gate(GateType.NOR2, inp, outw);
-        return xgate;
+       Gate xgate;
+       Wire outw = null;
+       List<Wire> inp = new ArrayList<Wire>();
+       GateType gtype = GateType.NOR2;
+       String sub = xg.substring(xg.indexOf("(")+1);
+       sub = sub.substring(0,sub.indexOf(")"));
+       String[] parts = sub.split(",");
+       WireType xwtype = WireType.connector;
+       for(int i=0;i<parts.length;i++)
+       {
+           
+           parts[i].trim();
+           
+           if(parts[i].contains("Wire"))
+               xwtype = WireType.connector;
+            else if(parts[i].contains("_0"))
+               xwtype = WireType.GND;
+            else if(parts[i].contains("_1"))
+               xwtype = WireType.Source;
+           else 
+               xwtype = WireType.input;
+           
+           
+           if(i==0)
+           {
+               if(xwtype == WireType.GND)
+                outw = NetSynth.zero;
+               else if(xwtype == WireType.Source)
+                outw = NetSynth.one;
+               else
+                outw = new Wire(parts[i],xwtype);
+           }
+           else
+           {
+               if(xwtype == WireType.GND)
+                   inp.add(NetSynth.one);
+               else if(xwtype == WireType.Source)
+                   inp.add(NetSynth.zero);
+               else
+                   inp.add(new Wire(parts[i],xwtype));
+           }
+       }
+       xgate = new Gate(gtype,inp,outw);
+       return xgate;
     }
     
     public static String binaryConv(int num)
