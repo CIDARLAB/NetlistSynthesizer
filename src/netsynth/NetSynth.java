@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import netsynth.DagGraph.DAGType;
 import netsynth.Gate.GateType;
 import netsynth.Wire.WireType;
+import precomputation.Input;
 
 
 /**
@@ -39,6 +40,9 @@ public class NetSynth {
     public static Wire zero;
     public static boolean functionOutp;
     public static String Filepath;
+    
+    
+    
     public static void main(String[] args) {
         // TODO code application logic here
         Global.wirecount = 0;
@@ -48,14 +52,22 @@ public class NetSynth {
         functionOutp = false;
         one = new Wire("_one",WireType.Source);
         zero = new Wire("_zero",WireType.GND);
-        //testnetlistmodule();
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        testEspresso();
         
-            
+        precompute();
+        
+        //testnetlistmodule();
+        //testEspresso();
         
     }
     
+    public static void precompute()
+    {
+       
+        List<List<Gate>> precomp;
+        precomp = Input.parseNetlistFile();
+        
+    }
     
     public static void testEspresso()
     {
@@ -724,10 +736,17 @@ public class NetSynth {
         return notInp;
     }
     
-    
-    public static List<Gate> AndORGates(List<Wire> andWires,GateType gOrAnd)
+    public static List<Gate> NORNANDGates(List<Wire> inpWires, GateType gtype)
     {
-        if (andWires.isEmpty())
+        List<Gate> minterm = new ArrayList<Gate>();
+        
+        
+        return minterm;
+    }
+    
+    public static List<Gate> AndORGates(List<Wire> inpWires,GateType gOrAnd)
+    {
+        if (inpWires.isEmpty())
         {    return null;}
         List<Gate> minterm = new ArrayList<Gate>();
         
@@ -736,8 +755,8 @@ public class NetSynth {
         List<Wire> temp = new ArrayList<Wire>();
         
         int wireCount,indx;
-        nextLevelWires.addAll(andWires);
-        wireCount = andWires.size();
+        nextLevelWires.addAll(inpWires);
+        wireCount = inpWires.size();
         
         while(wireCount > 1)
         {
@@ -777,12 +796,6 @@ public class NetSynth {
                 break;
             }
         }
-        /*for(Gate gmin:minterm)
-        {
-            String x = netlist(gmin);
-            System.out.println(x);
-            //System.out.println(gmin.gatestage);
-        }*/
         return minterm;
     }
   

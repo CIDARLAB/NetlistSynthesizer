@@ -33,6 +33,7 @@ public class Gate implements Serializable{
     public Wire output;
     public int gatestage;
     public float dagstage;
+    
     Gate()
     {      
          input = new ArrayList<Wire>();
