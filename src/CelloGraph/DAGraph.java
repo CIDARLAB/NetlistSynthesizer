@@ -12,8 +12,8 @@ import java.util.ArrayList;
  */
 public class DAGraph {
     
-    public ArrayList<DAGVertex> Vertices;
-    public ArrayList<DAGEdge> Edges;
+    public static ArrayList<DAGVertex> Vertices;
+    public static ArrayList<DAGEdge> Edges;
     
     public DAGraph()
     {
@@ -21,8 +21,16 @@ public class DAGraph {
         Edges = new ArrayList<DAGEdge>();
     }
     
-    public static void printGraph(){}
-    public static DAGEdge FindEdge(){return null;}
-    public static DAGVertex FindVertex(){return null;}
+    public static String printGraph()
+    {
+        return "";
+    }
+    
+    public static int FindEdge(int de){
+        return 0;
+    }
+    public static int FindVertex(int dv){
+        return 0;
+    }
     
 }

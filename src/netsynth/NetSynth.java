@@ -58,18 +58,20 @@ public class NetSynth {
         zero = new Wire("_zero",WireType.GND);
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         
-        precompute();
+        DAGraph x = precompute(5);
         
         //testnetlistmodule();
         //testEspresso();
         
     }
     
-    public static void precompute()
+    public static DAGraph precompute(int x)
     {
-       
+       DAGraph outdag = new DAGraph();
         List<List<Gate>> precomp;
         precomp = PreCompute.parseNetlistFile();
+        outdag = CreateDAGraph(precomp.get(x));
+        return outdag;
         
     }
     
@@ -885,7 +887,7 @@ public class NetSynth {
             //Gate Inp = new Gate(GateType.BUF,inpl,inpx);
             //vertexhash.put(Inp, vert);
         }
-        
+        int eind=0;
         for(int i=0;i<netlist.size();i++)
         {
             Gate netg = netlist.get(i);
@@ -907,7 +909,8 @@ public class NetSynth {
                 DAGEdge out = new DAGEdge();
                 out.From = Vertices.get(outpIndx);
                 out.To = vertexhash.get(netg);
-                out.Index = out.From.Index;
+                //out.Index = out.From.Index;
+                out.Index = eind++;
                 out.Next = null;
                 Edges.add(out);
             }
@@ -925,7 +928,7 @@ public class NetSynth {
                }
                DAGVertex gFrom = null;
                gFrom = vertexhash.get(netg);
-               DAGEdge newEdge = new DAGEdge(gFrom.Index,gFrom,gTo,temp);
+               DAGEdge newEdge = new DAGEdge(eind++,gFrom,gTo,temp);
                temp = newEdge;
                Edges.add(newEdge);
             }
