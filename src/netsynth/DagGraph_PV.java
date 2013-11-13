@@ -1,25 +1,25 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
+*/
 package netsynth;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author prashantvaidyanathan
- */
+*
+* @author prashantvaidyanathan
+*/
 public class DagGraph_PV {
 
    
     public enum DAGType
     {
-        NOT, 
+        NOT,
         OR,
-        NOR, 
-        AND, 
+        NOR,
+        AND,
         NAND,
         XOR,
         XNOR,

@@ -120,6 +120,9 @@ public class PreCompute {
         return all_netlists;
     }
     
+    
+    
+    
     public static Gate parseNorGate(String xg)
     {
        Gate xgate;
@@ -167,6 +170,7 @@ public class PreCompute {
        xgate = new Gate(gtype,inp,outw);
        return xgate;
     }
+    
     
     public static String binaryConv(int num)
     {

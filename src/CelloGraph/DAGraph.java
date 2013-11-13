@@ -12,8 +12,8 @@ import java.util.ArrayList;
  */
 public class DAGraph {
     
-    ArrayList<DAGVertex> Vertices;
-    ArrayList<DAGEdge> Edges;
+    public ArrayList<DAGVertex> Vertices;
+    public ArrayList<DAGEdge> Edges;
     
     public DAGraph()
     {

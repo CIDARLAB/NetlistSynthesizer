@@ -4,6 +4,10 @@
  */
 package netsynth;
 
+import CelloGraph.DAGEdge;
+import CelloGraph.DAGVertex;
+import CelloGraph.DAGVertex.VertexType;
+import CelloGraph.DAGraph;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -799,7 +803,93 @@ public class NetSynth {
         return minterm;
     }
   
-    
+    public static DAGraph CreateDAGraph(List<Gate> netlist)
+    {
+        DAGraph outDAG = new DAGraph();
+        List<Wire> inplist = new ArrayList<Wire>(); 
+        List<DAGVertex> Vertices = new ArrayList<DAGVertex>();
+        List<DAGEdge> Edges = new ArrayList<DAGEdge>();
+        int IndX =0; 
+        
+        for(int i=0;i<netlist.size();i++)
+        {
+            Gate netg = netlist.get(i);
+            if(netg.input.contains(zero))
+            {
+                Gate tempNot = new Gate();
+                for(Wire xi:netg.input)
+                {
+                    if(!(xi.equals(zero)))
+                        tempNot.input.add(xi);
+                    tempNot.output = netg.output;
+                    tempNot.gtype = GateType.NOT;
+                }
+                netg = tempNot;
+            }
+            for(Wire xi:netg.input)
+            {
+                if((xi.wtype == WireType.input) && (!(inplist.contains(xi))))
+                {
+                    inplist.add(xi);
+                }
+            }
+            
+            if(netg.output.wtype == WireType.output)
+            {
+                DAGVertex out =null;
+                DAGVertex lvert = null;
+                if(netg.gtype == GateType.NOT)
+                {
+                    out = new DAGVertex(IndX++, VertexType.OUTPUT_OR.toString()); 
+                    lvert = new DAGVertex(IndX++,VertexType.NOR.toString());
+                }
+                else if(netg.gtype == GateType.NOR2)
+                {
+                    out = new DAGVertex(IndX++, VertexType.OUTPUT.toString()); 
+                    lvert = new DAGVertex(IndX++,VertexType.NOR.toString());
+                }
+                lvert.outW = netg.output;
+                Vertices.add(out);
+                Vertices.add(lvert);
+            }
+            else
+            {
+                DAGVertex vert=null;
+                if(netg.gtype == GateType.NOT)
+                {
+                    vert = new DAGVertex(IndX++,VertexType.NOR.toString());
+                }
+                else if(netg.gtype == GateType.NOR2)
+                {
+                    vert = new DAGVertex(IndX++,VertexType.NOR.toString());
+                }
+                vert.outW = netg.output;
+                Vertices.add(vert);
+            }
+            
+        
+        }
+        
+        for(int i=0;i<netlist.size();i++)
+        {
+            Gate netg = netlist.get(i);
+            if(netg.input.contains(zero))
+            {
+                Gate tempNot = new Gate();
+                for(Wire xi:netg.input)
+                {
+                    if(!(xi.equals(zero)))
+                        tempNot.input.add(xi);
+                    tempNot.output = netg.output;
+                    tempNot.gtype = GateType.NOT;
+                }
+                netg = tempNot;
+            }
+            
+        }
+        
+        return outDAG;
+    }
    
     public static List<DagGraph_PV> CreateDAG(List<Gate> netlist)
     {
