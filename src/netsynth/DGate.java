@@ -12,7 +12,7 @@ import java.util.List;
  * @author prashantvaidyanathan
  */
 
-public class Gate implements Serializable{
+public class DGate implements Serializable{
     String gname;
     public enum GateType{
            NOT,
@@ -29,19 +29,19 @@ public class Gate implements Serializable{
            XNOR2;
     }
     GateType gtype;
-    public List<Wire> input;
-    public Wire output;
+    public List<DWire> input;
+    public DWire output;
     public int gatestage;
     public float dagstage;
     
-    public Gate()
+    public DGate()
     {      
-         input = new ArrayList<Wire>();
-         output = new Wire();
+         input = new ArrayList<DWire>();
+         output = new DWire();
     }
-    public Gate(GateType gType, List<Wire> inputWires, Wire outputWire)
+    public DGate(GateType gType, List<DWire> inputWires, DWire outputWire)
     {
-        input = new ArrayList<Wire>();
+        input = new ArrayList<DWire>();
         input.addAll(inputWires);
         gtype = gType;
         output = outputWire;        
@@ -50,7 +50,7 @@ public class Gate implements Serializable{
             float totInpWires=0;
             int tot=0;
             int maxStage = input.get(0).wirestage;
-            for(Wire w:input)
+            for(DWire w:input)
             {
                 totInpWires++;
                 tot+= w.dagstage;    
@@ -66,9 +66,9 @@ public class Gate implements Serializable{
         }
         
     }
-    public Gate(GateType gType, String gName, List<Wire> inputWires, Wire outputWire)
+    public DGate(GateType gType, String gName, List<DWire> inputWires, DWire outputWire)
     {
-        input = new ArrayList<Wire>();
+        input = new ArrayList<DWire>();
         input.addAll(inputWires);
         gtype = gType;
         output = outputWire;        
@@ -78,7 +78,7 @@ public class Gate implements Serializable{
             float totInpWires=0;
             int tot=0;
             int maxStage = input.get(0).wirestage;
-            for(Wire w:input)
+            for(DWire w:input)
             {
                 totInpWires++;
                 tot+= w.dagstage;
@@ -102,7 +102,7 @@ public class Gate implements Serializable{
             float totInpWires=0;
             int tot=0;
             int maxStage = this.input.get(0).wirestage;
-            for(Wire w:this.input)
+            for(DWire w:this.input)
             {
                 totInpWires++;
                 tot+= w.dagstage;

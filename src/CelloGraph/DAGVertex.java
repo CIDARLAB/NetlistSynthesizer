@@ -6,7 +6,7 @@ package CelloGraph;
 
 import java.util.ArrayList;
 import java.util.List;
-import netsynth.Wire;
+import netsynth.DWire;
 
 /**
  *
@@ -22,7 +22,7 @@ public class DAGVertex {
         NOT;
     }
     
-    public Wire outW = new Wire();
+    public DWire outW = new DWire();
     public int Index;
     public String Name;
     public String Type;
@@ -35,7 +35,7 @@ public class DAGVertex {
         this.Type = "";
         this.outgoing = null;
         
-        this.outW = new Wire();
+        this.outW = new DWire();
     }
     public DAGVertex(int ind,String dType)
     {
@@ -54,7 +54,7 @@ public class DAGVertex {
             this.Name = "";
         }
        
-        this.outW = new Wire();
+        this.outW = new DWire();
         this.outgoing = null;
     }
     public DAGVertex(int ind,String dType,DAGEdge de)
@@ -75,7 +75,7 @@ public class DAGVertex {
         }
         this.outgoing = de;
         
-        this.outW = new Wire();
+        this.outW = new DWire();
     
     }
     

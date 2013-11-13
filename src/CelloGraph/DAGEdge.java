@@ -4,7 +4,7 @@
  */
 package CelloGraph;
 
-import netsynth.Wire;
+import netsynth.DWire;
 
 /**
  *
@@ -16,7 +16,7 @@ public class DAGEdge {
     public DAGVertex From;
     public DAGVertex To;
     public DAGEdge Next;
-    public Wire wire;
+    public DWire wire;
     
     public DAGEdge()
     {

@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import netsynth.Gate;
-import netsynth.Gate.GateType;
+import netsynth.DGate;
+import netsynth.DGate.GateType;
 import netsynth.NetSynth;
-import netsynth.Wire;
-import netsynth.Wire.WireType;
+import netsynth.DWire;
+import netsynth.DWire.WireType;
 
 /**
  *
@@ -26,10 +26,10 @@ import netsynth.Wire.WireType;
 public class PreCompute {
     
     
-    public static List<List<Gate>> parseNetlistFile()
+    public static List<List<DGate>> parseNetlistFile()
     {
        
-        List<List<Gate>> all_netlists = new ArrayList<List<Gate>>();
+        List<List<DGate>> all_netlists = new ArrayList<List<DGate>>();
         List<List<String>> string_netlists = new ArrayList<List<String>>();
         
         // <editor-fold defaultstate="collapsed" desc="Read from Input File"> 
@@ -91,10 +91,10 @@ public class PreCompute {
         int cnt=1;
         for(int i=0;i<string_netlists.size();i++)
         {
-            List<Gate> set = new ArrayList<Gate>();
+            List<DGate> set = new ArrayList<DGate>();
             for(String xs:string_netlists.get(i))
             {
-                Gate xg1 = parseNorGate(xs);
+                DGate xg1 = parseNorGate(xs);
                 set.add(xg1);
             }
             if(!set.isEmpty())
@@ -123,11 +123,11 @@ public class PreCompute {
     
     
     
-    public static Gate parseNorGate(String xg)
+    public static DGate parseNorGate(String xg)
     {
-       Gate xgate;
-       Wire outw = null;
-       List<Wire> inp = new ArrayList<Wire>();
+       DGate xgate;
+       DWire outw = null;
+       List<DWire> inp = new ArrayList<DWire>();
        GateType gtype = GateType.NOR2;
        String sub = xg.substring(xg.indexOf("(")+1);
        sub = sub.substring(0,sub.indexOf(")"));
@@ -155,7 +155,7 @@ public class PreCompute {
                else if(xwtype == WireType.Source)
                 outw = NetSynth.one;
                else
-                outw = new Wire(parts[i],xwtype);
+                outw = new DWire(parts[i],xwtype);
            }
            else
            {
@@ -164,10 +164,10 @@ public class PreCompute {
                else if(xwtype == WireType.Source)
                    inp.add(NetSynth.one);
                else
-                   inp.add(new Wire(parts[i],xwtype));
+                   inp.add(new DWire(parts[i],xwtype));
            }
        }
-       xgate = new Gate(gtype,inp,outw);
+       xgate = new DGate(gtype,inp,outw);
        return xgate;
     }
     

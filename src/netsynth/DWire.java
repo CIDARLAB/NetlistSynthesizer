@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  * @author prashantvaidyanathan
  */
-public class Wire implements Serializable {
+public class DWire implements Serializable {
    
     
      String name; 
@@ -24,16 +24,16 @@ public class Wire implements Serializable {
      public WireType wtype;
      int wirestage;
      float dagstage;
-     public Wire()
+     public DWire()
      {
          name = "";
          wtype = WireType.connector;  
      }
-     public Wire(String wirename)
+     public DWire(String wirename)
      {
         this.name = wirename;
      }
-     public Wire(String wirename,WireType wType)
+     public DWire(String wirename,WireType wType)
      {
          if(wType == WireType.input)
          {
