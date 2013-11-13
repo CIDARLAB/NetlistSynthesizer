@@ -809,8 +809,9 @@ public class NetSynth {
         List<Wire> inplist = new ArrayList<Wire>(); 
         List<DAGVertex> Vertices = new ArrayList<DAGVertex>();
         List<DAGEdge> Edges = new ArrayList<DAGEdge>();
+        HashMap<Gate,DAGVertex> vertexhash = new HashMap<Gate,DAGVertex>();
         int IndX =0; 
-        
+        int outpIndx=0;
         for(int i=0;i<netlist.size();i++)
         {
             Gate netg = netlist.get(i);
@@ -840,13 +841,17 @@ public class NetSynth {
                 DAGVertex lvert = null;
                 if(netg.gtype == GateType.NOT)
                 {
-                    out = new DAGVertex(IndX++, VertexType.OUTPUT_OR.toString()); 
+                    outpIndx = IndX;
+                    out = new DAGVertex(IndX++, VertexType.OUTPUT_OR.toString());                 
                     lvert = new DAGVertex(IndX++,VertexType.NOR.toString());
+                    vertexhash.put(netg, lvert);
                 }
                 else if(netg.gtype == GateType.NOR2)
                 {
+                    outpIndx = IndX;
                     out = new DAGVertex(IndX++, VertexType.OUTPUT.toString()); 
                     lvert = new DAGVertex(IndX++,VertexType.NOR.toString());
+                    vertexhash.put(netg, lvert);
                 }
                 lvert.outW = netg.output;
                 Vertices.add(out);
@@ -864,10 +869,21 @@ public class NetSynth {
                     vert = new DAGVertex(IndX++,VertexType.NOR.toString());
                 }
                 vert.outW = netg.output;
+                vertexhash.put(netg, vert);
                 Vertices.add(vert);
             }
-            
-        
+        }
+        for(Wire inpx:inplist)
+        {
+            DAGVertex vert = new DAGVertex(IndX++,VertexType.INPUT.toString());
+            vert.outW = inpx;
+            vert.Name = inpx.name;
+            vert.outgoing = null;
+            Vertices.add(vert);
+            //List<Wire> inpl = new ArrayList<Wire>();
+            //inpl.add(inpx);
+            //Gate Inp = new Gate(GateType.BUF,inpl,inpx);
+            //vertexhash.put(Inp, vert);
         }
         
         for(int i=0;i<netlist.size();i++)
@@ -886,6 +902,41 @@ public class NetSynth {
                 netg = tempNot;
             }
             
+            if(netg.output.wtype == WireType.output)
+            {
+                DAGEdge out = new DAGEdge();
+                out.From = Vertices.get(outpIndx);
+                out.To = vertexhash.get(netg);
+                out.Index = out.From.Index;
+                out.Next = null;
+                Edges.add(out);
+            }
+            DAGEdge temp = null;
+            for(Wire inps:netg.input)
+            {
+               DAGVertex gTo=null;
+               for(DAGVertex xvert:Vertices)
+               {
+                   if(xvert.outW.equals(inps))
+                   {
+                       gTo = xvert;
+                       break;
+                   }
+               }
+               DAGVertex gFrom = null;
+               gFrom = vertexhash.get(netg);
+               DAGEdge newEdge = new DAGEdge(gFrom.Index,gFrom,gTo,temp);
+               temp = newEdge;
+               Edges.add(newEdge);
+            }
+        }
+        for(DAGEdge xdedge:Edges)
+        {
+            outDAG.Edges.add(xdedge);
+        }
+        for(DAGVertex xdvert:Vertices)
+        {
+            outDAG.Vertices.add(xdvert);
         }
         
         return outDAG;

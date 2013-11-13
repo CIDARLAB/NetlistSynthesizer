@@ -34,13 +34,13 @@ public class DAGEdge {
         this.To = dTo;
         this.Next = null;
     }
-    public DAGEdge(int indx,DAGVertex dFrom,DAGVertex dTo,Wire dwire)
+    public DAGEdge(int indx,DAGVertex dFrom,DAGVertex dTo,DAGEdge next)
     {
         this.Index = indx;
-        this.wire = dwire;
+        this.wire = null;
         this.From = dFrom;
         this.To = dTo;
-        this.Next = null;
+        this.Next = next;
     }
     @Override
     public String toString()
