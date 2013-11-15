@@ -14,28 +14,28 @@ public class DWire implements Serializable {
    
     
      String name; 
-     public enum WireType{
+     public enum DWireType{
          input,
          output,
          GND,
          Source,
          connector;
      }
-     public WireType wtype;
+     public DWireType wtype;
      int wirestage;
      float dagstage;
      public DWire()
      {
          name = "";
-         wtype = WireType.connector;  
+         wtype = DWireType.connector;  
      }
      public DWire(String wirename)
      {
         this.name = wirename;
      }
-     public DWire(String wirename,WireType wType)
+     public DWire(String wirename,DWireType wType)
      {
-         if(wType == WireType.input)
+         if(wType == DWireType.input)
          {
             this.wirestage = 0;
             this.dagstage = 0;

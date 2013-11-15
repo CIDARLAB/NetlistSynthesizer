@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import netsynth.DGate;
-import netsynth.DGate.GateType;
+import netsynth.DGate.DGateType;
 import netsynth.NetSynth;
 import netsynth.DWire;
-import netsynth.DWire.WireType;
+import netsynth.DWire.DWireType;
 
 /**
  *
@@ -99,7 +99,7 @@ public class PreCompute {
             }
             if(!set.isEmpty())
             {
-                set.get(set.size()-1).output.wtype = WireType.output;
+                set.get(set.size()-1).output.wtype = DWireType.output;
                 //System.out.println("Found" + cnt++);
             }
             
@@ -128,40 +128,40 @@ public class PreCompute {
        DGate xgate;
        DWire outw = null;
        List<DWire> inp = new ArrayList<DWire>();
-       GateType gtype = GateType.NOR2;
+       DGateType gtype = DGateType.NOR2;
        String sub = xg.substring(xg.indexOf("(")+1);
        sub = sub.substring(0,sub.indexOf(")"));
        String[] parts = sub.split(",");
-       WireType xwtype = WireType.connector;
+       DWireType xwtype = DWireType.connector;
        for(int i=0;i<parts.length;i++)
        {
            
            parts[i].trim();
            
            if(parts[i].contains("Wire"))
-               xwtype = WireType.connector;
+               xwtype = DWireType.connector;
             else if(parts[i].contains("_0"))
-               xwtype = WireType.GND;
+               xwtype = DWireType.GND;
             else if(parts[i].contains("_1"))
-               xwtype = WireType.Source;
+               xwtype = DWireType.Source;
            else 
-               xwtype = WireType.input;
+               xwtype = DWireType.input;
            
            
            if(i==0)
            {
-               if(xwtype == WireType.GND)
+               if(xwtype == DWireType.GND)
                 outw = NetSynth.zero;
-               else if(xwtype == WireType.Source)
+               else if(xwtype == DWireType.Source)
                 outw = NetSynth.one;
                else
                 outw = new DWire(parts[i],xwtype);
            }
            else
            {
-               if(xwtype == WireType.GND)
+               if(xwtype == DWireType.GND)
                    inp.add(NetSynth.zero);
-               else if(xwtype == WireType.Source)
+               else if(xwtype == DWireType.Source)
                    inp.add(NetSynth.one);
                else
                    inp.add(new DWire(parts[i],xwtype));

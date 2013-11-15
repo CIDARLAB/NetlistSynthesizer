@@ -14,7 +14,7 @@ import java.util.List;
 
 public class DGate implements Serializable{
     String gname;
-    public enum GateType{
+    public enum DGateType{
            NOT,
            BUF,
            NOR2, 
@@ -28,7 +28,7 @@ public class DGate implements Serializable{
            XOR2,
            XNOR2;
     }
-    GateType gtype;
+    DGateType gtype;
     public List<DWire> input;
     public DWire output;
     public int gatestage;
@@ -39,7 +39,7 @@ public class DGate implements Serializable{
          input = new ArrayList<DWire>();
          output = new DWire();
     }
-    public DGate(GateType gType, List<DWire> inputWires, DWire outputWire)
+    public DGate(DGateType gType, List<DWire> inputWires, DWire outputWire)
     {
         input = new ArrayList<DWire>();
         this.input.addAll(inputWires);
@@ -66,7 +66,7 @@ public class DGate implements Serializable{
         }
         
     }
-    public DGate(GateType gType, String gName, List<DWire> inputWires, DWire outputWire)
+    public DGate(DGateType gType, String gName, List<DWire> inputWires, DWire outputWire)
     {
         input = new ArrayList<DWire>();
         input.addAll(inputWires);

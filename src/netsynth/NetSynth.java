@@ -7,7 +7,10 @@ package netsynth;
 import CelloGraph.DAGEdge;
 import CelloGraph.DAGVertex;
 import CelloGraph.DAGVertex.VertexType;
+import CelloGraph.DAGW;
 import CelloGraph.DAGraph;
+import CelloGraph.Gate;
+import CelloGraph.Wire;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,8 +28,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import netsynth.DGate.GateType;
-import netsynth.DWire.WireType;
+import netsynth.DGate.DGateType;
+import netsynth.DWire.DWireType;
 import precomputation.PreCompute;
 
 
@@ -54,15 +57,26 @@ public class NetSynth {
         Global.espout =0;
         POSmode = false;
         functionOutp = false;
-        one = new DWire("_one",WireType.Source);
-        zero = new DWire("_zero",WireType.GND);
+        one = new DWire("_one",DWireType.Source);
+        zero = new DWire("_zero",DWireType.GND);
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         
         DAGraph x = precompute(2);
-        
+        DAGW y = computeDAGW(2);
         //testnetlistmodule();
         //testEspresso();
         
+    }
+    
+    public static DAGW computeDAGW(int x)
+    {
+        DAGW outdag = new DAGW();
+        List<List<DGate>> precomp;
+        precomp = PreCompute.parseNetlistFile();
+        outdag = CreateDAGW(precomp.get(x));
+        return outdag;
+        
+       
     }
     
     public static DAGraph precompute(int x)
@@ -190,15 +204,15 @@ public class NetSynth {
     public static void testnetlistmodule()
     {
         DGate and = new DGate();
-        DWire w1 = new DWire("A",WireType.input);
-        DWire w2 = new DWire("B",WireType.input);
-        DWire outp = new DWire("outP",WireType.output);
+        DWire w1 = new DWire("A",DWireType.input);
+        DWire w2 = new DWire("B",DWireType.input);
+        DWire outp = new DWire("outP",DWireType.output);
         List<DWire> inputWires = new ArrayList<DWire>();
         inputWires.add(w1);
         inputWires.add(w2);
         
-        GateType testgateType;
-        testgateType = GateType.NOR2;
+        DGateType testgateType;
+        testgateType = DGateType.NOR2;
         DGate gtest = new DGate(testgateType,inputWires,outp);
         
         List<DGate> test = new ArrayList<DGate>();
@@ -258,7 +272,7 @@ public class NetSynth {
         {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
                 splitInp += "I";
-            wireInputs.add(new DWire(splitInp,WireType.input));
+            wireInputs.add(new DWire(splitInp,DWireType.input));
         }
         // </editor-fold>
         
@@ -275,7 +289,7 @@ public class NetSynth {
         {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
                 splitInp += "O";
-            wireOutputs.add(new DWire(splitInp,WireType.output));
+            wireOutputs.add(new DWire(splitInp,DWireType.output));
         }
         // </editor-fold>        
         
@@ -293,7 +307,7 @@ public class NetSynth {
             {
                 inp01.add(zero);
             }
-            sopexp.add(new DGate(GateType.BUF,inp01,wireOutputs.get(0)));
+            sopexp.add(new DGate(DGateType.BUF,inp01,wireOutputs.get(0)));
             return sopexp;
         }
         // </editor-fold>
@@ -324,7 +338,7 @@ public class NetSynth {
             {
                 inp01.add(one);
             }
-            sopexp.add(new DGate(GateType.BUF,inp01,wireOutputs.get(0)));
+            sopexp.add(new DGate(DGateType.BUF,inp01,wireOutputs.get(0)));
             return sopexp;    
             }
                 
@@ -390,11 +404,11 @@ public class NetSynth {
             {
                 if(POSmode)
                 {
-                    prodGates = AndORGates(minTemp,GateType.OR2);         
+                    prodGates = AndORGates(minTemp,DGateType.OR2);         
                 }
                 else
                 {
-                    prodGates = AndORGates(minTemp,GateType.AND2);         
+                    prodGates = AndORGates(minTemp,DGateType.AND2);         
                 }
                 orWires.add(prodGates.get(prodGates.size()-1).output);
                 sopexp.addAll(prodGates);
@@ -404,16 +418,16 @@ public class NetSynth {
         prodGates = new ArrayList<DGate>();
         if(POSmode)
         {
-            prodGates = AndORGates(orWires,GateType.AND2);
+            prodGates = AndORGates(orWires,DGateType.AND2);
         }
         else
         {
-            prodGates = AndORGates(orWires,GateType.OR2);
+            prodGates = AndORGates(orWires,DGateType.OR2);
         }
         sopexp.addAll(prodGates);
         if(sopexp.isEmpty())
         {
-            DGate bufgate = new DGate(GateType.BUF,orWires,wireOutputs.get(0));
+            DGate bufgate = new DGate(DGateType.BUF,orWires,wireOutputs.get(0));
             sopexp.add(bufgate);
         }
         else
@@ -469,7 +483,7 @@ public class NetSynth {
         {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
                 splitInp += "I";
-            wireInputs.add(new DWire(splitInp,WireType.input));
+            wireInputs.add(new DWire(splitInp,DWireType.input));
         }
         // </editor-fold>
         
@@ -489,7 +503,7 @@ public class NetSynth {
         {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
                 splitInp += "O";
-            wireOutputs.add(new DWire(splitInp,WireType.output));
+            wireOutputs.add(new DWire(splitInp,DWireType.output));
         }
         // </editor-fold>        
         
@@ -507,7 +521,7 @@ public class NetSynth {
             {
                 inp01.add(zero);
             }
-            sopexp.add(new DGate(GateType.BUF,inp01,wireOutputs.get(0)));
+            sopexp.add(new DGate(DGateType.BUF,inp01,wireOutputs.get(0)));
             return sopexp;
         }
         // </editor-fold>
@@ -538,7 +552,7 @@ public class NetSynth {
             {
                 inp01.add(one);
             }
-            sopexp.add(new DGate(GateType.BUF,inp01,wireOutputs.get(0)));
+            sopexp.add(new DGate(DGateType.BUF,inp01,wireOutputs.get(0)));
             return sopexp;    
             }
                 
@@ -646,11 +660,11 @@ public class NetSynth {
             {
                 if(POSmode)
                 {
-                    prodGates = AndORGates(minTemp,GateType.NOR2);         
+                    prodGates = AndORGates(minTemp,DGateType.NOR2);         
                 }
                 else
                 {
-                    prodGates = AndORGates(minTemp,GateType.NAND2);         
+                    prodGates = AndORGates(minTemp,DGateType.NAND2);         
                 }
                 orWires.add(prodGates.get(prodGates.size()-1).output);
                 sopexp.addAll(prodGates);
@@ -660,7 +674,7 @@ public class NetSynth {
         prodGates = new ArrayList<DGate>();
         if(POSmode)
         {
-            prodGates = AndORGates(orWires,GateType.NOR2);
+            prodGates = AndORGates(orWires,DGateType.NOR2);
             
             if(prodGates.isEmpty())
             {
@@ -670,12 +684,12 @@ public class NetSynth {
         }
         else
         {
-            prodGates = AndORGates(orWires,GateType.NAND2);
+            prodGates = AndORGates(orWires,DGateType.NAND2);
         }
         sopexp.addAll(prodGates);
         if(sopexp.isEmpty())
         {
-            DGate bufgate = new DGate(GateType.BUF,orWires,wireOutputs.get(0));
+            DGate bufgate = new DGate(DGateType.BUF,orWires,wireOutputs.get(0));
             sopexp.add(bufgate);
         }
         else
@@ -688,7 +702,7 @@ public class NetSynth {
                 DWire aout = new DWire(Wirename);
                 List<DWire> notfinalinp = new ArrayList<DWire>();
                 notfinalinp.add(sopexp.get(sopexp.size()-1).output);
-                DGate notfinal = new DGate(GateType.NOT, notfinalinp ,aout);
+                DGate notfinal = new DGate(DGateType.NOT, notfinalinp ,aout);
                 sopexp.add(notfinal);
                 }
             }
@@ -710,12 +724,12 @@ public class NetSynth {
             DWire aout = new DWire(Wirename);
             List<DWire> inpNot = new ArrayList<DWire>();
             inpNot.add(xWire);
-            notInp.add(new DGate(GateType.NOT,inpNot,aout));
+            notInp.add(new DGate(DGateType.NOT,inpNot,aout));
         }
         return notInp;
     }
     
-    public static List<DGate> NORNANDGates(List<DWire> inpWires, GateType gtype)
+    public static List<DGate> NORNANDGates(List<DWire> inpWires, DGateType gtype)
     {
         List<DGate> minterm = new ArrayList<DGate>();
         
@@ -723,7 +737,7 @@ public class NetSynth {
         return minterm;
     }
     
-    public static List<DGate> AndORGates(List<DWire> inpWires,GateType gOrAnd)
+    public static List<DGate> AndORGates(List<DWire> inpWires,DGateType gOrAnd)
     {
         if (inpWires.isEmpty())
         {    return null;}
@@ -800,7 +814,7 @@ public class NetSynth {
                     if(!(xi.equals(zero)))
                         tempNot.input.add(xi);
                     tempNot.output = netg.output;
-                    tempNot.gtype = GateType.NOT;
+                    tempNot.gtype = DGateType.NOT;
                 }
                 netlist.get(i).gtype = tempNot.gtype;
                 netlist.get(i).input = tempNot.input;
@@ -818,25 +832,25 @@ public class NetSynth {
            
             for(DWire xi:netg.input)
             {
-                if((xi.wtype == WireType.input) && (!(inplist.contains(xi))))
+                if((xi.wtype == DWireType.input) && (!(inplist.contains(xi))))
                 {
                     inplist.add(xi);
                 }
             }
             
-            if(netg.output.wtype == WireType.output)
+            if(netg.output.wtype == DWireType.output)
             {
                 //System.out.println(IndX);
                 DAGVertex out =null;
                 DAGVertex lvert = null;
-                if(netg.gtype == GateType.NOT)
+                if(netg.gtype == DGateType.NOT)
                 {
                     outpIndx = IndX;
                     out = new DAGVertex(IndX++, VertexType.OUTPUT_OR.toString());                 
                     lvert = new DAGVertex(IndX++,VertexType.NOT.toString());
                     vertexhash.put(netg, lvert);
                 }
-                else if(netg.gtype == GateType.NOR2)
+                else if(netg.gtype == DGateType.NOR2)
                 {
                     outpIndx = IndX;
                     out = new DAGVertex(IndX++, VertexType.OUTPUT.toString()); 
@@ -855,11 +869,11 @@ public class NetSynth {
             else
             {
                 DAGVertex vert=null;
-                if(netg.gtype == GateType.NOT)
+                if(netg.gtype == DGateType.NOT)
                 {
                     vert = new DAGVertex(IndX++,VertexType.NOT.toString());
                 }
-                else if(netg.gtype == GateType.NOR2)
+                else if(netg.gtype == DGateType.NOR2)
                 {
                     vert = new DAGVertex(IndX++,VertexType.NOR.toString());
                 }
@@ -886,7 +900,7 @@ public class NetSynth {
         {
             DGate netg = netlist.get(i);
            
-            if(netg.output.wtype == WireType.output)
+            if(netg.output.wtype == DWireType.output)
             {
                 DAGEdge out = new DAGEdge();
                 out.From = Vertices.get(outpIndx);
@@ -977,7 +991,205 @@ public class NetSynth {
     }
    
    
-    
+     public static DAGW CreateDAGW(List<DGate> netlist)
+    {
+        DAGW outDAG = new DAGW();
+        List<DWire> inplist = new ArrayList<DWire>(); 
+        List<Gate> Gates = new ArrayList<Gate>();
+        List<Wire> Wires = new ArrayList<Wire>();
+        HashMap<DGate,Gate> vertexhash = new HashMap<DGate,Gate>();
+        int IndX =0; 
+        int outpIndx=0;
+        
+        
+        for(int i=netlist.size()-1;i>=0;i--)
+        {
+            DGate netg = netlist.get(i);
+             if(netg.input.contains(zero))
+             {
+                DGate tempNot = new DGate();
+                for(DWire xi:netg.input)
+                {
+                    if(!(xi.equals(zero)))
+                        tempNot.input.add(xi);
+                    tempNot.output = netg.output;
+                    tempNot.gtype = DGateType.NOT;
+                }
+                netlist.get(i).gtype = tempNot.gtype;
+                netlist.get(i).input = tempNot.input;
+                netlist.get(i).output = tempNot.output;
+                
+               
+            }
+        }
+        
+        
+        for(int i=netlist.size()-1;i>=0;i--)
+        {
+            DGate netg = netlist.get(i);
+           
+           
+            for(DWire xi:netg.input)
+            {
+                if((xi.wtype == DWireType.input) && (!(inplist.contains(xi))))
+                {
+                    inplist.add(xi);
+                }
+            }
+            
+            if(netg.output.wtype == DWireType.output)
+            {
+                //System.out.println(IndX);
+                Gate out =null;
+                Gate lvert = null;
+                if(netg.gtype == DGateType.NOT)
+                {
+                    outpIndx = IndX;
+                    out = new Gate(IndX++, VertexType.OUTPUT_OR.toString());                 
+                    lvert = new Gate(IndX++,VertexType.NOT.toString());
+                    vertexhash.put(netg, lvert);
+                }
+                else if(netg.gtype == DGateType.NOR2)
+                {
+                    outpIndx = IndX;
+                    out = new Gate(IndX++, VertexType.OUTPUT.toString()); 
+                    lvert = new Gate(IndX++,VertexType.NOR.toString());
+                    vertexhash.put(netg, lvert);
+                }
+                out.Name = netg.output.name;
+                lvert.outW = netg.output;
+                
+                //System.out.println(netg.output.wtype.toString());
+                //System.out.println(netg.gtype.toString());                
+                
+                Gates.add(out);
+                Gates.add(lvert);
+            }
+            else
+            {
+                Gate vert=null;
+                if(netg.gtype == DGateType.NOT)
+                {
+                    vert = new Gate(IndX++,VertexType.NOT.toString());
+                }
+                else if(netg.gtype == DGateType.NOR2)
+                {
+                    vert = new Gate(IndX++,VertexType.NOR.toString());
+                }
+                vert.outW = netg.output;
+                
+                //System.out.println(netg.output.wtype.toString());
+                //System.out.println(netg.gtype.toString());
+                vertexhash.put(netg, vert);
+                Gates.add(vert);
+            }
+        }
+        for(DWire inpx:inplist)
+        {
+            Gate vert = new Gate(IndX++,VertexType.INPUT.toString());
+            vert.outW = inpx;
+            vert.Name = inpx.name;
+            vert.Outgoing = null;
+            
+            Gates.add(vert);
+        }
+        int eind=0;
+        
+        for(int i=netlist.size()-1;i>=0;i--)
+        {
+            DGate netg = netlist.get(i);
+           
+            if(netg.output.wtype == DWireType.output)
+            {
+                Wire out = new Wire();
+                out.From = Gates.get(outpIndx);
+                out.To = vertexhash.get(netg);
+                out.Index = eind++;
+                out.Next = null;
+                Wires.add(out);
+            }
+            Wire temp = null;
+            
+            
+            
+            for(DWire inps:netg.input)
+            {
+                
+               Gate gTo=null;
+               //System.out.println(inps.name);
+               for(Gate xvert:Gates)
+               {
+                  
+                   if(xvert.outW.name.trim().equals(inps.name.trim()))
+                   {
+                       gTo = xvert;
+                       break;
+                   }
+               }
+               Gate gFrom = null;
+               gFrom = vertexhash.get(netg);
+               Wire newEdge = new Wire(eind++,gFrom,gTo,temp);
+               
+               temp = newEdge;
+               Wires.add(newEdge);
+               
+            }
+        }
+        
+        for(Wire edg:Wires)
+        {
+            if(edg.From.Type == "NOR")
+            {
+                if(!(edg.Next == null))
+                {
+                int count=0;
+                
+                for(Gate dvert:Gates)
+                {
+                    if(edg.From.equals(dvert))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+                
+                Gates.get(count).Outgoing = edg;
+                
+                }
+            }
+            else
+            {
+                if(edg.Next == null)
+                {
+                int count=0;
+                
+                for(Gate dvert:Gates)
+                {
+                    if(edg.From.equals(dvert))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+                Gates.get(count).Outgoing = edg;
+                
+                }
+            }
+        }
+        
+        for(Wire xdedge:Wires)
+        {
+            outDAG.Wires.add(xdedge);
+        }
+        for(Gate xdvert:Gates)
+        {
+            outDAG.Gates.add(xdvert);
+        }
+        
+        return outDAG;
+    }
+   
+   
     
     
     
