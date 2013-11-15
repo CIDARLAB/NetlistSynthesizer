@@ -26,14 +26,14 @@ public class DAGVertex {
     public int Index;
     public String Name;
     public String Type;
-    public DAGEdge outgoing;
+    public DAGEdge Outgoing;
     
     public DAGVertex()
     {
         this.Index = 0;
         this.Name = "";
         this.Type = "";
-        this.outgoing = null;
+        this.Outgoing = null;
         
         this.outW = new DWire();
     }
@@ -55,7 +55,7 @@ public class DAGVertex {
         }
        
         this.outW = new DWire();
-        this.outgoing = null;
+        this.Outgoing = null;
     }
     public DAGVertex(int ind,String dType,DAGEdge de)
     {
@@ -73,7 +73,7 @@ public class DAGVertex {
         { 
             this.Name = "";
         }
-        this.outgoing = de;
+        this.Outgoing = de;
         
         this.outW = new DWire();
     

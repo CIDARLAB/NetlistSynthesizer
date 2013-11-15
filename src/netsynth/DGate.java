@@ -42,7 +42,7 @@ public class DGate implements Serializable{
     public DGate(GateType gType, List<DWire> inputWires, DWire outputWire)
     {
         input = new ArrayList<DWire>();
-        input.addAll(inputWires);
+        this.input.addAll(inputWires);
         gtype = gType;
         output = outputWire;        
         if(!input.isEmpty())

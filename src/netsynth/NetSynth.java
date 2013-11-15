@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import netsynth.DagGraph_PV.DAGType;
+
 import netsynth.DGate.GateType;
 import netsynth.DWire.WireType;
 import precomputation.PreCompute;
@@ -58,7 +58,7 @@ public class NetSynth {
         zero = new DWire("_zero",WireType.GND);
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         
-        //DAGraph x = precompute(5);
+        DAGraph x = precompute(2);
         
         //testnetlistmodule();
         //testEspresso();
@@ -105,8 +105,7 @@ public class NetSynth {
         }
         
         NORgates = parseEspressoToNORNAND(espressoOut);
-        List<DagGraph_PV> dglist = new ArrayList<DagGraph_PV>();
-        dglist = CreateDAG(NORgates);
+     
         System.out.println("\nUniversal Gates : ");
         if(functionOutp)
         {
@@ -122,37 +121,11 @@ public class NetSynth {
                 System.out.println(gateString);
             }
             System.out.println("\n\n DAG Graph: \n");
-            for(DagGraph_PV dg:dglist)
-            {
-                String dagstring = printDAG(dg);
-                System.out.println(dagstring);
-            }
+          
         }
         
     }
-    
-    public static String printDAG(DagGraph_PV dg)
-    {
-        String outp="";
-        outp += "Index : ";
-        outp += (dg.Index + "\n");
-        outp += ("Vertex Name : " + dg.V.name + "\n");
-        outp += ("Vertex Type : " + dg.V.vertexD + "\n");
-        if(!dg.C.isEmpty())
-        {
-        for(DagGraph_PV.Child ech: dg.C)
-        {
-            outp+= "Child Name : " + ech.name + "\n" ;
-            outp+= "Child Type : " + ech.childD + "\n";
-            
-        }
-        }
-        outp+= "\n";
-        return outp;
-    }
-    
    
-    
     public static List<String> runEspresso() {
     
         
@@ -814,11 +787,13 @@ public class NetSynth {
         HashMap<DGate,DAGVertex> vertexhash = new HashMap<DGate,DAGVertex>();
         int IndX =0; 
         int outpIndx=0;
-        for(int i=0;i<netlist.size();i++)
+        
+        
+        for(int i=netlist.size()-1;i>=0;i--)
         {
             DGate netg = netlist.get(i);
-            if(netg.input.contains(zero))
-            {
+             if(netg.input.contains(zero))
+             {
                 DGate tempNot = new DGate();
                 for(DWire xi:netg.input)
                 {
@@ -827,8 +802,19 @@ public class NetSynth {
                     tempNot.output = netg.output;
                     tempNot.gtype = GateType.NOT;
                 }
-                netg = tempNot;
+                netlist.get(i).gtype = tempNot.gtype;
+                netlist.get(i).input = tempNot.input;
+                netlist.get(i).output = tempNot.output;
+               
             }
+        }
+        
+        
+        for(int i=netlist.size()-1;i>=0;i--)
+        {
+            DGate netg = netlist.get(i);
+           
+           
             for(DWire xi:netg.input)
             {
                 if((xi.wtype == WireType.input) && (!(inplist.contains(xi))))
@@ -839,13 +825,14 @@ public class NetSynth {
             
             if(netg.output.wtype == WireType.output)
             {
+                //System.out.println(IndX);
                 DAGVertex out =null;
                 DAGVertex lvert = null;
                 if(netg.gtype == GateType.NOT)
                 {
                     outpIndx = IndX;
                     out = new DAGVertex(IndX++, VertexType.OUTPUT_OR.toString());                 
-                    lvert = new DAGVertex(IndX++,VertexType.NOR.toString());
+                    lvert = new DAGVertex(IndX++,VertexType.NOT.toString());
                     vertexhash.put(netg, lvert);
                 }
                 else if(netg.gtype == GateType.NOR2)
@@ -855,6 +842,7 @@ public class NetSynth {
                     lvert = new DAGVertex(IndX++,VertexType.NOR.toString());
                     vertexhash.put(netg, lvert);
                 }
+                out.Name = netg.output.name;
                 lvert.outW = netg.output;
                 Vertices.add(out);
                 Vertices.add(lvert);
@@ -864,7 +852,7 @@ public class NetSynth {
                 DAGVertex vert=null;
                 if(netg.gtype == GateType.NOT)
                 {
-                    vert = new DAGVertex(IndX++,VertexType.NOR.toString());
+                    vert = new DAGVertex(IndX++,VertexType.NOT.toString());
                 }
                 else if(netg.gtype == GateType.NOR2)
                 {
@@ -880,7 +868,7 @@ public class NetSynth {
             DAGVertex vert = new DAGVertex(IndX++,VertexType.INPUT.toString());
             vert.outW = inpx;
             vert.Name = inpx.name;
-            vert.outgoing = null;
+            vert.Outgoing = null;
             Vertices.add(vert);
             //List<Wire> inpl = new ArrayList<Wire>();
             //inpl.add(inpx);
@@ -888,21 +876,12 @@ public class NetSynth {
             //vertexhash.put(Inp, vert);
         }
         int eind=0;
-        for(int i=0;i<netlist.size();i++)
+        for(int i=netlist.size()-1;i>=0;i--)
         {
             DGate netg = netlist.get(i);
-            if(netg.input.contains(zero))
-            {
-                DGate tempNot = new DGate();
-                for(DWire xi:netg.input)
-                {
-                    if(!(xi.equals(zero)))
-                        tempNot.input.add(xi);
-                    tempNot.output = netg.output;
-                    tempNot.gtype = GateType.NOT;
-                }
-                netg = tempNot;
-            }
+           
+            
+            //System.out.println(netg.gtype.toString());
             
             if(netg.output.wtype == WireType.output)
             {
@@ -915,9 +894,11 @@ public class NetSynth {
                 Edges.add(out);
             }
             DAGEdge temp = null;
+            
             for(DWire inps:netg.input)
             {
                DAGVertex gTo=null;
+               
                for(DAGVertex xvert:Vertices)
                {
                    if(xvert.outW.equals(inps))
@@ -928,11 +909,34 @@ public class NetSynth {
                }
                DAGVertex gFrom = null;
                gFrom = vertexhash.get(netg);
+               if(gFrom == null)
+                   System.out.println(netg.gtype);
                DAGEdge newEdge = new DAGEdge(eind++,gFrom,gTo,temp);
+             
                temp = newEdge;
                Edges.add(newEdge);
+               
             }
         }
+        
+        for(DAGEdge edg:Edges)
+        {
+            if(edg.Next == null)
+            {
+                int count=0;
+                
+                for(DAGVertex dvert:Vertices)
+                {
+                    if(edg.From.equals(dvert))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+                Vertices.get(count).Outgoing = edg;
+            }
+        }
+        
         for(DAGEdge xdedge:Edges)
         {
             outDAG.Edges.add(xdedge);
@@ -945,150 +949,10 @@ public class NetSynth {
         return outDAG;
     }
    
-    public static List<DagGraph_PV> CreateDAG(List<DGate> netlist)
-    {
-        List<DagGraph_PV> finalDag = new ArrayList<DagGraph_PV>();
-        int Dindx = 0;
-        HashMap<String,DWire> Inputs = new HashMap<String,DWire>();
-        for(int i=(netlist.size()-1);i>=0;i--)
-        {
-            DGate g = netlist.get(i);
-            DagGraph_PV x = new DagGraph_PV();
-            x.Index = Dindx;
-            if(g.output.wtype == WireType.output)
-            {
-                x.V.name = g.output.name;
-                DAGType child = DAGType.NOT;
-                String childname;
-                if(g.gtype == GateType.NOT)
-                {
-                    x.V.vertexD = DAGType.OUTPUT;
-                }
-                else if(g.gtype == GateType.NOR2)
-                {
-                    x.V.vertexD = DAGType.OUTPUT_OR;
-                }
-                child = calcDagType(g.gtype);
-                childname = child.toString();
-                DagGraph_PV.Child e = new DagGraph_PV.Child();
-                e.childD = child;
-                e.name = childname;
-                x.C.add(e);
-                finalDag.add(x);
-                Dindx++;
-                x = new DagGraph_PV();
-                x.Index = Dindx;
-                x.V.name = e.name;
-                x.V.vertexD = e.childD;
-                
-                // <editor-fold defaultstate="collapsed" desc="Calculate Child of DAG Graph"> 
-                for(DWire inp:g.input)
-                {
-                    DagGraph_PV.Child einp = new DagGraph_PV.Child();
-                    if(inp.wtype == WireType.input)
-                    {
-                        Inputs.put(inp.name, inp);
-                        einp.name = inp.name;
-                        einp.childD = DAGType.INPUT;
-                    } 
-                    else
-                    {
-                        for(DGate gf:netlist)
-                        {
-                            if(gf.output == inp)
-                            {
-                                einp.childD = calcDagType(gf.gtype);
-                                einp.name = einp.childD.toString();
-                            }
-                        }
-                    }
-                    x.C.add(einp);
-                }
-                // </editor-fold>
-                
-                finalDag.add(x);
-            }
-            else
-            {
-                x.V.vertexD = calcDagType(g.gtype);
-                x.V.name = x.V.vertexD.toString();        
-                // <editor-fold defaultstate="collapsed" desc="Calculate Child of DAG Graph"> 
-                for(DWire inp:g.input)
-                {
-                    DagGraph_PV.Child einp = new DagGraph_PV.Child();
-                    if(inp.wtype == WireType.input)
-                    {
-                        Inputs.put(inp.name, inp);
-                        einp.name = inp.name;
-                        einp.childD = DAGType.INPUT;
-                    } 
-                    else
-                    {
-                        for(DGate gf:netlist)
-                        {
-                            if(gf.output == inp)
-                            {
-                                einp.childD = calcDagType(gf.gtype);
-                                einp.name = einp.childD.toString();
-                            }
-                        }
-                    }
-                    x.C.add(einp);
-                }
-                // </editor-fold>
-                
-                finalDag.add(x);
-            }
-            
-            Dindx++;
-        }
-        
-        Iterator it = Inputs.entrySet().iterator();
-        while(it.hasNext())
-        {
-            Map.Entry pairs = (Map.Entry)it.next();
-            DWire xinp = (DWire)pairs.getValue();
-            DagGraph_PV x = new DagGraph_PV();
-            x.V.name = xinp.name;
-            x.V.vertexD = DAGType.INPUT;
-            x.Index = Dindx;
-            Dindx++;
-            finalDag.add(x);
-        }
-        return finalDag;
-        
-    }
+   
     
     
-    public static DAGType calcDagType(GateType gt)
-    {
-        DAGType out = null;
-        if(gt == GateType.AND2)
-            out = DAGType.AND;
-        else if(gt == GateType.AND3)
-            out = DAGType.AND;
-        else if(gt == GateType.OR2)
-            out = DAGType.OR;
-        else if(gt == GateType.OR3)
-            out = DAGType.OR;
-        else if(gt == GateType.NOT)
-            out = DAGType.NOT;
-        else if(gt == GateType.NOR2)
-            out = DAGType.NOR;
-        else if(gt == GateType.NOR3)
-            out = DAGType.NOR;
-        else if(gt == GateType.NAND2)
-            out = DAGType.NAND;
-        else if(gt == GateType.NAND3)
-            out = DAGType.NAND;
-        else if(gt == GateType.XNOR2)
-            out = DAGType.XNOR;
-        else if(gt == GateType.XOR2)
-            out = DAGType.XOR;
-        else if(gt == GateType.BUF)
-            out = DAGType.INPUT;                
-        return out;
-    }
+    
     
     
     public static String netlist(DGate g)
