@@ -805,6 +805,7 @@ public class NetSynth {
                 netlist.get(i).gtype = tempNot.gtype;
                 netlist.get(i).input = tempNot.input;
                 netlist.get(i).output = tempNot.output;
+                
                
             }
         }
@@ -844,6 +845,10 @@ public class NetSynth {
                 }
                 out.Name = netg.output.name;
                 lvert.outW = netg.output;
+                
+                //System.out.println(netg.output.wtype.toString());
+                //System.out.println(netg.gtype.toString());                
+                
                 Vertices.add(out);
                 Vertices.add(lvert);
             }
@@ -859,6 +864,9 @@ public class NetSynth {
                     vert = new DAGVertex(IndX++,VertexType.NOR.toString());
                 }
                 vert.outW = netg.output;
+                
+                //System.out.println(netg.output.wtype.toString());
+                //System.out.println(netg.gtype.toString());
                 vertexhash.put(netg, vert);
                 Vertices.add(vert);
             }
@@ -869,39 +877,37 @@ public class NetSynth {
             vert.outW = inpx;
             vert.Name = inpx.name;
             vert.Outgoing = null;
+            
             Vertices.add(vert);
-            //List<Wire> inpl = new ArrayList<Wire>();
-            //inpl.add(inpx);
-            //Gate Inp = new Gate(GateType.BUF,inpl,inpx);
-            //vertexhash.put(Inp, vert);
         }
         int eind=0;
+        
         for(int i=netlist.size()-1;i>=0;i--)
         {
             DGate netg = netlist.get(i);
            
-            
-            //System.out.println(netg.gtype.toString());
-            
             if(netg.output.wtype == WireType.output)
             {
                 DAGEdge out = new DAGEdge();
                 out.From = Vertices.get(outpIndx);
                 out.To = vertexhash.get(netg);
-                //out.Index = out.From.Index;
                 out.Index = eind++;
                 out.Next = null;
                 Edges.add(out);
             }
             DAGEdge temp = null;
             
+            
+            
             for(DWire inps:netg.input)
             {
+                
                DAGVertex gTo=null;
-               
+               //System.out.println(inps.name);
                for(DAGVertex xvert:Vertices)
                {
-                   if(xvert.outW.equals(inps))
+                  
+                   if(xvert.outW.name.trim().equals(inps.name.trim()))
                    {
                        gTo = xvert;
                        break;
@@ -909,10 +915,8 @@ public class NetSynth {
                }
                DAGVertex gFrom = null;
                gFrom = vertexhash.get(netg);
-               if(gFrom == null)
-                   System.out.println(netg.gtype);
                DAGEdge newEdge = new DAGEdge(eind++,gFrom,gTo,temp);
-             
+               
                temp = newEdge;
                Edges.add(newEdge);
                
@@ -921,8 +925,29 @@ public class NetSynth {
         
         for(DAGEdge edg:Edges)
         {
-            if(edg.Next == null)
+            if(edg.From.Type == "NOR")
             {
+                if(!(edg.Next == null))
+                {
+                int count=0;
+                
+                for(DAGVertex dvert:Vertices)
+                {
+                    if(edg.From.equals(dvert))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+                
+                Vertices.get(count).Outgoing = edg;
+                
+                }
+            }
+            else
+            {
+                if(edg.Next == null)
+                {
                 int count=0;
                 
                 for(DAGVertex dvert:Vertices)
@@ -934,6 +959,8 @@ public class NetSynth {
                     count++;
                 }
                 Vertices.get(count).Outgoing = edg;
+                
+                }
             }
         }
         
