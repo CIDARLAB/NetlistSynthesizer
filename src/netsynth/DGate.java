@@ -32,7 +32,7 @@ public class DGate implements Serializable{
     public List<DWire> input;
     public DWire output;
     public int gatestage;
-    public float dagstage;
+    
     
     public DGate()
     {      
@@ -47,19 +47,12 @@ public class DGate implements Serializable{
         output = outputWire;        
         if(!input.isEmpty())
         {
-            float totInpWires=0;
-            int tot=0;
             int maxStage = input.get(0).wirestage;
             for(DWire w:input)
             {
-                totInpWires++;
-                tot+= w.dagstage;    
                 if(maxStage<w.wirestage)
                     maxStage = w.wirestage;
             }
-            this.dagstage = (tot/totInpWires);
-            this.output.dagstage = (tot/totInpWires);
-            maxStage++;
             maxStage++;
             output.wirestage = maxStage;
             gatestage = maxStage;
@@ -75,19 +68,13 @@ public class DGate implements Serializable{
         gname = gName;
         if(!input.isEmpty())
         {
-            float totInpWires=0;
-            int tot=0;
             int maxStage = input.get(0).wirestage;
             for(DWire w:input)
             {
-                totInpWires++;
-                tot+= w.dagstage;
+             
                 if(maxStage<w.wirestage)
                     maxStage = w.wirestage;
             }
-            this.dagstage = (tot/totInpWires);
-            this.output.dagstage = (tot/totInpWires);
-            maxStage++;
             maxStage++;
             output.wirestage = maxStage;
             gatestage = maxStage;
@@ -99,18 +86,12 @@ public class DGate implements Serializable{
     {
         if(!this.input.isEmpty())
         {
-            float totInpWires=0;
-            int tot=0;
             int maxStage = this.input.get(0).wirestage;
             for(DWire w:this.input)
             {
-                totInpWires++;
-                tot+= w.dagstage;
                 if(maxStage<w.wirestage)
                     maxStage = w.wirestage;
             }
-            this.dagstage = (tot/totInpWires);
-            this.output.dagstage = (tot/totInpWires);
             maxStage++;
             this.output.wirestage = maxStage;
             this.gatestage = maxStage;

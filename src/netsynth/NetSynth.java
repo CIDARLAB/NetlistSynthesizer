@@ -61,21 +61,22 @@ public class NetSynth {
         zero = new DWire("_zero",DWireType.GND);
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         
-        DAGraph x = precompute(2);
-        DAGW y = computeDAGW(2);
+        //DAGraph x = precompute(2);
+        //DAGW y = computeDAGW(2);
         //testnetlistmodule();
-        //testEspresso();
+        testEspresso();
         
     }
     
     public static DAGW computeDAGW(int x)
     {
+        one = new DWire("_one",DWireType.Source);
+        zero = new DWire("_zero",DWireType.GND);
         DAGW outdag = new DAGW();
         List<List<DGate>> precomp;
         precomp = PreCompute.parseNetlistFile();
         outdag = CreateDAGW(precomp.get(x));
         return outdag;
-        
        
     }
     
@@ -134,8 +135,7 @@ public class NetSynth {
                 String gateString = netlist(g);
                 System.out.println(gateString);
             }
-            System.out.println("\n\n DAG Graph: \n");
-          
+           
         }
         
     }
@@ -660,11 +660,11 @@ public class NetSynth {
             {
                 if(POSmode)
                 {
-                    prodGates = AndORGates(minTemp,DGateType.NOR2);         
+                    prodGates = NORNANDGates(minTemp,DGateType.NOR2);         
                 }
                 else
                 {
-                    prodGates = AndORGates(minTemp,DGateType.NAND2);         
+                    prodGates = NORNANDGates(minTemp,DGateType.NAND2);         
                 }
                 orWires.add(prodGates.get(prodGates.size()-1).output);
                 sopexp.addAll(prodGates);
@@ -674,7 +674,7 @@ public class NetSynth {
         prodGates = new ArrayList<DGate>();
         if(POSmode)
         {
-            prodGates = AndORGates(orWires,DGateType.NOR2);
+            prodGates = NORNANDGates(orWires,DGateType.NOR2);
             
             if(prodGates.isEmpty())
             {
@@ -684,7 +684,7 @@ public class NetSynth {
         }
         else
         {
-            prodGates = AndORGates(orWires,DGateType.NAND2);
+            prodGates = NORNANDGates(orWires,DGateType.NAND2);
         }
         sopexp.addAll(prodGates);
         if(sopexp.isEmpty())
@@ -731,9 +731,69 @@ public class NetSynth {
     
     public static List<DGate> NORNANDGates(List<DWire> inpWires, DGateType gtype)
     {
+          if (inpWires.isEmpty())
+        {    return null;}
         List<DGate> minterm = new ArrayList<DGate>();
         
+       
+        List<DWire> nextLevelWires = new ArrayList<DWire>();
+        List<DWire> temp = new ArrayList<DWire>();
         
+        int wireCount,indx;
+        nextLevelWires.addAll(inpWires);
+        wireCount = inpWires.size();
+        
+        while(wireCount > 1)
+        {
+            temp = new ArrayList<DWire>();
+            temp.addAll(nextLevelWires);
+            nextLevelWires = new ArrayList<DWire>();
+            indx = 0;
+            while((indx+2)<= (wireCount))
+            {
+                
+                List<DWire> ainp = new ArrayList<DWire>();
+                ainp.add(temp.get(indx));
+                ainp.add(temp.get(indx+1));
+                String Wirename = "Wire" + Global.wirecount++;
+                
+                DWire aout = new DWire(Wirename);
+                DGate andG = new DGate(gtype,ainp,aout);
+                minterm.add(andG);
+                if(wireCount>2)
+                {
+                    Wirename = "Wire" + Global.wirecount++;
+                    List<DWire> ninp = new ArrayList<DWire>();
+                    ninp.add(aout);
+                    DWire anout = new DWire(Wirename);
+                    DGate notG = new DGate(DGateType.NOT, ninp ,anout);
+                    minterm.add(notG);
+                    nextLevelWires.add(anout);
+                }
+                else
+                {
+                    nextLevelWires.add(aout);
+                }
+                indx+=2;
+            
+            }
+            if(temp.size() %2 != 0)
+            {
+                nextLevelWires.add(temp.get(wireCount-1));
+            }
+            wireCount = nextLevelWires.size();
+            if(wireCount == 2)
+            {
+                List<DWire> ainp = new ArrayList<DWire>();
+                ainp.add(nextLevelWires.get(0));
+                ainp.add(nextLevelWires.get(1));
+                String Wirename = "Wire" + Global.wirecount++;
+                DWire aout = new DWire(Wirename);
+                DGate andG = new DGate(gtype,ainp,aout);
+                minterm.add(andG);
+                break;
+            }
+        }
         return minterm;
     }
     

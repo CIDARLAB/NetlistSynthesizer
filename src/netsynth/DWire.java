@@ -23,7 +23,7 @@ public class DWire implements Serializable {
      }
      public DWireType wtype;
      int wirestage;
-     float dagstage;
+    
      public DWire()
      {
          name = "";
@@ -38,7 +38,7 @@ public class DWire implements Serializable {
          if(wType == DWireType.input)
          {
             this.wirestage = 0;
-            this.dagstage = 0;
+          
          }
          this.name = wirename;
          this.wtype = wType;
