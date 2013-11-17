@@ -62,7 +62,7 @@ public class NetSynth {
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         
         //DAGraph x = precompute(2);
-        //DAGW y = computeDAGW(2);
+        DAGW y = computeDAGW(10);
         //testnetlistmodule();
         testEspresso();
         
@@ -76,6 +76,10 @@ public class NetSynth {
         List<List<DGate>> precomp;
         precomp = PreCompute.parseNetlistFile();
         outdag = CreateDAGW(precomp.get(x));
+        for(Gate xg:outdag.Gates)
+        {
+            System.out.println(xg.Name + "   " +xg.Type);
+        }
         return outdag;
        
     }
@@ -86,6 +90,7 @@ public class NetSynth {
         List<List<DGate>> precomp;
         precomp = PreCompute.parseNetlistFile();
         outdag = CreateDAGraph(precomp.get(x));
+        
         return outdag;
         
     }
@@ -1093,7 +1098,21 @@ public class NetSynth {
             {
                 if((xi.wtype == DWireType.input) && (!(inplist.contains(xi))))
                 {
-                    inplist.add(xi);
+                    int flag =0;
+                    for(DWire di:inplist)
+                    {
+                        if(di.name.trim().equals(xi.name.trim()))
+                        {
+                            flag =1;
+                            break;
+                        }
+                    }
+                    if(flag ==0)
+                    {
+                        System.out.println("Added : " + xi.name);
+                        inplist.add(xi);
+                    }
+                    
                 }
             }
             
