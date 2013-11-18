@@ -62,9 +62,10 @@ public class NetSynth {
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         
         //DAGraph x = precompute(2);
-        DAGW y = computeDAGW(10);
+        
+        DAGW y = computeDAGW(105);
         //testnetlistmodule();
-        testEspresso();
+        //testEspresso();
         
     }
     
@@ -76,10 +77,21 @@ public class NetSynth {
         List<List<DGate>> precomp;
         precomp = PreCompute.parseNetlistFile();
         outdag = CreateDAGW(precomp.get(x));
-        for(Gate xg:outdag.Gates)
+    
+      
+    
+        
+        /*for(Gate xg:outdag.Gates)
         {
+            if(xg.Outgoing == null)
+            {
+                System.out.println("Input : "+xg.Name);
+            }
             System.out.println(xg.Name + "   " +xg.Type);
-        }
+        }*/
+        
+        
+        
         return outdag;
        
     }
@@ -1087,7 +1099,37 @@ public class NetSynth {
                
             }
         }
-        
+        if(netlist.size()>1)
+        {
+            int lastnet = netlist.size()-1;
+            if((netlist.get(lastnet).gtype == DGateType.NOT) && (netlist.get(lastnet-1).gtype == DGateType.NOR2))
+            {
+                netlist.get(lastnet).gtype = DGateType.OR2;
+                netlist.get(lastnet).input = netlist.get(lastnet-1).input;
+                netlist.remove(lastnet-1);
+            }
+
+        }
+        for(int i=netlist.size()-1;i>=0;i--)
+        {
+            DGate netg = netlist.get(i);
+             if(netg.input.contains(zero))
+             {
+                DGate tempNot = new DGate();
+                for(DWire xi:netg.input)
+                {
+                    if(!(xi.equals(zero)))
+                        tempNot.input.add(xi);
+                    tempNot.output = netg.output;
+                    tempNot.gtype = DGateType.NOT;
+                }
+                netlist.get(i).gtype = tempNot.gtype;
+                netlist.get(i).input = tempNot.input;
+                netlist.get(i).output = tempNot.output;
+                
+               
+            }
+        }
         
         for(int i=netlist.size()-1;i>=0;i--)
         {
@@ -1109,7 +1151,7 @@ public class NetSynth {
                     }
                     if(flag ==0)
                     {
-                        System.out.println("Added : " + xi.name);
+                        //System.out.println("Added : " + xi.name);
                         inplist.add(xi);
                     }
                     
@@ -1118,31 +1160,41 @@ public class NetSynth {
             
             if(netg.output.wtype == DWireType.output)
             {
+                if(netg.gtype == DGateType.OR2)
+                {
+                    Gate outor = null;
+                    outpIndx = IndX;
+                    outor = new Gate(IndX++, VertexType.OUTPUT_OR.toString()); 
+                    outor.Name = netg.output.name;
+                    vertexhash.put(netg, outor);
+                    Gates.add(outor);
+                }
+                else
+                {
+                    Gate out =null;
+                    Gate lvert = null;
+                    if(netg.gtype == DGateType.NOT)
+                    {
+                        outpIndx = IndX;
+                        out = new Gate(IndX++, VertexType.OUTPUT.toString());                 
+                        lvert = new Gate(IndX++,VertexType.NOT.toString());
+                        vertexhash.put(netg, lvert);
+                    }
+                    else if(netg.gtype == DGateType.NOR2)
+                    {
+                        outpIndx = IndX;
+                        out = new Gate(IndX++, VertexType.OUTPUT.toString()); 
+                        lvert = new Gate(IndX++,VertexType.NOR.toString());
+                        vertexhash.put(netg, lvert);
+                    }
+                    out.Name = netg.output.name;
+                    lvert.outW = netg.output;
+                
+                    Gates.add(out);
+                    Gates.add(lvert);
+                }
                 //System.out.println(IndX);
-                Gate out =null;
-                Gate lvert = null;
-                if(netg.gtype == DGateType.NOT)
-                {
-                    outpIndx = IndX;
-                    out = new Gate(IndX++, VertexType.OUTPUT_OR.toString());                 
-                    lvert = new Gate(IndX++,VertexType.NOT.toString());
-                    vertexhash.put(netg, lvert);
-                }
-                else if(netg.gtype == DGateType.NOR2)
-                {
-                    outpIndx = IndX;
-                    out = new Gate(IndX++, VertexType.OUTPUT.toString()); 
-                    lvert = new Gate(IndX++,VertexType.NOR.toString());
-                    vertexhash.put(netg, lvert);
-                }
-                out.Name = netg.output.name;
-                lvert.outW = netg.output;
                 
-                //System.out.println(netg.output.wtype.toString());
-                //System.out.println(netg.gtype.toString());                
-                
-                Gates.add(out);
-                Gates.add(lvert);
             }
             else
             {
@@ -1178,12 +1230,12 @@ public class NetSynth {
         {
             DGate netg = netlist.get(i);
            
-            if(netg.output.wtype == DWireType.output)
+            if((netg.output.wtype == DWireType.output) && (netg.gtype != DGateType.OR2))
             {
                 Wire out = new Wire();
                 out.From = Gates.get(outpIndx);
                 out.To = vertexhash.get(netg);
-                out.Index = eind++;
+                out.Index = eind++; 
                 out.Next = null;
                 Wires.add(out);
             }
@@ -1217,7 +1269,7 @@ public class NetSynth {
         
         for(Wire edg:Wires)
         {
-            if(edg.From.Type == "NOR")
+            if(edg.From.Type == "NOR" || edg.From.Type == "OUTPUT_OR")
             {
                 if(!(edg.Next == null))
                 {
