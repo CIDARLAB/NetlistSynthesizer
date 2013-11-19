@@ -63,7 +63,7 @@ public class NetSynth {
         
         //DAGraph x = precompute(2);
         
-        DAGW y = computeDAGW(105);
+        DAGW y = computeDAGW(14);
         //testnetlistmodule();
         //testEspresso();
         
@@ -1078,6 +1078,36 @@ public class NetSynth {
         int IndX =0; 
         int outpIndx=0;
         
+        if(netlist.size() == 1 && netlist.get(0).gtype == DGateType.BUF)
+        {
+            Gate outb = new Gate();
+            Gate inpb = new Gate();
+            
+            outb.Type = "OUTPUT";
+            outb.Name = netlist.get(0).output.name;
+            outb.Index =0;
+            
+            inpb.Index = 1;
+            inpb.Name = netlist.get(0).input.get(0).name;
+            inpb.Type = "INPUT";
+            
+            
+            Wire edge = new Wire();
+            
+            edge.From = outb;
+            edge.To = inpb;
+            edge.Index = 0;
+            edge.Next = null;
+            
+            outb.Outgoing = edge;
+            inpb.Outgoing = null;
+            
+            outDAG.Gates.add(outb);
+            outDAG.Gates.add(inpb);
+            outDAG.Wires.add(edge);
+            return outDAG;
+            
+        }
         
         for(int i=netlist.size()-1;i>=0;i--)
         {
@@ -1110,26 +1140,7 @@ public class NetSynth {
             }
 
         }
-        for(int i=netlist.size()-1;i>=0;i--)
-        {
-            DGate netg = netlist.get(i);
-             if(netg.input.contains(zero))
-             {
-                DGate tempNot = new DGate();
-                for(DWire xi:netg.input)
-                {
-                    if(!(xi.equals(zero)))
-                        tempNot.input.add(xi);
-                    tempNot.output = netg.output;
-                    tempNot.gtype = DGateType.NOT;
-                }
-                netlist.get(i).gtype = tempNot.gtype;
-                netlist.get(i).input = tempNot.input;
-                netlist.get(i).output = tempNot.output;
-                
-               
-            }
-        }
+        
         
         for(int i=netlist.size()-1;i>=0;i--)
         {

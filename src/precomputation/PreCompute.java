@@ -77,7 +77,10 @@ public class PreCompute {
            int k;
             if(filelines.get(i).contains("Expression for "))
             {
+                String expression = filelines.get(i).substring(filelines.get(i).indexOf(":")+2);
+                
                 k=i+2;
+                
                 snetlist = new ArrayList<String>();
                 while(!filelines.get(k).equals(""))
                 {
@@ -85,7 +88,13 @@ public class PreCompute {
                     snetlist.add(nline);
                     k++; 
                 }
-                string_netlists.add(snetlist);
+                if(snetlist.isEmpty() )    
+                {
+                    snetlist.add(expression);
+                }
+                
+                    string_netlists.add(snetlist);
+                
             }
         }
         int cnt=1;
@@ -106,16 +115,7 @@ public class PreCompute {
             all_netlists.add(set);
         }
         
-        /*for(int i=0;i<all_netlists.size()-1;i++)
-        {
-            System.out.println("Netlist : "+ cnt++ + "\n");
-            for(Gate gg:all_netlists.get(i))
-            {
-                String ggs = NetSynth.netlist(gg);
-                System.out.println(ggs);
-            }
-            System.out.println("\n\n");
-        }*/
+
         
         return all_netlists;
     }
@@ -125,7 +125,18 @@ public class PreCompute {
     
     public static DGate parseNorGate(String xg)
     {
-       DGate xgate;
+       if(!xg.contains("NOR"))
+       {
+           DGate bufgate = new DGate();
+           bufgate.gtype = DGateType.BUF;
+           bufgate.input.add(new DWire(xg,DWireType.input));
+           DWire bufout = new DWire("X",DWireType.output);
+           bufgate.output = bufout;
+           return bufgate;
+       }
+       else
+       {
+           DGate xgate;
        DWire outw = null;
        List<DWire> inp = new ArrayList<DWire>();
        DGateType gtype = DGateType.NOR2;
@@ -169,6 +180,8 @@ public class PreCompute {
        }
        xgate = new DGate(gtype,inp,outw);
        return xgate;
+       }
+       
     }
     
     

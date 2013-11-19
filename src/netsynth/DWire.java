@@ -31,6 +31,7 @@ public class DWire implements Serializable {
      }
      public DWire(String wirename)
      {
+        wtype = DWireType.connector;
         this.name = wirename;
      }
      public DWire(String wirename,DWireType wType)

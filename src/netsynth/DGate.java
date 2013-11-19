@@ -28,7 +28,7 @@ public class DGate implements Serializable{
            XOR2,
            XNOR2;
     }
-    DGateType gtype;
+    public DGateType gtype;
     public List<DWire> input;
     public DWire output;
     public int gatestage;
