@@ -22,6 +22,14 @@ public class parseCaseStatements {
     public static int input3case(String Filepath)
     {
         
+         Filepath = parseCaseStatements.class.getClassLoader().getResource(".").getPath();
+        
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+       
+        Filepath += "src/ParseVerilog/Verilog.v";
         
         File file = new File(Filepath);
         
@@ -37,7 +45,11 @@ public class parseCaseStatements {
             {
                 while((line = br.readLine()) != null )
                 {
-                    filelines.add(line.trim());
+                    if(!line.trim().isEmpty())
+                    {
+                        filelines.add(line.trim());
+                        System.out.println(line.trim());
+                    }
                 }
             } 
             catch (IOException ex) 

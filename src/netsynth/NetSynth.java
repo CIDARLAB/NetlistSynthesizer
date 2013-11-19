@@ -11,6 +11,7 @@ import CelloGraph.DAGW;
 import CelloGraph.DAGraph;
 import CelloGraph.Gate;
 import CelloGraph.Wire;
+import ParseVerilog.parseCaseStatements;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -60,13 +61,18 @@ public class NetSynth {
         one = new DWire("_one",DWireType.Source);
         zero = new DWire("_zero",DWireType.GND);
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        
+        testParser();
         //DAGraph x = precompute(2);
         
-        DAGW y = computeDAGW(14);
+        //DAGW y = computeDAGW(14);
         //testnetlistmodule();
         //testEspresso();
         
+    }
+    
+    public static void testParser()
+    {
+        int x = parseCaseStatements.input3case("");
     }
     
     public static DAGW computeDAGW(int x)
@@ -78,20 +84,6 @@ public class NetSynth {
         precomp = PreCompute.parseNetlistFile();
         outdag = CreateDAGW(precomp.get(x));
     
-      
-    
-        
-        /*for(Gate xg:outdag.Gates)
-        {
-            if(xg.Outgoing == null)
-            {
-                System.out.println("Input : "+xg.Name);
-            }
-            System.out.println(xg.Name + "   " +xg.Type);
-        }*/
-        
-        
-        
         return outdag;
        
     }
