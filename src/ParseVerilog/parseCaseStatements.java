@@ -94,10 +94,12 @@ public class parseCaseStatements {
         
         //<editor-fold desc="Extract Module IO Contraints">
         String moduleString = alllines.substring(alllines.indexOf(" module "),alllines.indexOf(";"));
+        alllines = alllines.substring((alllines.indexOf(moduleString) + moduleString.length()+1), alllines.indexOf(" endmodule"));
+        alllines = alllines.trim();
         moduleString = moduleString.trim();
         moduleString = moduleString.substring((moduleString.indexOf("(")+1),moduleString.indexOf(")"));
         
-        System.out.println(moduleString);
+        //System.out.println(moduleString);
         String[] modulePieces = moduleString.split(",");
         for(int i=0;i<modulePieces.length;i++)
         {
@@ -119,20 +121,7 @@ public class parseCaseStatements {
                 unknownIO.add(IO);                
             }
         }
-        System.out.println("Inputs :" + inputs.size() + "\nOutputs :"+ outputs.size() + "\nUnknown IOs :" + unknownIO.size());
-        
-        System.out.println("Inputs :");
-        for(String xi:inputs)
-        {
-            System.out.println(xi);
-        }
-        
-        System.out.println("Outputs :");
-        for(String xi:outputs)
-        {
-            System.out.println(xi);
-        }
-        
+        System.out.println(alllines);
         //</editor-fold>
         
         
