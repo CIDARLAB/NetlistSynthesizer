@@ -1,9 +1,15 @@
 `timescale 1ns / 1ps
-module XOR(
-    A,
-    B,
-    C,
-    X
+
+///////////////////////////////////////////////////////////
+//
+// module name: test inputs
+//////////////////////////////////////////////////////////
+
+module XOR (
+  output X,
+  input A,                                                      
+  input B,
+  input C
     );
 
 input wire A;
