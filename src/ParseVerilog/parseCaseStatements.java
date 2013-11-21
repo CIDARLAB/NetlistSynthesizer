@@ -98,6 +98,7 @@ public class parseCaseStatements {
         alllines = alllines.trim();
         moduleString = moduleString.trim();
         moduleString = moduleString.substring((moduleString.indexOf("(")+1),moduleString.indexOf(")"));
+        //System.out.println(alllines);
         
         //System.out.println(moduleString);
         String[] modulePieces = moduleString.split(",");
@@ -121,13 +122,104 @@ public class parseCaseStatements {
                 unknownIO.add(IO);                
             }
         }
-        System.out.println(alllines);
+        //System.out.println(alllines);
         //</editor-fold>
         
-        
+        List<String> VerilogLines = new ArrayList<String>();
+        String temp="";
+        int caseLocation=-1;
+        int cnt =0;
+        while(alllines.contains(";") || alllines.length()>0)
+        {
+            
+            if(alllines.startsWith("always ") || alllines.startsWith("always@"))
+            {
+                if(alllines.contains(" begin "))
+                {
+                    int lastbeginIndx=0;
+                    if((alllines.lastIndexOf(" end")+4) == alllines.length())
+                    {
+                        temp = alllines.substring(0, alllines.lastIndexOf(" end")+4);
+                        VerilogLines.add(temp);
+                        alllines = alllines.substring(alllines.lastIndexOf(" end")+4);
+                    }
+                    else
+                    {
+                        temp = alllines.substring(0, alllines.lastIndexOf(" end ")+5);
+                        VerilogLines.add(temp);
+                        alllines = alllines.substring(alllines.lastIndexOf(" end ")+5);
+                    }
+                if(temp.contains(" endcase "))
+                    caseLocation = cnt;
+                alllines = alllines.trim();
+                }
                 
+            }
+            else if(alllines.contains(";"))
+            {
+                //System.out.println(alllines);
+                VerilogLines.add(alllines.substring(0,alllines.indexOf(";")));
+                alllines = alllines.substring(alllines.indexOf(";")+1);
+                alllines = alllines.trim();
+            }    
+            else
+            {
+                VerilogLines.add(alllines);
+                alllines = "";
+            }
+           
+            cnt++;
+        }
         
+        if(caseLocation == -1)
+            System.out.println("No case statements");
         
+        else
+        {
+            String tempcase = VerilogLines.get(caseLocation);
+            //List<String> caseStatements = new ArrayList<String>();
+            String caseblock ="";
+            String caseparam = "";
+            String[] caseStatements;
+            boolean unusualcase = false;
+            
+            if(tempcase.contains("case("))
+            {
+                caseblock = tempcase.substring(tempcase.indexOf("case(")+4);
+                caseblock = caseblock.trim();
+            }
+            else if(tempcase.contains("case "))
+            {
+               
+                //System.out.println(tempcase);
+                caseblock = tempcase.substring(tempcase.indexOf("case ")+5);
+                caseblock = caseblock.trim();
+                
+            }
+            else
+            {
+                unusualcase = true;
+                System.out.println("unusual Case Statement!!\n"+tempcase);
+            }
+            
+            if(!unusualcase)
+            {
+                caseparam = caseblock.substring(caseblock.indexOf("(")+1,caseblock.indexOf(")"));
+                caseblock = caseblock.substring(caseblock.indexOf(")")+1);
+                caseblock = caseblock.substring(0,caseblock.indexOf("endcase"));
+                caseblock = caseblock.trim();
+                caseStatements = caseblock.split(";");
+                //System.out.println(caseparam);
+                //System.out.println(caseblock);
+                for(int i=0;i<caseStatements.length;i++)
+                {
+                    String xcase = caseStatements[i].trim();
+                    System.out.println(xcase);
+                }
+            }
+                
+            
+        }
         
         
         return x;
