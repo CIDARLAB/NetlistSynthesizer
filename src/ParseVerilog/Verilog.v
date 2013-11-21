@@ -1,34 +1,18 @@
-`timescale 1ns / 1ps
-
-///////////////////////////////////////////////////////////
-//
-// module name: test inputs
-//////////////////////////////////////////////////////////
-
-module XOR (
-  output X,
-  input A,                                                      
-  input B,
-  input C
-    );
-
-input wire A;
-input wire B;
-input wire C;
-output reg X;
-
-always@(*) begin
-
-	case({A,B,C})
-		3'b000: X = 1'b0;
-		3'b001: X = 1'b1;
-		3'b010: X = 1'b1;
-		3'b011: X = 1'b0;
-		3'b100: X = 1'b1;
-		3'b101: X = 1'b0;
-		3'b110: X = 1'b0;
-		3'b111: X = 1'b1;
-
-	endcase
-end
+module and3(output out, input in1, in2, in3);
+  reg r_out;
+  assign out = r_out;
+  always@(in1, in2, in3)
+    begin
+      case({in3,in2,in1})
+        3b’000: out = 0;
+        3b’001: out = 0;
+        3b’010: out = 0;
+        3b’011: out = 0;
+        3b’100: out = 0;
+        3b’101: out = 1;
+        3b’110: out = 0;
+        3b’111: out = 1;
+        default: out = 0;
+      endcase
+    end
 endmodule

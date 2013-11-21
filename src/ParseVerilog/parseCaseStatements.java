@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * @author prashantvaidyanathan
  */
 public class parseCaseStatements {
-    public static int input3case(String Filepath)
+    public static CircuitDetails input3case(String Filepath)
     {
         
          Filepath = parseCaseStatements.class.getClassLoader().getResource(".").getPath();
@@ -31,7 +31,7 @@ public class parseCaseStatements {
          
          int x = 0;
         
-         
+         CircuitDetails circuit = new CircuitDetails();
         if(Filepath.contains("build/classes/"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
@@ -216,9 +216,11 @@ public class parseCaseStatements {
                 String[] caseinp = caseparam.split(",");
                 for(int i=0;i<caseinp.length;i++)
                 {
-                    caseinp[i] = caseinp[i].trim();
-                    System.out.println(caseinp[i]);
+                    circuit.inputNames.add(caseinp[i].trim());
                 }
+                String output = caseStatements[0].substring(caseStatements[0].indexOf(":")+1,caseStatements[0].indexOf("="));
+                output = output.trim();
+                circuit.outputNames.add(output);
                 for(int i=0;i<caseStatements.length;i++)
                 {
                     String xcase = caseStatements[i].trim();
@@ -237,32 +239,47 @@ public class parseCaseStatements {
                     
                     if(truthtable.containsKey(i))
                     {
+                     
                         xbits[i] = truthtable.get(i).toString().charAt(0);
                     }
                     else
                     {
-                        xbits[i] = '0';
+                        if(truthtable.containsKey(-2))
+                        {
+                            xbits[i] = truthtable.get(-2).toString().charAt(0);
+                        }
+                        else
+                        {
+                            xbits[i] = '0';
+                        }
                     }
                 }
                 int truthtableval = bintoDec(new String(xbits)) ;
-                System.out.println(truthtableval);
+                circuit.inputgatetable = truthtableval;
+                //System.out.println(truthtableval);
                 
             }
             else
             {
-                
+                return null;
             }
                 
             
         }
         
         
-        return x;
+        return circuit;
     }
     public static int toDec(String num)
     {
         int number =0;
-        if(num.contains("'"))
+        if(num.contains("default"))
+        {
+            return -2;
+        }
+        else
+        {
+        if(num.contains("’"))
         {
             if(num.contains("b"))
             {
@@ -277,9 +294,26 @@ public class parseCaseStatements {
                 number = Integer.parseInt(num);
             }
         }
+        else if(num.contains("'"))
+        {
+            if(num.contains("b"))
+            {
+                num = num.substring(num.indexOf("b")+1);
+                num = num.trim();
+                number = bintoDec(num);
+            }
+            else if(num.contains("d"))
+            {
+                num = num.substring(num.indexOf("d")+1);
+                num = num.trim();
+                number = Integer.parseInt(num);
+            }
+        }  
         else
         {
+            //System.out.println(num);
             number = Integer.parseInt(num);
+        }
         }
         return number;
     }

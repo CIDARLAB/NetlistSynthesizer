@@ -11,6 +11,7 @@ import CelloGraph.DAGW;
 import CelloGraph.DAGraph;
 import CelloGraph.Gate;
 import CelloGraph.Wire;
+import ParseVerilog.CircuitDetails;
 import ParseVerilog.parseCaseStatements;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -49,7 +50,7 @@ public class NetSynth {
     public static boolean functionOutp;
     public static String Filepath;
     
-    
+    public static CircuitDetails caseCirc;
     
     public static void main(String[] args) {
         // TODO code application logic here
@@ -61,7 +62,7 @@ public class NetSynth {
         one = new DWire("_one",DWireType.Source);
         zero = new DWire("_zero",DWireType.GND);
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        testParser();
+        DAGW xcasedag = testParser("");
         //DAGraph x = precompute(2);
         
         //DAGW y = computeDAGW(14);
@@ -70,9 +71,38 @@ public class NetSynth {
         
     }
     
-    public static void testParser()
+    public static DAGW testParser(String FilePath)
     {
-        int x = parseCaseStatements.input3case("");
+        caseCirc = new CircuitDetails();
+        caseCirc = parseCaseStatements.input3case(FilePath);
+        
+        DAGW circuitDAG = new DAGW();
+        
+        if(caseCirc.inputgatetable ==0 || caseCirc.inputgatetable ==255)
+            return null;
+        
+        circuitDAG = computeDAGW(caseCirc.inputgatetable);
+        //System.out.println(caseCirc.inputgatetable);
+        
+        for(Gate gdag:circuitDAG.Gates)
+        {
+            int i=0;
+            int j=0;
+            if(gdag.Type == "INPUT")
+            {
+                gdag.Name = caseCirc.inputNames.get(i);
+                i++;
+                //System.out.println("Hallelujah");
+            }
+            if(gdag.Type == "OUTPUT" || gdag.Type == "OUTPUT_OR")
+            {
+                gdag.Name = caseCirc.outputNames.get(i);
+                j++;
+                //System.out.println("Hallelujah");
+            }
+        }
+        return circuitDAG;
+        
     }
     
     public static DAGW computeDAGW(int x)
