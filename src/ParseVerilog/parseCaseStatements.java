@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -209,13 +210,47 @@ public class parseCaseStatements {
                 caseblock = caseblock.substring(0,caseblock.indexOf("endcase"));
                 caseblock = caseblock.trim();
                 caseStatements = caseblock.split(";");
-                //System.out.println(caseparam);
-                //System.out.println(caseblock);
+                
+                HashMap<Integer,Integer> truthtable = new HashMap<Integer,Integer>();
+                caseparam = caseparam.substring(caseparam.indexOf("{")+1, caseparam.indexOf("}"));
+                String[] caseinp = caseparam.split(",");
+                for(int i=0;i<caseinp.length;i++)
+                {
+                    caseinp[i] = caseinp[i].trim();
+                    System.out.println(caseinp[i]);
+                }
                 for(int i=0;i<caseStatements.length;i++)
                 {
                     String xcase = caseStatements[i].trim();
                     System.out.println(xcase);
+                    String cNum = xcase.substring(0,xcase.indexOf(":")).trim();
+                    int caseNumber = toDec(cNum);
+                    String sNum = xcase.substring(xcase.indexOf("=")+1).trim();
+                    int swNumber = toDec(sNum);
+                    truthtable.put(caseNumber, swNumber);
                 }
+                int numTT = (int) Math.pow(2, caseinp.length);
+                
+                char[] xbits = new char[numTT];
+                for(int i=0;i<numTT;i++)
+                {
+                    
+                    if(truthtable.containsKey(i))
+                    {
+                        xbits[i] = truthtable.get(i).toString().charAt(0);
+                    }
+                    else
+                    {
+                        xbits[i] = '0';
+                    }
+                }
+                int truthtableval = bintoDec(new String(xbits)) ;
+                System.out.println(truthtableval);
+                
+            }
+            else
+            {
+                
             }
                 
             
@@ -224,6 +259,44 @@ public class parseCaseStatements {
         
         return x;
     }
-    
-    
+    public static int toDec(String num)
+    {
+        int number =0;
+        if(num.contains("'"))
+        {
+            if(num.contains("b"))
+            {
+                num = num.substring(num.indexOf("b")+1);
+                num = num.trim();
+                number = bintoDec(num);
+            }
+            else if(num.contains("d"))
+            {
+                num = num.substring(num.indexOf("d")+1);
+                num = num.trim();
+                number = Integer.parseInt(num);
+            }
+        }
+        else
+        {
+            number = Integer.parseInt(num);
+        }
+        return number;
+    }
+    public static int bintoDec(String bin)
+    {
+        int dec =0;
+        int exp =0;
+        for(int i=bin.length()-1;i>=0;i--)
+        {
+            int pow2 = (int)Math.pow(2, exp);
+            if(bin.charAt(i)== '1')
+            {
+                dec += pow2;
+            }
+
+            exp++;
+        }
+        return dec;
+    }
 }
