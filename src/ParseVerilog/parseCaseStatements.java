@@ -213,7 +213,7 @@ public class parseCaseStatements {
                 
                 HashMap<Integer,Integer> truthtable = new HashMap<Integer,Integer>();
                 caseparam = caseparam.substring(caseparam.indexOf("{")+1, caseparam.indexOf("}"));
-                System.out.println(caseparam);
+                
                 String[] caseinp = caseparam.split(",");
                 for(int i=0;i<caseinp.length;i++)
                 {
@@ -226,7 +226,7 @@ public class parseCaseStatements {
                 for(int i=0;i<caseStatements.length;i++)
                 {
                     String xcase = caseStatements[i].trim();
-                    System.out.println(xcase);
+                
                     String cNum = xcase.substring(0,xcase.indexOf(":")).trim();
                     int caseNumber = toDec(cNum);
                     String sNum = xcase.substring(xcase.indexOf("=")+1).trim();

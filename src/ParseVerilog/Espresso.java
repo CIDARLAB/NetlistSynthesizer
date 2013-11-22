@@ -17,15 +17,15 @@ public class Espresso {
         List<String> esfile = new ArrayList<String>();
          int pw = (int) Math.pow(2, circ.inputNames.size());
         String truthfunc = dectoBin(circ.inputgatetable, pw);
-        System.out.println(truthfunc);
+        //System.out.println(truthfunc);
         String line = "";
         line += (".i " + circ.inputNames.size());
         esfile.add(line);
         line = "";
-        line += (".e " + circ.outputNames.size());
+        line += (".o " + circ.outputNames.size());
         esfile.add(line);
         line = "";
-        line += ".lb";
+        line += ".ilb";
         for(String xinp:circ.inputNames)
         {
             line += " "+xinp;
@@ -52,11 +52,7 @@ public class Espresso {
         line += ".e";
         esfile.add(line);
         
-        
-        for(String nline:esfile)
-        {
-            System.out.println(nline);
-        }
+      
         
         return esfile;
     }

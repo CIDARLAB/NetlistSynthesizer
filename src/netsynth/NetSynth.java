@@ -63,6 +63,13 @@ public class NetSynth {
         one = new DWire("_one",DWireType.Source);
         zero = new DWire("_zero",DWireType.GND);
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        
+        
+        
         DAGW xcasedag = testParser("");
         
         //DAGraph x = precompute(2);
@@ -72,40 +79,75 @@ public class NetSynth {
         
     }
     
-    public static DAGW testParser(String FilePath)
+    public static DAGW testParser(String pathFile)
     {
         caseCirc = new CircuitDetails();
-        caseCirc = parseCaseStatements.input3case(FilePath);
+        caseCirc = parseCaseStatements.input3case(pathFile);
         
         DAGW circuitDAG = new DAGW();
         
         if(caseCirc.inputgatetable ==0 || caseCirc.inputgatetable ==255)
             return null;
         
-        circuitDAG = computeDAGW(caseCirc.inputgatetable);
-        //System.out.println(caseCirc.inputgatetable);
-        int i=0;
-            int j=0;
-        for(Gate gdag:circuitDAG.Gates)
+        if(caseCirc.inputNames.size() == 3)
         {
+            circuitDAG = computeDAGW(caseCirc.inputgatetable);
+            int i=0;
+            int j=0;
+            for(Gate gdag:circuitDAG.Gates)
+            {
             
-            if(gdag.Type == "INPUT")
-            {
-                gdag.Name = caseCirc.inputNames.get(i);
-                i++;
-                System.out.println(gdag.Name);
-                //System.out.println("Hallelujah");
-            }
-            if(gdag.Type == "OUTPUT" || gdag.Type == "OUTPUT_OR")
-            {
-                gdag.Name = caseCirc.outputNames.get(j);
-                j++;
-                
+                if("INPUT".equals(gdag.Type))
+                {
+                    gdag.Name = caseCirc.inputNames.get(i);
+                    i++;
+                }
+                if("OUTPUT".equals(gdag.Type) || "OUTPUT_OR".equals(gdag.Type))
+                {
+                    gdag.Name = caseCirc.outputNames.get(j);
+                    j++; 
+                }
             }
         }
+        else
+        {
+            List<String> eslines = new ArrayList<String>();
+            eslines = Espresso.createFile(caseCirc);
+            
+              String filestring = "";
+            
+            
+            filestring += Filepath+ "src/resources/espresso";
+            filestring += Global.espout++ ;
+            filestring += ".txt";
+            File fespinp = new File(filestring);
+            try 
+            {
+                Writer output = new BufferedWriter(new FileWriter(fespinp));
+                for(String xline:eslines)
+                {
+                    String newl = (xline + "\n");
+                    output.write(newl);
+                }
+                output.close();
+                List<String> espout = new ArrayList<String>();
+                espout = runEspresso(filestring);
+                List<DGate> espoutput = new ArrayList<DGate>();
+                espoutput = parseEspressoToNORNAND(espout);
+                circuitDAG = CreateDAGW(espoutput);
+                fespinp.deleteOnExit();
+              
+            } 
+            catch (IOException ex) 
+            {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+        }
         
-        List<String> eslines = new ArrayList<String>();
-        eslines = Espresso.createFile(caseCirc);
+        
+        
         
         return circuitDAG;
         
@@ -139,7 +181,7 @@ public class NetSynth {
     {
         
         List<String> espressoOut = new ArrayList<String>();
-        espressoOut = runEspresso();
+        espressoOut = runEspresso("");
         
         List<DGate> SOPgates = new ArrayList<DGate>();
         List<DGate> NORgates = new ArrayList<DGate>();
@@ -185,7 +227,7 @@ public class NetSynth {
         
     }
    
-    public static List<String> runEspresso() {
+    public static List<String> runEspresso(String pathFile) {
     
         
         List<String> espressoOutput = new ArrayList<String>();
@@ -195,14 +237,12 @@ public class NetSynth {
         //{
             //commandBuilder = new StringBuilder("./src/resources/espresso.linux -epos src/resources/test.txt");
         //System.out.println(Filepath);
-        if(Filepath.contains("build/classes/"))
-            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
-        else if(Filepath.contains("src"))
-            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        
         
         //System.out.println(Filepath);
          
-            commandBuilder = new StringBuilder(Filepath+"src/resources/espresso.linux -epos "+ Filepath+"src/resources/test.txt");
+            //commandBuilder = new StringBuilder(Filepath+"src/resources/espresso.linux -epos "+ Filepath+"src/resources/test.txt");
+        commandBuilder = new StringBuilder(Filepath+"src/resources/espresso.linux -epos "+ pathFile);
        
             //}
         
