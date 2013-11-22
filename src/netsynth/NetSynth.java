@@ -12,6 +12,7 @@ import CelloGraph.DAGraph;
 import CelloGraph.Gate;
 import CelloGraph.Wire;
 import ParseVerilog.CircuitDetails;
+import ParseVerilog.Espresso;
 import ParseVerilog.parseCaseStatements;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -64,7 +65,8 @@ public class NetSynth {
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         DAGW xcasedag = testParser("");
         //DAGraph x = precompute(2);
-        
+        String xbin = Espresso.dectoBin(5, 5);
+        System.out.println(xbin);
         //DAGW y = computeDAGW(14);
         //testnetlistmodule();
         //testEspresso();
@@ -98,7 +100,7 @@ public class NetSynth {
             {
                 gdag.Name = caseCirc.outputNames.get(i);
                 j++;
-                //System.out.println("Hallelujah");
+                
             }
         }
         return circuitDAG;
