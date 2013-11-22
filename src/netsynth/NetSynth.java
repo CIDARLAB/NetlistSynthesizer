@@ -64,9 +64,8 @@ public class NetSynth {
         zero = new DWire("_zero",DWireType.GND);
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         DAGW xcasedag = testParser("");
+        
         //DAGraph x = precompute(2);
-        String xbin = Espresso.dectoBin(5, 5);
-        System.out.println(xbin);
         //DAGW y = computeDAGW(14);
         //testnetlistmodule();
         //testEspresso();
@@ -85,24 +84,29 @@ public class NetSynth {
         
         circuitDAG = computeDAGW(caseCirc.inputgatetable);
         //System.out.println(caseCirc.inputgatetable);
-        
+        int i=0;
+            int j=0;
         for(Gate gdag:circuitDAG.Gates)
         {
-            int i=0;
-            int j=0;
+            
             if(gdag.Type == "INPUT")
             {
                 gdag.Name = caseCirc.inputNames.get(i);
                 i++;
+                System.out.println(gdag.Name);
                 //System.out.println("Hallelujah");
             }
             if(gdag.Type == "OUTPUT" || gdag.Type == "OUTPUT_OR")
             {
-                gdag.Name = caseCirc.outputNames.get(i);
+                gdag.Name = caseCirc.outputNames.get(j);
                 j++;
                 
             }
         }
+        
+        List<String> eslines = new ArrayList<String>();
+        eslines = Espresso.createFile(caseCirc);
+        
         return circuitDAG;
         
     }

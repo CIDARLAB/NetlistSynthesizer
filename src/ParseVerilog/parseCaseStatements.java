@@ -213,11 +213,13 @@ public class parseCaseStatements {
                 
                 HashMap<Integer,Integer> truthtable = new HashMap<Integer,Integer>();
                 caseparam = caseparam.substring(caseparam.indexOf("{")+1, caseparam.indexOf("}"));
+                System.out.println(caseparam);
                 String[] caseinp = caseparam.split(",");
                 for(int i=0;i<caseinp.length;i++)
                 {
                     circuit.inputNames.add(caseinp[i].trim());
                 }
+                
                 String output = caseStatements[0].substring(caseStatements[0].indexOf(":")+1,caseStatements[0].indexOf("="));
                 output = output.trim();
                 circuit.outputNames.add(output);
