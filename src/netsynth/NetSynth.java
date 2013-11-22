@@ -69,7 +69,7 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
         
-        
+        histogram();
         DAGW xcasedag = testParser("");
         
         //DAGraph x = precompute(2);
@@ -77,6 +77,79 @@ public class NetSynth {
         //testnetlistmodule();
         //testEspresso();
         
+    }
+    
+    
+    public static void histogram()
+    {
+        String filestring ="";
+          filestring += Filepath+ "src/resources/Histogram";
+            //filestring += Global.espout++ ;
+            filestring += ".csv";
+            File fespinp = new File(filestring);
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            String Line = "SrNo,PreComputer,Espresspo\n";
+            output.write(Line);
+            List<List<DGate>> precomp;
+            precomp = PreCompute.parseNetlistFile();
+            CircuitDetails circ = new CircuitDetails();
+            circ.inputNames.add("A");
+            circ.inputNames.add("B");
+            circ.inputNames.add("C");
+            circ.outputNames.add("O");
+            for(int i=0;i<256;i++)
+            {
+                Line = "";
+                Line += (i + ",");
+                if(i==0 || i==255)
+                    Line += ("1,"); 
+                else
+                    Line += (precomp.get(i-1).size() + ",");
+                
+                circ.inputgatetable = i;
+                List<String> eslines = new ArrayList<String>();
+                eslines = Espresso.createFile(circ);
+                String filestring2 = "";
+            
+                filestring2 += Filepath+ "src/resources/espresso";
+                filestring2 += Global.espout++ ;
+                filestring2 += ".txt";
+                File fespinp2 = new File(filestring2);
+                try 
+                {
+                    Writer output2 = new BufferedWriter(new FileWriter(fespinp2));
+                    for(String xline:eslines)
+                    {
+                        String newl = (xline + "\n");
+                        output2.write(newl);
+                    }
+                    output2.close();
+                    List<String> espout2 = new ArrayList<String>();
+                    espout2 = runEspresso(filestring2);
+                    List<DGate> espoutput2 = new ArrayList<DGate>();
+                    espoutput2 = parseEspressoToNORNAND(espout2);
+                    
+                    Line += espoutput2.size();
+                    fespinp2.deleteOnExit();
+              
+                } 
+                catch (IOException ex) 
+                {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                Line += "\n";
+                output.write(Line);
+            }
+            output.close();
+        
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public static DAGW testParser(String pathFile)
@@ -134,6 +207,12 @@ public class NetSynth {
                 espout = runEspresso(filestring);
                 List<DGate> espoutput = new ArrayList<DGate>();
                 espoutput = parseEspressoToNORNAND(espout);
+                
+                for(DGate netgate:espoutput)
+                {
+                    System.out.println(netlist(netgate));
+                }
+                
                 circuitDAG = CreateDAGW(espoutput);
                 fespinp.deleteOnExit();
               
@@ -262,7 +341,7 @@ public class NetSynth {
             
             
             filestring += Filepath+ "src/resources/write";
-            filestring += Global.espout;
+            filestring += Global.espout++;
             filestring += ".txt";
             File fbool = new File(filestring);
             Writer output = new BufferedWriter(new FileWriter(fbool));
@@ -277,7 +356,7 @@ public class NetSynth {
                 output.write(line);
             }
             output.close();
-            //fbool.deleteOnExit();
+            fbool.deleteOnExit();
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }

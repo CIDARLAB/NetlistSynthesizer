@@ -23,9 +23,9 @@ module and3(output out, input in1, in2);
   always@(in1, in2)
     begin
       case({in2,in1})
-        2b’00: out = 1;
-        2b’01: out = 0;
-        2b’10: out = 0;
+        2b’00: out = 0;
+        2b’01: out = 1;
+        2b’10: out = 1;
         2b’11: out = 1;
         default: out = 0;
       endcase
