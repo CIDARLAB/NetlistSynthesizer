@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class DWire implements Serializable {
    
     
-     String name; 
+     public String name; 
      public enum DWireType{
          input,
          output,
@@ -34,11 +34,13 @@ public class DWire implements Serializable {
      public DWire()
      {
          name = "";
+         wValue = DWireValue._x;
          wtype = DWireType.connector;  
      }
      public DWire(String wirename)
      {
         wtype = DWireType.connector;
+        wValue = DWireValue._x;
         this.name = wirename;
      }
      public DWire(String wirename,DWireType wType)
@@ -50,8 +52,7 @@ public class DWire implements Serializable {
          }
          this.name = wirename;
          this.wtype = wType;
-
+         wValue = DWireValue._x;
      }
-     
      
 }

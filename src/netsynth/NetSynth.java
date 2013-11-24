@@ -14,6 +14,7 @@ import CelloGraph.Wire;
 import ParseVerilog.CircuitDetails;
 import ParseVerilog.Espresso;
 import ParseVerilog.parseCaseStatements;
+import booleanLogic.BooleanSimulator;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -69,7 +70,7 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
         
-        histogram();
+        //histogram();
         DAGW xcasedag = testParser("");
         
         //DAGraph x = precompute(2);
@@ -206,16 +207,17 @@ public class NetSynth {
                 List<String> espout = new ArrayList<String>();
                 espout = runEspresso(filestring);
                 List<DGate> espoutput = new ArrayList<DGate>();
-                espoutput = parseEspressoToNORNAND(espout);
                 
-                for(DGate netgate:espoutput)
+                espoutput = parseEspressoToNORNAND(espout);
+                String espperm = BooleanSimulator.bpermute(espoutput);
+                /*for(DGate netgate:espoutput)
                 {
                     System.out.println(netlist(netgate));
-                }
+                }*/
                 
                 circuitDAG = CreateDAGW(espoutput);
                 fespinp.deleteOnExit();
-              
+                System.out.println(espperm);
             } 
             catch (IOException ex) 
             {
