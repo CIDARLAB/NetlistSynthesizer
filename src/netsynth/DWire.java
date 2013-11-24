@@ -21,6 +21,13 @@ public class DWire implements Serializable {
          Source,
          connector;
      }
+     public enum DWireValue{
+         _1,
+         _0,
+         _x;
+     }
+     
+     public DWireValue wValue;
      public DWireType wtype;
      int wirestage;
     
