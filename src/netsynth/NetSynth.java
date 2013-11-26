@@ -70,7 +70,7 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
         
-        //histogram();
+        histogram();
         DAGW xcasedag = testParser("");
         
         //DAGraph x = precompute(2);
@@ -131,7 +131,10 @@ public class NetSynth {
                     espout2 = runEspresso(filestring2);
                     List<DGate> espoutput2 = new ArrayList<DGate>();
                     espoutput2 = parseEspressoToNORNAND(espout2);
-                    
+                    String xf ="";
+                    xf = BooleanSimulator.bpermute(espoutput2);
+                    if(i==253 || i == 254 || i==251 || i==239)
+                        System.out.println(xf);
                     Line += espoutput2.size();
                     fespinp2.deleteOnExit();
               
