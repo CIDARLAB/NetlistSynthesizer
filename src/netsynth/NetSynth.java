@@ -71,7 +71,7 @@ public class NetSynth {
         
         
         histogram();
-        DAGW xcasedag = testParser("");
+        //DAGW xcasedag = testParser("");
         
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);
@@ -109,6 +109,8 @@ public class NetSynth {
                 else
                     Line += (precomp.get(i-1).size() + ",");
                 
+                
+                
                 circ.inputgatetable = i;
                 List<String> eslines = new ArrayList<String>();
                 eslines = Espresso.createFile(circ);
@@ -131,10 +133,10 @@ public class NetSynth {
                     espout2 = runEspresso(filestring2);
                     List<DGate> espoutput2 = new ArrayList<DGate>();
                     espoutput2 = parseEspressoToNORNAND(espout2);
-                    String xf ="";
-                    xf = BooleanSimulator.bpermute(espoutput2);
-                    if(i==253 || i == 254 || i==251 || i==239)
-                        System.out.println(xf);
+                    //String xf ="";
+                    //xf = BooleanSimulator.bpermute(espoutput2);
+                    //if(i==253 || i == 254 || i==251 || i==239)
+                    //    System.out.println(xf);
                     Line += espoutput2.size();
                     fespinp2.deleteOnExit();
               
@@ -213,10 +215,10 @@ public class NetSynth {
                 
                 espoutput = parseEspressoToNORNAND(espout);
                 String espperm = BooleanSimulator.bpermute(espoutput);
-                /*for(DGate netgate:espoutput)
+                for(DGate netgate:espoutput)
                 {
                     System.out.println(netlist(netgate));
-                }*/
+                }
                 
                 circuitDAG = CreateDAGW(espoutput);
                 fespinp.deleteOnExit();

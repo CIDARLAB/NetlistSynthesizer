@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -101,6 +102,8 @@ public class PreCompute {
         for(int i=0;i<string_netlists.size();i++)
         {
             List<DGate> set = new ArrayList<DGate>();
+            List<DGate> stset = new ArrayList<DGate>();
+            
             for(String xs:string_netlists.get(i))
             {
                 DGate xg1 = parseNorGate(xs);
@@ -108,11 +111,13 @@ public class PreCompute {
             }
             if(!set.isEmpty())
             {
-                set.get(set.size()-1).output.wtype = DWireType.output;
+                stset = stitchNetlist(set); 
+                stset.get(stset.size()-1).output.wtype = DWireType.output;
                 //System.out.println("Found" + cnt++);
+                all_netlists.add(stset);
             }
-            
-            all_netlists.add(set);
+            else  
+                all_netlists.add(set);
         }
         
 
@@ -121,7 +126,118 @@ public class PreCompute {
     }
     
     
-    
+    public static List<DGate> stitchNetlist(List<DGate> set)
+    {
+        List<DGate> stitchedset = new ArrayList<DGate>();
+        HashMap<String,DWire> input = new HashMap<String,DWire>();
+        HashMap<String,DWire> connectors = new HashMap<String,DWire>();
+        
+        HashMap<String,DWire> allwires = new HashMap<String,DWire>();
+        List<DWire> wires = new ArrayList<DWire>();
+        
+        
+        for(DGate dg:set)
+        {
+            List<DWire> ninp = new ArrayList<DWire>();
+            DWire noup = new DWire();
+            for(DWire dw:dg.input)
+            {
+                //if(dw.wtype == DWireType.connector)
+                //{
+                    int flag =0;
+                    for(DWire sw:wires)
+                    {
+                        if(sw.name.trim().equals(dw.name.trim()))
+                        {
+                            ninp.add(sw);
+                            dw = sw;
+                            flag =1;
+                            break;
+                        }
+                    }
+                    if(flag ==0)
+                    {
+                        ninp.add(dw);
+                        wires.add(dw);
+                    }
+                //}
+            }
+            DWire dw = dg.output;
+            //if(dw.wtype == DWireType.connector)
+            //{
+                int flag =0;
+                for(DWire sw:wires)
+                {
+                    if(sw.name.trim().equals(dw.name.trim()))
+                    {
+                        noup = sw;
+                        dw = sw;
+                        flag =1;
+                        break;
+                    }
+                }
+                if(flag ==0)
+                {
+                    noup = dw;
+                    wires.add(dw);
+                }
+            //}
+            dg.input = ninp;
+            dg.output = noup;
+            stitchedset.add(dg);
+        }
+        
+        /*for(DGate dg:set)
+        {
+            for(DWire dw:dg.input)
+            {
+                if(dw.wtype == DWireType.Source ||dw.wtype == DWireType.GND || dw.wtype == DWireType.output )
+                {
+                }
+                else if(dw.wtype == DWireType.input)
+                {
+                    DWire x = input.get(dw.name.trim());
+                    if(x==null) 
+                        input.put(dw.name.trim(), dw);
+                    else
+                        dw = input.get(dw.name.trim());
+                }
+                else
+                {
+                    DWire x = connectors.get(dw.name.trim());
+                    if(x==null)
+                        connectors.put(dw.name.trim(), dw);
+                    else
+                        dw = connectors.get(dw.name.trim());
+                }
+            }
+            
+            DWire dw = dg.output;
+            if(dw.wtype == DWireType.Source ||dw.wtype == DWireType.GND || dw.wtype == DWireType.output )
+            {
+            }
+            else if(dw.wtype == DWireType.input)
+            {
+                    DWire x = input.get(dw.name.trim());
+                    if(x==null)
+                        input.put(dw.name.trim(), dw);
+                    else
+                        dw = input.get(dw.name.trim());
+             }
+             else
+             {
+                DWire x = connectors.get(dw.name.trim());
+                if(x==null)
+                    connectors.put(dw.name.trim(), dw);
+                else
+                    dw = connectors.get(dw.name.trim());
+             }
+            stitchedset.add(dg);
+        }*/
+        
+     
+        return stitchedset;
+    }
     
     public static DGate parseNorGate(String xg)
     {
@@ -166,7 +282,7 @@ public class PreCompute {
                else if(xwtype == DWireType.Source)
                 outw = NetSynth.one;
                else
-                outw = new DWire(parts[i],xwtype);
+                outw = new DWire(parts[i].trim(),xwtype);
            }
            else
            {
@@ -175,7 +291,7 @@ public class PreCompute {
                else if(xwtype == DWireType.Source)
                    inp.add(NetSynth.one);
                else
-                   inp.add(new DWire(parts[i],xwtype));
+                   inp.add(new DWire(parts[i].trim(),xwtype));
            }
        }
        xgate = new DGate(gtype,inp,outw);
@@ -185,10 +301,6 @@ public class PreCompute {
     }
     
     
-    public static String binaryConv(int num)
-    {
-        String outbin ="";
-        return outbin;
-    }
+   
    
 }
