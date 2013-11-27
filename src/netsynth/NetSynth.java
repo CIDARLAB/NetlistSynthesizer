@@ -69,10 +69,10 @@ public class NetSynth {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
-        
-        histogram();
+        verifyinverse();
+        //histogram();
         //DAGW xcasedag = testParser("");
-        
+        //verifyprecomute();
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);
         //testnetlistmodule();
@@ -80,6 +80,77 @@ public class NetSynth {
         
     }
     
+    
+    public static void verifyinverse()
+    {
+        String filestring ="";
+          filestring += Filepath+ "src/resources/Inverse";
+            //filestring += Global.espout++ ;
+            filestring += ".csv";
+            File fespinp = new File(filestring);
+        try {
+            List<List<DGate>> precomp;
+            precomp = PreCompute.parseNetlistFile();
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            String Line;
+            Line = "SrNo,Actual,Inverse\n";
+            output.write(Line);
+            for(int i=0;i<256;i++)
+            {
+                 Line ="";
+                if(i==0||i==255)
+                   Line += i + "\n";
+                else
+                {
+                    int x = precomp.get(i-1).size();
+                    int y = precomp.get(253- i + 1).size();
+                    //int y=0;
+                    Line = i+ ","+ x + "," + (y+1) + "\n";
+                }
+                output.write(Line);
+            }
+            output.close();
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
+    }
+    
+    public static void verifyprecomute()
+    {
+         List<List<DGate>> precomp;
+         precomp = PreCompute.parseNetlistFile();
+         int flag =0;
+         for(int i=0;i<256;i++)
+         {
+             if(i==0 || i==255)
+             {
+                 flag =0;
+             } 
+             else
+             {
+                 String truthfunc ="";
+                 truthfunc = BooleanSimulator.bpermutePreComp(precomp.get(i-1));
+                 //System.out.println(truthfunc);
+                 int k = parseCaseStatements.bintoDec(truthfunc);
+                 if(k!=i)
+                 {
+                     System.out.println(truthfunc);
+                     System.out.println(i-1);
+                     //flag =1;
+                     //break;
+                 }
+             }
+         }
+         if(flag == 1)
+         {
+             System.out.println("ERROR!!!");
+         }
+    }
     
     public static void histogram()
     {
@@ -133,10 +204,12 @@ public class NetSynth {
                     espout2 = runEspresso(filestring2);
                     List<DGate> espoutput2 = new ArrayList<DGate>();
                     espoutput2 = parseEspressoToNORNAND(espout2);
-                    //String xf ="";
-                    //xf = BooleanSimulator.bpermute(espoutput2);
+                    String xf ="";
+                    xf = BooleanSimulator.bpermute(espoutput2);
+                    
+                    //if(i==2)
                     //if(i==253 || i == 254 || i==251 || i==239)
-                    //    System.out.println(xf);
+                        //System.out.println(xf);
                     Line += espoutput2.size();
                     fespinp2.deleteOnExit();
               

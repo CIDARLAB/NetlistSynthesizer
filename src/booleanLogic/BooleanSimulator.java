@@ -131,5 +131,100 @@ public class BooleanSimulator {
         return output;
     }
     
+     public static String bpermutePreComp(List<DGate> netlist)
+    {
+        //DWireValue outvalue = DWireValue._x;
+        String output = "";
+        HashMap <String,DWire> inputsW = new HashMap<String,DWire>();
+        List<DWire> inputL = new ArrayList<DWire>();
+        
+        for(DGate dg:netlist)
+        {
+            for(DWire dw:dg.input)
+            {
+                if(dw.wtype == DWireType.input)
+                {
+                    if(!inputsW.containsKey(dw.name.trim()))
+                    {   
+                        inputL.add(dw);
+                       
+                        inputsW.put(dw.name.trim(),dw);}
+                    }
+            }
+        }
+        
+        HashMap <String,Integer> inputWires = new HashMap<String,Integer>();
+        
+        for(DWire dwl:inputL)
+        {
+            if("a".equals(dwl.name.trim()))
+                inputWires.put(dwl.name.trim(), 0);
+            else if("b".equals(dwl.name.trim()))
+                inputWires.put(dwl.name.trim(), 1);
+            //else if("c".equals(dwl.name.trim()))
+            else
+                inputWires.put(dwl.name.trim(), 2);
+            
+        }
+        /*Iterator it = inputsW.entrySet().iterator();
+        while(it.hasNext())
+        {
+            Map.Entry pair = (Map.Entry)it.next();
+            String val = (String) pair.getKey();
+            System.out.println(val);
+            inputWires.put(val, inpcnt);
+            inpcnt++;
+            //DWire temp = (DWire)pair.getValue();
+        }*/
+        
+        int inpsize = 3;
+        int inppow = (int) Math.pow(2, inpsize); 
+        for(int i=0;i<inppow;i++)
+        {
+            String xi = Espresso.dectoBin(i, inpsize);
+            for(DGate ng:netlist)
+            {
+                for(int j=0;j<ng.input.size();j++)
+                {
+                    DWire dw = ng.input.get(j);
+                    if(dw.wtype == DWireType.input)
+                    {
+                        int indx = inputWires.get(dw.name.trim());
+                        if(xi.charAt(indx) == '0')
+                            ng.input.get(j).wValue = DWireValue._0;
+                        else if(xi.charAt(indx) == '1')
+                            ng.input.get(j).wValue = DWireValue._1;
+                    }
+                    else if(dw.wtype == DWireType.Source)
+                    {
+                        ng.input.get(j).wValue = DWireValue._1;
+                    }
+                    else if(dw.wtype == DWireType.GND)
+                    {
+                        ng.input.get(j).wValue = DWireValue._0;
+                    }
+                    
+                
+                }
+                bfunction(ng);
+                
+            }
+            
+            //int 
+            
+            DWireValue finaldw = netlist.get(netlist.size()-1).output.wValue; 
+            if(finaldw == DWireValue._0)
+                output += "0";
+            else if(finaldw == DWireValue._1)
+                output += "1";
+            else if(finaldw == DWireValue._x)
+                output += "-";
+            
+        }
+        
+        return output;
+    }
+    
+    
     
 }
