@@ -16,7 +16,7 @@ public class Espresso {
     {
         List<String> esfile = new ArrayList<String>();
          int pw = (int) Math.pow(2, circ.inputNames.size());
-        String truthfunc = dectoBin(circ.inputgatetable, pw);
+        String truthfunc = Convert.dectoBin(circ.inputgatetable, pw);
         //System.out.println(truthfunc);
         String line = "";
         line += (".i " + circ.inputNames.size());
@@ -42,7 +42,7 @@ public class Espresso {
         for(int i=0;i<pw; i++)
         {
             line ="";
-            String tempinp = dectoBin(i,circ.inputNames.size());
+            String tempinp = Convert.dectoBin(i,circ.inputNames.size());
             line += tempinp;
             line += " ";
             line += truthfunc.charAt(i);
@@ -57,29 +57,5 @@ public class Espresso {
         return esfile;
     }
     
-    public static String dectoBin(int dec,int numofInputs)
-    {
-        String bin ="";
-        
-        for(int i=0;i<numofInputs;i++)
-        {
-            bin += "0";
-        }
-        if(dec ==0)
-            return bin;
-        
-        StringBuilder xbin = new StringBuilder(bin);
-        int indx =0;
-        while(dec>0)
-        {
-            int x = dec%2;
-            
-            char bins =  Character.forDigit(x,10);
-            xbin.setCharAt(indx, bins);
-            dec = dec/2;
-            indx++;
-        }
-        bin = xbin.reverse().toString();
-        return bin;
-    }
+  
 }

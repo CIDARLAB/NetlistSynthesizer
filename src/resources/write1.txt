@@ -1,9 +1,0 @@
-.i 2
-.o 1
-.ilb in2 in1
-.ob out
-#.phase 0
-.p 2
-10 1
-01 1
-.e

@@ -19,17 +19,34 @@ import java.util.logging.Logger;
  *
  * @author prashantvaidyanathan
  */
-public class parseCaseStatements {
+public class Parser {
     
-    public static CircuitDetails input3case(String Filepath)
+    public static HashMap<String,Integer> keywords = new HashMap<String,Integer>();
+    
+    public static void addkeywords()
+    {
+        keywords = new HashMap<String,Integer>();
+        keywords.put("input", 1);
+        keywords.put("output", 1);
+        keywords.put("and", 1);
+        keywords.put("or", 1);
+        keywords.put("not", 1);
+        keywords.put("nand", 1);
+        keywords.put("nor", 1);
+        keywords.put("xor", 1);
+        keywords.put("xnor", 1);
+        keywords.put("buf", 1);
+        keywords.put("if", 1);
+        keywords.put("begin", 1);
+        keywords.put("always", 1);
+    }
+    
+    public static CircuitDetails beginParsing(String Filepath)
     {
         
          Filepath = parseCaseStatements.class.getClassLoader().getResource(".").getPath();
          
-         List<String> inputs = new ArrayList<String>();
-         List<String> outputs = new ArrayList<String>();
-         List<String> unknownIO = new ArrayList<String>();
-         
+        
          int x = 0;
         
          CircuitDetails circuit = new CircuitDetails();
@@ -91,10 +108,23 @@ public class parseCaseStatements {
         {
             Logger.getLogger(parseCaseStatements.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        circuit = findIO(alllines);
+        return circuit;
         //System.out.println(alllines);
         
         //<editor-fold desc="Extract Module IO Contraints">
+        
+    }
+    
+    public static CircuitDetails findIO(String alllines)
+    {
+        addkeywords();
+        List<String> inputs = new ArrayList<String>();
+        List<String> outputs = new ArrayList<String>();
+        List<String> unknownIO = new ArrayList<String>();
+         
+        CircuitDetails circuit = new CircuitDetails();
+        
         String moduleString = alllines.substring(alllines.indexOf(" module "),alllines.indexOf(";"));
         alllines = alllines.substring((alllines.indexOf(moduleString) + moduleString.length()+1), alllines.indexOf(" endmodule"));
         alllines = alllines.trim();
@@ -112,7 +142,6 @@ public class parseCaseStatements {
                 IO = IO.substring(IO.indexOf("input ")+6);
                 IO = IO.trim();
                 inputs.add(IO);
-                
             }
             else if(IO.contains("output "))
             {
@@ -271,11 +300,65 @@ public class parseCaseStatements {
             
         }
         
-        
         return circuit;
+        
     }
     
     
+    public static void testfunction(String line)
+    {
+
+        List<String> inputs = new ArrayList<String>();
+        List<String> outputs = new ArrayList<String>();
+        List<String> uIO = new ArrayList<String>();
+        boolean iflag=false;
+        boolean oflag=false;
+        
+        String temp = line;
+        while(temp.contains("input "))
+        {
+           int sIndx =  temp.indexOf("input ");
+           if(sIndx != 0)
+           {
+               if(!(temp.charAt(sIndx-1) != ' '|| temp.charAt(sIndx-1) != ',' || temp.charAt(sIndx-1) != ';'|| temp.charAt(sIndx-1) != '('))
+               {
+                   iflag =true;
+               }
+           }
+           temp = temp.substring(sIndx+5);
+        }
+        
+        temp = line;
+        while(temp.contains("output "))
+        {
+           int sIndx =  temp.indexOf("output ");
+           if(sIndx != 0)
+           {
+               
+               if(!(temp.charAt(sIndx-1) == ' ' || temp.charAt(sIndx-1) == ',' || temp.charAt(sIndx-1) == ';' || temp.charAt(sIndx-1) == '('))
+               {
+                   oflag =true;
+               }
+           }
+           temp = temp.substring(sIndx+6);
+        }
     
+        if(iflag && oflag)
+        {
+            System.out.println("No input or output declaration detected..");
+        }
+        if(!iflag)
+        {
+                System.out.println(line.substring(line.indexOf("input ")+5));
+                temp = line;
+                //while()
+        }
+        
+        if(!oflag)
+        {
+            System.out.println(line.substring(line.indexOf("output ")+6));    
+        
+        }
+    }
     
 }

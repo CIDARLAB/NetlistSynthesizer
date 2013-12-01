@@ -4,6 +4,7 @@
  */
 package booleanLogic;
 
+import ParseVerilog.Convert;
 import ParseVerilog.Espresso;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,7 +88,7 @@ public class BooleanSimulator {
         int inppow = (int) Math.pow(2, inpsize); 
         for(int i=0;i<inppow;i++)
         {
-            String xi = Espresso.dectoBin(i, inpsize);
+            String xi = Convert.dectoBin(i, inpsize);
             for(DGate ng:netlist)
             {
                 for(int j=0;j<ng.input.size();j++)
@@ -181,7 +182,7 @@ public class BooleanSimulator {
         int inppow = (int) Math.pow(2, inpsize); 
         for(int i=0;i<inppow;i++)
         {
-            String xi = Espresso.dectoBin(i, inpsize);
+            String xi = Convert.dectoBin(i, inpsize);
             for(DGate ng:netlist)
             {
                 for(int j=0;j<ng.input.size();j++)

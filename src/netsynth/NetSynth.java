@@ -2,6 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
+
+
 package netsynth;
 
 import CelloGraph.DAGEdge;
@@ -12,7 +15,9 @@ import CelloGraph.DAGraph;
 import CelloGraph.Gate;
 import CelloGraph.Wire;
 import ParseVerilog.CircuitDetails;
+import ParseVerilog.Convert;
 import ParseVerilog.Espresso;
+import ParseVerilog.Parser;
 import ParseVerilog.parseCaseStatements;
 import booleanLogic.BooleanSimulator;
 import java.io.BufferedReader;
@@ -69,7 +74,10 @@ public class NetSynth {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
-        verifyinverse();
+       
+        vtestfunc();
+        
+        //verifyinverse();
         //histogram();
         //DAGW xcasedag = testParser("");
         //verifyprecomute();
@@ -80,6 +88,11 @@ public class NetSynth {
         
     }
     
+    public static void vtestfunc()
+    {
+        String line = "module and3(output out, input in1, in2);";
+        Parser.testfunction(line);
+    }
     
     public static void verifyinverse()
     {
@@ -136,7 +149,7 @@ public class NetSynth {
                  String truthfunc ="";
                  truthfunc = BooleanSimulator.bpermutePreComp(precomp.get(i-1));
                  //System.out.println(truthfunc);
-                 int k = parseCaseStatements.bintoDec(truthfunc);
+                 int k = Convert.bintoDec(truthfunc);
                  if(k!=i)
                  {
                      System.out.println(truthfunc);
