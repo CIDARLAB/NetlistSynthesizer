@@ -231,8 +231,10 @@ public class parseCaseStatements {
                 
                     String cNum = xcase.substring(0,xcase.indexOf(":")).trim();
                     int caseNumber = Convert.toDec(cNum);
+                    //System.out.println(caseNumber);
                     String sNum = xcase.substring(xcase.indexOf("=")+1).trim();
                     int swNumber = Convert.toDec(sNum);
+                    //System.out.println(swNumber);
                     truthtable.put(caseNumber, swNumber);
                 }
                 int numTT = (int) Math.pow(2, caseinp.length);
@@ -243,8 +245,10 @@ public class parseCaseStatements {
                     
                     if(truthtable.containsKey(i))
                     {
-                     
+                        
                         xbits[i] = truthtable.get(i).toString().charAt(0);
+                        //System.out.println(i+ " " +xbits[i]);
+                        
                     }
                     else
                     {
@@ -257,10 +261,11 @@ public class parseCaseStatements {
                             xbits[i] = '0';
                         }
                     }
+                   
                 }
+                
                 int truthtableval = Convert.bintoDec(new String(xbits)) ;
                 circuit.inputgatetable = truthtableval;
-                //System.out.println(truthtableval);
                 
             }
             else

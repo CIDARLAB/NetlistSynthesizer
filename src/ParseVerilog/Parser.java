@@ -26,19 +26,157 @@ public class Parser {
     public static void addkeywords()
     {
         keywords = new HashMap<String,Integer>();
-        keywords.put("input", 1);
-        keywords.put("output", 1);
-        keywords.put("and", 1);
-        keywords.put("or", 1);
-        keywords.put("not", 1);
-        keywords.put("nand", 1);
-        keywords.put("nor", 1);
-        keywords.put("xor", 1);
-        keywords.put("xnor", 1);
-        keywords.put("buf", 1);
-        keywords.put("if", 1);
-        keywords.put("begin", 1);
+        
         keywords.put("always", 1);
+        keywords.put("and", 1);
+        keywords.put("assign", 1);
+        keywords.put("automatic", 1);
+        
+        keywords.put("begin", 1);
+        keywords.put("buf", 1);
+        keywords.put("bufif0", 1);
+        keywords.put("bufif1", 1);
+        
+        keywords.put("case", 1);
+        keywords.put("casex", 1);
+        keywords.put("casez", 1);
+        keywords.put("cell", 1);
+        keywords.put("cmos", 1);
+        keywords.put("config", 1);
+        
+        keywords.put("deassign", 1);
+        keywords.put("default", 1);
+        keywords.put("defparam", 1);
+        keywords.put("design", 1);
+        keywords.put("disable", 1);
+        
+        keywords.put("edge", 1);
+        keywords.put("else", 1);
+        keywords.put("end", 1);
+        keywords.put("endcase", 1);
+        keywords.put("endconfig", 1);
+        keywords.put("endfunction", 1);
+        keywords.put("endgenerate", 1);
+        keywords.put("endmodule", 1);
+        keywords.put("endprimitive", 1);
+        keywords.put("endspecify", 1);
+        keywords.put("endtable", 1);
+        keywords.put("endtask", 1);
+        keywords.put("event", 1);
+        
+        keywords.put("for", 1);
+        keywords.put("force", 1);
+        keywords.put("forever", 1);
+        keywords.put("fork", 1);
+        keywords.put("function", 1);
+        
+        keywords.put("generate", 1);
+        keywords.put("genvar", 1);
+        
+        keywords.put("highz0", 1);
+        keywords.put("highz1", 1);
+        
+        keywords.put("if", 1);
+        keywords.put("ifnone", 1);
+        keywords.put("incdir", 1);
+        keywords.put("include", 1);
+        keywords.put("initial", 1);
+        keywords.put("inout", 1);
+        keywords.put("input", 1);
+        keywords.put("instance", 1);
+        keywords.put("integer", 1);
+        
+        keywords.put("join", 1);
+        
+        keywords.put("large", 1);
+        keywords.put("liblist", 1);
+        keywords.put("library", 1);
+        keywords.put("localparam", 1);
+        
+        keywords.put("macromodule", 1);
+        keywords.put("medium", 1);
+        keywords.put("module", 1);
+        
+        keywords.put("nand", 1);
+        keywords.put("negedge", 1);
+        keywords.put("nmos", 1);
+        keywords.put("nor", 1);
+        keywords.put("noshowcancelled", 1);
+        keywords.put("not", 1);
+        keywords.put("notif0", 1);
+        keywords.put("notif1", 1);
+        
+        keywords.put("or", 1);
+        keywords.put("output", 1);
+        
+        keywords.put("parameter", 1);
+        keywords.put("pmos", 1);
+        keywords.put("posedge", 1);
+        keywords.put("primitive", 1);
+        keywords.put("pull0", 1);
+        keywords.put("pull1", 1);
+        keywords.put("pulldown", 1);
+        keywords.put("pullup", 1);
+        keywords.put("pulsestyle_onevent", 1);
+        keywords.put("pulsestyle_ondetect", 1);
+        
+        keywords.put("rcmos", 1);
+        keywords.put("real", 1);
+        
+        keywords.put("realtime", 1);
+        keywords.put("reg", 1);
+        keywords.put("release", 1);
+        keywords.put("repeat", 1);
+        keywords.put("rnmos", 1);
+        keywords.put("rpmos", 1);
+        keywords.put("rtran", 1);
+        keywords.put("rtranif0", 1);
+        keywords.put("rtranif1", 1);
+        
+        keywords.put("scalared", 1);
+        keywords.put("showcancelled", 1);
+        keywords.put("signed", 1);
+        keywords.put("small", 1);
+        keywords.put("specify", 1);
+        keywords.put("specparam", 1);
+        keywords.put("strong0", 1);
+        keywords.put("strong1", 1);
+        keywords.put("supply0", 1);
+        keywords.put("supply1", 1);
+        
+        keywords.put("table", 1);
+        keywords.put("task", 1);
+        keywords.put("time", 1);
+        keywords.put("tran", 1);
+        keywords.put("tranif0", 1);
+        keywords.put("tranif1", 1);
+        keywords.put("tri", 1);
+        keywords.put("tri0", 1);
+        keywords.put("tri1", 1);
+        keywords.put("triand", 1);
+        keywords.put("trior", 1);
+        keywords.put("trireg", 1);
+        
+        keywords.put("unsigned", 1);
+        keywords.put("use", 1);
+        keywords.put("uwire", 1);
+        
+        keywords.put("vectored", 1);
+        
+        keywords.put("wait", 1);
+        keywords.put("wand", 1);
+        keywords.put("weak0", 1);
+        keywords.put("weak1", 1);
+        keywords.put("while", 1);
+        keywords.put("wire", 1);
+        
+        keywords.put("wor", 1);
+        
+        keywords.put("xnor", 1);
+        keywords.put("xor", 1);
+        
+        
+        
     }
     
     public static CircuitDetails beginParsing(String Filepath)
@@ -324,6 +462,11 @@ public class Parser {
                {
                    iflag =true;
                }
+               else
+               {
+                   iflag = false;
+                   break;
+               }
            }
            temp = temp.substring(sIndx+5);
         }
@@ -338,6 +481,11 @@ public class Parser {
                if(!(temp.charAt(sIndx-1) == ' ' || temp.charAt(sIndx-1) == ',' || temp.charAt(sIndx-1) == ';' || temp.charAt(sIndx-1) == '('))
                {
                    oflag =true;
+               }
+               else
+               {
+                   oflag = false;
+                   break;
                }
            }
            temp = temp.substring(sIndx+6);

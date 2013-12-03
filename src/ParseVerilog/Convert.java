@@ -52,7 +52,7 @@ public class Convert {
         else
         {
             //System.out.println(num);
-            number = Integer.parseInt(num);
+            number = Integer.parseInt(num.trim());
         }
         }
         return number;

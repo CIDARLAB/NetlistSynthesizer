@@ -90,7 +90,7 @@ public class NetSynth {
     
     public static void vtestfunc()
     {
-        String line = "module and3(output out, input in1, in2);";
+        String line = "module and3(output out, input uoutput , in2);";
         Parser.testfunction(line);
     }
     
