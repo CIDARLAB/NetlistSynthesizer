@@ -75,11 +75,11 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
        
-        vtestfunc();
+        //vtestfunc();
         
         //verifyinverse();
         //histogram();
-        //DAGW xcasedag = testParser("");
+        DAGW xcasedag = testParser("");
         //verifyprecomute();
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);
@@ -248,7 +248,7 @@ public class NetSynth {
     {
         caseCirc = new CircuitDetails();
         caseCirc = parseCaseStatements.input3case(pathFile);
-        
+        System.out.println(caseCirc.inputgatetable);
         DAGW circuitDAG = new DAGW();
         
         if(caseCirc.inputgatetable ==0 || caseCirc.inputgatetable ==255)
@@ -256,7 +256,8 @@ public class NetSynth {
         
         if(caseCirc.inputNames.size() == 3)
         {
-            circuitDAG = computeDAGW(caseCirc.inputgatetable);
+            //System.out.println("3 inputs found");
+            circuitDAG = computeDAGW(caseCirc.inputgatetable-1);
             int i=0;
             int j=0;
             for(Gate gdag:circuitDAG.Gates)
