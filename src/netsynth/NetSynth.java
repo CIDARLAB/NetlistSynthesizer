@@ -260,8 +260,8 @@ public class NetSynth {
             circuitDAG = computeDAGW(caseCirc.inputgatetable-1);
             int i=0;
             int j=0;
-            
-           
+            int caseinpcount =0;
+            HashMap<Integer,String> activeinp = new HashMap<Integer,String>();
             
             for(Gate gdag:circuitDAG.Gates)
             {
@@ -281,11 +281,10 @@ public class NetSynth {
                     {
                         i=2;
                     }
-                    
-                    System.out.println("INPUT : "+gdag.Name);
+                    activeinp.put(i,gdag.Name);
                     gdag.Name = caseCirc.inputNames.get(i);
-                    
                     //i++;
+                    caseinpcount++;
                 }
                 if("OUTPUT".equals(gdag.Type) || "OUTPUT_OR".equals(gdag.Type))
                 {
@@ -293,6 +292,22 @@ public class NetSynth {
                     j++; 
                 }
             }
+            if(caseinpcount != 3)
+            {
+                for(int jj=0;jj<3;jj++)
+                {
+                    if(!activeinp.containsKey(jj))
+                    {
+                        Gate uainp = new Gate();
+                        uainp.Outgoing = null;
+                        uainp.Index = -1;
+                        uainp.Type = Gate.GateType.INPUT.toString();
+                        uainp.Name = caseCirc.inputNames.get(jj);
+                        circuitDAG.Gates.add(uainp);
+                    }
+                }
+            }
+            
         }
         else
         {
