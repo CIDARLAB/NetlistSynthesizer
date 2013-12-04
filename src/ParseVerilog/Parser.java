@@ -445,6 +445,7 @@ public class Parser {
     
     public static void testfunction(String line)
     {
+        addkeywords();
 
         List<String> inputs = new ArrayList<String>();
         List<String> outputs = new ArrayList<String>();
@@ -495,11 +496,99 @@ public class Parser {
         {
             System.out.println("No input or output declaration detected..");
         }
+        
         if(!iflag)
         {
-                System.out.println(line.substring(line.indexOf("input ")+5));
-                temp = line;
-                //while()
+            
+            System.out.println("Inputs exist : " + line.substring(line.indexOf("input ")+5));
+            temp = line;
+            
+            
+                while(temp.contains("input "))
+                {
+                    int sIndx =  temp.indexOf("input ");
+                    String inptemp="";
+                    if(sIndx != 0)
+                    {
+                        if(!(temp.charAt(sIndx-1) != ' '|| temp.charAt(sIndx-1) != ',' || temp.charAt(sIndx-1) != ';'|| temp.charAt(sIndx-1) != '('))
+                        {
+                            temp = temp.substring(sIndx+5);
+                            continue;
+                        }
+                        else
+                        {
+                            inptemp = temp.substring(sIndx+5);
+                        }
+                    }
+                    else
+                    {
+                            inptemp = temp.substring(sIndx+5);
+                    }
+                    
+                    if(inptemp.contains(","))
+                    {
+                        String[] inp_parts = inptemp.split(",");
+                        for(int ii=0;ii<inp_parts.length;ii++)
+                        {
+                            String tmp = inp_parts[ii].trim();
+                            if(tmp.contains(" "))
+                            {//Work on this part
+                                String[] spc = tmp.split(" ");
+                                String firstspace = spc[0].trim();
+                                int val = keywords.get(firstspace);
+                                if(val == 1)
+                                {    
+                                    temp = temp.substring(temp.indexOf(temp));
+                                    continue;
+                                }
+                                else
+                                {
+                                    
+                                }
+                            }
+                            else
+                            {
+                                if(tmp.contains(")"))
+                                {
+                                    tmp = tmp.substring(0,tmp.indexOf(")"));
+                                    tmp = tmp.trim();
+                                }
+                                if(tmp.contains(";"))
+                                {
+                                    tmp = tmp.substring(0,tmp.indexOf(";"));
+                                    tmp = tmp.trim();
+                                }    
+                                inputs.add(tmp);
+                                System.out.println(tmp);
+                                
+                            }
+                        }
+                    }
+                    else
+                    {
+                       if(inptemp.contains(")"))
+                       {
+                           //Input is from Module declaration
+                           String tmp = inptemp.substring(0,inptemp.indexOf(")"));
+                           tmp = tmp.trim();
+                           inputs.add(tmp);
+                           System.out.println(tmp);
+                       }
+                       else
+                       {
+                           String tmp = inptemp.substring(0,inptemp.indexOf(";"));
+                           tmp = tmp.trim();
+                           inputs.add(tmp);
+                           System.out.println(tmp);
+                       }
+                    }
+                    
+                    temp = temp.substring(sIndx+5);
+                }
+                
+                
+                
+                
         }
         
         if(!oflag)
