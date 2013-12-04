@@ -75,11 +75,11 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
        
-        vtestfunc();
+        //vtestfunc();
         
         //verifyinverse();
         //histogram();
-        //DAGW xcasedag = testParser("");
+        DAGW xcasedag = testParser("");
         //verifyprecomute();
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);
@@ -260,6 +260,9 @@ public class NetSynth {
             circuitDAG = computeDAGW(caseCirc.inputgatetable-1);
             int i=0;
             int j=0;
+            
+           
+            
             for(Gate gdag:circuitDAG.Gates)
             {
             

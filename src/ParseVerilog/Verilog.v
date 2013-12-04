@@ -29,7 +29,7 @@ module and3(output out, input in1, in2,in3);
         3: out = 0;
         4: out = 0;
         5: out = 0;
-        6: out = 0;
+        6: out = 1;
         7: out = 1;
         
         default: out = 0;

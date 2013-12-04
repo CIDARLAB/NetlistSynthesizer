@@ -539,7 +539,7 @@ public class Parser {
                                 if(val == 1)
                                 {    
                                     temp = temp.substring(temp.indexOf(temp));
-                                    continue;
+                                    break;
                                 }
                                 else
                                 {
