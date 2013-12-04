@@ -268,8 +268,24 @@ public class NetSynth {
             
                 if("INPUT".equals(gdag.Type))
                 {
+                   
+                    if("c".equals(gdag.Name))
+                    {
+                        i=0;
+                    }
+                    else if("b".equals(gdag.Name))
+                    {
+                        i=1;
+                    }
+                    else 
+                    {
+                        i=2;
+                    }
+                    
+                    System.out.println("INPUT : "+gdag.Name);
                     gdag.Name = caseCirc.inputNames.get(i);
-                    i++;
+                    
+                    //i++;
                 }
                 if("OUTPUT".equals(gdag.Type) || "OUTPUT_OR".equals(gdag.Type))
                 {

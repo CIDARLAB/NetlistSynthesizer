@@ -13,6 +13,7 @@ import java.util.List;
  */
 public class CircuitDetails {
     public List<String> inputNames = new ArrayList<String>();
+    
     public List<String> outputNames = new ArrayList<String>();
     public int inputgatetable;
     
