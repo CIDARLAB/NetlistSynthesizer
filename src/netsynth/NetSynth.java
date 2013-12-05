@@ -30,10 +30,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -243,6 +246,18 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    private static Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>()
+    {
+            public int compare(String str1, String str2)
+            {
+                int res = String.CASE_INSENSITIVE_ORDER.compare(str1, str2);
+                if(res ==0)
+                {
+                    res = str1.compareTo(str2);                
+                }
+                return res;
+            }
+    };
     
     public static DAGW testParser(String pathFile)
     {
@@ -269,11 +284,11 @@ public class NetSynth {
                 if("INPUT".equals(gdag.Type))
                 {
                    
-                    if("c".equals(gdag.Name))
+                    if("c".equals(gdag.Name.trim()))
                     {
                         i=0;
                     }
-                    else if("b".equals(gdag.Name))
+                    else if("b".equals(gdag.Name.trim()))
                     {
                         i=1;
                     }
@@ -292,6 +307,7 @@ public class NetSynth {
                     j++; 
                 }
             }
+            
             if(caseinpcount != 3)
             {
                 for(int jj=0;jj<3;jj++)
@@ -307,6 +323,37 @@ public class NetSynth {
                     }
                 }
             }
+            List<String> inputGates = new ArrayList<String>();
+            HashMap<String,Gate> inpord = new HashMap<String,Gate>();
+            
+            for(Gate gdag:circuitDAG.Gates)
+            {
+                if(gdag.Type.equals("INPUT"))
+                {
+                    inputGates.add(gdag.Name.trim());
+                    inpord.put(gdag.Name.trim(), gdag);
+                    //System.out.println(gdag.Name);
+                }
+            } 
+            Collections.sort(inputGates);
+            Collections.reverse(inputGates);
+            int kk=0;
+           
+            for(int ii=0;ii<circuitDAG.Gates.size();ii++)
+            {
+                Gate gdag = circuitDAG.Gates.get(ii);
+                if(gdag.Type.equals("INPUT"))
+                {
+                   Gate val = inpord.get(inputGates.get(kk));
+                   circuitDAG.Gates.set(ii, val);
+                   kk++;
+                }
+            }
+            for(Gate gdag:circuitDAG.Gates)
+            {
+                System.out.println(gdag.Name);
+            }
+            
             
         }
         else
