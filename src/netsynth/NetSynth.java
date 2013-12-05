@@ -78,11 +78,11 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
        
-        //vtestfunc();
+        vtestfunc();
         
         //verifyinverse();
         //histogram();
-        DAGW xcasedag = testParser("");
+        //DAGW xcasedag = testParser("");
         //verifyprecomute();
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);
@@ -93,7 +93,7 @@ public class NetSynth {
     
     public static void vtestfunc()
     {
-        String line = "module and3(output out, input in2, in1 );";
+        String line = "module and3(output out, input in2, output on1, input in1, in3, in4);";
         Parser.testfunction(line);
     }
     

@@ -446,7 +446,7 @@ public class Parser {
     public static void testfunction(String line)
     {
         addkeywords();
-
+        System.out.println(line);
         List<String> inputs = new ArrayList<String>();
         List<String> outputs = new ArrayList<String>();
         List<String> uIO = new ArrayList<String>();
@@ -503,9 +503,10 @@ public class Parser {
             System.out.println("Inputs exist : " + line.substring(line.indexOf("input ")+5));
             temp = line;
             
-            
+            int count =-1;
                 while(temp.contains("input "))
                 {
+                    count++;
                     int sIndx =  temp.indexOf("input ");
                     String inptemp="";
                     if(sIndx != 0)
@@ -524,7 +525,7 @@ public class Parser {
                     {
                             inptemp = temp.substring(sIndx+5);
                     }
-                    
+                    //System.out.println(count + inptemp);
                     if(inptemp.contains(","))
                     {
                         String[] inp_parts = inptemp.split(",");
@@ -535,16 +536,19 @@ public class Parser {
                             {//Work on this part
                                 String[] spc = tmp.split(" ");
                                 String firstspace = spc[0].trim();
-                                int val = keywords.get(firstspace);
-                                if(val == 1)
-                                {    
-                                    temp = temp.substring(temp.indexOf(temp));
-                                    break;
+                                if(keywords.containsKey(firstspace))
+                                {
+                                        //System.out.println(inptemp);
+                                        temp = temp.substring(inptemp.indexOf(firstspace));
+                                        //System.out.println(temp);
+                                        break;
+                                        
                                 }
                                 else
                                 {
-                                    
+                                        inputs.add(firstspace);  
                                 }
+                                
                             }
                             else
                             {
@@ -559,7 +563,7 @@ public class Parser {
                                     tmp = tmp.trim();
                                 }    
                                 inputs.add(tmp);
-                                System.out.println(tmp);
+                                //System.out.println(tmp);
                                 
                             }
                         }
@@ -572,21 +576,22 @@ public class Parser {
                            String tmp = inptemp.substring(0,inptemp.indexOf(")"));
                            tmp = tmp.trim();
                            inputs.add(tmp);
-                           System.out.println(tmp);
+                           //System.out.println(tmp);
                        }
                        else
                        {
                            String tmp = inptemp.substring(0,inptemp.indexOf(";"));
                            tmp = tmp.trim();
                            inputs.add(tmp);
-                           System.out.println(tmp);
+                           //System.out.println(tmp);
                        }
                     }
                     
                     temp = temp.substring(sIndx+5);
                 }
                 
-                
+                for(String s:inputs)
+                    System.out.println(s);
                 
                 
         }
