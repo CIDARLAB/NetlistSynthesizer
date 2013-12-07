@@ -93,7 +93,7 @@ public class NetSynth {
     
     public static void vtestfunc()
     {
-        String line = "module and3(output out, input in2, output on1, input in1, in3, in4);";
+        String line = "module and3(output out, input wire in2,in6, bryan, output wire on1, input in1, in3, in4);";
         Parser.testfunction(line);
     }
     
@@ -101,7 +101,6 @@ public class NetSynth {
     {
         String filestring ="";
           filestring += Filepath+ "src/resources/Inverse";
-            //filestring += Global.espout++ ;
             filestring += ".csv";
             File fespinp = new File(filestring);
         try {
@@ -246,7 +245,7 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    private static Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>()
+    /*private static Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>()
     {
             public int compare(String str1, String str2)
             {
@@ -257,7 +256,7 @@ public class NetSynth {
                 }
                 return res;
             }
-    };
+    };*/
     
     public static DAGW testParser(String pathFile)
     {

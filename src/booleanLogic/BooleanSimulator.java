@@ -73,6 +73,7 @@ public class BooleanSimulator {
             inputWires.put(dwl.name.trim(), inpcnt);
             inpcnt++;
         }
+        
         /*Iterator it = inputsW.entrySet().iterator();
         while(it.hasNext())
         {
@@ -86,6 +87,7 @@ public class BooleanSimulator {
         
         int inpsize = inputWires.size();
         int inppow = (int) Math.pow(2, inpsize); 
+        
         for(int i=0;i<inppow;i++)
         {
             String xi = Convert.dectoBin(i, inpsize);

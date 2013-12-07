@@ -4,6 +4,7 @@
  */
 package ParseVerilog;
 
+import ParseVerilog.VerilogDetails.ioType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -452,7 +453,8 @@ public class Parser {
         List<String> uIO = new ArrayList<String>();
         boolean iflag=false;
         boolean oflag=false;
-        
+        ioType iowire = null;
+        int isize =1;
         String temp = line;
         while(temp.contains("input "))
         {
@@ -504,6 +506,8 @@ public class Parser {
             temp = line;
             
             int count =-1;
+            
+            
                 while(temp.contains("input "))
                 {
                     count++;
@@ -525,7 +529,7 @@ public class Parser {
                     {
                             inptemp = temp.substring(sIndx+5);
                     }
-                    //System.out.println(count + inptemp);
+                    
                     if(inptemp.contains(","))
                     {
                         String[] inp_parts = inptemp.split(",");
@@ -538,11 +542,17 @@ public class Parser {
                                 String firstspace = spc[0].trim();
                                 if(keywords.containsKey(firstspace))
                                 {
+                                    if(firstspace.equals("wire"))
+                                    {
+                                        inputs.add(spc[1]);
+                                    }
+                                    else
+                                    {
                                         //System.out.println(inptemp);
                                         temp = temp.substring(inptemp.indexOf(firstspace));
                                         //System.out.println(temp);
                                         break;
-                                        
+                                    }   
                                 }
                                 else
                                 {
