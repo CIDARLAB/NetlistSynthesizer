@@ -13,10 +13,12 @@ import java.util.List;
  * @author prashantvaidyanathan
  */
 public class VerilogDetails {
+    
     public enum ioType{
         wire,
         reg;
     }
+    
     public List<input> inputs = new ArrayList<input>();
     public List<output> outputs = new ArrayList<output>();
     

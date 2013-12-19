@@ -13,6 +13,7 @@ import CelloGraph.DAGVertex.VertexType;
 import CelloGraph.DAGW;
 import CelloGraph.DAGraph;
 import CelloGraph.Gate;
+import CelloGraph.Gate.GateType;
 import CelloGraph.Wire;
 import ParseVerilog.CircuitDetails;
 import ParseVerilog.Convert;
@@ -78,11 +79,11 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
        
-        vtestfunc();
+        //vtestfunc();
         
         //verifyinverse();
         //histogram();
-        //DAGW xcasedag = testParser("");
+        DAGW xcasedag = testParser("");
         //verifyprecomute();
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);
@@ -245,6 +246,8 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
     /*private static Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>()
     {
             public int compare(String str1, String str2)
@@ -262,9 +265,11 @@ public class NetSynth {
     {
         caseCirc = new CircuitDetails();
         caseCirc = parseCaseStatements.input3case(pathFile);
-        System.out.println(caseCirc.inputgatetable);
+        //System.out.println(caseCirc.inputgatetable);
         DAGW circuitDAG = new DAGW();
-        
+        DAGW circuitDAGinv = new DAGW();
+        int invindx ;
+            
         if(caseCirc.inputgatetable ==0 || caseCirc.inputgatetable ==255)
             return null;
         
@@ -272,6 +277,36 @@ public class NetSynth {
         {
             //System.out.println("3 inputs found");
             circuitDAG = computeDAGW(caseCirc.inputgatetable-1);
+            invindx = 255 - caseCirc.inputgatetable;
+            circuitDAGinv = computeDAGW(invindx-1);
+            if (circuitDAGinv.Gates.size() > 1) 
+            {
+                int gatessize = circuitDAGinv.Gates.size();
+                if (circuitDAGinv.Gates.get(gatessize - 2).Type == "NOR" || circuitDAGinv.Gates.get(gatessize - 2).Type == "NOR") 
+                {
+                    if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) 
+                    {
+                        circuitDAG = circuitDAGinv;
+                        gatessize = circuitDAGinv.Gates.size();
+                        if(circuitDAG.Gates.get(gatessize -2).Type == "NOR")
+                        {
+                            circuitDAG.Gates.get(gatessize-2).Type = GateType.OUTPUT_OR.toString();
+                            circuitDAG.Gates.get(gatessize-2).Name = circuitDAG.Gates.get(gatessize-1).Name;
+                            circuitDAG.Gates.remove(gatessize-1);
+                            //circuitDAG.Gates.get(invindx-2)
+                        }
+                        else if(circuitDAG.Gates.get(gatessize -2).Type == "NOT")
+                        {
+                            circuitDAG.Gates.get(gatessize-2).Type = GateType.OUTPUT.toString();
+                            circuitDAG.Gates.get(gatessize-2).Name = circuitDAG.Gates.get(gatessize-1).Name;
+                            circuitDAG.Gates.remove(gatessize-1);
+                            
+                        }
+                        
+                    }
+                    
+                }
+            }
             int i=0;
             int j=0;
             int caseinpcount =0;
@@ -414,7 +449,7 @@ public class NetSynth {
         List<List<DGate>> precomp;
         precomp = PreCompute.parseNetlistFile();
         outdag = CreateDAGW(precomp.get(x));
-    
+        
         return outdag;
        
     }
@@ -1277,6 +1312,8 @@ public class NetSynth {
                 }
                 vert.outW = netg.output;
                 
+                
+                
                 //System.out.println(netg.output.wtype.toString());
                 //System.out.println(netg.gtype.toString());
                 vertexhash.put(netg, vert);
@@ -1398,7 +1435,10 @@ public class NetSynth {
         HashMap<DGate,Gate> vertexhash = new HashMap<DGate,Gate>();
         int IndX =0; 
         int outpIndx=0;
-        
+        for(DGate xgate:netlist)
+        {
+            System.out.println(netlist(xgate));
+        }
         if(netlist.size() == 1 && netlist.get(0).gtype == DGateType.BUF)
         {
             Gate outb = new Gate();

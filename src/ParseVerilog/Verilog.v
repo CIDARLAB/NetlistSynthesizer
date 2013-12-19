@@ -27,10 +27,10 @@ module and3(output out, input in1, in2,in3);
         1: out = 1;
         2: out = 1;
         3: out = 1;
-        //4: out = 0;
-        //5: out = 1;
-        //6: out = 0;
-        //7: out = 1;
+        4: out = 0;
+        5: out = 1;
+        6: out = 0;
+        7: out = 1;
         
         default: out = 0;
       endcase
