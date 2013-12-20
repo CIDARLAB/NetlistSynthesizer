@@ -86,7 +86,7 @@ public class NetSynth {
         
         //verifyinverse();
         //histogram();
-        DAGW xcasedag = testParser("");
+        DAGW xcasedag = testParser("",0);
         //verifyprecomute();
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);
@@ -264,7 +264,7 @@ public class NetSynth {
             }
     };*/
     
-    public static DAGW testParser(String pathFile)
+    public static DAGW testParser(String pathFile, int inv)
     {
         caseCirc = new CircuitDetails();
         caseCirc = parseCaseStatements.input3case(pathFile);
@@ -312,7 +312,7 @@ public class NetSynth {
            
           
             
-            if (circuitDAGinv.Gates.size() > 1) 
+            if (circuitDAGinv.Gates.size() > 1 && (inv == 1)) 
             {
                 
                 int gatessize = circuitDAGinv.Gates.size();
