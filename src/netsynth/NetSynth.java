@@ -12,8 +12,10 @@ import CelloGraph.DAGVertex;
 import CelloGraph.DAGVertex.VertexType;
 import CelloGraph.DAGW;
 import CelloGraph.DAGraph;
+
 import CelloGraph.Gate;
 import CelloGraph.Gate.GateType;
+
 import CelloGraph.Wire;
 import ParseVerilog.CircuitDetails;
 import ParseVerilog.Convert;
@@ -36,6 +38,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -269,37 +272,74 @@ public class NetSynth {
         DAGW circuitDAG = new DAGW();
         DAGW circuitDAGinv = new DAGW();
         int invindx ;
-            
+        
+        
+        
         if(caseCirc.inputgatetable ==0 || caseCirc.inputgatetable ==255)
             return null;
         
         if(caseCirc.inputNames.size() == 3)
         {
-            //System.out.println("3 inputs found");
-            circuitDAG = computeDAGW(caseCirc.inputgatetable-1);
-            invindx = 255 - caseCirc.inputgatetable;
-            circuitDAGinv = computeDAGW(invindx-1);
+            DAGW circ = computeDAGW(caseCirc.inputgatetable-1);
+            /*for(Gate xgate:circ.Gates)
+            {
+                circuitDAG.Gates.add(xgate);
+            }
+            for(Wire xwire:circ.Wires)
+            {
+                circuitDAG.Wires.add(xwire);
+            }*/
+            //Collections.copy(circuitDAG.Gates, circ.Gates);
+            //Collections.copy(circuitDAG.Wires, circ.Wires);
+            
+            circuitDAG = new DAGW(circ.Gates,circ.Wires);
+            DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable - 1);
+            //Collections.copy(circuitDAGinv.Gates, circinv.Gates);
+            //Collections.copy(circuitDAGinv.Wires, circinv.Wires);
+            
+            
+            /*for(Gate xgate:circinv.Gates)
+            {
+                circuitDAGinv.Gates.add(xgate);
+            }
+            for(Wire xwire:circinv.Wires)
+            {
+                circuitDAGinv.Wires.add(xwire);
+            }*/
+            
+            circuitDAGinv = new DAGW(circinv.Gates,circinv.Wires);
+            
+           
+          
+            
             if (circuitDAGinv.Gates.size() > 1) 
             {
+                
                 int gatessize = circuitDAGinv.Gates.size();
-                if (circuitDAGinv.Gates.get(gatessize - 2).Type == "NOR" || circuitDAGinv.Gates.get(gatessize - 2).Type == "NOR") 
+ 
+                if (circuitDAGinv.Gates.get(1).Type == "NOR" || circuitDAGinv.Gates.get(1).Type == "NOT") 
                 {
+                    
                     if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) 
                     {
+                        //System.out.println(circuitDAG.Gates.size());
+                        //System.out.println(circuitDAGinv.Gates.size());
+                        
+                                
                         circuitDAG = circuitDAGinv;
                         gatessize = circuitDAGinv.Gates.size();
-                        if(circuitDAG.Gates.get(gatessize -2).Type == "NOR")
+                        if(circuitDAG.Gates.get(1).Type == "NOR")
                         {
-                            circuitDAG.Gates.get(gatessize-2).Type = GateType.OUTPUT_OR.toString();
-                            circuitDAG.Gates.get(gatessize-2).Name = circuitDAG.Gates.get(gatessize-1).Name;
-                            circuitDAG.Gates.remove(gatessize-1);
+                            circuitDAG.Gates.get(1).Type = GateType.OUTPUT_OR.toString();
+                            circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
+                            circuitDAG.Gates.remove(0);
                             //circuitDAG.Gates.get(invindx-2)
                         }
-                        else if(circuitDAG.Gates.get(gatessize -2).Type == "NOT")
+                        else if(circuitDAG.Gates.get(1).Type == "NOT")
                         {
-                            circuitDAG.Gates.get(gatessize-2).Type = GateType.OUTPUT.toString();
-                            circuitDAG.Gates.get(gatessize-2).Name = circuitDAG.Gates.get(gatessize-1).Name;
-                            circuitDAG.Gates.remove(gatessize-1);
+                            circuitDAG.Gates.get(1).Type = GateType.OUTPUT.toString();
+                            circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
+                            circuitDAG.Gates.remove(0);
                             
                         }
                         
@@ -441,18 +481,57 @@ public class NetSynth {
         
     }
     
-    public static DAGW computeDAGW(int x)
+    public static DAGW computeDAGW(int x) 
     {
         one = new DWire("_one",DWireType.Source);
         zero = new DWire("_zero",DWireType.GND);
-        DAGW outdag = new DAGW();
+        DAGW outputdag = new DAGW();
         List<List<DGate>> precomp;
         precomp = PreCompute.parseNetlistFile();
-        outdag = CreateDAGW(precomp.get(x));
+        DAGW circ = new DAGW();
+        circ = CreateDAGW(precomp.get(x));
+      
         
-        return outdag;
-       
+        //outputdag = (DAGW) circ.clone();
+        
+        //Collections.copy(outputdag.Gates, circ.Gates);
+        //Collections.copy(outputdag.Wires, circ.Wires);
+        //outputdag = new DAGW(circ.Gates, circ.Wires);
+        
+        /*ListIterator<Gate> itgate = circ.Gates.listIterator();
+        if(itgate.hasNext())
+        {
+            Gate gnew = new Gate(itgate.next());
+            outputdag.Gates.add(new Gate(gnew));
+        }
+        ListIterator<Wire> itwire = circ.Wires.listIterator();
+        if(itwire.hasNext())
+        {
+            Wire wnew = new Wire(itwire.next());
+            outputdag.Wires.add(new Wire(wnew));
+        }*/
+        
+        //for(int i=0;i<circ.Gates.size();i++)
+        /*for(Gate gx:CreateDAGW(precomp.get(x)).Gates)
+        {
+            Gate gnew = new Gate(gx);
+            outdag.Gates.add(gnew);
+            System.out.println("Adding Gate");
+        }*/
+        /*
+        for(int i=0;i<circ.Wires.size();i++)
+        {
+            Wire wnew = new Wire(circ.Wires.get(i));
+            outputdag.Wires.add(wnew);
+            System.out.println("Adding Wire");
+        }*/
+        outputdag = new DAGW(circ.Gates,circ.Wires);
+        //outputdag = new DAGW(circ);
+        //System.out.println("done with this function");
+        return outputdag;
     }
+ 
+    
     
     public static DAGraph precompute(int x)
     {
@@ -1428,17 +1507,17 @@ public class NetSynth {
    
      public static DAGW CreateDAGW(List<DGate> netlist)
     {
-        DAGW outDAG = new DAGW();
-        List<DWire> inplist = new ArrayList<DWire>(); 
-        List<Gate> Gates = new ArrayList<Gate>();
-        List<Wire> Wires = new ArrayList<Wire>();
-        HashMap<DGate,Gate> vertexhash = new HashMap<DGate,Gate>();
-        int IndX =0; 
-        int outpIndx=0;
-        for(DGate xgate:netlist)
+         DAGW outDAG = new DAGW();
+         List<DWire> inplist = new ArrayList<DWire>(); 
+         List<Gate> Gates = new ArrayList<Gate>();
+         List<Wire> Wires = new ArrayList<Wire>();
+         HashMap<DGate,Gate> vertexhash = new HashMap<DGate,Gate>();
+         int IndX =0; 
+         int outpIndx=0;
+        /*for(DGate xgate:netlist)
         {
             System.out.println(netlist(xgate));
-        }
+        }*/
         if(netlist.size() == 1 && netlist.get(0).gtype == DGateType.BUF)
         {
             Gate outb = new Gate();
@@ -1618,7 +1697,7 @@ public class NetSynth {
             for(DWire inps:netg.input)
             {
                 
-               Gate gTo=null;
+               Gate gTo= null;
                //System.out.println(inps.name);
                for(Gate xvert:Gates)
                {
@@ -1682,18 +1761,17 @@ public class NetSynth {
         
         for(Wire xdedge:Wires)
         {
-            outDAG.Wires.add(xdedge);
+            outDAG.Wires.add(new Wire(xdedge));
         }
         for(Gate xdvert:Gates)
         {
-            outDAG.Gates.add(xdvert);
+            outDAG.Gates.add(new Gate(xdvert));
         }
-        
+        //DAGW outputDAG = new DAGW(outDAG.Gates,outDAG.Wires);
         return outDAG;
     }
    
    
-    
     
     
     

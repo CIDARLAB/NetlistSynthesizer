@@ -25,6 +25,13 @@ public class Wire {
         this.To = null;
         this.Next = null;
     }
+    public Wire(Wire w) {
+	this.Index = w.Index;
+        this.wire = w.wire;
+        this.From = w.From;
+        this.To = w.To;
+        this.Next = w.Next;
+    }
     public Wire(int indx,Gate dFrom,Gate dTo)
     {
         this.Index = indx;
