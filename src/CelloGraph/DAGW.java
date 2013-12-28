@@ -31,16 +31,7 @@ public class DAGW {
         if (dagwWires != null) 
         {
             Wires = new ArrayList<Wire>();
-            /*Iterator<Wire> itwire = dagwWires.iterator();
-            while(itwire.hasNext())
-            {
-                Wire rmw = itwire.next();
-                Wire y = new Wire(rmw);
-                dagwWires.remove(rmw);
-                Wires.add(y);
-            }*/
-            
-            //Collections.copy(Wires,dagwWires);
+         
             for (int i=0;i < dagwWires.size();i++) 
             {
                 Wire y = new Wire(dagwWires.get(i));
@@ -50,17 +41,6 @@ public class DAGW {
         if (dagwGates != null) 
         {
             Gates = new ArrayList<Gate>();
-            /*Iterator<Gate> itgate = dagwGates.iterator();
-            while(itgate.hasNext())
-            {
-                Gate rmg = itgate.next();
-                Gate y = new Gate(rmg);
-                dagwGates.remove(rmg);
-                Gates.add(y);
-            }*/
-            
-            //Collections.copy(Gates, dagwGates);
-            
             for(int i=0;i<dagwGates.size();i++) 
             {
                 Gate gy = new Gate(dagwGates.get(i));

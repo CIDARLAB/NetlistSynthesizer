@@ -86,7 +86,7 @@ public class NetSynth {
         
         //verifyinverse();
         //histogram();
-        DAGW xcasedag = testParser("",0);
+        DAGW xcasedag = testParser("",1);
         //verifyprecomute();
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);
@@ -278,54 +278,21 @@ public class NetSynth {
         if(caseCirc.inputgatetable ==0 || caseCirc.inputgatetable ==255)
             return null;
         
+         // <editor-fold desc="If 3 input circuit">
         if(caseCirc.inputNames.size() == 3)
         {
             DAGW circ = computeDAGW(caseCirc.inputgatetable-1);
-            /*for(Gate xgate:circ.Gates)
-            {
-                circuitDAG.Gates.add(xgate);
-            }
-            for(Wire xwire:circ.Wires)
-            {
-                circuitDAG.Wires.add(xwire);
-            }*/
-            //Collections.copy(circuitDAG.Gates, circ.Gates);
-            //Collections.copy(circuitDAG.Wires, circ.Wires);
-            
             circuitDAG = new DAGW(circ.Gates,circ.Wires);
             DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable - 1);
-            //Collections.copy(circuitDAGinv.Gates, circinv.Gates);
-            //Collections.copy(circuitDAGinv.Wires, circinv.Wires);
-            
-            
-            /*for(Gate xgate:circinv.Gates)
-            {
-                circuitDAGinv.Gates.add(xgate);
-            }
-            for(Wire xwire:circinv.Wires)
-            {
-                circuitDAGinv.Wires.add(xwire);
-            }*/
-            
             circuitDAGinv = new DAGW(circinv.Gates,circinv.Wires);
-            
-           
-          
             
             if (circuitDAGinv.Gates.size() > 1 && (inv == 1)) 
             {
-                
                 int gatessize = circuitDAGinv.Gates.size();
- 
                 if (circuitDAGinv.Gates.get(1).Type == "NOR" || circuitDAGinv.Gates.get(1).Type == "NOT") 
                 {
-                    
                     if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) 
                     {
-                        //System.out.println(circuitDAG.Gates.size());
-                        //System.out.println(circuitDAGinv.Gates.size());
-                        
-                                
                         circuitDAG = circuitDAGinv;
                         gatessize = circuitDAGinv.Gates.size();
                         if(circuitDAG.Gates.get(1).Type == "NOR")
@@ -333,18 +300,14 @@ public class NetSynth {
                             circuitDAG.Gates.get(1).Type = GateType.OUTPUT_OR.toString();
                             circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
                             circuitDAG.Gates.remove(0);
-                            //circuitDAG.Gates.get(invindx-2)
                         }
                         else if(circuitDAG.Gates.get(1).Type == "NOT")
                         {
                             circuitDAG.Gates.get(1).Type = GateType.OUTPUT.toString();
                             circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
                             circuitDAG.Gates.remove(0);
-                            
                         }
-                        
                     }
-                    
                 }
             }
             int i=0;
@@ -354,10 +317,8 @@ public class NetSynth {
             
             for(Gate gdag:circuitDAG.Gates)
             {
-            
                 if("INPUT".equals(gdag.Type))
                 {
-                   
                     if("c".equals(gdag.Name.trim()))
                     {
                         i=0;
@@ -372,7 +333,6 @@ public class NetSynth {
                     }
                     activeinp.put(i,gdag.Name);
                     gdag.Name = caseCirc.inputNames.get(i);
-                    //i++;
                     caseinpcount++;
                 }
                 if("OUTPUT".equals(gdag.Type) || "OUTPUT_OR".equals(gdag.Type))
@@ -410,7 +370,6 @@ public class NetSynth {
                 }
             } 
             Collections.sort(inputGates);
-            Collections.reverse(inputGates);
             int kk=0;
            
             for(int ii=0;ii<circuitDAG.Gates.size();ii++)
@@ -430,18 +389,31 @@ public class NetSynth {
             
             
         }
+        // </editor-fold>
+        
         else
         {
             List<String> eslines = new ArrayList<String>();
+            List<String> eslinesinv = new ArrayList<String>();
+            int powr = (int) Math.pow(2, caseCirc.inputNames.size());
+            String caseCirctt = Convert.dectoBin(caseCirc.inputgatetable, powr);
+            String caseCircttinv;
+            caseCircttinv = Convert.invBin(caseCirctt);
+            int invval = Convert.bintoDec(caseCircttinv);
+            CircuitDetails invcaseCirc = new CircuitDetails(caseCirc.inputNames,caseCirc.outputNames,invval);
+            
             eslines = Espresso.createFile(caseCirc);
-            
-              String filestring = "";
-            
-            
+            eslinesinv = Espresso.createFile(invcaseCirc);
+            String filestring = "";
+            String filestringinv = "";
             filestring += Filepath+ "src/resources/espresso";
             filestring += Global.espout++ ;
+            filestringinv += filestring;
             filestring += ".txt";
+            filestringinv += "inv.txt";
+            
             File fespinp = new File(filestring);
+            File fespinpinv = new File(filestringinv);
             try 
             {
                 Writer output = new BufferedWriter(new FileWriter(fespinp));
@@ -454,14 +426,42 @@ public class NetSynth {
                 List<String> espout = new ArrayList<String>();
                 espout = runEspresso(filestring);
                 List<DGate> espoutput = new ArrayList<DGate>();
-                
                 espoutput = parseEspressoToNORNAND(espout);
+                
+                Writer outputinv = new BufferedWriter(new FileWriter(fespinpinv));
+                for(String xline:eslinesinv)
+                {
+                    String newl = (xline + "\n");
+                    outputinv.write(newl);
+                }
+                outputinv.close();
+                
+                List<String> espoutinv = new ArrayList<String>();
+                espoutinv = runEspresso(filestringinv);
+                List<DGate> espoutputinv = new ArrayList<DGate>();
+                espoutputinv = parseEspressoToNORNAND(espoutinv);
+                if(espoutput.size() > (espoutputinv.size() + 1))
+                {
+                    System.out.println("Special Condition");
+                    espoutput = espoutputinv;
+                    String Wirename = "Wire" + Global.wirecount++;
+                    espoutput.get(espoutput.size()-1).output.wtype = DWireType.connector;
+                    List<DWire> inpwesp = new ArrayList<DWire>();
+                    DWire outwesp = new DWire();
+                    outwesp.name =  espoutput.get(espoutput.size()-1).output.name;
+                    outwesp.wtype = DWireType.output;
+                    
+                    espoutput.get(espoutput.size()-1).output.name = Wirename;
+                    
+                    inpwesp.add(espoutput.get(espoutput.size()-1).output);
+                    espoutput.add(new DGate(DGateType.NOT,inpwesp,outwesp));
+                }
+                
                 String espperm = BooleanSimulator.bpermute(espoutput);
                 for(DGate netgate:espoutput)
                 {
                     System.out.println(netlist(netgate));
                 }
-                
                 circuitDAG = CreateDAGW(espoutput);
                 fespinp.deleteOnExit();
                 System.out.println(espperm);
@@ -490,44 +490,8 @@ public class NetSynth {
         precomp = PreCompute.parseNetlistFile();
         DAGW circ = new DAGW();
         circ = CreateDAGW(precomp.get(x));
-      
-        
-        //outputdag = (DAGW) circ.clone();
-        
-        //Collections.copy(outputdag.Gates, circ.Gates);
-        //Collections.copy(outputdag.Wires, circ.Wires);
-        //outputdag = new DAGW(circ.Gates, circ.Wires);
-        
-        /*ListIterator<Gate> itgate = circ.Gates.listIterator();
-        if(itgate.hasNext())
-        {
-            Gate gnew = new Gate(itgate.next());
-            outputdag.Gates.add(new Gate(gnew));
-        }
-        ListIterator<Wire> itwire = circ.Wires.listIterator();
-        if(itwire.hasNext())
-        {
-            Wire wnew = new Wire(itwire.next());
-            outputdag.Wires.add(new Wire(wnew));
-        }*/
-        
-        //for(int i=0;i<circ.Gates.size();i++)
-        /*for(Gate gx:CreateDAGW(precomp.get(x)).Gates)
-        {
-            Gate gnew = new Gate(gx);
-            outdag.Gates.add(gnew);
-            System.out.println("Adding Gate");
-        }*/
-        /*
-        for(int i=0;i<circ.Wires.size();i++)
-        {
-            Wire wnew = new Wire(circ.Wires.get(i));
-            outputdag.Wires.add(wnew);
-            System.out.println("Adding Wire");
-        }*/
+
         outputdag = new DAGW(circ.Gates,circ.Wires);
-        //outputdag = new DAGW(circ);
-        //System.out.println("done with this function");
         return outputdag;
     }
  

@@ -10,8 +10,31 @@ package ParseVerilog;
  */
 public class Convert {
     
+     public static String invBin(String binnum)
+     {
+         String bininv ="";
+         
+         for(int i=0;i<binnum.length();i++)
+         {
+             if(binnum.charAt(i)== '1')
+             {
+                 bininv += "0";
+             }
+             else if(binnum.charAt(i)=='0')
+             {
+                 bininv += "1";
+             }
+             else 
+             {
+                 bininv += "-";
+             }
+         }
+         
+         return bininv;
+     }
+    
      public static int toDec(String num)
-    {
+     {
         int number =0;
         if(num.contains("default"))
         {
