@@ -194,7 +194,15 @@ public class Parser {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        Filepath += "src/BU/ParseVerilog/Verilog.v";
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/BU/ParseVerilog/Verilog.v";
+        }
+        else
+        {
+            Filepath += "BU/ParseVerilog/Verilog.v";
+        }
+        
         
         File file = new File(Filepath);
         

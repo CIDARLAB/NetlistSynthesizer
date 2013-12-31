@@ -104,7 +104,15 @@ public class NetSynth {
     public static void verifyinverse()
     {
         String filestring ="";
-          filestring += Filepath+ "src/BU/resources/Inverse";
+        if(Filepath.contains("prashant"))
+        {
+            filestring += Filepath+ "src/BU/resources/Inverse";
+        }
+        else
+        {
+            filestring += Filepath+ "BU/resources/Inverse";
+        }
+          
             filestring += ".csv";
             File fespinp = new File(filestring);
         try {
@@ -174,7 +182,16 @@ public class NetSynth {
     public static void histogram()
     {
         String filestring ="";
-          filestring += Filepath+ "src/BU/resources/Histogram";
+          if(Filepath.contains("prashant"))
+          {
+              filestring += Filepath+ "src/BU/resources/Histogram";
+          }
+          else
+          {
+              filestring += Filepath+ "BU/resources/Histogram";
+          }
+        
+          
             //filestring += Global.espout++ ;
             filestring += ".csv";
             File fespinp = new File(filestring);
@@ -205,8 +222,14 @@ public class NetSynth {
                 List<String> eslines = new ArrayList<String>();
                 eslines = Espresso.createFile(circ);
                 String filestring2 = "";
-            
-                filestring2 += Filepath+ "src/BU/resources/espresso";
+                if(Filepath.contains("prashant"))
+                {
+                    filestring2 += Filepath+ "src/BU/resources/espresso";
+                }
+                else
+                {
+                    filestring2 += Filepath+ "BU/resources/espresso";
+                }
                 filestring2 += Global.espout++ ;
                 filestring2 += ".txt";
                 File fespinp2 = new File(filestring2);
@@ -406,7 +429,14 @@ public class NetSynth {
             eslinesinv = Espresso.createFile(invcaseCirc);
             String filestring = "";
             String filestringinv = "";
-            filestring += Filepath+ "src/BU/resources/espresso";
+            if(Filepath.contains("prashant"))
+            {
+                filestring += Filepath+ "src/BU/resources/espresso";
+            }
+            else
+            {
+                filestring += Filepath+ "BU/resources/espresso";
+            }
             filestring += Global.espout++ ;
             filestringinv += filestring;
             filestring += ".txt";
@@ -597,22 +627,24 @@ public class NetSynth {
         List<String> espressoOutput = new ArrayList<String>();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
-        //if("Linux".equals(x))
-        //{
-            //commandBuilder = new StringBuilder("./src/resources/espresso.linux -epos src/resources/test.txt");
-        //System.out.println(Filepath);
+        if(x.contains("Mac"))
+        {
+            commandBuilder = new StringBuilder(Filepath+"BU/resources/espresso.mac -epos "+ pathFile);
+        }
+        else if("Linux".equals(x))
+        {
+            if(Filepath.contains("prashant"))
+            {
+                commandBuilder = new StringBuilder(Filepath+"src/BU/resources/espresso.linux -epos "+ pathFile);
+            }
+            else
+            {
+                commandBuilder = new StringBuilder(Filepath+"BU/resources/espresso.linux -epos "+ pathFile);
+            }
+            
+        }
         
-        
-        //System.out.println(Filepath);
-         
-            //commandBuilder = new StringBuilder(Filepath+"src/resources/espresso.linux -epos "+ Filepath+"src/resources/test.txt");
-        commandBuilder = new StringBuilder(Filepath+"src/BU/resources/espresso.linux -epos "+ pathFile);
-       
-            //}
-        
-        //System.out.println(commandBuilder);
         String command = commandBuilder.toString();
-        //System.out.println("So this is what is happening: "+command);
         
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
@@ -625,7 +657,18 @@ public class NetSynth {
             String filestring = "";
             
             
-            filestring += Filepath+ "src/BU/resources/write";
+             if(Filepath.contains("prashant"))
+             {
+                filestring += Filepath+ "src/BU/resources/write";
+             }
+            else
+            {
+                filestring += Filepath+ "BU/resources/write";
+            }
+        
+            
+            
+            
             filestring += Global.espout++;
             filestring += ".txt";
             File fbool = new File(filestring);

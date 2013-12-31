@@ -43,8 +43,16 @@ public class PreCompute {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        Filepath += "src/BU/precomputation/allnetlists.txt";
-       
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/BU/precomputation/allnetlists.txt";
+        }
+        else
+        {
+            Filepath += "BU/precomputation/allnetlists.txt";
+        }
+        
+        
         File file = new File(Filepath);
         
          BufferedReader br;
