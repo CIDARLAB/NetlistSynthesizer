@@ -440,7 +440,42 @@ public class NetSynth {
                 espoutinv = runEspresso(filestringinv);
                 List<DGate> espoutputinv = new ArrayList<DGate>();
                 espoutputinv = parseEspressoToNORNAND(espoutinv);
-                if(espoutput.size() > (espoutputinv.size() + 1))
+                
+                //DAGW circ = computeDAGW(caseCirc.inputgatetable-1);
+                circuitDAG = CreateDAGW(espoutput);
+                //DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable - 1);
+                circuitDAGinv = CreateDAGW(espoutputinv);
+                
+                if (circuitDAGinv.Gates.size() > 1 && (inv == 1)) 
+                {
+                    
+                    int gatessize = circuitDAGinv.Gates.size();
+                    if (circuitDAGinv.Gates.get(1).Type == "NOR" || circuitDAGinv.Gates.get(1).Type == "NOT") 
+                    {
+                        if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) 
+                        {
+                            
+                            System.out.println("Special Case");
+                            circuitDAG = circuitDAGinv;
+                            gatessize = circuitDAGinv.Gates.size();
+                            if(circuitDAG.Gates.get(1).Type == "NOR")
+                            {
+                                circuitDAG.Gates.get(1).Type = GateType.OUTPUT_OR.toString();
+                                circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
+                                circuitDAG.Gates.remove(0);
+                            }
+                            else if(circuitDAG.Gates.get(1).Type == "NOT")
+                            {
+                                circuitDAG.Gates.get(1).Type = GateType.OUTPUT.toString();
+                                circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
+                                circuitDAG.Gates.remove(0);
+                            }
+                        }
+                    }
+                }
+                
+                
+                /*if(espoutput.size() > (espoutputinv.size() + 1))
                 {
                     System.out.println("Special Condition");
                     espoutput = espoutputinv;
@@ -450,21 +485,19 @@ public class NetSynth {
                     DWire outwesp = new DWire();
                     outwesp.name =  espoutput.get(espoutput.size()-1).output.name;
                     outwesp.wtype = DWireType.output;
-                    
                     espoutput.get(espoutput.size()-1).output.name = Wirename;
-                    
                     inpwesp.add(espoutput.get(espoutput.size()-1).output);
                     espoutput.add(new DGate(DGateType.NOT,inpwesp,outwesp));
-                }
+                }*/
                 
-                String espperm = BooleanSimulator.bpermute(espoutput);
+                //String espperm = BooleanSimulator.bpermute(espoutput);
                 for(DGate netgate:espoutput)
                 {
                     System.out.println(netlist(netgate));
                 }
-                circuitDAG = CreateDAGW(espoutput);
+                //circuitDAG = CreateDAGW(espoutput);
                 fespinp.deleteOnExit();
-                System.out.println(espperm);
+                //System.out.println(espperm);
             } 
             catch (IOException ex) 
             {
