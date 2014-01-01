@@ -17,7 +17,7 @@
 //    end
 //endmodule
 
-module and3(output out, input in1, in2, in3);
+module and3(output out, input in1,in2,in3);
   reg r_out;
   assign out = r_out;
   always@(in1, in2, in3)

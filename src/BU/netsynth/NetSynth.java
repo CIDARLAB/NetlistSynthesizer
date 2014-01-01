@@ -47,6 +47,7 @@ import java.util.logging.Logger;
 import BU.netsynth.DGate.DGateType;
 import BU.netsynth.DWire.DWireType;
 import BU.precomputation.PreCompute;
+import BU.precomputation.genVerilogFile;
 
 
 /**
@@ -68,8 +69,8 @@ public class NetSynth {
     
     public static void main(String[] args) {
         // TODO code application logic here
-        
-        System.out.println(Convert.HextoInt("6"));
+        //genVerilogFile.createVerilogFile(3, "0xBF" );
+        //System.out.println(Convert.HextoInt("6"));
         
         Global.wirecount = 0;
         Global.espinp =0;
