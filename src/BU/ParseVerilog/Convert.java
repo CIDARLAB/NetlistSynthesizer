@@ -10,6 +10,64 @@ package BU.ParseVerilog;
  */
 public class Convert {
     
+    
+     public static int HextoInt(String hex)
+     {
+         int dec=0,multh = 0,pow;
+         if(hex.contains("0x"))
+         { 
+             hex = hex.substring(hex.indexOf("0x")+2);
+         }
+         int hlen = hex.length();
+         int j=0;
+         for(int i=(hlen-1);i>=0;i--)
+         {
+             if(hex.charAt(i)=='0')
+                 multh = 0;
+             else if(hex.charAt(i)=='1')
+                 multh = 1;
+             else if(hex.charAt(i)=='2')
+                 multh = 2;
+             else if(hex.charAt(i)=='3')
+                 multh = 3;
+             else if(hex.charAt(i)=='4')
+                 multh = 4;
+             else if(hex.charAt(i)=='5')
+                 multh = 5;
+             else if(hex.charAt(i)=='6')
+                 multh = 6;
+             else if(hex.charAt(i)=='7')
+                 multh = 7;
+             else if(hex.charAt(i)=='8')
+                 multh = 8;
+             else if(hex.charAt(i)=='9')
+                 multh = 9;
+             else if(hex.charAt(i)=='A' || hex.charAt(i)=='a')
+                 multh = 10;
+             else if(hex.charAt(i)=='B' || hex.charAt(i)=='b')
+                 multh = 11;
+             else if(hex.charAt(i)=='C' || hex.charAt(i)=='c')
+                 multh = 12;
+             else if(hex.charAt(i)=='D' || hex.charAt(i)=='d')
+                 multh = 13;
+             else if(hex.charAt(i)=='E' || hex.charAt(i)=='e')
+                 multh = 14;
+             else if(hex.charAt(i)=='F' || hex.charAt(i)=='f')
+                 multh = 15;
+             else
+                 multh =0;
+             pow = (int)Math.pow(16, j); 
+             dec+= (multh*pow);
+             
+             j++;
+         
+         }
+         
+         
+         
+         return dec;
+     }
+     
      public static String invBin(String binnum)
      {
          String bininv ="";

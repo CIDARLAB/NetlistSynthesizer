@@ -68,6 +68,9 @@ public class NetSynth {
     
     public static void main(String[] args) {
         // TODO code application logic here
+        
+        System.out.println(Convert.HextoInt("6"));
+        
         Global.wirecount = 0;
         Global.espinp =0;
         Global.espout =0;
@@ -558,8 +561,9 @@ public class NetSynth {
         return outputdag;
     }
  
+    //<editor-fold desc="precompute function">
     
-    
+    /*
     public static DAGraph precompute(int x)
     {
        DAGraph outdag = new DAGraph();
@@ -570,6 +574,8 @@ public class NetSynth {
         return outdag;
         
     }
+    */
+    //</editor-fold>
     
     public static void testEspresso()
     {
@@ -1343,7 +1349,9 @@ public class NetSynth {
         }
         return minterm;
     }
-  
+    //<editor-fold desc="CreateDAGraph Function">
+    
+    /*
     public static DAGraph CreateDAGraph(List<DGate> netlist)
     {
         DAGraph outDAG = new DAGraph();
@@ -1543,7 +1551,9 @@ public class NetSynth {
         
         return outDAG;
     }
-   
+    
+    */
+    //</editor-fold>
    
      public static DAGW CreateDAGW(List<DGate> netlist)
     {
