@@ -10,7 +10,62 @@ package BU.ParseVerilog;
  */
 public class Convert {
     
-    
+     public static String InttoHex(int dec)
+     {
+         
+         if(dec == 0)
+             return "0x0";
+         String hex ="0x";
+         String multh = "";
+         int dig = 0;
+         String temp = "";
+         while(dec>0)
+         {
+             dig = dec%16;
+            
+             if(dig==0)
+                 multh = "0";
+             else if(dig==1)
+                 multh = "1";
+             else if(dig==2)
+                 multh = "2";
+             else if(dig==3)
+                 multh = "3";
+             else if(dig==4)
+                 multh = "4";
+             else if(dig==5)
+                 multh = "5";
+             else if(dig==6)
+                 multh = "6";
+             else if(dig==7)
+                 multh = "7";
+             else if(dig==8)
+                 multh = "8";
+             else if(dig==9)
+                 multh = "9";
+             else if(dig==10)
+                 multh = "A";
+             else if(dig==11)
+                 multh = "B";
+             else if(dig==12)
+                 multh = "C";
+             else if(dig==13)
+                 multh = "D";
+             else if(dig==14)
+                 multh = "E";
+             else if(dig==15)
+                 multh = "F";
+             else
+                 multh ="0";
+             
+             temp += multh;
+             dec = dec/16;
+             
+         }
+         StringBuilder xhex = new StringBuilder(temp);
+         hex +=xhex.reverse();
+         return hex;
+     }
      public static int HextoInt(String hex)
      {
          int dec=0,multh = 0,pow;

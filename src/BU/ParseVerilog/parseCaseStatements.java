@@ -24,7 +24,6 @@ public class parseCaseStatements {
     public static CircuitDetails input3case(String Filepath)
     {
         
-         Filepath = parseCaseStatements.class.getClassLoader().getResource(".").getPath();
          
          List<String> inputs = new ArrayList<String>();
          List<String> outputs = new ArrayList<String>();
@@ -32,25 +31,26 @@ public class parseCaseStatements {
          
          int x = 0;
         
-         CircuitDetails circuit = new CircuitDetails();
-        if(Filepath.contains("build/classes/"))
-            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
-        else if(Filepath.contains("src"))
-            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-       
+        CircuitDetails circuit = new CircuitDetails();
+        
+        String path = Filepath;
+        
+        Filepath = parseCaseStatements.class.getClassLoader().getResource(".").getPath();
+         
         if(Filepath.contains("prashant"))
         {
+            if(Filepath.contains("build/classes/"))
+                Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+            else if(Filepath.contains("src"))
+                Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
             Filepath += "src/BU/ParseVerilog/Verilog.v";
+            path = Filepath;
         }
-        else
-        {
-            Filepath += "BU/ParseVerilog/Verilog.v";
-        }
+                
         
         
         
-        
-        File file = new File(Filepath);
+        File file = new File(path);
         
         BufferedReader br;
         FileReader fr;

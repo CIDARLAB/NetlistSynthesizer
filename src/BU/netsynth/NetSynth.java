@@ -69,8 +69,7 @@ public class NetSynth {
     
     public static void main(String[] args) {
         // TODO code application logic here
-        genVerilogFile.createVerilogFile(4, "0xBBBBB" );
-        //System.out.println(Convert.HextoInt("6"));
+        
         
         Global.wirecount = 0;
         Global.espinp =0;
@@ -85,8 +84,12 @@ public class NetSynth {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
-       
-        //vtestfunc();
+        //for(int i=0;i<257;i++)
+        //    System.out.println(Convert.InttoHex(i));
+        
+       //genVerilogFile.createVerilogFile(4, "0xBBBBB" );
+        //System.out.println(Convert.HextoInt("6"));
+       //vtestfunc();
         
         //verifyinverse();
         //histogram();
@@ -293,8 +296,17 @@ public class NetSynth {
     
     public static DAGW testParser(String pathFile, int inv, int presynth)
     {
+        
+        String path = pathFile;
+        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        
+        
         caseCirc = new CircuitDetails();
-        caseCirc = parseCaseStatements.input3case(pathFile);
+        caseCirc = parseCaseStatements.input3case(path);
         //System.out.println(caseCirc.inputgatetable);
         DAGW circuitDAG = new DAGW();
         DAGW circuitDAGinv = new DAGW();
@@ -433,6 +445,7 @@ public class NetSynth {
             eslinesinv = Espresso.createFile(invcaseCirc);
             String filestring = "";
             String filestringinv = "";
+           
             if(Filepath.contains("prashant"))
             {
                 filestring += Filepath+ "src/BU/resources/espresso";
@@ -488,7 +501,6 @@ public class NetSynth {
                     {
                         if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) 
                         {
-                            
                             System.out.println("Special Case");
                             circuitDAG = circuitDAGinv;
                             gatessize = circuitDAGinv.Gates.size();
@@ -730,6 +742,8 @@ public class NetSynth {
     
     public static List<DGate> parseEspressoOutput(List<String> espinp)
     {
+        one = new DWire("_one",DWireType.Source);
+        zero = new DWire("_zero",DWireType.GND);
         List<DGate> sopexp = new ArrayList<DGate>();
         List<DWire> wireInputs = new ArrayList<DWire>();
         List<DWire> wireOutputs = new ArrayList<DWire>();
