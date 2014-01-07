@@ -56,9 +56,9 @@ public class genVerilogFile {
         String bin = Convert.dectoBin(dec, ttpow);
         String line = "";
         verout.add(modulestring);
-        verout.add("reg out;");
+        verout.add("     reg out;");
         //line = "";
-        line += "always@(";
+        line += "     always@(";
         for(int i=0;i<inputs;i++)
         {
             if(i == (inputs-1))
@@ -70,11 +70,10 @@ public class genVerilogFile {
                 line += (inputvars.get(i) + ","); 
             }
         }    
-        line += ")";
+        line += ") begin";
         verout.add(line);
-        verout.add("begin");
         line = "";
-        line+= "case({";
+        line+= "          case({";
         for(int i=(inputs-1);i>=0;i--)
         {
             if(i == 0)
@@ -92,7 +91,7 @@ public class genVerilogFile {
         
         for(int i=0;i<ttlength;i++)
         {
-            line ="";
+            line ="               ";
             line += (inputs+ "b'");
             String bini = Convert.dectoBin(i, inputs);
             line +=bini;
@@ -101,9 +100,9 @@ public class genVerilogFile {
             line += ";";
             verout.add(line);
         }
-        verout.add("default: out = 0;");
-        verout.add("endcase");
-        verout.add("end");
+        verout.add("               default: out = 0;");
+        verout.add("          endcase");
+        verout.add("     end");
         verout.add("endmodule");
         printverilogfile(verout);
         return verout;
