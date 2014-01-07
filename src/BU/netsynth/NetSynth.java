@@ -69,7 +69,7 @@ public class NetSynth {
     
     public static void main(String[] args) {
         // TODO code application logic here
-        //genVerilogFile.createVerilogFile(3, "0xBF" );
+        genVerilogFile.createVerilogFile(4, "0xBBBBB" );
         //System.out.println(Convert.HextoInt("6"));
         
         Global.wirecount = 0;
@@ -90,7 +90,7 @@ public class NetSynth {
         
         //verifyinverse();
         //histogram();
-        DAGW xcasedag = testParser("",1,1);
+        //DAGW xcasedag = testParser("",1,1);
         //verifyprecomute();
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);

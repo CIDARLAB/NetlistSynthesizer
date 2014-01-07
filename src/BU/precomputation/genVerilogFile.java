@@ -16,8 +16,17 @@ public class genVerilogFile {
     
     public static List<String> createVerilogFile(int inputs,String hex)
     {
+        
         List<String> verout = new ArrayList<String>();
         int dec = Convert.HextoInt(hex);
+        int combinations = (int)Math.pow(2, inputs);
+        int maxdec = (int)Math.pow(2, combinations);
+        maxdec--;
+        if(dec > maxdec)
+        {
+            dec = maxdec;
+        }
+        
         List<String> inputvars = new ArrayList<String>();
         int incnt =1;
         for(int i=0;i<inputs;i++)
@@ -27,7 +36,9 @@ public class genVerilogFile {
             incnt++;
         }
         
-        String modulestring = "module veriloginp(outout out, input ";
+        String modulename = "";
+        modulename += hex + "_" + inputs;
+        String modulestring = "module " +  modulename +"(outout out, input ";
         for(int i=0;i<inputs;i++)
         {
             if(i == (inputs-1))
