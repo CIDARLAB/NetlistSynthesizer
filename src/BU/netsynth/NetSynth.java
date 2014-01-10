@@ -48,6 +48,8 @@ import BU.netsynth.DGate.DGateType;
 import BU.netsynth.DWire.DWireType;
 import BU.precomputation.PreCompute;
 import BU.precomputation.genVerilogFile;
+import MIT.dnacompiler.HeuristicSearch;
+import MIT.dnacompiler.LoadTables;
 
 
 /**
@@ -83,6 +85,9 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        
+        //LoadTables.getAllCombos(0.9994);
+        HeuristicSearch.beginSearch(null, 0.999);
         
         //for(int i=0;i<257;i++)
         //    System.out.println(Convert.InttoHex(i));
