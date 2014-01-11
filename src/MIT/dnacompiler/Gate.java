@@ -54,13 +54,14 @@ public class Gate {
 
     //public ArrayList<Part> gate_parts;  // parts for this gate
     //public ArrayList<Part> transcription_parts; // parts for a transcripion unit
-
+   
     public int id;
     public int part_id;
     public int gatetype_id;
     public int input1_id;
     public int input2_id; 
     public int output_id;
+    public int stage;
     public String source;
 
     //public Part input1;
@@ -74,6 +75,7 @@ public class Gate {
 
     public Gate(){
 	this.Index = 0;
+        this.stage =0;
 	this.Name = "";
 	this.Type = "";
         this.Outgoing = null;
@@ -90,6 +92,7 @@ public class Gate {
     public Gate(int ind,String dType)
     {
         this.Index = ind;
+        this.stage = 0;
         this.Type = dType;
         if(dType.equals(GateType.NOR.toString()))
         {
@@ -117,6 +120,7 @@ public class Gate {
 
     public Gate(int ind,String dType,Wire de)
     {
+        this.stage =0;
         this.Index = ind;
         this.Type = dType;
         if(dType.equals(GateType.NOR.toString()))
@@ -167,7 +171,7 @@ public class Gate {
 	this.simulate_logic = true;
 	this.simulate_reu = true;
 	this.direction = "+";
-
+        this.stage =0;
 	this.Index = 0;
 	//this.Name = "";
 	this.Type = "";
@@ -179,6 +183,7 @@ public class Gate {
 
     // deep copy
     public Gate(Gate gate){
+        this.stage = gate.stage;
 	simulate_logic = gate.simulate_logic;
 	simulate_reu = gate.simulate_reu;
 	tir_ratio    = gate.tir_ratio;

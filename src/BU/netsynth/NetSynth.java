@@ -87,7 +87,7 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
         //LoadTables.getAllCombos(0.9994);
-        HeuristicSearch.beginSearch(null, 0.999);
+        //HeuristicSearch.beginSearch(null, 0.9);
         
         //for(int i=0;i<257;i++)
         //    System.out.println(Convert.InttoHex(i));
@@ -98,7 +98,9 @@ public class NetSynth {
         
         //verifyinverse();
         //histogram();
-        //DAGW xcasedag = testParser("",1,1);
+        DAGW xcasedag = testParser("",0,1);
+        HeuristicSearch.beginSearch(xcasedag, 0.9);
+        
         //verifyprecomute();
         //DAGraph x = precompute(2);
         //DAGW y = computeDAGW(14);

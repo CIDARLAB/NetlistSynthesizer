@@ -7,6 +7,7 @@ package MIT.dnacompiler;
 import BU.CelloGraph.DAGW;
 import MIT.dnacompiler.Gate.GateType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public class HeuristicSearch {
     {
         List<BGateCombo> allcombos = new ArrayList<BGateCombo>();
         allcombos = LoadTables.getAllCombos(cutoff);
-        //int gates_size = dagCirc.Gates.size();
+        int gates_size = dagCirc.Gates.size();
         List<BGateCombo> notcombos = new ArrayList<BGateCombo>();
         List<BGateCombo> norcombos = new ArrayList<BGateCombo>();
         int notcombosSize = LoadTables.NOTgateCount(allcombos);
@@ -30,11 +31,107 @@ public class HeuristicSearch {
         sortcombos(notcombos);
         sortcombos(norcombos);
         
-        LoadTables.printallCombos(notcombos);
-        System.out.println("\n\n");
-        LoadTables.printallCombos(norcombos);
+        HashMap<String,String> Notgates = new HashMap<String,String>();
+        HashMap<String,String> Norgates = new HashMap<String,String>();
+        HashMap<String,String> inputNotgates = new HashMap<String,String>();
+        HashMap<String,String> inputNorgates = new HashMap<String,String>();
         
-    
+        notcombos = sortcombosGatewise(notcombos);
+        norcombos = sortcombosGatewise(norcombos);
+        
+        for(BGateCombo bgc:notcombos)
+        {
+            if(!Notgates.containsKey(bgc.Out))
+                Notgates.put(bgc.Out, bgc.Out);
+            
+            if(bgc.Inp1.contains("inducer"))
+            {
+                if(!inputNotgates.containsKey(bgc.Inp1))
+                    inputNotgates.put(bgc.Inp1, bgc.Inp1);
+            }
+        }
+        for(BGateCombo bgc:norcombos)
+        {
+            if(!Norgates.containsKey(bgc.Out))
+                Norgates.put(bgc.Out, bgc.Out);
+            
+            if(bgc.Inp1.contains("inducer"))
+            {
+                if(!inputNorgates.containsKey(bgc.Inp1))
+                    inputNorgates.put(bgc.Inp1, bgc.Inp1);
+            }
+            if(bgc.Inp2.contains("inducer"))
+            {
+                if(!inputNorgates.containsKey(bgc.Inp2))
+                    inputNorgates.put(bgc.Inp2, bgc.Inp2);
+            }
+        }
+        
+        /*System.out.println("Number of availabe Not Inputs with cutoff higher than "+ cutoff +": " + inputNotgates.size());
+        System.out.println("Number of availabe Nor Inputs with cutoff higher than "+ cutoff +": " + inputNorgates.size());
+        System.out.println("Number of availabe Not outputs with cutoff higher than "+ cutoff +": " + Notgates.size());
+        System.out.println("Number of availabe Nor outputs with cutoff higher than "+ cutoff +": " + Norgates.size());
+        */
+        HashMap<Gate,Integer> nodesCirc = new HashMap<Gate,Integer>();
+        int indx = gates_size-1;
+        
+        
+        
+        
+        for (int i = 0; i < dagCirc.Gates.size(); i++) {
+	    if (dagCirc.Gates.get(i).Outgoing != null) {                     //Outgoing is a wire
+		int index = dagCirc.Gates.get(i).Outgoing.Index;
+		for(Wire w: dagCirc.Wires) {
+		    if(w.Index == index) { dagCirc.Gates.get(i).Outgoing = w; }
+		}
+	    }
+	}
+	for (int i = 0; i < dagCirc.Wires.size(); i++) {
+	    if (dagCirc.Wires.get(i).From != null) {                        //From is a gate
+		int index = dagCirc.Wires.get(i).From.Index;
+		for(Gate g: dagCirc.Gates) {
+		    if(g.Index == index) { dagCirc.Wires.get(i).From = g; }
+		}
+	    }
+	    if (dagCirc.Wires.get(i).To != null) {                          //To is a gate
+		int index = dagCirc.Wires.get(i).To.Index;
+		for(Gate g: dagCirc.Gates) {
+		    if(g.Index == index) { dagCirc.Wires.get(i).To = g; }
+		}
+	    }
+	    if (dagCirc.Wires.get(i).Next != null) {                        //Next is a wire
+		int index = dagCirc.Wires.get(i).Next.Index;
+		for(Wire w: dagCirc.Wires) {
+		    if(w.Index == index) { dagCirc.Wires.get(i).Next = w; }
+		}
+	    }
+	}
+
+        
+        
+        for(int i=(dagCirc.Gates.size()-1);i>=0;i--)
+        {
+            if(isInput(dagCirc.Gates.get(i)))
+            {
+               dagCirc.Gates.get(i).stage =0;
+            }
+            else
+            {
+                int max = dagCirc.Gates.get(i).stage;
+                Wire w = dagCirc.Gates.get(i).Outgoing;
+                while(w!=null)
+                {
+                    int stg = w.To.stage;
+                    if(stg >max)
+                        max = stg;
+                    w = w.Next;
+                }
+                dagCirc.Gates.get(i).stage = (max +1);
+            }
+            
+            System.out.println(dagCirc.Gates.get(i).Name + ":"+dagCirc.Gates.get(i).stage);
+        }
+        
     }
     
     
@@ -105,4 +202,29 @@ public class HeuristicSearch {
 
     }
     
+    public static List<BGateCombo> sortcombosGatewise(List<BGateCombo> combos)
+    {
+        List<BGateCombo> gatewisecombo = new ArrayList<BGateCombo>();
+        HashMap<String,String> outputdone = new HashMap<String,String>();
+        int i,j;
+        
+        for(i=0;i<combos.size();i++)
+        {
+            String bgcOut = combos.get(i).Out;
+            if(outputdone.containsKey(bgcOut))
+                continue;
+            
+            outputdone.put(bgcOut, bgcOut);
+            for(j=i;j<combos.size();j++)
+            {
+                if(combos.get(j).Out.equals(bgcOut))
+                {
+                    gatewisecombo.add(combos.get(j));
+                }
+            }
+        }
+        
+        
+        return gatewisecombo;
+    }
 }

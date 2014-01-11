@@ -125,9 +125,7 @@ public class LoadTables {
 	catch (FileNotFoundException ex) {
 	    System.out.println("FileNotFoundException when reading input file");
 	}
-        //System.out.println(NOTgateCount(all_combos));
-        //printallCombos(all_combos);
-	return all_combos;
+        return all_combos;
 
     }
     public static int NOTgateCount(List<BGateCombo> allcombos)
