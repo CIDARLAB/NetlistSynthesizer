@@ -14,6 +14,7 @@ import java.util.List;
 public class BGateNode {
     
     public static String gname;
+    public static Gate bgate;
     public static int index;
     public static enum nodecolor{
         WHITE,

@@ -8,7 +8,9 @@ import BU.CelloGraph.DAGW;
 import MIT.dnacompiler.Gate.GateType;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -72,7 +74,7 @@ public class HeuristicSearch {
         System.out.println("Number of availabe Not outputs with cutoff higher than "+ cutoff +": " + Notgates.size());
         System.out.println("Number of availabe Nor outputs with cutoff higher than "+ cutoff +": " + Norgates.size());
         */
-        HashMap<Gate,Integer> nodesCirc = new HashMap<Gate,Integer>();
+        HashMap<Integer,Gate> nodesCirc = new HashMap<Integer,Gate>();
         int indx = gates_size-1;
         
         
@@ -128,9 +130,34 @@ public class HeuristicSearch {
                 }
                 dagCirc.Gates.get(i).stage = (max +1);
             }
-            
-            System.out.println(dagCirc.Gates.get(i).Name + ":"+dagCirc.Gates.get(i).stage);
+            //System.out.println(dagCirc.Gates.get(i).Name + ":"+dagCirc.Gates.get(i).stage);
         }
+        int maxstage = dagCirc.Gates.get(0).stage;
+        int xstage =0;
+        
+        int xindx =0;
+        while(xstage <= maxstage)
+        {
+            for(Gate bgate:dagCirc.Gates)
+            {
+                if(bgate.stage == xstage)
+                {
+                    nodesCirc.put(xindx,bgate);
+                    xindx++;
+                }
+            }
+            xstage++;
+        }
+        Iterator it = nodesCirc.entrySet().iterator();
+        while(it.hasNext())
+        {
+            Map.Entry pairs = (Map.Entry)it.next();
+            Gate x = (Gate)pairs.getValue();
+            System.out.println(x.Name +":"+pairs.getKey());
+        }
+        
+        
+        
         
     }
     
