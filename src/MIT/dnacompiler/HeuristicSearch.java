@@ -5,6 +5,7 @@
 package MIT.dnacompiler;
 
 import BU.CelloGraph.DAGW;
+import MIT.dnacompiler.BGateNode.nodecolor;
 import MIT.dnacompiler.Gate.GateType;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,9 +78,6 @@ public class HeuristicSearch {
         HashMap<Integer,Gate> nodesCirc = new HashMap<Integer,Gate>();
         int indx = gates_size-1;
         
-        
-        
-        
         for (int i = 0; i < dagCirc.Gates.size(); i++) {
 	    if (dagCirc.Gates.get(i).Outgoing != null) {                     //Outgoing is a wire
 		int index = dagCirc.Gates.get(i).Outgoing.Index;
@@ -108,8 +106,6 @@ public class HeuristicSearch {
 		}
 	    }
 	}
-
-        
         
         for(int i=(dagCirc.Gates.size()-1);i>=0;i--)
         {
@@ -148,18 +144,39 @@ public class HeuristicSearch {
             }
             xstage++;
         }
-        Iterator it = nodesCirc.entrySet().iterator();
+        xindx--;
+        System.out.println(xindx);
+        BGateNode root = new BGateNode();
+        root.bgate = (Gate)nodesCirc.get(xindx);
+        //System.out.println(root.bgate.Name);
+        root.parent = null;
+        root.Next = null;
+        root.ncolor = nodecolor.WHITE;
+        BGateNode curr = new BGateNode();
+        curr = root;
+        
+        while(curr.parent!= null && curr.ncolor!= nodecolor.BLACK)
+        {
+            if(curr.ncolor == nodecolor.WHITE)
+            {
+                curr.ncolor = nodecolor.GRAY;
+                
+            }
+        }
+        
+        /*Iterator it = nodesCirc.entrySet().iterator();
         while(it.hasNext())
         {
             Map.Entry pairs = (Map.Entry)it.next();
             Gate x = (Gate)pairs.getValue();
             System.out.println(x.Name +":"+pairs.getKey());
-        }
-        
+        }*/
         
         
         
     }
+    
+    
     
     
     public static boolean hasInput(Gate bgate)
