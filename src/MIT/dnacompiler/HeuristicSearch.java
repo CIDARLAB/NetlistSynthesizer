@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  *
@@ -75,7 +76,7 @@ public class HeuristicSearch {
         System.out.println("Number of availabe Not outputs with cutoff higher than "+ cutoff +": " + Notgates.size());
         System.out.println("Number of availabe Nor outputs with cutoff higher than "+ cutoff +": " + Norgates.size());
         */
-        HashMap<Integer,Gate> nodesCirc = new HashMap<Integer,Gate>();
+        HashMap<Gate,Integer> nodesCirc = new HashMap<Gate,Integer>();
         int indx = gates_size-1;
         
         for (int i = 0; i < dagCirc.Gates.size(); i++) {
@@ -138,7 +139,7 @@ public class HeuristicSearch {
             {
                 if(bgate.stage == xstage)
                 {
-                    nodesCirc.put(xindx,bgate);
+                    nodesCirc.put(bgate,xindx);
                     xindx++;
                 }
             }
@@ -147,20 +148,61 @@ public class HeuristicSearch {
         xindx--;
         System.out.println(xindx);
         BGateNode root = new BGateNode();
-        root.bgate = (Gate)nodesCirc.get(xindx);
-        //System.out.println(root.bgate.Name);
+        for(Entry<Gate,Integer> entry : nodesCirc.entrySet())
+        {
+            if(entry.getValue() == xindx)
+            {
+                root.bgate = (Gate)entry.getKey();
+            }
+        }
+        
+        //root.bgate = (Gate)nodesCirc.get(xindx);
+        
         root.parent = null;
         root.Next = null;
         root.ncolor = nodecolor.WHITE;
-        BGateNode curr = new BGateNode();
-        curr = root;
-        
-        while(curr.parent!= null && curr.ncolor!= nodecolor.BLACK)
+        BGateNode curr = root;
+        //curr = root;
+        List<Pair<Integer,Gate>> nodequeue = new ArrayList<Pair<Integer,Gate>>();
+        while(curr!= null)
         {
+            
             if(curr.ncolor == nodecolor.WHITE)
             {
-                curr.ncolor = nodecolor.GRAY;
                 
+                curr.ncolor = nodecolor.GRAY;
+                Wire w = curr.bgate.Outgoing;
+                while(w!=null)
+                {
+                    int ind = nodesCirc.get(w.To);
+                    Gate g = new Gate(w.To);
+                    nodequeue.add(new Pair(ind,g));
+                    w= w.Next;
+                }
+                for(Pair xp:nodequeue)
+                {
+                    Gate xpg = (Gate) xp.g;
+                    System.out.println(xp.ind + " : " + xpg.Name);
+                }
+                if(nodequeue.isEmpty())
+                {
+                    curr.ncolor = nodecolor.BLACK;
+                    if(curr.Next != null)
+                        curr = curr.Next;
+                    else
+                        curr = curr.parent;
+                }
+                break;
+                
+                
+            }
+            else if(curr.ncolor == nodecolor.GRAY)
+            {
+                curr.ncolor = nodecolor.BLACK;
+                if(curr.Next != null)
+                    curr = curr.Next;
+                else
+                    curr = curr.parent;
             }
         }
         
@@ -177,7 +219,32 @@ public class HeuristicSearch {
     }
     
     
-    
+    public static class Pair<Integer,Gate>
+    {
+        public Gate g;
+        public int ind;
+        public Pair(int xind,Gate xg)
+        {
+            this.g = xg;
+            this.ind = xind;
+        }
+        public Gate getGate()
+        {
+            return g;
+        }
+        public int returnindex()
+        {
+            return ind;
+        }
+        public void setGate(Gate xg)
+        {
+            this.g = xg;
+        }
+        public void setIndex(int xind)
+        {
+            this.ind = xind;
+        }
+    }
     
     public static boolean hasInput(Gate bgate)
     {
