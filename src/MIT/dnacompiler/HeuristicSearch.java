@@ -76,7 +76,7 @@ public class HeuristicSearch {
         System.out.println("Number of availabe Not outputs with cutoff higher than "+ cutoff +": " + Notgates.size());
         System.out.println("Number of availabe Nor outputs with cutoff higher than "+ cutoff +": " + Norgates.size());
         */
-        HashMap<Gate,Integer> nodesCirc = new HashMap<Gate,Integer>();
+        HashMap<Integer,Gate> nodesCirc = new HashMap<Integer,Gate>();
         int indx = gates_size-1;
         
         //<editor-fold desc="Reconnecting DAGW in memory">
@@ -133,8 +133,8 @@ public class HeuristicSearch {
             //System.out.println(dagCirc.Gates.get(i).Name + ":"+dagCirc.Gates.get(i).stage);
         }
         int maxstage = dagCirc.Gates.get(0).stage;
-        int xstage =0;
         
+        int xstage =0;
         int xindx =0;
         while(xstage <= maxstage)
         {
@@ -142,7 +142,7 @@ public class HeuristicSearch {
             {
                 if(bgate.stage == xstage)
                 {
-                    nodesCirc.put(bgate,xindx);
+                    nodesCirc.put(xindx,bgate);
                     xindx++;
                 }
             }
@@ -151,25 +151,37 @@ public class HeuristicSearch {
         xindx--;
         System.out.println(xindx);
         BGateNode root = new BGateNode();
-        for(Entry<Gate,Integer> entry : nodesCirc.entrySet())
-        {
-            if(entry.getValue() == xindx)
-            {
-                root.bgate = (Gate)entry.getKey();
-            }
-        }
+        
+        root.bgate = (Gate)nodesCirc.get(xindx);
+        
         
         //root.bgate = (Gate)nodesCirc.get(xindx);
-        
+        root.index = xindx;
+        root.bgname = "reporter_YFP";
         root.parent = null;
         root.Next = null;
         root.ncolor = nodecolor.WHITE;
         BGateNode curr = root;
         //curr = root;
         //HashMap<HashMap<Integer,BGateNode>,Integer> combinations = new HashMap<HashMap<Integer,BGateNode>,Integer>();
+        
+        Iterator it = nodesCirc.entrySet().iterator();
+        while(it.hasNext())
+        {
+            Map.Entry pairs = (Map.Entry)it.next();
+            Gate x = (Gate)pairs.getValue();
+            x.Index = (Integer)pairs.getKey();
+            System.out.println(x.Name +":"+pairs.getKey());
+        }
+        /*for(Gate xg:dagCirc.Gates)
+        {
+            System.out.println(xg.Name + ":" + xg.Index);
+        }*/
+        
+        
         List<HashMap<Integer,BGateNode>> combinations = new ArrayList<HashMap<Integer,BGateNode>>();
         
-        List<Pair<Integer,Wire>> nodequeue = new ArrayList<Pair<Integer,Wire>>();
+        //List<Pair<Integer,Wire>> nodequeue = new ArrayList<Pair<Integer,Wire>>();
         
         //Start Heuristic Search Algo
         while (curr != null) 
@@ -179,55 +191,17 @@ public class HeuristicSearch {
             {
 
                 curr.ncolor = nodecolor.GRAY;
-                Wire w = curr.bgate.Outgoing;
-                while (w != null) 
-                {
-                    int ind = nodesCirc.get(w.To);
-                    Wire gw = w; //Possible deep copy needed?
-                    int flag = 0;
-                    BGateNode runner = curr;
-                    while (runner != null) //check if the bgate has already been assigned
-                    {
-                        if (gw.To.Index == runner.bgate.Index) 
-                        {
-                            flag = 1;
-                            break;
-                        }
-                        runner = runner.parent;
-                    }
-                    if (flag == 0) // add to nodequeue only if the bgate has not been assigned in the tree before. 
-                    {
-                        if(gw!=null)
-                            nodequeue.add(new Pair(ind, gw));
-                    }
-
-                    w = w.Next;
-                }
-                /*for(Pair xp:nodequeue)
-                {
-                Gate xpg = (Gate) xp.g;
-                System.out.println(xp.ind + " : " + xpg.Name);
-                }*/
-
-                if (nodequeue.isEmpty()) 
+                if (curr.index == 0) 
                 {
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
-                    int xrundepth = 0;
                     HashMap<Integer, BGateNode> assign = new HashMap<Integer, BGateNode>();
-
                     while (runner != null) 
                     {
                         assign.put(runner.index, runner);
                         runner = runner.parent;
-                        xrundepth++;
-
                     }
-                    System.out.println(xrundepth);
-                    if (xrundepth == xindx) 
-                    {
-                        combinations.add(assign);
-                    }
+                    combinations.add(assign);
                     if (curr.Next != null) 
                     {
                         curr = curr.Next;
@@ -236,171 +210,200 @@ public class HeuristicSearch {
                     {
                         curr = curr.parent;
                     }
-
                 } 
                 else 
                 {
-                    //<editor-fold desc="GateType is Output or Output_OR">
-                    if (curr.bgate.Type.equals(GateType.OUTPUT.toString()) || curr.bgate.Type.equals(GateType.OUTPUT_OR.toString())) 
+                
+                    
+                    List<String> childnodeassign = new ArrayList<String>();
+                    //HashMap<String,String> hashchildnodeassign = new HashMap<String,String>();
+                    
+                    int next_indx = curr.index-1;
+                    BGateNode runner = curr;
+                    int flag =0;
+                    while(runner!= null)
                     {
-                        List<String> childnodeassign = new ArrayList<String>();
-                        //HashMap<String,String> hashchildnodeassign = new HashMap<String,String>();
-                        //<editor-fold desc="Output is NOR gate">
-                        if (curr.bgate.Outgoing.To.Type.equals(GateType.NOR.toString())) 
+                        Wire outw = runner.bgate.Outgoing;
+                        while(outw!=null)
                         {
-                            int inpno = 0;
-                            Wire xw = curr.bgate.Outgoing.To.Outgoing;
-                            while (xw != null) 
+                            if(outw.To.Index == next_indx)
                             {
-                                if (xw.To.Type.equals(GateType.INPUT.toString())) 
-                                {
-                                    inpno++;
-                                }
-                                xw = xw.Next;
+                                flag =1;
+                                break;
                             }
-                            //System.out.println("reached here!! NOR GATE");
-                            childnodeassign = new ArrayList<String>();
+                            outw = outw.Next;
+                        }
+                        if(flag==1)
+                            break;
+                        runner = runner.parent;
+                    }
+                    childnodeassign = new ArrayList<String>();
+                    if(runner.bgate.Type.equals(GateType.OUTPUT.toString()) || runner.bgate.Type.equals(GateType.OUTPUT_OR.toString()))
+                    {
+                        if(nodesCirc.get(next_indx).Type.equals(GateType.NOR.toString()))
+                        {
+                            int inpno=0;
+                            Wire nextw = nodesCirc.get(next_indx).Outgoing;
+                            while(nextw!=null)
+                            {
+                                if(nextw.To.Type.equals(GateType.INPUT.toString()))
+                                    inpno++;
+                                nextw = nextw.Next;
+                            }
                             for (BGateCombo xbgc : norcombos) 
                             {
-                                if (!childnodeassign.contains(xbgc.Out)) 
+                                int comboflag =0;
+                                if(inpno == 1)
                                 {
-                                    BGateNode runner = curr;
-                                    int flag =0;
-                                    if (inpno == 1) 
+                                    if(xbgc.Inp1.contains("inducer")||xbgc.Inp2.contains("inducer"))
                                     {
-                                        if (xbgc.Inp1.contains("inducer") || xbgc.Inp2.contains("inducer")) 
-                                        {
-                                            flag = 1;
-                                            //childnodeassign.add(xbgc.Out);
-                                        }
-                                    } 
-                                    else if (inpno == 2) 
-                                    {
-                                        if (xbgc.Inp1.contains("inducer") && xbgc.Inp2.contains("inducer")) 
-                                        {
-                                            flag = 1;
-                                            //childnodeassign.add(xbgc.Out);
-                                        }
-                                    } 
-                                    else 
-                                    {
-                                        flag = 1;
-                                        //childnodeassign.add(xbgc.Out);
+                                        comboflag =1;
                                     }
-                                    while(runner!= null)
+                                }
+                                else if(inpno ==2)
+                                {
+                                    if(xbgc.Inp1.contains("inducer")&&xbgc.Inp2.contains("inducer"))
                                     {
-                                        if(runner.bgname.equals(xbgc.Inp1) || runner.bgname.equals(xbgc.Inp2) || runner.bgname.equals(xbgc.Out))
+                                        comboflag =1;
+                                    }
+                                }
+                                else
+                                {
+                                    if((!xbgc.Inp1.contains("inducer")) && (!xbgc.Inp2.contains("inducer")))
+                                    {
+                                        comboflag =1;
+                                    }
+                                }
+                                BGateNode subrunner = curr;
+                                if (comboflag == 1) 
+                                {
+                                    while (subrunner != null) 
+                                    {
+                                        if (subrunner.bgname.equals(xbgc.Inp1) || subrunner.bgname.equals(xbgc.Inp2) || subrunner.bgname.equals(xbgc.Out)) 
                                         {
-                                            flag = 0;
+                                            comboflag = 0;
                                             break;
                                         }
-                                        runner = runner.parent;
+                                        subrunner = subrunner.parent;
                                     }
-                                    if(flag == 1) // add to child node assign iff the gate has not been assigned previously.
-                                    {
-                                        childnodeassign.add(xbgc.Out);
-                                        //hashchildnodeassign.put(xbgc.Out,xbgc.Out);
-                                    }    
+                                }
+                                if(comboflag ==1)
+                                {
+                                    childnodeassign.add(xbgc.Out);
                                 }
                             }
-                        } 
-                        //</editor-fold>
-                        //<editor-fold desc="Output is NOT gate">
-                        else if (curr.bgate.Outgoing.To.equals(GateType.NOT.toString())) 
+                            
+                            
+                        }
+                        else if(nodesCirc.get(next_indx).Type.equals(GateType.NOT.toString()))
                         {
-                            System.out.println("Reached here!!");
-                            int inpno = 0;
-                            Wire xw = curr.bgate.Outgoing.To.Outgoing;
-                            while (xw != null) 
+                            int inpno=0;
+                            Wire nextw = nodesCirc.get(next_indx).Outgoing;
+                            while(nextw!=null)
                             {
-                                if (xw.To.Type.equals(GateType.INPUT.toString())) 
-                                {
+                                if(nextw.To.Type.equals(GateType.INPUT.toString()))
                                     inpno++;
-                                }
-                                xw = xw.Next;
+                                nextw = nextw.Next;
                             }
-                            childnodeassign = new ArrayList<String>();
-                            for (BGateCombo xbgc : notcombos) 
+                            for (BGateCombo xbgc : norcombos) 
                             {
-                                if (!childnodeassign.contains(xbgc.Out)) 
+                                int comboflag =0;
+                                if(inpno == 1)
                                 {
-                                    BGateNode runner = curr;
-                                    int flag =0;
-                                    if (inpno == 1) 
+                                    if(xbgc.Inp1.contains("inducer"))
                                     {
-                                        if (xbgc.Inp1.contains("inducer")) 
-                                        {
-                                            flag =1;
-                                            //childnodeassign.add(xbgc.Out);
-                                        }
-                                    } 
-                                    else 
-                                    {
-                                        flag =1;
-                                        //childnodeassign.add(xbgc.Out);
+                                        comboflag =1;
                                     }
-                                    while(runner!= null)
+                                }
+                                else
+                                {
+                                    if((!xbgc.Inp1.contains("inducer")))
                                     {
-                                        if(runner.bgname.equals(xbgc.Inp1) || runner.bgname.equals(xbgc.Out))
+                                        comboflag =1;
+                                    }
+                                }
+                                BGateNode subrunner = curr;
+                                if (comboflag == 1) 
+                                {
+                                    while (subrunner != null) 
+                                    {
+                                        if (subrunner.bgname.equals(xbgc.Inp1) || subrunner.bgname.equals(xbgc.Out)) 
                                         {
-                                            flag = 0;
+                                            comboflag = 0;
                                             break;
                                         }
-                                        runner = runner.parent;
+                                        subrunner = subrunner.parent;
                                     }
-                                    if(flag == 1) // add to child node assign iff the gate has not been assigned previously.
-                                    {
-                                        childnodeassign.add(xbgc.Out);
-                                        //hashchildnodeassign.put(xbgc.Out,xbgc.Out);
-                                    }  
+                                }
+                                if(comboflag ==1)
+                                {
+                                    childnodeassign.add(xbgc.Out);
                                 }
                             }
                         }
-                        //</editor-fold>
                         
-                        /*for(String xstring:childnodeassign)
+                        
+                        
+                        
+                        
+                        
+                    }
+                    else
+                    {
+                        if(runner.bgate.Type.equals(GateType.NOR.toString()))
                         {
-                            System.out.println(xstring);
-                        }*/
-                        
-                        BGateNode childprev = null;
-                        //BGateNode childcurr = new BGateNode();
+                                
+                        }
+                        else if(runner.bgate.Type.equals(GateType.NOT.toString()))
+                        {
+                                
+                        }
+                    }
+                   
+                    if (childnodeassign.isEmpty()) 
+                    {
+                        curr.ncolor = nodecolor.BLACK;
+                        if (curr.Next != null) 
+                        {
+                            curr = curr.Next;
+                        } 
+                        else 
+                        {
+                            curr = curr.parent;
+                        }
+                    } 
+                    else 
+                    {
                         List<BGateNode> nodeschildren = new ArrayList<BGateNode>();
                         for (int i = 0; i < childnodeassign.size(); i++) 
                         {
-                            BGateNode childcurr = new BGateNode(null,null,curr,nodecolor.WHITE,nodequeue.get(0).getWire().To,childnodeassign.get(i),nodequeue.get(0).returnindex());
-                            
+                            BGateNode childcurr = new BGateNode(null, null, curr, nodecolor.WHITE, nodesCirc.get(curr.index - 1), childnodeassign.get(i), (curr.index - 1));
                             nodeschildren.add(childcurr);
-                            //childcurr.Next = childprev;
-                            //childcurr.parent = curr;
-                            //childcurr.bgate = new Gate(); 
-                            //childcurr.bgate = nodequeue.get(0).getGate();
-                            //childcurr.ncolor = nodecolor.WHITE;
-                            //childcurr.bgname = childnodeassign.get(i);
-                            //childprev = childcurr;
                         }
-                        nodequeue.remove(0);
-                        for(int i=0;i<nodeschildren.size()-1;i++)
+                        for (int i = 0; i < nodeschildren.size() - 1; i++) 
                         {
-                            nodeschildren.get(i).Next = nodeschildren.get(i+1);
+                            nodeschildren.get(i).Next = nodeschildren.get(i + 1);
                         }
                         curr.child = nodeschildren.get(0);
+                        if (curr.child != null) 
+                        {
+                            curr = curr.child;
+                        } 
+                        else if (curr.Next != null) 
+                        {
+                            curr = curr.Next;
+                        } 
+                        else 
+                        {
+                            curr = curr.parent;
+                        }
+                        System.out.println("reached here!!");
+                    }
 
-                    }
-                    //</editor-fold>
-                    else 
-                    {
-                        Wire nextw = (Wire)nodequeue.get(0).g;
-                        
-                        
-                    }
-                    System.out.println("reached here!!");
+                    //BGateNode childprev = null;
+                    
                 }
-                //break;
-
-
             }
-            
             else if(curr.ncolor == nodecolor.GRAY)
             {
                 curr.ncolor = nodecolor.BLACK;
@@ -411,45 +414,14 @@ public class HeuristicSearch {
             }
         }
         
-        /*Iterator it = nodesCirc.entrySet().iterator();
-        while(it.hasNext())
-        {
-            Map.Entry pairs = (Map.Entry)it.next();
-            Gate x = (Gate)pairs.getValue();
-            System.out.println(x.Name +":"+pairs.getKey());
-        }*/
+        
         
         
         
     }
     
     
-    public static class Pair<Integer,Wire>
-    {
-        public Wire g;
-        public int ind;
-        public Pair(int xind,Wire xg)
-        {
-            this.g = xg;
-            this.ind = xind;
-        }
-        public Wire getWire()
-        {
-            return g;
-        }
-        public int returnindex()
-        {
-            return ind;
-        }
-        public void setWire(Wire xg)
-        {
-            this.g = xg;
-        }
-        public void setIndex(int xind)
-        {
-            this.ind = xind;
-        }
-    }
+
     
     public static boolean hasInput(Gate bgate)
     {
