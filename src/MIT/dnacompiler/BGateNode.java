@@ -13,15 +13,15 @@ import java.util.List;
  */
 public class BGateNode {
     
-    public static String bgname;
-    public static Gate bgate;
-    public static int index;
-    public static enum nodecolor{
+    public String bgname;
+    public  Gate bgate;
+    public  int index;
+    public  enum nodecolor{
         WHITE,
         GRAY,
         BLACK;
     }
-    public static nodecolor ncolor;
+    public  nodecolor ncolor;
     BGateNode parent;
     BGateNode child;
     BGateNode Next;
@@ -36,5 +36,15 @@ public class BGateNode {
         this.bgate = new Gate();
         this.bgname = "";
         this.index = 0;
+    }
+    public BGateNode(BGateNode xnext, BGateNode xchild, BGateNode xparent, nodecolor xncolor, Gate xgate, String xbgname, int xind)
+    {
+        this.Next = xnext;
+        this.child = xchild;
+        this.parent = xparent;
+        this.ncolor = xncolor;
+        this.bgate = new Gate(xgate);
+        this.bgname = xbgname;
+        this.index = xind;
     }
 }
