@@ -184,6 +184,8 @@ public class HeuristicSearch {
         //List<Pair<Integer,Wire>> nodequeue = new ArrayList<Pair<Integer,Wire>>();
         
         //Start Heuristic Search Algo
+        
+        System.out.println("\n\n\nStart Heuristic Algorithm!!\n");
         while (curr != null) 
         {
             
@@ -191,18 +193,22 @@ public class HeuristicSearch {
             {
 
                 curr.ncolor = nodecolor.GRAY;
+                System.out.println(curr.index);
                 if (curr.index == 0) 
                 {
+                    
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
                     HashMap<Integer, BGateNode> assign = new HashMap<Integer, BGateNode>();
+                    //System.out.println("Assignment!! ==>");
                     while (runner != null) 
                     {
                         assign.put(runner.index, runner);
-                        System.out.println(runner.index + ":" +runner.bgname);
+                        //System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
                     combinations.add(assign);
+                    //System.out.println(combinations.size());
                     if (curr.Next != null) 
                     {
                         curr = curr.Next;
@@ -236,8 +242,13 @@ public class HeuristicSearch {
                         runner = runner.parent;
                     }
                     childnodeassign = new ArrayList<String>();
+                    
+                    //<editor-fold desc="Curr node is an input to the OUPUT/OUTPUT_OR Gate " defaultstate="collapsed">
                     if(runner.bgate.Type.equals(GateType.OUTPUT.toString()) || runner.bgate.Type.equals(GateType.OUTPUT_OR.toString()))
                     {
+                        //Child nodes to be added are of Gatetype NOR
+                        
+                        //<editor-fold desc="Child nodes to be added are of GateType NOR" defaultstate="collapsed">
                         if(nodesCirc.get(next_indx).Type.equals(GateType.NOR.toString()))
                         {
                             int inpno=0;
@@ -253,7 +264,7 @@ public class HeuristicSearch {
                                 int comboflag =0;
                                 if(inpno == 1)
                                 {
-                                    if(xbgc.Inp1.contains("inducer")||xbgc.Inp2.contains("inducer"))
+                                    if((xbgc.Inp1.contains("inducer") && (!xbgc.Inp2.contains("inducer"))) || ((!xbgc.Inp1.contains("inducer")) && xbgc.Inp2.contains("inducer")) )
                                     {
                                         comboflag =1;
                                     }
@@ -287,12 +298,14 @@ public class HeuristicSearch {
                                 }
                                 if(comboflag ==1)
                                 {
-                                    childnodeassign.add(xbgc.Out);
+                                    if(!childnodeassign.contains(xbgc.Out))
+                                        childnodeassign.add(xbgc.Out);
                                 }
                             }
-                            
-                            
                         }
+                        //</editor-fold>
+                        //<editor-fold desc="Child nodes to be added are of GateType NOR" defaultstate="collapsed">
+                        
                         else if(nodesCirc.get(next_indx).Type.equals(GateType.NOT.toString()))
                         {
                             int inpno=0;
@@ -335,11 +348,68 @@ public class HeuristicSearch {
                                 }
                                 if(comboflag ==1)
                                 {
+                                    if(!childnodeassign.contains(xbgc.Out))
                                     childnodeassign.add(xbgc.Out);
                                 }
                             }
                         }
+                        //</editor-fold>
+                        //<editor-fold desc="Child nodes to be added are of GateType INPUT" defaultstate="collapsed">
+                        else if (nodesCirc.get(next_indx).Type.equals(GateType.INPUT.toString())) 
+                        {
+                            Iterator itinput = inputNotgates.entrySet().iterator();
+                            while (itinput.hasNext()) 
+                            {
+                                Map.Entry pairs = (Map.Entry) itinput.next();
+                                String tempinp = (String) pairs.getKey();
+                                if (!childnodeassign.contains(tempinp)) 
+                                {
+                                    int inpflag = 0;
+                                    BGateNode inpbgc = curr;
+                                    while (inpbgc != null) 
+                                    {
+                                        if (inpbgc.bgname.equals(tempinp)) 
+                                        {
+                                            inpflag = 1;
+                                            break;
+                                        }
+                                        inpbgc = inpbgc.parent;
+                                    }
+                                    if (inpflag == 0) 
+                                    {
+                                        childnodeassign.add(tempinp);
+                                    }
+                                }
+                            }
+                            itinput = inputNorgates.entrySet().iterator();
+                            while (itinput.hasNext()) 
+                            {
+                                Map.Entry pairs = (Map.Entry) itinput.next();
+                                String tempinp = (String) pairs.getKey();
+                                if (!childnodeassign.contains(tempinp)) 
+                                {
+                                    int inpflag = 0;
+                                    BGateNode inpbgc = curr;
+                                    while (inpbgc != null) 
+                                    {
+                                        if (inpbgc.bgname.equals(tempinp)) 
+                                        {
+                                            inpflag = 1;
+                                            break;
+                                        }
+                                        inpbgc = inpbgc.parent;
+                                    }
+                                    if (inpflag == 0) 
+                                    {
+                                        childnodeassign.add(tempinp);
+                                    }
+                                }
+                            }
+                        }
+                        //</editor-fold>
+                        
                     }
+                    //</editor-fold>
                     else
                     {
                         int isInp=0;
@@ -351,6 +421,7 @@ public class HeuristicSearch {
                         else if(ginp.Type.equals(GateType.NOR.toString()))
                         {
                             isInp =2;
+                            //System.out.println("childcurr is a nor gate");
                         }
                         else if(ginp.Type.equals(GateType.NOT.toString()))
                         {
@@ -360,6 +431,7 @@ public class HeuristicSearch {
                         {
                             //<editor-fold desc="Current node is an input to a NOR Gate">
                             String outrun = runner.bgname;
+                            //System.out.println(outrun);
                             String inp1run = "";
                             int found=0;
                             if(runner.bgate.Outgoing.To.Index == next_indx)
@@ -379,7 +451,7 @@ public class HeuristicSearch {
                                 {
                                     inp1run = subrunner.bgname; 
                                 }
-                            }
+                            } 
                             else
                             {
                                 BGateNode subrunner = curr;
@@ -635,7 +707,7 @@ public class HeuristicSearch {
                                         {
                                             if(inpno ==1)
                                             {
-                                                if(bgc.Inp1.contains("inducer")||bgc.Inp2.contains("inducer")) 
+                                                if((bgc.Inp1.contains("inducer") && (!bgc.Inp2.contains("inducer"))) ||  ((!bgc.Inp1.contains("inducer")) && (bgc.Inp2.contains("inducer")))) 
                                                 {
                                                     niflag =1;
                                                 }
@@ -660,6 +732,7 @@ public class HeuristicSearch {
                                                 int flaginp2=0;
                                                 if(isInp == 2) // Nor gate
                                                 {
+                                                    
                                                     int deepinpno=0;
                                                     Wire deepw = ginp.Outgoing;
                                                     while(deepw!=null)
@@ -674,7 +747,7 @@ public class HeuristicSearch {
                                                         {
                                                             if(deepinpno ==1)
                                                             {
-                                                                if(deepbgc.Inp1.contains("inducer") || deepbgc.Inp2.contains("inducer"))
+                                                                if((deepbgc.Inp1.contains("inducer") && (!deepbgc.Inp2.contains("inducer")))|| ((!deepbgc.Inp1.contains("inducer")) && (deepbgc.Inp2.contains("inducer"))))
                                                                 {
                                                                     flaginp1=1;
                                                                 }
@@ -688,17 +761,20 @@ public class HeuristicSearch {
                                                             }
                                                             else
                                                             {
+                                                                
                                                                 if((!deepbgc.Inp1.contains("inducer")) && (!deepbgc.Inp2.contains("inducer")))
                                                                 {
                                                                     flaginp1=1;
+                                                                    
                                                                 }
                                                             }
                                                         }
                                                         if(deepbgc.Out.equals(bgc.Inp2))
                                                         {
+                                                            
                                                             if(deepinpno ==1)
                                                             {
-                                                                if(deepbgc.Inp1.contains("inducer") || deepbgc.Inp2.contains("inducer"))
+                                                                if((deepbgc.Inp1.contains("inducer") && (!deepbgc.Inp2.contains("inducer")))|| ((!deepbgc.Inp1.contains("inducer")) && (deepbgc.Inp2.contains("inducer"))))
                                                                 {
                                                                     flaginp2=1;
                                                                 }
@@ -728,6 +804,7 @@ public class HeuristicSearch {
                                                                     flaginp1=0;
                                                                     break;
                                                                 }
+                                                                finalrunner = finalrunner.parent;
                                                             }
                                                             if(flaginp1==1)
                                                             {
@@ -745,6 +822,7 @@ public class HeuristicSearch {
                                                                     flaginp2=0;
                                                                     break;
                                                                 }
+                                                                finalrunner = finalrunner.parent;
                                                             }
                                                             if(flaginp2==1)
                                                             {
@@ -810,6 +888,7 @@ public class HeuristicSearch {
                                                                     flaginp1=0;
                                                                     break;
                                                                 }
+                                                                finalrunner = finalrunner.parent;
                                                             }
                                                             if(flaginp1==1)
                                                             {
@@ -827,6 +906,7 @@ public class HeuristicSearch {
                                                                     flaginp2=0;
                                                                     break;
                                                                 }
+                                                                finalrunner = finalrunner.parent;
                                                             }
                                                             if(flaginp2==1)
                                                             {
@@ -931,6 +1011,7 @@ public class HeuristicSearch {
                                                                     flaginp1=0;
                                                                     break;
                                                                 }
+                                                                finalrunner = finalrunner.parent;
                                                             }
                                                             if(flaginp1==1)
                                                             {
@@ -979,6 +1060,7 @@ public class HeuristicSearch {
                                                                     flaginp1=0;
                                                                     break;
                                                                 }
+                                                                finalrunner = finalrunner.parent;
                                                             }
                                                             if(flaginp1==1)
                                                             {
@@ -1021,9 +1103,18 @@ public class HeuristicSearch {
                             nodeschildren.get(i).Next = nodeschildren.get(i + 1);
                         }
                         curr.child = nodeschildren.get(0);
+                        
+                        /*BGateNode childcheck = curr.child;
+                        while(childcheck!=null)
+                        {
+                            System.out.println(childcheck.index + "" + childcheck.bgname);
+                            childcheck = childcheck.Next;
+                        }*/
+                        
                         if (curr.child != null) 
                         {
                             curr = curr.child;
+                            //System.out.println("Curr " + curr.index);
                         } 
                         else if (curr.Next != null) 
                         {
@@ -1036,6 +1127,8 @@ public class HeuristicSearch {
                         //System.out.println("reached here!!");
                     }
                 }
+                //Comment this out
+                //break;
             }
             else if(curr.ncolor == nodecolor.GRAY)
             {
@@ -1046,6 +1139,7 @@ public class HeuristicSearch {
                     curr = curr.parent;
             }
         }
+        System.out.println(combinations.size());
         
         
         
