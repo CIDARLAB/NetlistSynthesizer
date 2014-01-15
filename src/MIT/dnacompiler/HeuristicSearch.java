@@ -199,6 +199,7 @@ public class HeuristicSearch {
                     while (runner != null) 
                     {
                         assign.put(runner.index, runner);
+                        System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
                     combinations.add(assign);
@@ -357,6 +358,7 @@ public class HeuristicSearch {
                         }
                         if(runner.bgate.Type.equals(GateType.NOR.toString()))
                         {
+                            //<editor-fold desc="Current node is an input to a NOR Gate">
                             String outrun = runner.bgname;
                             String inp1run = "";
                             int found=0;
@@ -625,7 +627,7 @@ public class HeuristicSearch {
                                     }
                                     //</editor-fold>
                                     
-                                    //<editor-fold desc="none of the inputs has been assigned">
+                                    //<editor-fold desc="none of the inputs have been assigned">
                                     else // none of the inputs have been assigned
                                     {
                                         int niflag =0;
@@ -840,11 +842,157 @@ public class HeuristicSearch {
                                     }
                                     //</editor-fold>
                                 }
-                            
+                        //</editor-fold>    
                         }
                         else if(runner.bgate.Type.equals(GateType.NOT.toString()))
                         {
+                            //<editor-fold desc="Current node is an input to a NOT Gate">
+                            String outrun = runner.bgname;
+                            //String inp1run = "";
+                            int found=0;
+                            
+                            
+                                Wire wcheck = runner.bgate.Outgoing;
+                                int inpno=0;
+                                while(wcheck!=null)
+                                {
+                                    if(wcheck.To.Type.equals(GateType.INPUT.toString()))
+                                        inpno++; 
+                                    wcheck = wcheck.Next;
+                                }
                                 
+                                for(BGateCombo bgc:notcombos)
+                                {
+                                    //<editor-fold desc="none of the inputs have been assigned">
+                                    
+                                        int niflag =0;
+                                        if(bgc.Out.equals(outrun))
+                                        {
+                                            if(inpno ==1)
+                                            {
+                                                if(bgc.Inp1.contains("inducer")) 
+                                                {
+                                                    niflag =1;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if(!(bgc.Inp1.contains("inducer"))) 
+                                                {
+                                                    niflag =1;
+                                                }
+                                            }
+                                            if(niflag == 1)
+                                            {
+                                                int flaginp1=0;
+                                                if(isInp == 2) // Nor gate
+                                                {
+                                                    int deepinpno=0;
+                                                    Wire deepw = ginp.Outgoing;
+                                                    while(deepw!=null)
+                                                    {
+                                                        if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                            deepinpno++;
+                                                        deepw = deepw.Next;
+                                                    }
+                                                    for(BGateCombo deepbgc: norcombos)
+                                                    {
+                                                        if(deepbgc.Out.equals(bgc.Inp1))
+                                                        {
+                                                            if(deepinpno ==1)
+                                                            {
+                                                                if(deepbgc.Inp1.contains("inducer") || deepbgc.Inp2.contains("inducer"))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                            else if(deepinpno==2)
+                                                            {
+                                                                if(deepbgc.Inp1.contains("inducer") && deepbgc.Inp2.contains("inducer"))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                if((!deepbgc.Inp1.contains("inducer")) && (!deepbgc.Inp2.contains("inducer")))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                        }
+                                                        if(flaginp1 ==1)
+                                                        {
+                                                            BGateNode finalrunner = curr;
+                                                            while(finalrunner!=null)
+                                                            {
+                                                                if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
+                                                                {
+                                                                    flaginp1=0;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if(flaginp1==1)
+                                                            {
+                                                                if(!childnodeassign.contains(bgc.Inp1))
+                                                                    childnodeassign.add(bgc.Inp1);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else if(isInp == 3) //Not gate
+                                                {
+                                                    int deepinpno=0;
+                                                    Wire deepw = ginp.Outgoing;
+                                                    while(deepw!=null)
+                                                    {
+                                                        if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                            deepinpno++;
+                                                        deepw = deepw.Next;
+                                                    }
+                                                    for(BGateCombo deepbgc: notcombos)
+                                                    {
+                                                        if(deepbgc.Out.equals(bgc.Inp1))
+                                                        {
+                                                            if(deepinpno ==1)
+                                                            {
+                                                                if(deepbgc.Inp1.contains("inducer"))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                if((!deepbgc.Inp1.contains("inducer")))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                        }
+                                                        if(flaginp1 ==1)
+                                                        {
+                                                            BGateNode finalrunner = curr;
+                                                            while(finalrunner!=null)
+                                                            {
+                                                                if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1))
+                                                                {
+                                                                    flaginp1=0;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if(flaginp1==1)
+                                                            {
+                                                                if(!childnodeassign.contains(bgc.Inp1))
+                                                                    childnodeassign.add(bgc.Inp1);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    //</editor-fold>
+                                }
+                        //</editor-fold>    
                         }
                     }
                    
@@ -885,7 +1033,7 @@ public class HeuristicSearch {
                         {
                             curr = curr.parent;
                         }
-                        System.out.println("reached here!!");
+                        //System.out.println("reached here!!");
                     }
                 }
             }
