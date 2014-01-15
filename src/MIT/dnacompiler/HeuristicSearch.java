@@ -193,14 +193,14 @@ public class HeuristicSearch {
             {
 
                 curr.ncolor = nodecolor.GRAY;
-                System.out.println(curr.index);
+                //System.out.println(curr.index);
                 if (curr.index == 0) 
                 {
                     
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
                     HashMap<Integer, BGateNode> assign = new HashMap<Integer, BGateNode>();
-                    //System.out.println("Assignment!! ==>");
+                    //System.out.println("\n\nAssignment!! ==>");
                     while (runner != null) 
                     {
                         assign.put(runner.index, runner);
@@ -429,6 +429,7 @@ public class HeuristicSearch {
                         }
                         if(runner.bgate.Type.equals(GateType.NOR.toString()))
                         {
+                            
                             //<editor-fold desc="Current node is an input to a NOR Gate">
                             String outrun = runner.bgname;
                             //System.out.println(outrun);
@@ -534,6 +535,7 @@ public class HeuristicSearch {
                                                             }
                                                             if(inpflag ==0)
                                                             {
+                                                                //System.out.println(bgc.Inp1);
                                                                 childnodeassign.add(bgc.Inp1);
                                                             }
                                                         }
@@ -702,6 +704,7 @@ public class HeuristicSearch {
                                     //<editor-fold desc="none of the inputs have been assigned">
                                     else // none of the inputs have been assigned
                                     {
+                                        
                                         int niflag =0;
                                         if(bgc.Out.equals(outrun))
                                         {
@@ -728,8 +731,33 @@ public class HeuristicSearch {
                                             }
                                             if(niflag == 1)
                                             {
+                                                
                                                 int flaginp1=0;
                                                 int flaginp2=0;
+                                                if(isInp == 1)
+                                                {
+                                                    String xinp1;
+                                                    String xinp2;
+                                                    xinp1 = bgc.Inp1;
+                                                    xinp2 = bgc.Inp2;
+                                                    
+                                                    if(xinp1.contains("inducer"))
+                                                    {
+                                                        if(!childnodeassign.contains(xinp1))
+                                                        {
+                                                            childnodeassign.add(xinp1);
+                                                        }
+                                                    }
+                                                    if(xinp2.contains("inducer"))
+                                                    {
+                                                        if(!childnodeassign.contains(xinp2))
+                                                        {
+                                                            childnodeassign.add(xinp2);
+                                                        }
+                                                    }
+                                                    //System.out.println("Write something here!!");
+                                                }
+                                                
                                                 if(isInp == 2) // Nor gate
                                                 {
                                                     
@@ -926,7 +954,9 @@ public class HeuristicSearch {
                         }
                         else if(runner.bgate.Type.equals(GateType.NOT.toString()))
                         {
+                            
                             //<editor-fold desc="Current node is an input to a NOT Gate">
+                            
                             String outrun = runner.bgname;
                             //String inp1run = "";
                             int found=0;
@@ -944,7 +974,7 @@ public class HeuristicSearch {
                                 for(BGateCombo bgc:notcombos)
                                 {
                                     //<editor-fold desc="none of the inputs have been assigned">
-                                    
+                                       
                                         int niflag =0;
                                         if(bgc.Out.equals(outrun))
                                         {
@@ -953,6 +983,7 @@ public class HeuristicSearch {
                                                 if(bgc.Inp1.contains("inducer")) 
                                                 {
                                                     niflag =1;
+                                                    //System.out.println("Valid Combo!");
                                                 }
                                             }
                                             else
@@ -965,6 +996,27 @@ public class HeuristicSearch {
                                             if(niflag == 1)
                                             {
                                                 int flaginp1=0;
+                                                
+                                                if(isInp == 1)
+                                                {
+                                                    BGateNode finalinprunner = curr;
+                                                    int finalinpflag =0;
+                                                    if(!childnodeassign.contains(bgc.Inp1))
+                                                    {
+                                                        while(finalinprunner!=null)
+                                                        {
+                                                            if(finalinprunner.bgname.equals(bgc.Inp1))
+                                                            {
+                                                                finalinpflag =1;
+                                                                break;
+                                                            }
+                                                            finalinprunner = finalinprunner.parent;
+                                                        }
+                                                        if(finalinpflag ==0)
+                                                            childnodeassign.add(bgc.Inp1);
+                                                    }
+                                                }
+                                                
                                                 if(isInp == 2) // Nor gate
                                                 {
                                                     int deepinpno=0;
@@ -1238,8 +1290,6 @@ public class HeuristicSearch {
                 }
             }
         }
-        
-        
         return gatewisecombo;
     }
 }
