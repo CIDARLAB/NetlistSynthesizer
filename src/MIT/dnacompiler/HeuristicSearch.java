@@ -347,14 +347,23 @@ public class HeuristicSearch {
                         {
                             isInp =1;
                         }
+                        else if(ginp.Type.equals(GateType.NOR.toString()))
+                        {
+                            isInp =2;
+                        }
+                        else if(ginp.Type.equals(GateType.NOT.toString()))
+                        {
+                            isInp =3;
+                        }
                         if(runner.bgate.Type.equals(GateType.NOR.toString()))
                         {
                             String outrun = runner.bgname;
-                            String inp1run;
+                            String inp1run = "";
+                            int found=0;
                             if(runner.bgate.Outgoing.To.Index == next_indx)
                             {
-                                BGateNode subrunner = runner;
-                                int found =0;
+                                BGateNode subrunner = curr;
+                                found =0;
                                 while(subrunner!= null)
                                 {
                                     if(subrunner.index == runner.bgate.Outgoing.Next.To.Index)
@@ -368,44 +377,470 @@ public class HeuristicSearch {
                                 {
                                     inp1run = subrunner.bgname; 
                                 }
-                                for(BGateCombo bgc:norcombos)
-                                {
-                                    Wire wcheck = runner.bgate.Outgoing;
-                                    int inpno=0;
-                                    while(wcheck!=null)
-                                    {
-                                        if(wcheck.To.Type.equals(GateType.INPUT.toString()))
-                                            inpno++;
-                                        wcheck = wcheck.Next;
-                                    }    
-                                    if(found ==1)
-                                    {
-                                        
-                                    }
-                                    else
-                                    {
-                                        if(inpno ==1)
-                                        {
-                                            
-                                        }
-                                        else if(inpno == 2)
-                                        {
-                                        }
-                                        else
-                                        {
-                                        }
-                                    }
-                                        
-                                }
-                                
-                                
-                                
                             }
                             else
                             {
-                                //outgoing.next.to is the present gate!
-                                //for()
+                                BGateNode subrunner = curr;
+                                found =0;
+                                while(subrunner!= null)
+                                {
+                                    if(subrunner.index == runner.bgate.Outgoing.To.Index)
+                                    {
+                                        found =1;
+                                        break;
+                                    }
+                                    subrunner = subrunner.parent;
+                                }
+                                if(found ==1)
+                                {
+                                    inp1run = subrunner.bgname; 
+                                }
                             }
+                            
+                                Wire wcheck = runner.bgate.Outgoing;
+                                int inpno=0;
+                                while(wcheck!=null)
+                                {
+                                    if(wcheck.To.Type.equals(GateType.INPUT.toString()))
+                                        inpno++; 
+                                    wcheck = wcheck.Next;
+                                }
+                                
+                                for(BGateCombo bgc:norcombos)
+                                {
+                                    
+                                    //<editor-fold desc="one of the inputs has been assigned already">
+                                    if(found ==1) // one of the inputs has been assigned already
+                                    {
+                                        //<editor-fold desc="intended node is an input node"> 
+                                        if(isInp == 1) //intended node is an input
+                                        {
+                                            if(bgc.Out.equals(outrun))
+                                            {
+                                                if(bgc.Inp1.equals(inp1run))
+                                                {
+                                                    if(bgc.Inp2.contains("inducer"))
+                                                    {
+                                                        if(!childnodeassign.contains(bgc.Inp2))
+                                                        {
+                                                            int inpflag =0;
+                                                            BGateNode inprunner = curr;
+                                                            while(inprunner!=null)
+                                                            {
+                                                                if(inprunner.bgname.equals(bgc.Inp2))
+                                                                {
+                                                                    inpflag =1;
+                                                                    break;
+                                                                }
+                                                                inprunner = inprunner.parent;
+                                                            }
+                                                            if(inpflag ==0)
+                                                            {
+                                                                childnodeassign.add(bgc.Inp2);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else if(bgc.Inp2.equals(inp1run))
+                                                {
+                                                    if(bgc.Inp1.contains("inducer"))
+                                                    {
+                                                        if(!childnodeassign.contains(bgc.Inp1))
+                                                        {
+                                                            int inpflag =0;
+                                                            BGateNode inprunner = curr;
+                                                            while(inprunner!=null)
+                                                            {
+                                                                if(inprunner.bgname.equals(bgc.Inp1))
+                                                                {
+                                                                    inpflag =1;
+                                                                    break;
+                                                                }
+                                                                inprunner = inprunner.parent;
+                                                            }
+                                                            if(inpflag ==0)
+                                                            {
+                                                                childnodeassign.add(bgc.Inp1);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        //</editor-fold>
+                                        //<editor-fold desc="intended node is not an output">
+                                        else // concerned gate is not an input gate (be careful here)
+                                        {
+                                            String tempnodesassign = "";
+                                            if(bgc.Out.equals(outrun))
+                                            {
+                                                if(bgc.Inp1.equals(inp1run))
+                                                {
+                                                   int inpflag =0;
+                                                   BGateNode inprunner = curr;
+                                                   while(inprunner!=null)
+                                                   {
+                                                       if(inprunner.bgname.equals(bgc.Inp2))
+                                                       {
+                                                           inpflag =1;
+                                                           break;
+                                                       }
+                                                       inprunner = inprunner.parent;
+                                                   }
+                                                   if(inpflag ==0)
+                                                   {
+                                                       tempnodesassign = bgc.Inp2;
+                                                   }
+                                                }
+                                                else if (bgc.Inp2.equals(inp1run)) 
+                                                {
+                                                    if (bgc.Inp1.contains("inducer")) 
+                                                    {
+
+                                                        int inpflag = 0;
+                                                        BGateNode inprunner = curr;
+                                                        while (inprunner != null) 
+                                                        {
+                                                            if (inprunner.bgname.equals(bgc.Inp1)) 
+                                                            {
+                                                                inpflag = 1;
+                                                                break;
+                                                            }
+                                                            inprunner = inprunner.parent;
+                                                        }
+                                                        if (inpflag == 0) 
+                                                        {
+                                                            tempnodesassign = bgc.Inp1;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if(isInp == 2) // nodes to be added have gate of type nor
+                                            {
+                                                int deepinpno =0;
+                                                Wire deepw = ginp.Outgoing;
+                                                while(deepw!=null)
+                                                {
+                                                    if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                        deepinpno++;
+                                                    deepw = deepw.Next;
+                                                }
+                                                String xtempn = tempnodesassign;
+                                                
+                                                    for(BGateCombo nbcg:norcombos)
+                                                    {
+                                                        if(xtempn.equals(nbcg.Out))
+                                                        {
+                                                            int deepflag =0;
+                                                            if(deepinpno==1)
+                                                            {
+                                                                if(nbcg.Inp1.contains("inducer") || nbcg.Inp2.contains("inducer"))
+                                                                    deepflag =1;
+                                                            }
+                                                            else if(deepinpno == 2)
+                                                            {
+                                                                if(nbcg.Inp1.contains("inducer") && nbcg.Inp2.contains("inducer"))
+                                                                    deepflag =1;
+                                                                
+                                                            }
+                                                            else 
+                                                            {
+                                                                if((!nbcg.Inp1.contains("inducer")) && (!nbcg.Inp2.contains("inducer")))
+                                                                    deepflag =1;
+                                                            }
+                                                            if(deepflag == 1)
+                                                            {
+                                                                BGateNode deeprunner = curr;
+                                                                while(deeprunner!=null)
+                                                                {
+                                                                    if(deeprunner.bgname.equals(nbcg.Out) ||deeprunner.bgname.equals(nbcg.Inp1)||deeprunner.bgname.equals(nbcg.Inp2))
+                                                                    {
+                                                                        deepflag =0;
+                                                                        break;
+                                                                    }
+                                                                    deeprunner = deeprunner.parent;
+                                                                }
+                                                            }
+                                                        }
+                                                        if(!childnodeassign.contains(xtempn))
+                                                            childnodeassign.add(xtempn);
+                                                    }
+                                                
+                                            }
+                                            else if(isInp == 3) //nodes to be added have the gate type not
+                                            {
+                                                int deepinpno =0;
+                                                Wire deepw = ginp.Outgoing;
+                                                while(deepw!=null)
+                                                {
+                                                    if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                        deepinpno++;
+                                                    deepw = deepw.Next;
+                                                }
+                                                String xtempn = tempnodesassign;
+
+                                                for (BGateCombo nbcg : notcombos) 
+                                                {
+                                                    if (xtempn.equals(nbcg.Out)) 
+                                                    {
+                                                        int deepflag = 0;
+                                                        if (deepinpno == 1) 
+                                                        {
+                                                            if (nbcg.Inp1.contains("inducer")) 
+                                                            {
+                                                                deepflag = 1;
+                                                            }
+                                                        } 
+                                                        else 
+                                                        {
+                                                            if ((!nbcg.Inp1.contains("inducer"))) 
+                                                            {
+                                                                deepflag = 1;
+                                                            }
+                                                        }
+                                                        if (deepflag == 1) 
+                                                        {
+                                                            BGateNode deeprunner = curr;
+                                                            while (deeprunner != null) 
+                                                            {
+                                                                if (deeprunner.bgname.equals(nbcg.Out) || deeprunner.bgname.equals(nbcg.Inp1)) 
+                                                                {
+                                                                    deepflag = 0;
+                                                                    break;
+                                                                }
+                                                                deeprunner = deeprunner.parent;
+                                                            }
+                                                        }
+                                                    }
+                                                    if (!childnodeassign.contains(xtempn)) 
+                                                    {
+                                                        childnodeassign.add(xtempn);
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                        //</editor-fold>
+                                    }
+                                    //</editor-fold>
+                                    
+                                    //<editor-fold desc="none of the inputs has been assigned">
+                                    else // none of the inputs have been assigned
+                                    {
+                                        int niflag =0;
+                                        if(bgc.Out.equals(outrun))
+                                        {
+                                            if(inpno ==1)
+                                            {
+                                                if(bgc.Inp1.contains("inducer")||bgc.Inp2.contains("inducer")) 
+                                                {
+                                                    niflag =1;
+                                                }
+                                            }
+                                            else if(inpno == 2)
+                                            {
+                                                if(bgc.Inp1.contains("inducer")&&bgc.Inp2.contains("inducer")) 
+                                                {
+                                                    niflag =1;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if(!(bgc.Inp1.contains("inducer"))&&(!bgc.Inp2.contains("inducer"))) 
+                                                {
+                                                    niflag =1;
+                                                }
+                                            }
+                                            if(niflag == 1)
+                                            {
+                                                int flaginp1=0;
+                                                int flaginp2=0;
+                                                if(isInp == 2) // Nor gate
+                                                {
+                                                    int deepinpno=0;
+                                                    Wire deepw = ginp.Outgoing;
+                                                    while(deepw!=null)
+                                                    {
+                                                        if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                            deepinpno++;
+                                                        deepw = deepw.Next;
+                                                    }
+                                                    for(BGateCombo deepbgc: norcombos)
+                                                    {
+                                                        if(deepbgc.Out.equals(bgc.Inp1))
+                                                        {
+                                                            if(deepinpno ==1)
+                                                            {
+                                                                if(deepbgc.Inp1.contains("inducer") || deepbgc.Inp2.contains("inducer"))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                            else if(deepinpno==2)
+                                                            {
+                                                                if(deepbgc.Inp1.contains("inducer") && deepbgc.Inp2.contains("inducer"))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                if((!deepbgc.Inp1.contains("inducer")) && (!deepbgc.Inp2.contains("inducer")))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                        }
+                                                        if(deepbgc.Out.equals(bgc.Inp2))
+                                                        {
+                                                            if(deepinpno ==1)
+                                                            {
+                                                                if(deepbgc.Inp1.contains("inducer") || deepbgc.Inp2.contains("inducer"))
+                                                                {
+                                                                    flaginp2=1;
+                                                                }
+                                                            }
+                                                            else if(deepinpno==2)
+                                                            {
+                                                                if(deepbgc.Inp1.contains("inducer") && deepbgc.Inp2.contains("inducer"))
+                                                                {
+                                                                    flaginp2=1;
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                if((!deepbgc.Inp1.contains("inducer")) && (!deepbgc.Inp2.contains("inducer")))
+                                                                {
+                                                                    flaginp2=1;
+                                                                }
+                                                            }
+                                                        }
+                                                        if(flaginp1 ==1)
+                                                        {
+                                                            BGateNode finalrunner = curr;
+                                                            while(finalrunner!=null)
+                                                            {
+                                                                if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
+                                                                {
+                                                                    flaginp1=0;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if(flaginp1==1)
+                                                            {
+                                                                if(!childnodeassign.contains(bgc.Inp1))
+                                                                    childnodeassign.add(bgc.Inp1);
+                                                            }
+                                                        }
+                                                        if(flaginp2 ==1)
+                                                        {
+                                                            BGateNode finalrunner = curr;
+                                                            while(finalrunner!=null)
+                                                            {
+                                                                if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
+                                                                {
+                                                                    flaginp2=0;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if(flaginp2==1)
+                                                            {
+                                                                if(!childnodeassign.contains(bgc.Inp2))
+                                                                    childnodeassign.add(bgc.Inp2);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else if(isInp == 3) //Not gate
+                                                {
+                                                    int deepinpno=0;
+                                                    Wire deepw = ginp.Outgoing;
+                                                    while(deepw!=null)
+                                                    {
+                                                        if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                            deepinpno++;
+                                                        deepw = deepw.Next;
+                                                    }
+                                                    for(BGateCombo deepbgc: notcombos)
+                                                    {
+                                                        if(deepbgc.Out.equals(bgc.Inp1))
+                                                        {
+                                                            if(deepinpno ==1)
+                                                            {
+                                                                if(deepbgc.Inp1.contains("inducer"))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                if((!deepbgc.Inp1.contains("inducer")))
+                                                                {
+                                                                    flaginp1=1;
+                                                                }
+                                                            }
+                                                        }
+                                                        if(deepbgc.Out.equals(bgc.Inp2))
+                                                        {
+                                                            if(deepinpno ==1)
+                                                            {
+                                                                if(deepbgc.Inp1.contains("inducer"))
+                                                                {
+                                                                    flaginp2=1;
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                if((!deepbgc.Inp1.contains("inducer")))
+                                                                {
+                                                                    flaginp2=1;
+                                                                }
+                                                            }
+                                                        }
+                                                        if(flaginp1 ==1)
+                                                        {
+                                                            BGateNode finalrunner = curr;
+                                                            while(finalrunner!=null)
+                                                            {
+                                                                if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1))
+                                                                {
+                                                                    flaginp1=0;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if(flaginp1==1)
+                                                            {
+                                                                if(!childnodeassign.contains(bgc.Inp1))
+                                                                    childnodeassign.add(bgc.Inp1);
+                                                            }
+                                                        }
+                                                        if(flaginp2 ==1)
+                                                        {
+                                                            BGateNode finalrunner = curr;
+                                                            while(finalrunner!=null)
+                                                            {
+                                                                if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1))
+                                                                {
+                                                                    flaginp2=0;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if(flaginp2==1)
+                                                            {
+                                                                if(!childnodeassign.contains(bgc.Inp2))
+                                                                    childnodeassign.add(bgc.Inp2);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                
+                                            }
+                                        }
+                                    }
+                                    //</editor-fold>
+                                }
+                            
                         }
                         else if(runner.bgate.Type.equals(GateType.NOT.toString()))
                         {
@@ -452,9 +887,6 @@ public class HeuristicSearch {
                         }
                         System.out.println("reached here!!");
                     }
-
-                   
-                    
                 }
             }
             else if(curr.ncolor == nodecolor.GRAY)
