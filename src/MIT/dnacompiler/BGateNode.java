@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class BGateNode {
     
-    public String bgname;
+    public String bgname ="";
     public  Gate bgate;
     public  int index;
     public  enum nodecolor{

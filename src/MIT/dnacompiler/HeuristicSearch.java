@@ -213,11 +213,8 @@ public class HeuristicSearch {
                 } 
                 else 
                 {
-                
-                    
                     List<String> childnodeassign = new ArrayList<String>();
                     //HashMap<String,String> hashchildnodeassign = new HashMap<String,String>();
-                    
                     int next_indx = curr.index-1;
                     BGateNode runner = curr;
                     int flag =0;
@@ -341,18 +338,74 @@ public class HeuristicSearch {
                                 }
                             }
                         }
-                        
-                        
-                        
-                        
-                        
-                        
                     }
                     else
                     {
+                        int isInp=0;
+                        Gate ginp = nodesCirc.get(next_indx);
+                        if(ginp.Type.equals(GateType.INPUT.toString()))
+                        {
+                            isInp =1;
+                        }
                         if(runner.bgate.Type.equals(GateType.NOR.toString()))
                         {
+                            String outrun = runner.bgname;
+                            String inp1run;
+                            if(runner.bgate.Outgoing.To.Index == next_indx)
+                            {
+                                BGateNode subrunner = runner;
+                                int found =0;
+                                while(subrunner!= null)
+                                {
+                                    if(subrunner.index == runner.bgate.Outgoing.Next.To.Index)
+                                    {
+                                        found =1;
+                                        break;
+                                    }
+                                    subrunner = subrunner.parent;
+                                }
+                                if(found ==1)
+                                {
+                                    inp1run = subrunner.bgname; 
+                                }
+                                for(BGateCombo bgc:norcombos)
+                                {
+                                    Wire wcheck = runner.bgate.Outgoing;
+                                    int inpno=0;
+                                    while(wcheck!=null)
+                                    {
+                                        if(wcheck.To.Type.equals(GateType.INPUT.toString()))
+                                            inpno++;
+                                        wcheck = wcheck.Next;
+                                    }    
+                                    if(found ==1)
+                                    {
+                                        
+                                    }
+                                    else
+                                    {
+                                        if(inpno ==1)
+                                        {
+                                            
+                                        }
+                                        else if(inpno == 2)
+                                        {
+                                        }
+                                        else
+                                        {
+                                        }
+                                    }
+                                        
+                                }
                                 
+                                
+                                
+                            }
+                            else
+                            {
+                                //outgoing.next.to is the present gate!
+                                //for()
+                            }
                         }
                         else if(runner.bgate.Type.equals(GateType.NOT.toString()))
                         {
@@ -400,7 +453,7 @@ public class HeuristicSearch {
                         System.out.println("reached here!!");
                     }
 
-                    //BGateNode childprev = null;
+                   
                     
                 }
             }
