@@ -205,15 +205,18 @@ public class HeuristicSearch {
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
                     HashMap<Integer, BGateNode> assign = new HashMap<Integer, BGateNode>();
+                    HashMap<Integer, String> assignGate = new HashMap<Integer, String>();
+                    
                     System.out.println("\n\nAssignment!! ==>");
                     while (runner != null) 
                     {
                         assign.put(runner.index, runner);
+                        assignGate.put(runner.index, runner.bgname);
                         System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
                     combinations.add(assign);
-                    assignmentresult.assignment.add(assign);
+                    assignmentresult.assignment.add(assignGate);
                     System.out.println(combinations.size());
                     if (curr.Next != null) 
                     {

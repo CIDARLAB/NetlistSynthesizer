@@ -16,5 +16,5 @@ import java.util.List;
 public class DAGW_assignment {
     
     public DAGW dagobject = new DAGW();
-    public List<HashMap<Integer,BGateNode>> assignment = new ArrayList<HashMap<Integer,BGateNode>>();
+    public List<HashMap<Integer,String>> assignment = new ArrayList<HashMap<Integer,String>>();
 }
