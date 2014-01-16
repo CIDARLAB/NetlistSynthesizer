@@ -49,7 +49,6 @@ public class DAGW {
                 Gates.add(gy);
             }
         }
-
     }
     
     public DAGW(DAGW obj)

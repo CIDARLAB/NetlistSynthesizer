@@ -5,6 +5,7 @@
 package MIT.dnacompiler;
 
 import BU.CelloGraph.DAGW;
+import BU.CelloGraph.DAGW_assignment;
 import MIT.dnacompiler.BGateNode.nodecolor;
 import MIT.dnacompiler.Gate.GateType;
 import java.util.ArrayList;
@@ -21,8 +22,9 @@ import java.util.Map.Entry;
 public class HeuristicSearch {
 
     
-    public static void beginSearch(DAGW dagCirc, double cutoff)
+    public static DAGW_assignment beginSearch(DAGW dagCirc, double cutoff)
     {
+        DAGW_assignment assignmentresult = new DAGW_assignment();
         List<BGateCombo> allcombos = new ArrayList<BGateCombo>();
         allcombos = LoadTables.getAllCombos(cutoff);
         int gates_size = dagCirc.Gates.size();
@@ -185,6 +187,9 @@ public class HeuristicSearch {
         
         //Start Heuristic Search Algo
         
+        assignmentresult.dagobject = dagCirc;
+        
+        
         System.out.println("\n\n\nStart Heuristic Algorithm!!\n");
         while (curr != null) 
         {
@@ -208,7 +213,8 @@ public class HeuristicSearch {
                         runner = runner.parent;
                     }
                     combinations.add(assign);
-                    //System.out.println(combinations.size());
+                    assignmentresult.assignment.add(assign);
+                    System.out.println(combinations.size());
                     if (curr.Next != null) 
                     {
                         curr = curr.Next;
@@ -1200,7 +1206,7 @@ public class HeuristicSearch {
         
         
         
-        
+    return assignmentresult;  
     }
     
     
