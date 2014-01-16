@@ -200,11 +200,11 @@ public class HeuristicSearch {
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
                     HashMap<Integer, BGateNode> assign = new HashMap<Integer, BGateNode>();
-                    //System.out.println("\n\nAssignment!! ==>");
+                    System.out.println("\n\nAssignment!! ==>");
                     while (runner != null) 
                     {
                         assign.put(runner.index, runner);
-                        //System.out.println(runner.index + ":" +runner.bgname);
+                        System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
                     combinations.add(assign);
@@ -688,11 +688,15 @@ public class HeuristicSearch {
                                                                 deeprunner = deeprunner.parent;
                                                             }
                                                         }
+                                                        if(deepflag == 1)
+                                                        {
+                                                            if (!childnodeassign.contains(xtempn)) 
+                                                            {
+                                                                childnodeassign.add(xtempn);
+                                                            }
+                                                        }
                                                     }
-                                                    if (!childnodeassign.contains(xtempn)) 
-                                                    {
-                                                        childnodeassign.add(xtempn);
-                                                    }
+                                                    
                                                 }
 
                                             }
