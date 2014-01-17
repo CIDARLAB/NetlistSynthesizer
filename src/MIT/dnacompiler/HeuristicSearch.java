@@ -8,12 +8,19 @@ import BU.CelloGraph.DAGW;
 import BU.CelloGraph.DAGW_assignment;
 import MIT.dnacompiler.BGateNode.nodecolor;
 import MIT.dnacompiler.Gate.GateType;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -79,7 +86,8 @@ public class HeuristicSearch {
         System.out.println("Number of availabe Nor outputs with cutoff higher than "+ cutoff +": " + Norgates.size());
         */
         HashMap<Integer,Gate> nodesCirc = new HashMap<Integer,Gate>();
-        int indx = gates_size-1;
+        
+        int indx = dagCirc.Gates.size()-1;
         
         //<editor-fold desc="Reconnecting DAGW in memory">
         for (int i = 0; i < dagCirc.Gates.size(); i++) {
@@ -112,7 +120,7 @@ public class HeuristicSearch {
 	}
         //</editor-fold>
         
-        
+        //<editor-fold desc="Assiging Gate Stages"> 
         for(int i=(dagCirc.Gates.size()-1);i>=0;i--)
         {
             if(isInput(dagCirc.Gates.get(i)))
@@ -134,10 +142,15 @@ public class HeuristicSearch {
             }
             //System.out.println(dagCirc.Gates.get(i).Name + ":"+dagCirc.Gates.get(i).stage);
         }
+        //</editor-fold>
+        
         int maxstage = dagCirc.Gates.get(0).stage;
+        
         
         int xstage =0;
         int xindx =0;
+        
+        //<editor-fold desc="Reindexing Gates">
         while(xstage <= maxstage)
         {
             for(Gate bgate:dagCirc.Gates)
@@ -150,6 +163,9 @@ public class HeuristicSearch {
             }
             xstage++;
         }
+        //</editor-fold>
+        
+        
         xindx--;
         System.out.println(xindx);
         BGateNode root = new BGateNode();
@@ -175,49 +191,49 @@ public class HeuristicSearch {
             x.Index = (Integer)pairs.getKey();
             System.out.println(x.Name +":"+pairs.getKey());
         }
-        /*for(Gate xg:dagCirc.Gates)
-        {
-            System.out.println(xg.Name + ":" + xg.Index);
-        }*/
-        
-        
+       
         List<HashMap<Integer,BGateNode>> combinations = new ArrayList<HashMap<Integer,BGateNode>>();
         
         //List<Pair<Integer,Wire>> nodequeue = new ArrayList<Pair<Integer,Wire>>();
         
         //Start Heuristic Search Algo
-        
+        List<Integer> indices = new ArrayList<Integer>();
         assignmentresult.dagobject = dagCirc;
         
-        
+        int assigncounter =0;
         System.out.println("\n\n\nStart Heuristic Algorithm!!\n");
         while (curr != null) 
         {
             
+            
+            
+            //<editor-fold desc="Node is white">
             if (curr.ncolor == nodecolor.WHITE) 
             {
 
                 curr.ncolor = nodecolor.GRAY;
                 //System.out.println(curr.index);
+                //indices.add(curr.index);
                 if (curr.index == 0) 
                 {
                     
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
-                    HashMap<Integer, BGateNode> assign = new HashMap<Integer, BGateNode>();
+                    //HashMap<Integer, BGateNode> assign = new HashMap<Integer, BGateNode>();
                     HashMap<Integer, String> assignGate = new HashMap<Integer, String>();
-                    
-                    System.out.println("\n\nAssignment!! ==>");
+                    //System.out.println("\n\nAssignment!! ==>");
                     while (runner != null) 
                     {
-                        assign.put(runner.index, runner);
+                        //assign.put(runner.index, runner);
                         assignGate.put(runner.index, runner.bgname);
-                        System.out.println(runner.index + ":" +runner.bgname);
+                        //System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
-                    combinations.add(assign);
+                    //combinations.add(assign);
                     assignmentresult.assignment.add(assignGate);
-                    System.out.println(combinations.size());
+                    //if(assignmentresult.assignment.size() == 25)
+                        //break;
+                    //System.out.println(combinations.size());
                     if (curr.Next != null) 
                     {
                         curr = curr.Next;
@@ -327,6 +343,9 @@ public class HeuristicSearch {
                             }
                             for (BGateCombo xbgc : norcombos) 
                             {
+                                if(childnodeassign.contains(xbgc.Out)) // skip certain values in combos list
+                                    continue;
+                                
                                 int comboflag =0;
                                 if(inpno == 1)
                                 {
@@ -496,6 +515,9 @@ public class HeuristicSearch {
                                     //<editor-fold desc="one of the inputs has been assigned already">
                                     if(found ==1) // one of the inputs has been assigned already
                                     {
+                                        if(childnodeassign.contains(bgc.Inp1) && childnodeassign.contains(bgc.Inp2))
+                                            continue;
+                                        
                                         //<editor-fold desc="intended node is an input node"> 
                                         if(isInp == 1) //intended node is an input
                                         {
@@ -600,7 +622,8 @@ public class HeuristicSearch {
                                                     }
                                                 }
                                             }
-                                            
+                                            if(childnodeassign.contains(tempnodesassign))
+                                                    continue;
                                             if(isInp == 2) // nodes to be added have gate of type nor
                                             {
                                                 int deepinpno =0;
@@ -1195,24 +1218,203 @@ public class HeuristicSearch {
                 //Comment this out
                 //break;
             }
+            //</editor-fold>
+            
             else if(curr.ncolor == nodecolor.GRAY)
             {
-                curr.ncolor = nodecolor.BLACK;
+                
+                    BGateNode subrunnercolor = curr.child;
+                    int colorflag =0;
+                    while(subrunnercolor!=null)
+                    {
+                        if(subrunnercolor.ncolor != nodecolor.BLACK)
+                        {
+                            colorflag =1;
+                            break;
+                        }
+                        subrunnercolor = subrunnercolor.Next;
+                    }
+                    if(colorflag ==1)
+                        curr = curr.child;
+                    else
+                    {
+                        curr.ncolor = nodecolor.BLACK;
+                        if(curr.Next != null)
+                            curr = curr.Next;
+                        else
+                            curr = curr.parent;
+                    }
+                
+           }
+            else if(curr.ncolor == nodecolor.BLACK)
+            {
+                if(curr.Next == null && curr.index == (xindx-1))
+                {
+                    int colorflag =0;
+                    BGateNode runnercolor = curr.parent.child;
+                    while(runnercolor.Next!=null)
+                    {
+                        if(runnercolor.ncolor != nodecolor.BLACK)
+                        {
+                            colorflag =1;
+                            break;
+                        }
+                        runnercolor = runnercolor.Next;
+                    }
+                    if(colorflag == 0)
+                    {
+                        curr.ncolor = nodecolor.BLACK;
+                        curr = curr.parent;
+                    }
+                    else 
+                        curr = runnercolor;
+                }
+                else
+                {
                 if(curr.Next != null)
                     curr = curr.Next;
                 else
                     curr = curr.parent;
-            }
+            
+                }
+            }     
+            
         }
-        System.out.println(combinations.size());
-        
-        
+        //System.out.println(combinations.size());
+        System.out.println(assignmentresult.assignment.size());
+        //genindexGraph(indices);
         
         
     return assignmentresult;  
     }
     
     
+    public static DAGW getFinalDAG(DAGW dagCirc)
+    {
+        int indx = dagCirc.Gates.size()-1;
+        
+        //<editor-fold desc="Reconnecting DAGW in memory">
+        for (int i = 0; i < dagCirc.Gates.size(); i++) {
+	    if (dagCirc.Gates.get(i).Outgoing != null) {                     //Outgoing is a wire
+		int index = dagCirc.Gates.get(i).Outgoing.Index;
+		for(Wire w: dagCirc.Wires) {
+		    if(w.Index == index) { dagCirc.Gates.get(i).Outgoing = w; }
+		}
+	    }
+	}
+	for (int i = 0; i < dagCirc.Wires.size(); i++) {
+	    if (dagCirc.Wires.get(i).From != null) {                        //From is a gate
+		int index = dagCirc.Wires.get(i).From.Index;
+		for(Gate g: dagCirc.Gates) {
+		    if(g.Index == index) { dagCirc.Wires.get(i).From = g; }
+		}
+	    }
+	    if (dagCirc.Wires.get(i).To != null) {                          //To is a gate
+		int index = dagCirc.Wires.get(i).To.Index;
+		for(Gate g: dagCirc.Gates) {
+		    if(g.Index == index) { dagCirc.Wires.get(i).To = g; }
+		}
+	    }
+	    if (dagCirc.Wires.get(i).Next != null) {                        //Next is a wire
+		int index = dagCirc.Wires.get(i).Next.Index;
+		for(Wire w: dagCirc.Wires) {
+		    if(w.Index == index) { dagCirc.Wires.get(i).Next = w; }
+		}
+	    }
+	}
+        //</editor-fold>
+        
+        //<editor-fold desc="Assiging Gate Stages"> 
+        for(int i=(dagCirc.Gates.size()-1);i>=0;i--)
+        {
+            if(isInput(dagCirc.Gates.get(i)))
+            {
+               dagCirc.Gates.get(i).stage =0;
+            }
+            else
+            {
+                int max = dagCirc.Gates.get(i).stage;
+                Wire w = dagCirc.Gates.get(i).Outgoing;
+                while(w!=null)
+                {
+                    int stg = w.To.stage;
+                    if(stg >max)
+                        max = stg;
+                    w = w.Next;
+                }
+                dagCirc.Gates.get(i).stage = (max +1);
+            }
+            //System.out.println(dagCirc.Gates.get(i).Name + ":"+dagCirc.Gates.get(i).stage);
+        }
+        //</editor-fold>
+        
+        int maxstage = dagCirc.Gates.get(0).stage;
+        
+        
+        int xstage =0;
+        int xindx =0;
+        
+        //<editor-fold desc="Reindexing Gates">
+        while(xstage <= maxstage)
+        {
+            for(Gate bgate:dagCirc.Gates)
+            {
+                if(bgate.stage == xstage)
+                {
+                    //nodesCirc.put(xindx,bgate);
+                    xindx++;
+                }
+            }
+            xstage++;
+        }
+        //</editor-fold>
+        
+        
+        return dagCirc;
+    }
+    public static void genindexGraph(List<Integer> indexlist)
+    { 
+        
+        String Filepath;
+        Filepath = HeuristicSearch.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        
+          String filestring ="";
+          if(Filepath.contains("prashant"))
+          {
+              filestring += Filepath+ "src/BU/resources/IndexGraph";
+          }
+          else
+          {
+              filestring += Filepath+ "BU/resources/IndexGraph";
+          }
+        
+          
+            //filestring += Global.espout++ ;
+            filestring += ".csv";
+            File fespinp = new File(filestring);
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            String Line = "Index,NodeIndex\n";
+            output.write(Line);
+            
+            for(int i=0;i<indexlist.size();i++)
+                output.write(i +","+indexlist.get(i)+"\n");
+            //for(int i=0;i<10000;i++)
+            //    output.write(i +","+indexlist.get(i)+"\n");
+            
+            output.close();
+        
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(HeuristicSearch.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     
     public static boolean hasInput(Gate bgate)

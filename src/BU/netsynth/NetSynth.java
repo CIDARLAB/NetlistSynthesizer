@@ -959,6 +959,10 @@ public class NetSynth {
     
     public static List<DGate> parseEspressoToNORNAND(List<String> espinp)
     {
+        
+        one = new DWire("_one",DWireType.Source);
+        zero = new DWire("_zero",DWireType.GND);
+        
       List<DGate> sopexp = new ArrayList<DGate>();
         List<DWire> wireInputs = new ArrayList<DWire>();
         List<DWire> wireOutputs = new ArrayList<DWire>();
