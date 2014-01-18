@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 public class HeuristicSearch {
 
     
-    public static DAGW_assignment beginSearch(DAGW dagCirc, double cutoff)
+    public static DAGW_assignment beginSearch(DAGW dagCirc, double cutoff, long outputshift)
     {
         DAGW_assignment assignmentresult = new DAGW_assignment();
         List<BGateCombo> allcombos = new ArrayList<BGateCombo>();
@@ -40,7 +40,7 @@ public class HeuristicSearch {
         int notcombosSize = LoadTables.NOTgateCount(allcombos);
         notcombos = LoadTables.dividelist(allcombos, GateType.NOT);
         norcombos = LoadTables.dividelist(allcombos, GateType.NOR);
-        
+        long outputassigns =0;
         sortcombos(notcombos);
         sortcombos(norcombos);
         
@@ -157,6 +157,7 @@ public class HeuristicSearch {
             {
                 if(bgate.stage == xstage)
                 {
+                    bgate.Index = xindx;
                     nodesCirc.put(xindx,bgate);
                     xindx++;
                 }
@@ -219,21 +220,31 @@ public class HeuristicSearch {
                     
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
-                    //HashMap<Integer, BGateNode> assign = new HashMap<Integer, BGateNode>();
                     HashMap<Integer, String> assignGate = new HashMap<Integer, String>();
                     //System.out.println("\n\nAssignment!! ==>");
                     while (runner != null) 
                     {
-                        //assign.put(runner.index, runner);
                         assignGate.put(runner.index, runner.bgname);
                         //System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
-                    //combinations.add(assign);
                     assignmentresult.assignment.add(assignGate);
-                    //if(assignmentresult.assignment.size() == 25)
-                        //break;
-                    //System.out.println(combinations.size());
+                    assigncounter++;
+                    
+                    if(assigncounter >= outputshift)
+                    {
+                        while(curr.index!=(xindx-1))
+                        {
+                            curr = curr.parent;
+                        }
+                        if(curr.Next != null)
+                            curr = curr.Next;
+                        else
+                          curr = curr.parent.child;   
+                        
+                    }
+                    
+                    
                     if (curr.Next != null) 
                     {
                         curr = curr.Next;
@@ -243,8 +254,11 @@ public class HeuristicSearch {
                         curr = curr.parent;
                     }
                 } 
+                
                 else 
                 {
+                    if(curr.index == (xindx-1))
+                        assigncounter =0;
                     List<String> childnodeassign = new ArrayList<String>();
                     //HashMap<String,String> hashchildnodeassign = new HashMap<String,String>();
                     int next_indx = curr.index-1;
@@ -1362,6 +1376,7 @@ public class HeuristicSearch {
                 if(bgate.stage == xstage)
                 {
                     //nodesCirc.put(xindx,bgate);
+                    bgate.Index = xindx;
                     xindx++;
                 }
             }
