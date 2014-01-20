@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 public class HeuristicSearch {
 
     
-    public static DAGW_assignment beginSearch(DAGW dagCirc, double cutoff, long outputshift)
+    public static DAGW_assignment beginSearch(DAGW dagCirc, double cutoff,double maxscore, long maxassign, long outputshift)
     {
         DAGW_assignment assignmentresult = new DAGW_assignment();
         List<BGateCombo> allcombos = new ArrayList<BGateCombo>();
@@ -43,6 +43,7 @@ public class HeuristicSearch {
         long outputassigns =0;
         sortcombos(notcombos);
         sortcombos(norcombos);
+        long totassign=0;
         
         HashMap<String,String> Notgates = new HashMap<String,String>();
         HashMap<String,String> Norgates = new HashMap<String,String>();
@@ -229,10 +230,12 @@ public class HeuristicSearch {
                         runner = runner.parent;
                     }
                     assignmentresult.assignment.add(assignGate);
+                    totassign++;
                     assigncounter++;
                     
-                    if(assigncounter >= outputshift)
+                    if(assigncounter == outputshift)
                     {
+                        assigncounter =0;
                         while(curr.index!=(xindx-1))
                         {
                             curr = curr.parent;
@@ -244,7 +247,11 @@ public class HeuristicSearch {
                         
                     }
                     
-                    
+                    if(totassign == maxassign)
+                        break;
+                    /*if(score >= maxscore)
+                     * break;
+                     */
                     if (curr.Next != null) 
                     {
                         curr = curr.Next;
