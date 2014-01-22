@@ -266,6 +266,8 @@ public class HeuristicSearch {
                 {
                     if(curr.index == (xindx-1))
                         assigncounter =0;
+                    //if(curr.index ==7)
+                    //    System.out.println("Blah!");
                     List<String> childnodeassign = new ArrayList<String>();
                     //HashMap<String,String> hashchildnodeassign = new HashMap<String,String>();
                     int next_indx = curr.index-1;
@@ -629,8 +631,8 @@ public class HeuristicSearch {
                                                 }
                                                 else if (bgc.Inp2.equals(inp1run)) 
                                                 {
-                                                    if (bgc.Inp1.contains("inducer")) 
-                                                    {
+                                                    //if (bgc.Inp1.contains("inducer")) 
+                                                    //{
 
                                                         int inpflag = 0;
                                                         BGateNode inprunner = curr;
@@ -647,7 +649,7 @@ public class HeuristicSearch {
                                                         {
                                                             tempnodesassign = bgc.Inp1;
                                                         }
-                                                    }
+                                                    //}
                                                 }
                                             }
                                             if(childnodeassign.contains(tempnodesassign))
@@ -671,7 +673,7 @@ public class HeuristicSearch {
                                                             int deepflag =0;
                                                             if(deepinpno==1)
                                                             {
-                                                                if(nbcg.Inp1.contains("inducer") || nbcg.Inp2.contains("inducer"))
+                                                                if(((nbcg.Inp1.contains("inducer")) && (!nbcg.Inp2.contains("inducer"))) || ((!nbcg.Inp1.contains("inducer")) && (nbcg.Inp2.contains("inducer"))))
                                                                     deepflag =1;
                                                             }
                                                             else if(deepinpno == 2)
@@ -697,11 +699,20 @@ public class HeuristicSearch {
                                                                     }
                                                                     deeprunner = deeprunner.parent;
                                                                 }
+                                                             
                                                             }
+                                                            if(deepflag ==1)
+                                                            {
+                                                                if (!childnodeassign.contains(xtempn)) 
+                                                                {    
+                                                                    childnodeassign.add(xtempn);
+                                                                }
+                                                            }
+                                                            
                                                         }
-                                                        if(!childnodeassign.contains(xtempn))
-                                                            childnodeassign.add(xtempn);
+                                                        
                                                     }
+                                                    
                                                 
                                             }
                                             else if(isInp == 3) //nodes to be added have the gate type not
