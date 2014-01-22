@@ -222,11 +222,11 @@ public class HeuristicSearch {
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
                     HashMap<Integer, String> assignGate = new HashMap<Integer, String>();
-                    //System.out.println("\n\nAssignment!! ==>");
+                    System.out.println("\n\nAssignment!! ==>");
                     while (runner != null) 
                     {
                         assignGate.put(runner.index, runner.bgname);
-                        //System.out.println(runner.index + ":" +runner.bgname);
+                        System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
                     assignmentresult.assignment.add(assignGate);
@@ -287,8 +287,15 @@ public class HeuristicSearch {
                             break;
                         runner = runner.parent;
                     }
+                    
+                        
                     childnodeassign = new ArrayList<String>();
                     
+                    if(runner == null)
+                        childnodeassign.add("Inducer_Dummy");
+                    else
+                    {
+                  
                     //<editor-fold desc="Curr node is an input to the OUPUT/OUTPUT_OR Gate " defaultstate="collapsed">
                     if(runner.bgate.Type.equals(GateType.OUTPUT.toString()) || runner.bgate.Type.equals(GateType.OUTPUT_OR.toString()))
                     {
@@ -1186,7 +1193,7 @@ public class HeuristicSearch {
                         //</editor-fold>    
                         }
                     }
-                   
+                    }
                     if (childnodeassign.isEmpty()) 
                     {
                         curr.ncolor = nodecolor.BLACK;
