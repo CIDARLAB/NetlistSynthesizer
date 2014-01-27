@@ -222,11 +222,11 @@ public class HeuristicSearch {
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
                     HashMap<Integer, String> assignGate = new HashMap<Integer, String>();
-                    System.out.println("\n\nAssignment!! ==>");
+                    //System.out.println("\n\nAssignment!! ==>");
                     while (runner != null) 
                     {
                         assignGate.put(runner.index, runner.bgname);
-                        System.out.println(runner.index + ":" +runner.bgname);
+                        //System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
                     assignmentresult.assignment.add(assignGate);
@@ -266,8 +266,7 @@ public class HeuristicSearch {
                 {
                     if(curr.index == (xindx-1))
                         assigncounter =0;
-                    //if(curr.index ==7)
-                    //    System.out.println("Blah!");
+                   
                     List<String> childnodeassign = new ArrayList<String>();
                     //HashMap<String,String> hashchildnodeassign = new HashMap<String,String>();
                     int next_indx = curr.index-1;
@@ -699,7 +698,6 @@ public class HeuristicSearch {
                                                                     }
                                                                     deeprunner = deeprunner.parent;
                                                                 }
-                                                             
                                                             }
                                                             if(deepflag ==1)
                                                             {
@@ -1004,7 +1002,7 @@ public class HeuristicSearch {
                                                             BGateNode finalrunner = curr;
                                                             while(finalrunner!=null)
                                                             {
-                                                                if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1))
+                                                                if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp2)) //this line was changed
                                                                 {
                                                                     flaginp2=0;
                                                                     break;
@@ -1108,7 +1106,7 @@ public class HeuristicSearch {
                                                         {
                                                             if(deepinpno ==1)
                                                             {
-                                                                if(deepbgc.Inp1.contains("inducer") || deepbgc.Inp2.contains("inducer"))
+                                                                if(((!deepbgc.Inp1.contains("inducer")) && deepbgc.Inp2.contains("inducer")) || (deepbgc.Inp1.contains("inducer") && (!deepbgc.Inp2.contains("inducer")))  )
                                                                 {
                                                                     flaginp1=1;
                                                                 }
