@@ -269,18 +269,18 @@ public class HeuristicSearch {
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
                     HashMap<Integer, String> assignGate = new HashMap<Integer, String>();
-                    //System.out.println("\n\nAssignment!! ==>");
+                    System.out.println("\n\nAssignment!! ==>");
                     while (runner != null) 
                     {
                         assignGate.put(runner.index, runner.bgname);
-                        //System.out.println(runner.index + ":" +runner.bgname);
+                        System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
                     if(fixedinputs ==1)
                     {
-                        assignGate.put(1, "inducer_pTac");
-                        assignGate.put(2, "inducer_pBAD"); 
-                        assignGate.put(3, "inducer_pTetStar");
+                        assignGate.put(0, "inducer_pTac");
+                        assignGate.put(1, "inducer_pBAD"); 
+                        assignGate.put(2, "inducer_pTetStar");
                     }
                     assignmentresult.assignment.add(assignGate);
                     totassign++;
