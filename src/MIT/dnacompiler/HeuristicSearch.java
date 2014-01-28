@@ -1628,15 +1628,55 @@ public class HeuristicSearch {
             }
             else if(dagCirc.Gates.get(i).Type.equals(GateType.OUTPUT.toString()) || dagCirc.Gates.get(i).Type.equals(GateType.OUTPUT_OR.toString()))
             {
-                
+                if(dagCirc.Gates.get(i).Type.equals(GateType.OUTPUT.toString()))
+                {
+                    int prevind = dagCirc.Gates.get(i).Outgoing.To.Index;
+                    score = 1 - (pminList.get(prevind)/pmaxList.get(prevind));
+                    
+                }
+                else
+                {
+                    int prevind1 = dagCirc.Gates.get(i).Outgoing.To.Index;
+                    int prevind2 = dagCirc.Gates.get(i).Outgoing.Next.To.Index;
+                    score = 1 - ((pminList.get(prevind1) + pminList.get(prevind2)) /  (pmaxList.get(prevind1) + pmaxList.get(prevind2))  );
+                    
+                }
             }
             else
             {
                 if(dagCirc.Gates.get(i).Type.equals(GateType.NOT.toString()))
                 {
+                    int prevind = dagCirc.Gates.get(i).Outgoing.To.Index;
+                    TransferFunction tempnot = new TransferFunction();
+                    tempnot = gatefunc.get(gateassign.get(gind));
+                    
+                    double score0 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, pminList.get(prevind));
+                    double score1 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, pmaxList.get(prevind));
+                    pminList.set(gind, score1);
+                    pmaxList.set(gind, score0);
+                    
+                    
                 }
                 else if(dagCirc.Gates.get(i).Type.equals(GateType.NOR.toString()))
                 {
+                    int prevind1 = dagCirc.Gates.get(i).Outgoing.To.Index;
+                    int prevind2 = dagCirc.Gates.get(i).Outgoing.Next.To.Index;
+                    TransferFunction tempnot = new TransferFunction();
+                    tempnot = gatefunc.get(gateassign.get(gind));
+                    
+                    double score00 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (pminList.get(prevind1) + pminList.get(prevind2)));
+                    double score01 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (pminList.get(prevind1) + pmaxList.get(prevind2)));
+                    double score10 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (pmaxList.get(prevind1) + pminList.get(prevind2)));
+                    double score11 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (pmaxList.get(prevind1) + pmaxList.get(prevind2)));
+                    
+                    double maxscore = score01;
+                    if(score10 > maxscore)
+                        maxscore = score10;
+                    if(score11 > maxscore)
+                        maxscore = score11;
+                    
+                    pminList.set(gind, maxscore);
+                    pmaxList.set(gind, score00);
                 }
             }
         }

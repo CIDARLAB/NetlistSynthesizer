@@ -1,4 +1,4 @@
-inducer_pTac 20.8746 0.0188736
-inducer_pBAD 30.413 0.0178353
-inducer_pTetStar 1.77633 0.03187
-inducer_pLuxStar 17.7122 0.0498889
+inducer_pTac 6.226 0.058
+inducer_pBAD 9.784 0.065
+inducer_pTetStar 50.0 0.25
+inducer_pLuxStar 50.0 0.25
