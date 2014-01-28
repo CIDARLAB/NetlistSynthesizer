@@ -128,6 +128,9 @@ public class LoadTables {
         return all_combos;
 
     }
+    
+    
+    
     public static int NOTgateCount(List<BGateCombo> allcombos)
     {
         int num =0;

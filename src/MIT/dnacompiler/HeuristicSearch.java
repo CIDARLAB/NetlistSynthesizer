@@ -8,8 +8,11 @@ import BU.CelloGraph.DAGW;
 import BU.CelloGraph.DAGW_assignment;
 import MIT.dnacompiler.BGateNode.nodecolor;
 import MIT.dnacompiler.Gate.GateType;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -132,7 +135,7 @@ public class HeuristicSearch {
         HashMap<Integer,Gate> nodesCirc = new HashMap<Integer,Gate>();
         
         int indx = dagCirc.Gates.size()-1;
-        
+        int no_of_inputs =0;
         //<editor-fold desc="Reconnecting DAGW in memory">
         for (int i = 0; i < dagCirc.Gates.size(); i++) {
 	    if (dagCirc.Gates.get(i).Outgoing != null) {                     //Outgoing is a wire
@@ -141,7 +144,9 @@ public class HeuristicSearch {
 		    if(w.Index == index) { dagCirc.Gates.get(i).Outgoing = w; }
 		}
 	    }
-	}
+	if(dagCirc.Gates.get(i).Type.equals(GateType.INPUT.toString()))
+            no_of_inputs++;
+        }
 	for (int i = 0; i < dagCirc.Wires.size(); i++) {
 	    if (dagCirc.Wires.get(i).From != null) {                        //From is a gate
 		int index = dagCirc.Wires.get(i).From.Index;
@@ -190,6 +195,11 @@ public class HeuristicSearch {
         
         int maxstage = dagCirc.Gates.get(0).stage;
         
+        List<String> fixedinputsList = new ArrayList<String>();
+         
+        fixedinputsList.add("inducer_pTac");
+        fixedinputsList.add("inducer_pBAD");
+        fixedinputsList.add("inducer_pTetStar");
         
         int xstage =0;
         int xindx =0;
@@ -227,7 +237,7 @@ public class HeuristicSearch {
         BGateNode curr = root;
         //curr = root;
         //HashMap<HashMap<Integer,BGateNode>,Integer> combinations = new HashMap<HashMap<Integer,BGateNode>,Integer>();
-        int no_of_inputs =3;
+        
         Iterator it = nodesCirc.entrySet().iterator();
         while(it.hasNext())
         {
@@ -249,13 +259,10 @@ public class HeuristicSearch {
         //System.out.println("\n\n\nStart Heuristic Algorithm!!\n");
         while (curr != null) 
         {
-            
             int term=0;
-            
             //<editor-fold desc="Node is white">
             if (curr.ncolor == nodecolor.WHITE) 
             {
-
                 curr.ncolor = nodecolor.GRAY;
                 //System.out.println(curr.index);
                 //indices.add(curr.index);
@@ -269,18 +276,17 @@ public class HeuristicSearch {
                     curr.ncolor = nodecolor.BLACK;
                     BGateNode runner = curr;
                     HashMap<Integer, String> assignGate = new HashMap<Integer, String>();
-                    System.out.println("\n\nAssignment!! ==>");
+                    //System.out.println("\n\nAssignment!! ==>");
                     while (runner != null) 
                     {
                         assignGate.put(runner.index, runner.bgname);
-                        System.out.println(runner.index + ":" +runner.bgname);
+                        //System.out.println(runner.index + ":" +runner.bgname);
                         runner = runner.parent;
                     }
                     if(fixedinputs ==1)
                     {
-                        assignGate.put(0, "inducer_pTac");
-                        assignGate.put(1, "inducer_pBAD"); 
-                        assignGate.put(2, "inducer_pTetStar");
+                        for(int fi=0;fi<no_of_inputs;fi++)
+                            assignGate.put(fi,fixedinputsList.get(fi));
                     }
                     assignmentresult.assignment.add(assignGate);
                     totassign++;
@@ -1600,6 +1606,56 @@ public class HeuristicSearch {
     }
     
     
+    public static double ScoreCircuit(DAGW dagCirc, HashMap<Integer,String> gateassign, HashMap<String,TransferFunction> gatefunc, HashMap<String,TransferFunction> inpfunc)
+    {
+        double score=0;
+        List<Double> pminList = new ArrayList<Double>();
+        List<Double> pmaxList = new ArrayList<Double>();
+        
+        for(int i=0;i<dagCirc.Gates.size();i++)
+        {
+            pminList.add(0.0);
+            pmaxList.add(0.0);
+            
+        }
+        for(int i=0;i<dagCirc.Gates.size();i++)
+        {
+            int gind = dagCirc.Gates.get(i).Index;
+            if(dagCirc.Gates.get(i).Type.equals(GateType.INPUT.toString()))
+            {
+                pminList.set(gind, inpfunc.get(gatefunc.get(gind)).pmin);
+                pmaxList.set(gind, inpfunc.get(gatefunc.get(gind)).pmax);
+            }
+            else if(dagCirc.Gates.get(i).Type.equals(GateType.OUTPUT.toString()) || dagCirc.Gates.get(i).Type.equals(GateType.OUTPUT_OR.toString()))
+            {
+                
+            }
+            else
+            {
+                if(dagCirc.Gates.get(i).Type.equals(GateType.NOT.toString()))
+                {
+                }
+                else if(dagCirc.Gates.get(i).Type.equals(GateType.NOR.toString()))
+                {
+                }
+            }
+        }
+        return score;
+    }
+    
+    public static double ScoreGate(double pmin, double pmax, double kd, double n, double x)
+    {
+        double score=0;
+        double term1 = x/kd;
+        double term2 = Math.pow(term1, n);
+        double term3 = 1 + term2;
+        double term4 = pmax/term3;
+        score = pmin + term4;
+    
+        return score;
+    }
+    
+    
     public static DAGW getFinalDAG(DAGW dagCirc)
     {
         int indx = dagCirc.Gates.size()-1;
@@ -1684,6 +1740,8 @@ public class HeuristicSearch {
         
         return dagCirc;
     }
+    
+    
     public static void genindexGraph(List<Integer> indexlist)
     { 
         
@@ -1819,4 +1877,121 @@ public class HeuristicSearch {
         }
         return gatewisecombo;
     }
+    
+    
+    
+    
+    public static HashMap<String,TransferFunction> getGateFunction()
+    {
+
+	String Filepath ="";
+        HashMap<String,TransferFunction> gatefunctions = new HashMap<String,TransferFunction>();
+        
+	Filepath = HeuristicSearch.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+       
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/MIT/dnacompiler/";
+        }
+        else
+        {
+            Filepath += "MIT/dnacompiler/";
+        }
+
+	String file_gates = Filepath + "TransferFunc.txt";
+	
+	File filegates = new File(file_gates);
+	BufferedReader brgate;
+	FileReader frgate;
+	
+	try {
+	    frgate = new FileReader(filegates);
+	    brgate = new BufferedReader(frgate);
+	    String line;
+	    try 
+            {
+		while((line = brgate.readLine()) != null ) 
+                {
+	            String lines[] = line.split(" ");
+                    TransferFunction entry = new TransferFunction();
+                    entry.bgname = lines[0];
+                    entry.pmax = Double.parseDouble(lines[1]);
+                    entry.pmin = Double.parseDouble(lines[2]);
+                    entry.kd = Double.parseDouble(lines[3]);
+                    entry.n = Double.parseDouble(lines[4]);
+                    gatefunctions.put(entry.bgname, entry);
+                }
+	    }
+	    catch (IOException ex) {
+		System.out.println("IOException when reading input file");
+	    }
+	} 
+	catch (FileNotFoundException ex) {
+	    System.out.println("FileNotFoundException when reading input file");
+	}
+
+        
+        return gatefunctions;
+
+    }
+    public static HashMap<String,TransferFunction> getInpFunction()
+    {
+
+	String Filepath ="";
+        HashMap<String,TransferFunction> inpfunctions = new HashMap<String,TransferFunction>();
+        
+	Filepath = HeuristicSearch.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+       
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/MIT/dnacompiler/";
+        }
+        else
+        {
+            Filepath += "MIT/dnacompiler/";
+        }
+
+	String file_inputs = Filepath + "InpFunc.txt";
+
+	
+        
+        File fileinp = new File(file_inputs);
+	BufferedReader brinp;
+	FileReader frinp;
+	try {
+	    frinp = new FileReader(fileinp);
+	    brinp = new BufferedReader(frinp);
+	    String line;
+	    try {
+		while((line = brinp.readLine()) != null ) {
+	
+		    String lines[] = line.split(" ");
+                    TransferFunction entry = new TransferFunction();
+                    entry.bgname = lines[0];
+                    entry.pmax = Double.parseDouble(lines[1]);
+                    entry.pmin = Double.parseDouble(lines[2]);
+                    inpfunctions.put(entry.bgname, entry);
+		}
+	    }
+	    catch (IOException ex) {
+		System.out.println("IOException when reading input file");
+	    }
+	} 
+	catch (FileNotFoundException ex) {
+	    System.out.println("FileNotFoundException when reading input file");
+	}
+        return inpfunctions;
+
+    }
+    
+    
+    
 }
