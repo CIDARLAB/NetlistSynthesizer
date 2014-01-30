@@ -32,8 +32,9 @@ import java.util.logging.Logger;
 public class HeuristicSearch {
 
     
-    public static DAGW_assignment beginSearch(DAGW dagCirc, double cutoff,double maxscore, long maxassign, long outputshift, int fixedinputs)
+    public static void beginSearch(DAGW dagCirc, double cutoff,double maxscore, long maxassign, long outputshift, int fixedinputs)
     {
+        
         DAGW_assignment assignmentresult = new DAGW_assignment();
         List<BGateCombo> allcombos = new ArrayList<BGateCombo>();
         allcombos = LoadTables.getAllCombos(cutoff);
@@ -49,6 +50,11 @@ public class HeuristicSearch {
         List<BGateCombo> notcombo_0_inputs = new ArrayList<BGateCombo>();
         List<BGateCombo> notcombo_1_input = new ArrayList<BGateCombo>();
         
+        HashMap<String,TransferFunction> inpfunctions = new HashMap<String,TransferFunction>();
+        HashMap<String,TransferFunction> gatefunctions = new HashMap<String,TransferFunction>();
+        
+        inpfunctions = getInpFunction();
+        gatefunctions = getGateFunction();
         
         
         int notcombosSize = LoadTables.NOTgateCount(allcombos);
@@ -58,7 +64,7 @@ public class HeuristicSearch {
         sortcombos(notcombos);
         sortcombos(norcombos);
         long totassign=0;
-        
+        long maxpos =0;
         HashMap<String,String> Notgates = new HashMap<String,String>();
         HashMap<String,String> Norgates = new HashMap<String,String>();
         HashMap<String,String> inputNotgates = new HashMap<String,String>();
@@ -168,7 +174,9 @@ public class HeuristicSearch {
 	    }
 	}
         //</editor-fold>
-        
+        double scoremax=0;
+        long negcirc =0;
+        long excelcirc =0;
         //<editor-fold desc="Assiging Gate Stages"> 
         for(int i=(dagCirc.Gates.size()-1);i>=0;i--)
         {
@@ -288,8 +296,40 @@ public class HeuristicSearch {
                         for(int fi=0;fi<no_of_inputs;fi++)
                             assignGate.put(fi,fixedinputsList.get(fi));
                     }
-                    assignmentresult.assignment.add(assignGate);
+                    
+                    Double circuitscore = ScoreCircuit(nodesCirc, assignGate, gatefunctions, inpfunctions);
+                    
+                    if(circuitscore < 0)
+                        negcirc++;
+                    if(circuitscore > 0.99)
+                        excelcirc++;
+                    
+                    //System.out.println(circuitscore);
+                    
+                    //assignmentresult.assignment.add(assignGate);
                     totassign++;
+                    
+                    if(circuitscore>scoremax)
+                    {
+                        scoremax = circuitscore;
+                        maxpos = totassign;
+                    }
+                    if(circuitscore >= maxscore)
+                    {
+                        
+                        System.out.println("Max Score Reached at: " + totassign);
+                        System.out.println("Value of Max Score " + circuitscore);
+                        break;
+                    }
+                    if(totassign == maxassign)
+                    {
+                        System.out.println("Max Assignment Reached");
+                        System.out.println("Max Score Reached at: " + maxpos);
+                        System.out.println("Value of Max Score " + scoremax);
+                        
+                        break;
+                    }    
+                    
                     assigncounter++;
                     
                     if(assigncounter == outputshift)
@@ -306,11 +346,7 @@ public class HeuristicSearch {
                         
                     }
                     
-                    if(totassign == maxassign)
-                        break;
-                    /*if(score >= maxscore)
-                     * break;
-                     */
+                   
                     if (curr.Next != null) 
                     {
                         curr = curr.Next;
@@ -1469,12 +1505,7 @@ public class HeuristicSearch {
                                                                     }
                                                                 }
                                                             }
-                                                        
-                                                        
-                                                            
-                                                        
                                                     }
-                                                
                                             }
                                         }
                                     //</editor-fold>
@@ -1597,56 +1628,66 @@ public class HeuristicSearch {
             }     
             
         }
-        //System.out.println(combinations.size());
-        System.out.println(assignmentresult.assignment.size());
         //genindexGraph(indices);
         
+        System.out.println("\n\nEND OF HEURISTIC ALGORITHM!!");
+        System.out.println("=========Results=========");
+        System.out.println("Total Assignments : " + totassign);
+        System.out.println("Maximum Score : "+ scoremax);
+        System.out.println("Position of Maximum Score : " + maxpos);
+        System.out.println("Circuits with negative Scores (Bad Circuits) : " + negcirc);
+        System.out.println("Circuits with Scores greater than 0.99 (Excellent Circuits) : " + excelcirc);
         
-    return assignmentresult;  
+        
+         //return assignmentresult;  
     }
     
     
-    public static double ScoreCircuit(DAGW dagCirc, HashMap<Integer,String> gateassign, HashMap<String,TransferFunction> gatefunc, HashMap<String,TransferFunction> inpfunc)
+    public static double ScoreCircuit(HashMap<Integer,Gate> index_gates, HashMap<Integer,String> gateassign, HashMap<String,TransferFunction> gatefunc, HashMap<String,TransferFunction> inpfunc)
     {
         double score=0;
+        
         List<Double> pminList = new ArrayList<Double>();
         List<Double> pmaxList = new ArrayList<Double>();
         
-        for(int i=0;i<dagCirc.Gates.size();i++)
+        for(int i=0;i<index_gates.size();i++)
         {
             pminList.add(0.0);
             pmaxList.add(0.0);
-            
         }
-        for(int i=0;i<dagCirc.Gates.size();i++)
+        
+        for(int i=0;i<index_gates.size();i++)
         {
-            int gind = dagCirc.Gates.get(i).Index;
-            if(dagCirc.Gates.get(i).Type.equals(GateType.INPUT.toString()))
+            Gate xgate = index_gates.get(i);
+            //System.out.println(xgate.Type);
+            int gind = xgate.Index;
+            if(xgate.Type.equals(GateType.INPUT.toString()))
             {
-                pminList.set(gind, inpfunc.get(gatefunc.get(gind)).pmin);
-                pmaxList.set(gind, inpfunc.get(gatefunc.get(gind)).pmax);
-            }
-            else if(dagCirc.Gates.get(i).Type.equals(GateType.OUTPUT.toString()) || dagCirc.Gates.get(i).Type.equals(GateType.OUTPUT_OR.toString()))
-            {
-                if(dagCirc.Gates.get(i).Type.equals(GateType.OUTPUT.toString()))
+                if(!gateassign.get(gind).equals("Inducer_Dummy"))
                 {
-                    int prevind = dagCirc.Gates.get(i).Outgoing.To.Index;
+                    pminList.set(gind, inpfunc.get(gateassign.get(gind)).pmin);
+                    pmaxList.set(gind, inpfunc.get(gateassign.get(gind)).pmax);
+                }
+            }
+            else if(xgate.Type.equals(GateType.OUTPUT.toString()) || xgate.Type.equals(GateType.OUTPUT_OR.toString()))
+            {
+                if(xgate.Type.equals(GateType.OUTPUT.toString()))
+                {
+                    int prevind = xgate.Outgoing.To.Index;
                     score = 1 - (pminList.get(prevind)/pmaxList.get(prevind));
-                    
                 }
                 else
                 {
-                    int prevind1 = dagCirc.Gates.get(i).Outgoing.To.Index;
-                    int prevind2 = dagCirc.Gates.get(i).Outgoing.Next.To.Index;
-                    score = 1 - ((pminList.get(prevind1) + pminList.get(prevind2)) /  (pmaxList.get(prevind1) + pmaxList.get(prevind2))  );
-                    
+                    int prevind1 = xgate.Outgoing.To.Index;
+                    int prevind2 = xgate.Outgoing.Next.To.Index;
+                    score = 1 - ((pminList.get(prevind1) + pminList.get(prevind2)) /  (pmaxList.get(prevind1) + pmaxList.get(prevind2)));
                 }
             }
             else
             {
-                if(dagCirc.Gates.get(i).Type.equals(GateType.NOT.toString()))
+                if(xgate.Type.equals(GateType.NOT.toString()))
                 {
-                    int prevind = dagCirc.Gates.get(i).Outgoing.To.Index;
+                    int prevind = xgate.Outgoing.To.Index;
                     TransferFunction tempnot = new TransferFunction();
                     tempnot = gatefunc.get(gateassign.get(gind));
                     
@@ -1654,13 +1695,11 @@ public class HeuristicSearch {
                     double score1 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, pmaxList.get(prevind));
                     pminList.set(gind, score1);
                     pmaxList.set(gind, score0);
-                    
-                    
                 }
-                else if(dagCirc.Gates.get(i).Type.equals(GateType.NOR.toString()))
+                else if(xgate.Type.equals(GateType.NOR.toString()))
                 {
-                    int prevind1 = dagCirc.Gates.get(i).Outgoing.To.Index;
-                    int prevind2 = dagCirc.Gates.get(i).Outgoing.Next.To.Index;
+                    int prevind1 = xgate.Outgoing.To.Index;
+                    int prevind2 = xgate.Outgoing.Next.To.Index;
                     TransferFunction tempnot = new TransferFunction();
                     tempnot = gatefunc.get(gateassign.get(gind));
                     

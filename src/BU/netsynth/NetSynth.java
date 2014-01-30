@@ -99,7 +99,7 @@ public class NetSynth {
         //verifyinverse();
         //histogram();
         DAGW xcasedag = testParser("",0,1);
-        HeuristicSearch.beginSearch(xcasedag, 0.95,1,0,100,0);
+        HeuristicSearch.beginSearch(xcasedag, 0.0,1,200000,20,0);
         
         //verifyprecomute();
         //DAGraph x = precompute(2);
