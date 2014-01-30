@@ -298,7 +298,7 @@ public class HeuristicSearch {
                     }
                     
                     Double circuitscore = ScoreCircuit(nodesCirc, assignGate, gatefunctions, inpfunctions);
-                    
+                    System.out.println(circuitscore);
                     if(circuitscore < 0)
                         negcirc++;
                     if(circuitscore > 0.99)
