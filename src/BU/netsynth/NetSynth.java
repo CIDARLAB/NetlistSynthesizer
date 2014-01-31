@@ -99,7 +99,7 @@ public class NetSynth {
         //verifyinverse();
         //histogram();
         DAGW xcasedag = testParser("",0,1);
-        //HeuristicSearch.beginSearch(xcasedag, 0.90,1,20000,20,1);
+        HeuristicSearch.beginSearch(xcasedag, 0.90,1,20000,20,0);
         
         //verifyprecomute();
         //DAGraph x = precompute(2);
@@ -496,7 +496,7 @@ public class NetSynth {
                 List<DGate> espoutputinv = new ArrayList<DGate>();
                 espoutputinv = parseEspressoToNORNAND(espoutinv);
                 
-                System.out.println("\n\n==== CHECKING!!! ====");
+                /*System.out.println("\n\n==== CHECKING!!! ====");
                 
                 System.out.println("\n==== Primary Circuit ====");
                 System.out.println(BooleanSimulator.bpermute(espoutput));
@@ -507,7 +507,7 @@ public class NetSynth {
                 System.out.println(BooleanSimulator.bpermute(espoutputinv));
                 for(DGate dg:espoutputinv)
                     System.out.println(netlist(dg));
-                
+                */
                 //DAGW circ = computeDAGW(caseCirc.inputgatetable-1);
                 circuitDAG = CreateDAGW(espoutput);
                 //DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable - 1);
@@ -518,7 +518,7 @@ public class NetSynth {
                     int gatessize = circuitDAGinv.Gates.size();
                     if (circuitDAGinv.Gates.get(1).Type == "NOR" || circuitDAGinv.Gates.get(1).Type == "NOT") {
                         if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) {
-                            System.out.println("Special Case");
+                            //System.out.println("Special Case");
                             circuitDAG = circuitDAGinv;
                             gatessize = circuitDAGinv.Gates.size();
                             if (circuitDAG.Gates.get(1).Type == "NOR") {
@@ -543,7 +543,7 @@ public class NetSynth {
                     {
                         activeinp++;
                         activeinplist.add(xgate.Name);
-                        System.out.println(xgate.Name.trim());
+                        //System.out.println(xgate.Name.trim());
                     }
                 }
                 if(activeinp < caseCirc.inputNames.size())
@@ -564,18 +564,20 @@ public class NetSynth {
                 
                 HashMap<String, Gate> inpord = new HashMap<String, Gate>();
                 List<String> inputGates = new ArrayList<String>();
-                
-                for (Gate gdag : circuitDAG.Gates) 
+                for(String xinp:caseCirc.inputNames)
                 {
-                    if (gdag.Type.equals("INPUT")) 
+                    for (Gate gdag : circuitDAG.Gates) 
                     {
-                        inputGates.add(gdag.Name.trim());
-                        inpord.put(gdag.Name.trim(), gdag);
-                        //System.out.println(gdag.Name);
-                    }
+                        if (gdag.Type.equals("INPUT") && gdag.Name.equals(xinp)) 
+                        {
+                            inputGates.add(gdag.Name.trim());
+                            inpord.put(gdag.Name.trim(), gdag);
+                            //System.out.println(gdag.Name);
+                        }
+                    }   
                 }
-                int kk = caseCirc.inputNames.size()-1;
-
+                //int kk = caseCirc.inputNames.size()-1;
+                int kk=0;
                 for (int ii = 0; ii < circuitDAG.Gates.size(); ii++) 
                 {
                     Gate gdag = circuitDAG.Gates.get(ii);
@@ -583,7 +585,8 @@ public class NetSynth {
                     {
                         Gate val = inpord.get(inputGates.get(kk));
                         circuitDAG.Gates.set(ii, val);
-                        kk--;
+                        //kk--;
+                        kk++;
                     }
                 }
                 for (Gate gdag : circuitDAG.Gates) 
@@ -625,10 +628,10 @@ public class NetSynth {
             
             
         }
+        int ttpow = (int)Math.pow(2, caseCirc.inputNames.size());
+        String bintt = Convert.dectoBin(caseCirc.inputgatetable, ttpow);
         
-        
-        
-        
+        circuitDAG.truthtable = bintt;
         return circuitDAG;
         
     }

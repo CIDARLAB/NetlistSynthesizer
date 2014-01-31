@@ -18,17 +18,19 @@ import java.util.List;
 public class DAGW {
     public ArrayList<Wire> Wires;
     public ArrayList<Gate> Gates;
+    public String truthtable;
     public DAGW()
     {
         Wires = new ArrayList<Wire>();
         Gates = new ArrayList<Gate>();
+        truthtable = "";
     }
     
     public DAGW(List<Gate> dagwGates,List<Wire> dagwWires)
     {
         Wires = new ArrayList<Wire>();
         Gates = new ArrayList<Gate>();
- 
+        truthtable = "";
       
         if (dagwWires != null) 
         {
@@ -55,7 +57,7 @@ public class DAGW {
     {
         Wires = new ArrayList<Wire>();
         Gates = new ArrayList<Gate>();
- 
+        truthtable = obj.truthtable;
         if (obj.Wires != null) 
         {
             Wires = new ArrayList<Wire>();

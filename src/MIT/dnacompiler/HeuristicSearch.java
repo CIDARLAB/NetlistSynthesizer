@@ -6,6 +6,7 @@ package MIT.dnacompiler;
 
 import BU.CelloGraph.DAGW;
 import BU.CelloGraph.DAGW_assignment;
+import BU.ParseVerilog.Convert;
 import MIT.dnacompiler.BGateNode.nodecolor;
 import MIT.dnacompiler.Gate.GateType;
 import java.io.BufferedReader;
@@ -297,14 +298,14 @@ public class HeuristicSearch {
                             assignGate.put(fi,fixedinputsList.get(fi));
                     }
                     
-                    Double circuitscore = ScoreCircuit(nodesCirc, assignGate, gatefunctions, inpfunctions);
+                    Double circuitscore = ScoreCircuit(dagCirc,nodesCirc, assignGate, gatefunctions, inpfunctions);
                     System.out.println(circuitscore);
                     if(circuitscore < 0)
                         negcirc++;
                     if(circuitscore > 0.99)
                         excelcirc++;
                     
-                    //System.out.println(circuitscore);
+                    System.out.println(circuitscore);
                     
                     //assignmentresult.assignment.add(assignGate);
                     totassign++;
@@ -1643,83 +1644,144 @@ public class HeuristicSearch {
     }
     
     
-    public static double ScoreCircuit(HashMap<Integer,Gate> index_gates, HashMap<Integer,String> gateassign, HashMap<String,TransferFunction> gatefunc, HashMap<String,TransferFunction> inpfunc)
+    public static double ScoreCircuit(DAGW dagCirc, HashMap<Integer,Gate> index_gates, HashMap<Integer,String> gateassign, HashMap<String,TransferFunction> gatefunc, HashMap<String,TransferFunction> inpfunc)
     {
         double score=0;
         
-        List<Double> pminList = new ArrayList<Double>();
-        List<Double> pmaxList = new ArrayList<Double>();
+        List<Double> reuList = new ArrayList<Double>();
+        HashMap<Integer, Integer> indgate = new HashMap<Integer, Integer>();
+        List<Double> truthList = new ArrayList<Double>();
+        List<Double> truthLow = new ArrayList<Double>();
+        List<Double> truthHigh = new ArrayList<Double>();
         
-        for(int i=0;i<index_gates.size();i++)
+        int kk=0;
+        for(int i=0; i<dagCirc.Gates.size();i++)
         {
-            pminList.add(0.0);
-            pmaxList.add(0.0);
-        }
-        
-        for(int i=0;i<index_gates.size();i++)
-        {
-            Gate xgate = index_gates.get(i);
-            //System.out.println(xgate.Type);
-            int gind = xgate.Index;
-            if(xgate.Type.equals(GateType.INPUT.toString()))
-            {
-                if(!gateassign.get(gind).equals("Inducer_Dummy"))
+                reuList.add(0.0);
+                if(dagCirc.Gates.get(i).Type.equals(GateType.INPUT.toString()))
                 {
-                    pminList.set(gind, inpfunc.get(gateassign.get(gind)).pmin);
-                    pmaxList.set(gind, inpfunc.get(gateassign.get(gind)).pmax);
+                    indgate.put(dagCirc.Gates.get(i).Index,kk);
+                    kk++;
+                    //System.out.println(dagCirc.Gates.get(i).Name);
                 }
-            }
-            else if(xgate.Type.equals(GateType.OUTPUT.toString()) || xgate.Type.equals(GateType.OUTPUT_OR.toString()))
+        }
+        //System.out.println("SIZE " +indgate.size());
+        int inpcount = indgate.size();
+        int ttlines = (int) Math.pow(2,inpcount);
+        
+        for(int j=0;j<ttlines;j++)
+        {
+            for(int i=0; i<dagCirc.Gates.size();i++)
             {
-                if(xgate.Type.equals(GateType.OUTPUT.toString()))
+                reuList.set(i, 0.0);
+            }
+            String ttval = Convert.dectoBin(j, inpcount);
+            //int kk = 
+            //System.out.println(ttval.charAt(0));
+        
+            for(int i=0;i<index_gates.size();i++)
+            {
+                Gate xgate = index_gates.get(i);
+                //System.out.println(xgate.Type);
+                int gind = xgate.Index;
+                if(xgate.Type.equals(GateType.INPUT.toString()))
+                {   
+                    if(!gateassign.get(gind).equals("Inducer_Dummy"))
+                    {
+                        char hilo = ttval.charAt(indgate.get(xgate.Index));
+                        if(hilo == '0')
+                        {
+                            reuList.set(i, inpfunc.get(gateassign.get(xgate.Index)).pmin);
+                        }
+                        else if(hilo == '1')
+                        {
+                            reuList.set(i, inpfunc.get(gateassign.get(xgate.Index)).pmax);
+                        }
+                    }
+                }
+                else if(xgate.Type.equals(GateType.OUTPUT.toString()) || xgate.Type.equals(GateType.OUTPUT_OR.toString()))
                 {
-                    int prevind = xgate.Outgoing.To.Index;
-                    score = 1 - (pminList.get(prevind)/pmaxList.get(prevind));
+                    if(xgate.Type.equals(GateType.OUTPUT.toString()))
+                    {
+                        int prevind = xgate.Outgoing.To.Index;
+                        truthList.add(reuList.get(prevind));
+                        if(dagCirc.truthtable.charAt(j) == '0')
+                            truthLow.add(reuList.get(prevind));
+                        else
+                            truthHigh.add(reuList.get(prevind));
+                    }
+                    else
+                    {
+                        int prevind1 = xgate.Outgoing.To.Index;
+                        int prevind2 = xgate.Outgoing.Next.To.Index;
+                        Double tempscore = reuList.get(prevind1) + reuList.get(prevind2);  
+                        truthList.add(tempscore);
+                            if(dagCirc.truthtable.charAt(j) == '0')
+                            truthLow.add(tempscore);
+                        else
+                            truthHigh.add(tempscore);
+                    
+                    }
+                    
                 }
                 else
                 {
-                    int prevind1 = xgate.Outgoing.To.Index;
-                    int prevind2 = xgate.Outgoing.Next.To.Index;
-                    score = 1 - ((pminList.get(prevind1) + pminList.get(prevind2)) /  (pmaxList.get(prevind1) + pmaxList.get(prevind2)));
-                }
-            }
-            else
-            {
-                if(xgate.Type.equals(GateType.NOT.toString()))
-                {
-                    int prevind = xgate.Outgoing.To.Index;
-                    TransferFunction tempnot = new TransferFunction();
-                    tempnot = gatefunc.get(gateassign.get(gind));
+                    if(xgate.Type.equals(GateType.NOT.toString()))
+                    {   
+                        int prevind = xgate.Outgoing.To.Index;
+                        TransferFunction tempnot = new TransferFunction();
+                        tempnot = gatefunc.get(gateassign.get(gind));
                     
-                    double score0 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, pminList.get(prevind));
-                    double score1 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, pmaxList.get(prevind));
-                    pminList.set(gind, score1);
-                    pmaxList.set(gind, score0);
-                }
-                else if(xgate.Type.equals(GateType.NOR.toString()))
-                {
-                    int prevind1 = xgate.Outgoing.To.Index;
-                    int prevind2 = xgate.Outgoing.Next.To.Index;
-                    TransferFunction tempnot = new TransferFunction();
-                    tempnot = gatefunc.get(gateassign.get(gind));
-                    
-                    double score00 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (pminList.get(prevind1) + pminList.get(prevind2)));
-                    double score01 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (pminList.get(prevind1) + pmaxList.get(prevind2)));
-                    double score10 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (pmaxList.get(prevind1) + pminList.get(prevind2)));
-                    double score11 = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (pmaxList.get(prevind1) + pmaxList.get(prevind2)));
-                    
-                    double maxscore = score01;
-                    if(score10 > maxscore)
-                        maxscore = score10;
-                    if(score11 > maxscore)
-                        maxscore = score11;
-                    
-                    pminList.set(gind, maxscore);
-                    pmaxList.set(gind, score00);
+                        double tempscore = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, reuList.get(prevind));
+                        reuList.set(gind, tempscore);
+                    }
+                    else if(xgate.Type.equals(GateType.NOR.toString()))
+                    {
+                        int prevind1 = xgate.Outgoing.To.Index;
+                        int prevind2 = xgate.Outgoing.Next.To.Index;
+                        TransferFunction tempnot = new TransferFunction();
+                        tempnot = gatefunc.get(gateassign.get(gind));
+                        double tempscore = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (reuList.get(prevind1) + reuList.get(prevind2)));
+                        reuList.set(gind, tempscore);
+                    }
                 }
             }
         }
+       
+        double offhigh = maxval(truthLow);
+        double onlow = minval(truthHigh);
+        
+        score = 1 - (offhigh/onlow);
+        
+        
+        
         return score;
+    }
+    
+    public static double maxval(List<Double> ttval)
+    {
+        double max=0;
+        if(ttval.size()>0)
+            max = ttval.get(0);
+        for(int i=0;i<ttval.size();i++)
+        {
+            if(ttval.get(i)>max)
+                max = ttval.get(i);
+        }
+        return max;
+    }
+    
+    public static double minval(List<Double> ttval)
+    {
+        double min=0;
+        if(ttval.size()>0)
+            min = ttval.get(0);
+        for(int i=0;i<ttval.size();i++)
+        {
+            if(ttval.get(i)<min)
+                min = ttval.get(i);
+        }
+        return min;
     }
     
     public static double ScoreGate(double pmin, double pmax, double kd, double n, double x)
