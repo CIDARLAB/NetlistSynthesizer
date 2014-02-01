@@ -1,0 +1,5 @@
+inducer_syth0 50.000000 0.025000
+inducer_syth1 50.000000 0.025000
+inducer_syth2 50.000000 0.025000
+inducer_syth3 50.000000 0.025000
+inducer_syth4 50.000000 0.025000

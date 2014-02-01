@@ -54,6 +54,8 @@ public class LoadTables {
 
 	String file_NOT = Filepath + "list_NOT_pairs.txt";
 	String file_NOR = Filepath + "list_NOR_trips.txt";
+        //String file_NOT = Filepath + "synth_NOT_pairs.txt";
+	//String file_NOR = Filepath + "synth_NOR_trips.txt";
 
 	File fileNOT = new File(file_NOT);
 	BufferedReader brNOT;

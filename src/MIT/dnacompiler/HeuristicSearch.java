@@ -305,7 +305,6 @@ public class HeuristicSearch {
                     if(circuitscore > 0.99)
                         excelcirc++;
                     
-                    System.out.println(circuitscore);
                     
                     //assignmentresult.assignment.add(assignGate);
                     totassign++;
@@ -1653,6 +1652,12 @@ public class HeuristicSearch {
         List<Double> truthList = new ArrayList<Double>();
         List<Double> truthLow = new ArrayList<Double>();
         List<Double> truthHigh = new ArrayList<Double>();
+        
+        
+        for(int ii=0;ii<gateassign.size();ii++)
+        {
+            System.out.println(ii+ ":" + gateassign.get(ii));
+        }
         
         int kk=0;
         for(int i=0; i<dagCirc.Gates.size();i++)
