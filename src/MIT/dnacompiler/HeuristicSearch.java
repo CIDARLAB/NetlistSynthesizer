@@ -36,6 +36,9 @@ public class HeuristicSearch {
     public static void beginSearch(DAGW dagCirc, double cutoff,double maxscore, long maxassign, long outputshift, int fixedinputs)
     {
         
+        Synthetic_Gates.genNortrips();
+        Synthetic_Gates.genNotpairs();
+        
         DAGW_assignment assignmentresult = new DAGW_assignment();
         List<BGateCombo> allcombos = new ArrayList<BGateCombo>();
         allcombos = LoadTables.getAllCombos(cutoff);
@@ -54,8 +57,10 @@ public class HeuristicSearch {
         HashMap<String,TransferFunction> inpfunctions = new HashMap<String,TransferFunction>();
         HashMap<String,TransferFunction> gatefunctions = new HashMap<String,TransferFunction>();
         
-        inpfunctions = getInpFunction();
-        gatefunctions = getGateFunction();
+        //inpfunctions = getInpFunction();
+        //gatefunctions = getGateFunction();
+        inpfunctions = Synthetic_Gates.getInpFunction();
+        gatefunctions = Synthetic_Gates.getGateFunction();
         
         
         int notcombosSize = LoadTables.NOTgateCount(allcombos);
@@ -299,7 +304,7 @@ public class HeuristicSearch {
                     }
                     
                     Double circuitscore = ScoreCircuit(dagCirc,nodesCirc, assignGate, gatefunctions, inpfunctions);
-                    System.out.println(circuitscore);
+                    //System.out.println(circuitscore);
                     if(circuitscore < 0)
                         negcirc++;
                     if(circuitscore > 0.99)
@@ -1654,10 +1659,10 @@ public class HeuristicSearch {
         List<Double> truthHigh = new ArrayList<Double>();
         
         
-        for(int ii=0;ii<gateassign.size();ii++)
+        /*for(int ii=0;ii<gateassign.size();ii++)
         {
             System.out.println(ii+ ":" + gateassign.get(ii));
-        }
+        }*/
         
         int kk=0;
         for(int i=0; i<dagCirc.Gates.size();i++)

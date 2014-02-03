@@ -5,11 +5,18 @@
 package MIT.dnacompiler;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,6 +27,208 @@ public class Synthetic_Gates {
     
     
     
+    
+    
+    
+    public static void genNotpairs()
+    {
+        HashMap<String,TransferFunction> gatefunctions = new HashMap<String,TransferFunction>();
+        HashMap<String,TransferFunction> inpfunctions = new HashMap<String,TransferFunction>();
+        
+        
+        HashMap<Integer,TransferFunction> allgates = new HashMap<Integer,TransferFunction>();
+        List<String> gatesF = new ArrayList<String>();
+        List<String> complgatesF = new ArrayList<String>();
+        
+        gatefunctions = getGateFunction();
+        inpfunctions = getInpFunction();
+        
+        int cnt=0;
+        for(String xname: gatefunctions.keySet())
+        {
+            gatesF.add(xname);
+            complgatesF.add(xname);
+        }
+        for(String xname: inpfunctions.keySet())
+        {
+            complgatesF.add(xname);
+        }
+        for(int i=0;i<complgatesF.size();i++)
+        {
+            String tempg = complgatesF.get(i);
+            if(inpfunctions.containsKey(tempg))
+            {
+                allgates.put(cnt,inpfunctions.get(tempg));
+                cnt++;
+            }
+            else if(gatefunctions.containsKey(tempg))
+            {
+                allgates.put(cnt,gatefunctions.get(tempg));
+                cnt++;
+            }
+            
+        }
+        String Filepath;
+        Filepath = Synthetic_Gates.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/MIT/dnacompiler/";
+        }
+        else
+        {
+            Filepath += "MIT/dnacompiler/";
+        }
+        String file_gates = Filepath + "synth_NOT_pairs.txt";
+        
+        File fespinp = new File(file_gates);
+        try 
+        {
+            
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            String Line ="";
+            for(int i=0;i<gatesF.size();i++)
+            {
+                String outname = gatesF.get(i);
+                TransferFunction out = new TransferFunction();
+                out = gatefunctions.get(outname);
+                for(int j=0;j<cnt;j++)
+                {
+                    TransferFunction inp1 = new TransferFunction();
+                    inp1 = allgates.get(j);
+                    if(inp1.bgname.equals(out.bgname))
+                        continue;
+                    double score0 = HeuristicSearch.ScoreGate(out.pmin, out.pmax, out.kd, out.n, (inp1.pmin));
+                    double score1 = HeuristicSearch.ScoreGate(out.pmin, out.pmax, out.kd, out.n, (inp1.pmax));
+                    double finalscore = (1 - (score1/score0));
+                    Line = inp1.bgname + " " + out.bgname + " " + finalscore + "\n"; 
+                    output.write(Line);
+                }
+            }
+            
+            
+            
+            output.close();
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Synthetic_Gates.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    
+    }
+    public static void genNortrips()
+    {
+        HashMap<String,TransferFunction> gatefunctions = new HashMap<String,TransferFunction>();
+        HashMap<String,TransferFunction> inpfunctions = new HashMap<String,TransferFunction>();
+        
+        
+        HashMap<Integer,TransferFunction> allgates = new HashMap<Integer,TransferFunction>();
+        List<String> gatesF = new ArrayList<String>();
+        List<String> complgatesF = new ArrayList<String>();
+        
+        gatefunctions = getGateFunction();
+        inpfunctions = getInpFunction();
+        
+        int cnt=0;
+        for(String xname: gatefunctions.keySet())
+        {
+            gatesF.add(xname);
+            complgatesF.add(xname);
+        }
+        for(String xname: inpfunctions.keySet())
+        {
+            complgatesF.add(xname);
+        }
+        for(int i=0;i<complgatesF.size();i++)
+        {
+            String tempg = complgatesF.get(i);
+            if(inpfunctions.containsKey(tempg))
+            {
+                allgates.put(cnt,inpfunctions.get(tempg));
+                cnt++;
+            }
+            else if(gatefunctions.containsKey(tempg))
+            {
+                allgates.put(cnt,gatefunctions.get(tempg));
+                cnt++;
+            }
+            
+        }
+        String Filepath;
+        Filepath = Synthetic_Gates.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/MIT/dnacompiler/";
+        }
+        else
+        {
+            Filepath += "MIT/dnacompiler/";
+        }
+        String file_gates = Filepath + "synth_NOR_trips.txt";
+        
+        File fespinp = new File(file_gates);
+        try 
+        {
+            
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            String Line ="";
+            for(int i=0;i<gatesF.size();i++)
+            {
+                String outname = gatesF.get(i);
+                TransferFunction out = new TransferFunction();
+                out = gatefunctions.get(outname);
+                for(int j=0;j<cnt;j++)
+                {
+                    TransferFunction inp1 = new TransferFunction();
+                    inp1 = allgates.get(j);
+                    if(inp1.bgname.equals(out.bgname))
+                        continue;
+                    for(int k=j;k<cnt;k++)
+                    {
+                        if(k==j)
+                            continue;
+                        TransferFunction inp2 = new TransferFunction();
+                        inp2 = allgates.get(k);
+                        if(inp2.bgname.equals(inp1.bgname) ||  inp2.bgname.equals(out.bgname))
+                            continue;
+                        
+                        double score00 = HeuristicSearch.ScoreGate(out.pmin, out.pmax, out.kd, out.n, (inp1.pmin + inp2.pmin));
+                        double score01 = HeuristicSearch.ScoreGate(out.pmin, out.pmax, out.kd, out.n, (inp1.pmin + inp2.pmax));
+                        double score10 = HeuristicSearch.ScoreGate(out.pmin, out.pmax, out.kd, out.n, (inp1.pmax + inp2.pmin));
+                        double score11 = HeuristicSearch.ScoreGate(out.pmin, out.pmax, out.kd, out.n, (inp1.pmax + inp2.pmax));
+                        
+                        double maxscore = score01;
+                        if(score10>maxscore)
+                            maxscore = score10;
+                        if(score11>maxscore)
+                            maxscore = score11;
+                        
+                        double finalscore = (1 - (maxscore/score00));
+                        Line = inp1.bgname + " " + inp2.bgname + " " + out.bgname + " " + finalscore + "\n"; 
+                        output.write(Line);
+                    }
+                }
+            }
+            
+            
+            
+            output.close();
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Synthetic_Gates.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    
+    }
     
      
     public static HashMap<String,TransferFunction> getGateFunction()
