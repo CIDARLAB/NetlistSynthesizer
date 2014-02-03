@@ -25,9 +25,114 @@ import java.util.logging.Logger;
 public class Synthetic_Gates {
     
     
+    public static void genrandomGateInpFiles(int numofgates, int numofinp)
+    {
+    }
+    public static void genidealGateInpFiles(int numofgates, int numofinp)
+    {
+        String Filepath;
+        Filepath = Synthetic_Gates.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/MIT/dnacompiler/";
+        }
+        else
+        {
+            Filepath += "MIT/dnacompiler/";
+        }
+        String file_gates = Filepath + "synth_Gates.txt";
+        
+        String file_inp = Filepath + "synth_inducer.txt";
+        
+        File fespgate = new File(file_gates);
+        File fespinp = new File(file_inp);
+        try 
+        {
+            
+            Writer output = new BufferedWriter(new FileWriter(fespgate));
+            Writer outputinp = new BufferedWriter(new FileWriter(fespinp));
+            
+            String line ="";
+            for(int i=0;i<numofgates;i++)
+            {
+                line = "NOTsynth_" + i + " 50.000000 0.025000 0.800000 18\n"; 
+                output.write(line);
+            }
+            output.close();
+            for(int i=0;i<numofinp;i++)
+            {
+                line = "inducerSynth_" + i + " 50.000000 0.025000\n"; 
+                outputinp.write(line);
+            }
+            outputinp.close();
+            
+        
+        } catch (IOException ex) {
+            Logger.getLogger(Synthetic_Gates.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     
-    
+    public static void genExistingGateInpFiles()
+    {
+        String Filepath;
+        Filepath = Synthetic_Gates.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/MIT/dnacompiler/";
+        }
+        else
+        {
+            Filepath += "MIT/dnacompiler/";
+        }
+        String file_gates = Filepath + "synth_Gates.txt";
+        String original_gates = Filepath + "TransferFunc.txt";
+        String file_inp = Filepath + "synth_inducer.txt";
+        String original_inp = Filepath + "InpFunc.txt";
+        
+        BufferedReader brgate;
+	FileReader frgate;
+        BufferedReader brinp;
+	FileReader frinp;
+        int cnt=1;
+        File fespgate = new File(file_gates);
+        File fespinp = new File(file_inp);
+        try 
+        {
+            frgate = new FileReader(original_gates);
+	    brgate = new BufferedReader(frgate);
+            frinp = new FileReader(original_inp);
+	    brinp = new BufferedReader(frinp);
+            Writer output = new BufferedWriter(new FileWriter(fespgate));
+            Writer outputinp = new BufferedWriter(new FileWriter(fespinp));
+            
+            String line ="";
+            while((line = brgate.readLine()) != null ) 
+            {
+                line +="\n";
+                output.write(line);
+            }
+            output.close();
+            while((line = brinp.readLine()) != null ) 
+            {
+                line +="\n";
+                outputinp.write(line);
+            }
+            outputinp.close();
+            
+        
+        } catch (IOException ex) {
+            Logger.getLogger(Synthetic_Gates.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     
     public static void genNotpairs()
