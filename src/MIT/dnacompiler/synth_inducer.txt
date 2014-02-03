@@ -1,5 +1,4 @@
-inducerSyth_0 50.000000 0.025000
-inducerSyth_1 50.000000 0.025000
-inducerSyth_2 50.000000 0.025000
-inducerSyth_3 50.000000 0.025000
-inducerSyth_4 50.000000 0.025000
+inducerSynth_0 50.0 0.065
+inducerSynth_1 6.226 0.25
+inducerSynth_2 50.0 0.25
+inducerSynth_3 9.784 0.065

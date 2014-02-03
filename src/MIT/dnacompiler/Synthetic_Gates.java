@@ -15,6 +15,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +28,136 @@ public class Synthetic_Gates {
     
     public static void genrandomGateInpFiles(int numofgates, int numofinp)
     {
+        List<Double> pmin = new ArrayList<Double>();
+        List<Double> pmax = new ArrayList<Double>();
+        List<Double> kd = new ArrayList<Double>();
+        List<Double> n = new ArrayList<Double>();
+        
+        List<Double> indpmin = new ArrayList<Double>();
+        List<Double> indpmax = new ArrayList<Double>();
+        
+        String Filepath ="";
+        Filepath = Synthetic_Gates.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+       
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/MIT/dnacompiler/";
+        }
+        else
+        {
+            Filepath += "MIT/dnacompiler/";
+        }
+
+	String file_gates = Filepath + "TransferFunc.txt";
+	
+	File gate_file = new File(file_gates);
+	BufferedReader brgate;
+	FileReader frgate;
+	
+	try {
+	    frgate = new FileReader(gate_file);
+	    brgate = new BufferedReader(frgate);
+	    String line;
+	    try 
+            {
+		while((line = brgate.readLine()) != null ) 
+                {
+	            String lines[] = line.split(" ");
+                    //TransferFunction entry = new TransferFunction();
+                    //entry.bgname = lines[0];
+                    pmax.add(Double.parseDouble(lines[1]));
+                    pmin.add(Double.parseDouble(lines[2]));
+                      kd.add(Double.parseDouble(lines[3]));
+                       n.add(Double.parseDouble(lines[4]));
+                }
+	    }
+	    catch (IOException ex) {
+		System.out.println("IOException when reading input file");
+	    }
+	} 
+	catch (FileNotFoundException ex) {
+	    System.out.println("FileNotFoundException when reading input file");
+	}
+        
+        String inp_file = Filepath + "InpFunc.txt";
+	
+	File fileinp = new File(inp_file);
+	BufferedReader brinp;
+	FileReader frinp;
+	
+	try {
+	    frinp = new FileReader(fileinp);
+	    brinp = new BufferedReader(frinp);
+	    String line;
+	    try 
+            {
+		while((line = brinp.readLine()) != null ) 
+                {
+	            String lines[] = line.split(" ");
+                    //TransferFunction entry = new TransferFunction();
+                    //entry.bgname = lines[0];
+                    indpmax.add(Double.parseDouble(lines[1]));
+                    indpmin.add(Double.parseDouble(lines[2]));
+                }
+	    }
+	    catch (IOException ex) {
+		System.out.println("IOException when reading input file");
+	    }
+	} 
+	catch (FileNotFoundException ex) {
+	    System.out.println("FileNotFoundException when reading input file");
+	}
+    
+        String file_gate = Filepath + "synth_Gates.txt";
+        String file_inp = Filepath + "synth_inducer.txt";
+        
+        File fespgate = new File(file_gate);
+        File fespinp = new File(file_inp);
+        try 
+        {
+            
+            Writer output = new BufferedWriter(new FileWriter(fespgate));
+            Writer outputinp = new BufferedWriter(new FileWriter(fespinp));
+            
+            String line ="";
+            Random randg = new Random();
+            Random randinp = new Random();
+                
+            for(int i=0;i<numofgates;i++)
+            {
+                int randpmax = randg.nextInt(pmin.size());
+                int randpmin = randg.nextInt(pmin.size());
+                int randkd = randg.nextInt(pmin.size());
+                int randn = randg.nextInt(pmin.size());
+                
+                
+                line = "NOTsynth_" + i + " " + pmax.get(randpmax) + " "+pmin.get(randpmin) + " " + kd.get(randkd) + " "+ n.get(randn) +"\n"; 
+                output.write(line);
+            }
+            output.close();
+            for(int i=0;i<numofinp;i++)
+            {
+                int randpmax = randinp.nextInt(indpmin.size());
+                int randpmin = randinp.nextInt(indpmin.size());
+                line = "inducerSynth_" + i + " " + indpmax.get(randpmax) + " "+indpmin.get(randpmin) +"\n"; 
+                outputinp.write(line);
+            }
+            outputinp.close();
+            
+        
+        } catch (IOException ex) {
+            Logger.getLogger(Synthetic_Gates.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
+    
+    
+    
     }
+    
     public static void genidealGateInpFiles(int numofgates, int numofinp)
     {
         String Filepath;
@@ -75,7 +205,6 @@ public class Synthetic_Gates {
             Logger.getLogger(Synthetic_Gates.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
     
     public static void genExistingGateInpFiles()
     {
@@ -133,7 +262,6 @@ public class Synthetic_Gates {
             Logger.getLogger(Synthetic_Gates.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
     
     public static void genNotpairs()
     {
@@ -225,6 +353,7 @@ public class Synthetic_Gates {
         
     
     }
+    
     public static void genNortrips()
     {
         HashMap<String,TransferFunction> gatefunctions = new HashMap<String,TransferFunction>();
