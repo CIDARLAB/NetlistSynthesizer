@@ -575,8 +575,5 @@ public class Synthetic_Gates {
         return inpfunctions;
 
     }
-    
-    
-    
-    
+  
 }

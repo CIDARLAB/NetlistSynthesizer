@@ -38,7 +38,7 @@ public class HeuristicSearch {
         
         //Synthetic_Gates.genExistingGateInpFiles();
         //Synthetic_Gates.genidealGateInpFiles(18, 4);
-        Synthetic_Gates.genrandomGateInpFiles(18, 4);
+        //Synthetic_Gates.genrandomGateInpFiles(18, 4);
         
         Synthetic_Gates.genNortrips();
         Synthetic_Gates.genNotpairs();

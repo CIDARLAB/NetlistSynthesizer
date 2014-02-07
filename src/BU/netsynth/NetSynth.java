@@ -98,8 +98,8 @@ public class NetSynth {
         
         //verifyinverse();
         //histogram();
-        DAGW xcasedag = testParser("",0,1);
-        HeuristicSearch.beginSearch(xcasedag, 0.90,0.995,200000,20,0);
+        DAGW xcasedag = testParser("",1,1);
+        //HeuristicSearch.beginSearch(xcasedag, 0.95,1.0,-1,500,0);
         
         //verifyprecomute();
         //DAGraph x = precompute(2);
@@ -335,19 +335,20 @@ public class NetSynth {
             if (circuitDAGinv.Gates.size() > 1 && (inv == 1)) 
             {
                 int gatessize = circuitDAGinv.Gates.size();
-                if (circuitDAGinv.Gates.get(1).Type == "NOR" || circuitDAGinv.Gates.get(1).Type == "NOT") 
+                if (("NOR".equals(circuitDAGinv.Gates.get(1).Type) || "NOT".equals(circuitDAGinv.Gates.get(1).Type)) && (!circuitDAGinv.Gates.get(0).Type.equals(GateType.OUTPUT_OR.toString()))) 
                 {
+                    
                     if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) 
                     {
                         circuitDAG = circuitDAGinv;
                         gatessize = circuitDAGinv.Gates.size();
-                        if(circuitDAG.Gates.get(1).Type == "NOR")
+                        if("NOR".equals(circuitDAG.Gates.get(1).Type))
                         {
                             circuitDAG.Gates.get(1).Type = GateType.OUTPUT_OR.toString();
                             circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
                             circuitDAG.Gates.remove(0);
                         }
-                        else if(circuitDAG.Gates.get(1).Type == "NOT")
+                        else if("NOT".equals(circuitDAG.Gates.get(1).Type))
                         {
                             circuitDAG.Gates.get(1).Type = GateType.OUTPUT.toString();
                             circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
@@ -644,8 +645,14 @@ public class NetSynth {
         List<List<DGate>> precomp;
         precomp = PreCompute.parseNetlistFile();
         DAGW circ = new DAGW();
+        
         circ = CreateDAGW(precomp.get(x));
-
+        for(int i=0;i<precomp.get(x).size();i++)
+            System.out.println(netlist(precomp.get(x).get(i)));
+        
+        for(int i=0;i<circ.Gates.size();i++)
+            System.out.println(circ.Gates.get(i).Name);
+        System.out.println("\n\n");
         outputdag = new DAGW(circ.Gates,circ.Wires);
         return outputdag;
     }
