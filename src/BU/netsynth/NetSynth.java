@@ -98,7 +98,7 @@ public class NetSynth {
         
         //verifyinverse();
         //histogram();
-        DAGW xcasedag = testParser("",1,1);
+        DAGW xcasedag = testParser("",0,0);
         //HeuristicSearch.beginSearch(xcasedag, 0.95,1.0,-1,500,0);
         
         //verifyprecomute();
@@ -448,7 +448,11 @@ public class NetSynth {
             String caseCircttinv;
             caseCircttinv = Convert.invBin(caseCirctt);
             int invval = Convert.bintoDec(caseCircttinv);
+            
             CircuitDetails invcaseCirc = new CircuitDetails(caseCirc.inputNames,caseCirc.outputNames,invval);
+            
+            System.out.println("Main Circuit: " + caseCirctt);
+            System.out.println("Main Circuit: " + caseCircttinv);
             
             eslines = Espresso.createFile(caseCirc);
             eslinesinv = Espresso.createFile(invcaseCirc);
@@ -497,18 +501,18 @@ public class NetSynth {
                 List<DGate> espoutputinv = new ArrayList<DGate>();
                 espoutputinv = parseEspressoToNORNAND(espoutinv);
                 
-                /*System.out.println("\n\n==== CHECKING!!! ====");
+                System.out.println("\n\n==== CHECKING!!! ====");
                 
                 System.out.println("\n==== Primary Circuit ====");
-                System.out.println(BooleanSimulator.bpermute(espoutput));
+                System.out.println(BooleanSimulator.bpermuteEsynth(espoutput));
                 for(DGate dg:espoutput)
                     System.out.println(netlist(dg));
                 
                 System.out.println("\n==== Inverse Circuit ====");
-                System.out.println(BooleanSimulator.bpermute(espoutputinv));
+                System.out.println(BooleanSimulator.bpermuteEsynth(espoutputinv));
                 for(DGate dg:espoutputinv)
                     System.out.println(netlist(dg));
-                */
+                
                 //DAGW circ = computeDAGW(caseCirc.inputgatetable-1);
                 circuitDAG = CreateDAGW(espoutput);
                 //DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable - 1);
@@ -517,7 +521,8 @@ public class NetSynth {
                 if (circuitDAGinv.Gates.size() > 1 && (inv == 1)) {
 
                     int gatessize = circuitDAGinv.Gates.size();
-                    if (circuitDAGinv.Gates.get(1).Type == "NOR" || circuitDAGinv.Gates.get(1).Type == "NOT") {
+                    if (("NOR".equals(circuitDAGinv.Gates.get(1).Type) || "NOT".equals(circuitDAGinv.Gates.get(1).Type)) && (!circuitDAGinv.Gates.get(0).Type.equals(GateType.OUTPUT_OR.toString()))) 
+                    {
                         if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) {
                             //System.out.println("Special Case");
                             circuitDAG = circuitDAGinv;
