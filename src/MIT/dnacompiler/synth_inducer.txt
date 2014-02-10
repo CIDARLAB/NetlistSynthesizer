@@ -1,4 +1,4 @@
-inducerSynth_0 9.784 0.25
-inducerSynth_1 50.0 0.058
-inducerSynth_2 9.784 0.25
-inducerSynth_3 9.784 0.058
+inducer_pTac 6.226 0.058
+inducer_pTetStar 9.784 0.065
+inducer_pBAD 50.0 0.25
+inducer_pLuxStar 50.0 0.25

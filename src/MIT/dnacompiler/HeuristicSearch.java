@@ -36,11 +36,12 @@ public class HeuristicSearch {
     public static void beginSearch(DAGW dagCirc, double cutoff,double maxscore, long maxassign, long outputshift, int fixedinputs)
     {
         
-        //Synthetic_Gates.genExistingGateInpFiles();
+        Synthetic_Gates.genExistingGateInpFiles();
         //Synthetic_Gates.genidealGateInpFiles(18, 4);
         //Synthetic_Gates.genrandomGateInpFiles(18, 4);
-        
-        Synthetic_Gates.genNortrips();
+        List<HashMap<String,String>> roadblockingrules = new ArrayList<HashMap<String,String>>();
+        roadblockingrules = Synthetic_Gates.genRules();
+        Synthetic_Gates.genNortrips(roadblockingrules);
         Synthetic_Gates.genNotpairs();
         
         DAGW_assignment assignmentresult = new DAGW_assignment();
@@ -1804,7 +1805,7 @@ public class HeuristicSearch {
         double term1 = x/kd;
         double term2 = Math.pow(term1, n);
         double term3 = 1 + term2;
-        double term4 = pmax/term3;
+        double term4 = (pmax-pmin)/term3;
         score = pmin + term4;
     
         return score;

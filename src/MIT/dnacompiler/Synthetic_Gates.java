@@ -350,12 +350,71 @@ public class Synthetic_Gates {
         } catch (IOException ex) {
             Logger.getLogger(Synthetic_Gates.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-    
     }
     
-    public static void genNortrips()
+    public static List<HashMap<String,String>> genRules()
     {
+        List<HashMap<String,String>> roadblockingrules = new ArrayList<HashMap<String,String>>();
+        String Filepath ="";
+        HashMap<String,TransferFunction> inpfunctions = new HashMap<String,TransferFunction>();
+        
+	Filepath = Synthetic_Gates.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+       
+        if(Filepath.contains("prashant"))
+        {
+            Filepath += "src/MIT/dnacompiler/";
+        }
+        else
+        {
+            Filepath += "MIT/dnacompiler/";
+        }
+
+	String file_inputs = Filepath + "rules.txt";
+        
+        
+         File fileinp = new File(file_inputs);
+	BufferedReader brinp;
+	FileReader frinp;
+	try {
+	    frinp = new FileReader(fileinp);
+	    brinp = new BufferedReader(frinp);
+	    String line;
+	    try {
+		while((line = brinp.readLine()) != null ) {
+	
+		   if(line.trim().equals("roadblocking pairs"))
+                   {
+                       roadblockingrules = new ArrayList<HashMap<String,String>>();
+                   }
+                   else
+                   {
+                       String pieces[] = line.split(",");
+                       HashMap<String,String> rule = new HashMap<String,String>();
+                       for(int i=0;i<pieces.length;i++)
+                       {
+                           rule.put(pieces[i], pieces[i]);
+                       }
+                       roadblockingrules.add(rule);
+                   }
+		}
+	    }
+	    catch (IOException ex) {
+		System.out.println("IOException when reading input file");
+	    }
+	} 
+	catch (FileNotFoundException ex) {
+	    System.out.println("FileNotFoundException when reading input file");
+	}
+        return roadblockingrules;
+    }
+    
+    public static void genNortrips(List<HashMap<String,String>> roadblockingpairs)
+    {
+        
         HashMap<String,TransferFunction> gatefunctions = new HashMap<String,TransferFunction>();
         HashMap<String,TransferFunction> inpfunctions = new HashMap<String,TransferFunction>();
         
@@ -427,11 +486,26 @@ public class Synthetic_Gates {
                         continue;
                     for(int k=j;k<cnt;k++)
                     {
+                        int ruleflag = 0;
                         if(k==j)
                             continue;
+                        
+                        
                         TransferFunction inp2 = new TransferFunction();
                         inp2 = allgates.get(k);
                         if(inp2.bgname.equals(inp1.bgname) ||  inp2.bgname.equals(out.bgname))
+                            continue;
+                        
+                        for(int m=0;m<roadblockingpairs.size();m++)
+                        {
+                            if(roadblockingpairs.get(m).containsKey(inp1.bgname) && roadblockingpairs.get(m).containsKey(inp2.bgname))
+                            {
+                                ruleflag =1;
+                                break;
+                            }
+                        }
+                        
+                        if(ruleflag ==1)
                             continue;
                         
                         double score00 = HeuristicSearch.ScoreGate(out.pmin, out.pmax, out.kd, out.n, (inp1.pmin + inp2.pmin));
