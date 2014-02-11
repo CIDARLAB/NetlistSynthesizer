@@ -334,6 +334,8 @@ public class Synthetic_Gates {
                     inp1 = allgates.get(j);
                     if(inp1.bgname.equals(out.bgname))
                         continue;
+                    if(inp1.bgfamily.equals(out.bgfamily))
+                        continue;
                     double score0 = HeuristicSearch.ScoreGate(out.pmin, out.pmax, out.kd, out.n, (inp1.pmin));
                     double score1 = HeuristicSearch.ScoreGate(out.pmin, out.pmax, out.kd, out.n, (inp1.pmax));
                     double finalscore = (1 - (score1/score0));
