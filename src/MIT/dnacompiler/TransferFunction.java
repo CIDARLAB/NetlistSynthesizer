@@ -14,6 +14,8 @@ public class TransferFunction {
     public double pmax;
     public double kd;
     public double n;
+    public String bgtype;
     public String bgname;
-    
+    public String bgqualifier;
+    public String bgfamily;
 }

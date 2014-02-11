@@ -99,7 +99,7 @@ public class NetSynth {
         //verifyinverse();
         //histogram();
         DAGW xcasedag = testParser("",1,1);
-        HeuristicSearch.beginSearch(xcasedag, 0.95,1.0,-1,500,0);
+        HeuristicSearch.beginSearch(xcasedag, 0.95,0.95,-1,500,0);
         
         //verifyprecomute();
         //DAGraph x = precompute(2);
@@ -331,7 +331,9 @@ public class NetSynth {
             circuitDAG = new DAGW(circ.Gates,circ.Wires);
             DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable - 1);
             circuitDAGinv = new DAGW(circinv.Gates,circinv.Wires);
+            //System.out.println("Ratatatatatata Circus Afro"+circuitDAG.Gates.get(0).Type.toString());
             
+            //System.out.println("Ratatatatatata Circus"+circuitDAG.Wires.get(0).From.Type.toString());
             if (circuitDAGinv.Gates.size() > 1 && (inv == 1)) 
             {
                 int gatessize = circuitDAGinv.Gates.size();
@@ -346,6 +348,7 @@ public class NetSynth {
                         {
                             circuitDAG.Gates.get(1).Type = GateType.OUTPUT_OR.toString();
                             circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
+                            
                             circuitDAG.Gates.remove(0);
                         }
                         else if("NOT".equals(circuitDAG.Gates.get(1).Type))
@@ -415,7 +418,9 @@ public class NetSynth {
                     inpord.put(gdag.Name.trim(), gdag);
                     //System.out.println(gdag.Name);
                 }
-            } 
+            }
+            
+            
             Collections.sort(inputGates);
             int kk=0;
            
@@ -531,10 +536,12 @@ public class NetSynth {
                                 circuitDAG.Gates.get(1).Type = GateType.OUTPUT_OR.toString();
                                 circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
                                 circuitDAG.Gates.remove(0);
+                                circuitDAG.Wires.remove(0);
                             } else if (circuitDAG.Gates.get(1).Type == "NOT") {
                                 circuitDAG.Gates.get(1).Type = GateType.OUTPUT.toString();
                                 circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
                                 circuitDAG.Gates.remove(0);
+                                circuitDAG.Wires.remove(0);
                             }
                         }
                     }

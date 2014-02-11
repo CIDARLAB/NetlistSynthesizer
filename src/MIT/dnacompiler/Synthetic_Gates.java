@@ -135,7 +135,7 @@ public class Synthetic_Gates {
                 int randn = randg.nextInt(pmin.size());
                 
                 
-                line = "NOTsynth_" + i + " " + pmax.get(randpmax) + " "+pmin.get(randpmin) + " " + kd.get(randkd) + " "+ n.get(randn) +"\n"; 
+                line = "NOT_synth-"+i+" " + pmax.get(randpmax) + " "+pmin.get(randpmin) + " " + kd.get(randkd) + " "+ n.get(randn) +"\n"; 
                 output.write(line);
             }
             output.close();
@@ -143,7 +143,7 @@ public class Synthetic_Gates {
             {
                 int randpmax = randinp.nextInt(indpmin.size());
                 int randpmin = randinp.nextInt(indpmin.size());
-                line = "inducerSynth_" + i + " " + indpmax.get(randpmax) + " "+indpmin.get(randpmin) +"\n"; 
+                line = "inducer_Synth-"+i+" " + indpmax.get(randpmax) + " "+indpmin.get(randpmin) +"\n"; 
                 outputinp.write(line);
             }
             outputinp.close();
@@ -189,13 +189,13 @@ public class Synthetic_Gates {
             String line ="";
             for(int i=0;i<numofgates;i++)
             {
-                line = "NOTsynth_" + i + " 50.000000 0.025000 0.800000 18\n"; 
+                line = "NOT_synth-"+i+" 50.000000 0.025000 0.800000 18\n"; 
                 output.write(line);
             }
             output.close();
             for(int i=0;i<numofinp;i++)
             {
-                line = "inducerSynth_" + i + " 50.000000 0.025000\n"; 
+                line = "inducer_Synth-" +i+" 50.000000 0.025000\n"; 
                 outputinp.write(line);
             }
             outputinp.close();
@@ -484,6 +484,8 @@ public class Synthetic_Gates {
                     inp1 = allgates.get(j);
                     if(inp1.bgname.equals(out.bgname))
                         continue;
+                    if(out.bgfamily.equals(inp1.bgfamily))
+                            continue;
                     for(int k=j;k<cnt;k++)
                     {
                         int ruleflag = 0;
@@ -491,9 +493,12 @@ public class Synthetic_Gates {
                             continue;
                         
                         
+                        
                         TransferFunction inp2 = new TransferFunction();
                         inp2 = allgates.get(k);
                         if(inp2.bgname.equals(inp1.bgname) ||  inp2.bgname.equals(out.bgname))
+                            continue;
+                        if(inp2.bgfamily.equals(out.bgfamily) || inp2.bgfamily.equals(inp1.bgfamily))
                             continue;
                         
                         for(int m=0;m<roadblockingpairs.size();m++)
@@ -577,6 +582,35 @@ public class Synthetic_Gates {
 	            String lines[] = line.split(" ");
                     TransferFunction entry = new TransferFunction();
                     entry.bgname = lines[0];
+                    if(lines[0].contains("_"))
+                    {
+                        String pieces[] = lines[0].split("_");
+                        entry.bgtype = pieces[0];
+                        if(pieces[1].contains("-"))
+                        {
+                            String finalpieces[] = pieces[1].split("-");
+                            entry.bgfamily = finalpieces[1];
+                            entry.bgqualifier = finalpieces[0];
+                        }
+                        else
+                        {
+                            entry.bgfamily = pieces[1];
+                        }
+                    }
+                    else
+                    {
+                        if(lines[0].contains("-"))
+                        {
+                            String finalpieces[] = lines[0].split("-");
+                            entry.bgfamily = finalpieces[1];
+                            entry.bgqualifier = finalpieces[0];
+                        }
+                        else
+                        {
+                            entry.bgfamily = lines[0];
+                        }
+                    }
+                    
                     entry.pmax = Double.parseDouble(lines[1]);
                     entry.pmin = Double.parseDouble(lines[2]);
                     entry.kd = Double.parseDouble(lines[3]);
@@ -634,6 +668,34 @@ public class Synthetic_Gates {
 		    String lines[] = line.split(" ");
                     TransferFunction entry = new TransferFunction();
                     entry.bgname = lines[0];
+                    if(lines[0].contains("_"))
+                    {
+                        String pieces[] = lines[0].split("_");
+                        entry.bgtype = pieces[0];
+                        if(pieces[1].contains("-"))
+                        {
+                            String finalpieces[] = pieces[1].split("-");
+                            entry.bgfamily = finalpieces[1];
+                            entry.bgqualifier = finalpieces[0];
+                        }
+                        else
+                        {
+                            entry.bgfamily = pieces[1];
+                        }
+                    }
+                    else
+                    {
+                        if(lines[0].contains("-"))
+                        {
+                            String finalpieces[] = lines[0].split("-");
+                            entry.bgfamily = finalpieces[1];
+                            entry.bgqualifier = finalpieces[0];
+                        }
+                        else
+                        {
+                            entry.bgfamily = lines[0];
+                        }
+                    }
                     entry.pmax = Double.parseDouble(lines[1]);
                     entry.pmin = Double.parseDouble(lines[2]);
                     inpfunctions.put(entry.bgname, entry);
