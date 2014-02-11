@@ -431,13 +431,122 @@ public class HeuristicSearch {
                                         continue;
                                     
                                     BGateNode subrunner = curr;
+                                    
+                                    
+                                    //<editor-fold desc="Family of bg of bgatecombo">
+                                    String inp1fam="";
+                                    String inp2fam="";
+                                    String outfam="";
+                                    if(xbgc.Out.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Out.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            outfam= fam2[1];
+                                        }
+                                        else
+                                            outfam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Out.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Out.split("-");
+                                            outfam = fam2[1];
+                                        }
+                                        else
+                                            outfam = xbgc.Out;
+                                    }
+                                    
+                                    if(xbgc.Inp1.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Inp1.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp1fam= fam2[1];
+                                        }
+                                        else
+                                            inp1fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Inp1.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Inp1.split("-");
+                                            inp1fam = fam2[1];
+                                        }
+                                        else
+                                            inp1fam = xbgc.Inp1;
+                                    }
+                                    if(xbgc.Inp2.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Inp2.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp2fam= fam2[1];
+                                        }
+                                        else
+                                            inp2fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Inp2.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Inp2.split("-");
+                                            inp2fam = fam2[1];
+                                        }
+                                        else
+                                            inp2fam = xbgc.Inp2;
+                                    }
+                                    //</editor-fold>
+                                    
+                                    
                                     while (subrunner != null) 
                                     {
+                                        
+                                        //<editor-fold desc="Subrunner bgname family">
+                                        String subfam = "";
+                                        if (subrunner.bgname.contains("_")) 
+                                        {
+                                            String fam1[] = subrunner.bgname.split("_");
+                                            if (fam1[1].contains("-")) 
+                                            {
+                                                String fam2[] = fam1[1].split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = fam1[1];
+                                            }
+                                        } 
+                                        else 
+                                        {
+                                            if (subrunner.bgname.contains("-")) 
+                                            {
+                                                String fam2[] = subrunner.bgname.split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = subrunner.bgname;
+                                            }
+                                        }
+                                        //</editor-fold>
+                                        
                                         if (subrunner.bgname.equals(xbgc.Inp1) || subrunner.bgname.equals(xbgc.Inp2) || subrunner.bgname.equals(xbgc.Out)) 
                                         {
                                             comboflag = 0;
                                             break;
                                         }
+                                        if(subfam.equals(outfam)|| subfam.equals(inp1fam)|| subfam.equals(inp2fam))
+                                        {
+                                            comboflag =0;
+                                            break;
+                                        }
+                                        
                                         subrunner = subrunner.parent;
                                     }
                                     if (comboflag == 1) 
@@ -450,17 +559,125 @@ public class HeuristicSearch {
                             {
                                 for (BGateCombo xbgc : norcombo_2_inputs) 
                                 {
+                                    
+                                    
+                                    //<editor-fold desc="Family of bg of bgatecombo">
+                                    String inp1fam="";
+                                    String inp2fam="";
+                                    String outfam="";
+                                    if(xbgc.Out.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Out.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            outfam= fam2[1];
+                                        }
+                                        else
+                                            outfam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Out.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Out.split("-");
+                                            outfam = fam2[1];
+                                        }
+                                        else
+                                            outfam = xbgc.Out;
+                                    }
+                                    
+                                    if(xbgc.Inp1.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Inp1.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp1fam= fam2[1];
+                                        }
+                                        else
+                                            inp1fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Inp1.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Inp1.split("-");
+                                            inp1fam = fam2[1];
+                                        }
+                                        else
+                                            inp1fam = xbgc.Inp1;
+                                    }
+                                    if(xbgc.Inp2.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Inp2.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp2fam= fam2[1];
+                                        }
+                                        else
+                                            inp2fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Inp2.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Inp2.split("-");
+                                            inp2fam = fam2[1];
+                                        }
+                                        else
+                                            inp2fam = xbgc.Inp2;
+                                    }
+                                    //</editor-fold>
+                                    
+                                    
                                     comboflag = 1;
                                     if(childnodeassign.contains(xbgc.Out))
                                         continue;
                                     BGateNode subrunner = curr;
                                     while (subrunner != null) 
                                     {
+                                        
+                                        //<editor-fold desc="Subrunner bgname family">
+                                        String subfam = "";
+                                        if (subrunner.bgname.contains("_")) 
+                                        {
+                                            String fam1[] = subrunner.bgname.split("_");
+                                            if (fam1[1].contains("-")) 
+                                            {
+                                                String fam2[] = fam1[1].split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = fam1[1];
+                                            }
+                                        } 
+                                        else 
+                                        {
+                                            if (subrunner.bgname.contains("-")) 
+                                            {
+                                                String fam2[] = subrunner.bgname.split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = subrunner.bgname;
+                                            }
+                                        }
+                                        //</editor-fold>
+                                        if(subfam.equals(outfam)|| subfam.equals(inp1fam)|| subfam.equals(inp2fam))
+                                        {
+                                            comboflag =0;
+                                            break;
+                                        }
                                         if (subrunner.bgname.equals(xbgc.Inp1) || subrunner.bgname.equals(xbgc.Inp2) || subrunner.bgname.equals(xbgc.Out)) 
                                         {
                                             comboflag = 0;
                                             break;
                                         }
+                                        
                                         subrunner = subrunner.parent;
                                     }
                                     if (comboflag == 1) 
@@ -473,12 +690,120 @@ public class HeuristicSearch {
                             {
                                 for (BGateCombo xbgc : norcombo_0_inputs) 
                                 {
+                                    
+                                    
+                                    //<editor-fold desc="Family of bg of bgatecombo">
+                                    String inp1fam="";
+                                    String inp2fam="";
+                                    String outfam="";
+                                    if(xbgc.Out.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Out.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            outfam= fam2[1];
+                                        }
+                                        else
+                                            outfam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Out.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Out.split("-");
+                                            outfam = fam2[1];
+                                        }
+                                        else
+                                            outfam = xbgc.Out;
+                                    }
+                                    
+                                    if(xbgc.Inp1.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Inp1.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp1fam= fam2[1];
+                                        }
+                                        else
+                                            inp1fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Inp1.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Inp1.split("-");
+                                            inp1fam = fam2[1];
+                                        }
+                                        else
+                                            inp1fam = xbgc.Inp1;
+                                    }
+                                    if(xbgc.Inp2.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Inp2.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp2fam= fam2[1];
+                                        }
+                                        else
+                                            inp2fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Inp2.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Inp2.split("-");
+                                            inp2fam = fam2[1];
+                                        }
+                                        else
+                                            inp2fam = xbgc.Inp2;
+                                    }
+                                    //</editor-fold>
+                                    
+                                    
                                     comboflag = 1;
                                     if(childnodeassign.contains(xbgc.Out))
                                         continue;
                                     BGateNode subrunner = curr;
                                     while (subrunner != null) 
                                     {
+                                        
+                                        //<editor-fold desc="Subrunner bgname family">
+                                        String subfam = "";
+                                        if (subrunner.bgname.contains("_")) 
+                                        {
+                                            String fam1[] = subrunner.bgname.split("_");
+                                            if (fam1[1].contains("-")) 
+                                            {
+                                                String fam2[] = fam1[1].split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = fam1[1];
+                                            }
+                                        } 
+                                        else 
+                                        {
+                                            if (subrunner.bgname.contains("-")) 
+                                            {
+                                                String fam2[] = subrunner.bgname.split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = subrunner.bgname;
+                                            }
+                                        }
+                                        //</editor-fold>
+                                        if(subfam.equals(outfam)|| subfam.equals(inp1fam)|| subfam.equals(inp2fam))
+                                        {
+                                            comboflag =0;
+                                            break;
+                                        }
+                                        
                                         if (subrunner.bgname.equals(xbgc.Inp1) || subrunner.bgname.equals(xbgc.Inp2) || subrunner.bgname.equals(xbgc.Out)) 
                                         {
                                             comboflag = 0;
@@ -512,6 +837,60 @@ public class HeuristicSearch {
                             {
                                 for (BGateCombo xbgc : notcombo_1_input) 
                                 {
+                                    
+                                    
+                                    
+                                    //<editor-fold desc="Family of bg of bgatecombo for NOT combos">
+                                    String inp1fam="";
+                                    
+                                    String outfam="";
+                                    if(xbgc.Out.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Out.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            outfam= fam2[1];
+                                        }
+                                        else
+                                            outfam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Out.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Out.split("-");
+                                            outfam = fam2[1];
+                                        }
+                                        else
+                                            outfam = xbgc.Out;
+                                    }
+                                    
+                                    if(xbgc.Inp1.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Inp1.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp1fam= fam2[1];
+                                        }
+                                        else
+                                            inp1fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Inp1.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Inp1.split("-");
+                                            inp1fam = fam2[1];
+                                        }
+                                        else
+                                            inp1fam = xbgc.Inp1;
+                                    }
+                                    
+                                    //</editor-fold>
+                                    
+                                    
                                     comboflag = 1;
                                     if (childnodeassign.contains(xbgc.Out)) // skip certain values in combos list
                                     {
@@ -521,6 +900,40 @@ public class HeuristicSearch {
                                     
                                         while (subrunner != null) 
                                         {
+                                            
+                                            //<editor-fold desc="Subrunner bgname family">
+                                        String subfam = "";
+                                        if (subrunner.bgname.contains("_")) 
+                                        {
+                                            String fam1[] = subrunner.bgname.split("_");
+                                            if (fam1[1].contains("-")) 
+                                            {
+                                                String fam2[] = fam1[1].split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = fam1[1];
+                                            }
+                                        } 
+                                        else 
+                                        {
+                                            if (subrunner.bgname.contains("-")) 
+                                            {
+                                                String fam2[] = subrunner.bgname.split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = subrunner.bgname;
+                                            }
+                                        }
+                                        //</editor-fold>
+                                            if(subfam.equals(outfam)|| subfam.equals(inp1fam))
+                                            {
+                                                comboflag =0;
+                                                break;
+                                            }
                                             if (subrunner.bgname.equals(xbgc.Inp1) || subrunner.bgname.equals(xbgc.Out)) 
                                             {
                                                 comboflag = 0;
@@ -539,14 +952,103 @@ public class HeuristicSearch {
                             {
                                 for(BGateCombo xbgc : notcombo_0_inputs) 
                                 {
+                                    
+                                    
+                                    //<editor-fold desc="Family of bg of bgatecombo for NOT combos">
+                                    String inp1fam="";
+                                    String outfam="";
+                                    if(xbgc.Out.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Out.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            outfam= fam2[1];
+                                        }
+                                        else
+                                            outfam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Out.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Out.split("-");
+                                            outfam = fam2[1];
+                                        }
+                                        else
+                                            outfam = xbgc.Out;
+                                    }
+                                    
+                                    if(xbgc.Inp1.contains("_"))
+                                    {
+                                        String fam1[] = xbgc.Inp1.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp1fam= fam2[1];
+                                        }
+                                        else
+                                            inp1fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(xbgc.Inp1.contains("-"))
+                                        {
+                                            String fam2[] = xbgc.Inp1.split("-");
+                                            inp1fam = fam2[1];
+                                        }
+                                        else
+                                            inp1fam = xbgc.Inp1;
+                                    }
+                                    
+                                    //</editor-fold>
+                                    
+                                    
+                                    
                                     comboflag = 1;
                                     if (childnodeassign.contains(xbgc.Out)) 
                                     {
                                         continue;
                                     }
                                     BGateNode subrunner = curr;
-                                        while (subrunner != null) {
-                                            if (subrunner.bgname.equals(xbgc.Inp1) || subrunner.bgname.equals(xbgc.Out)) {
+                                        while (subrunner != null) 
+                                        {
+                                            
+                                            //<editor-fold desc="Subrunner bgname family">
+                                        String subfam = "";
+                                        if (subrunner.bgname.contains("_")) 
+                                        {
+                                            String fam1[] = subrunner.bgname.split("_");
+                                            if (fam1[1].contains("-")) 
+                                            {
+                                                String fam2[] = fam1[1].split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = fam1[1];
+                                            }
+                                        } 
+                                        else 
+                                        {
+                                            if (subrunner.bgname.contains("-")) 
+                                            {
+                                                String fam2[] = subrunner.bgname.split("-");
+                                                subfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                subfam = subrunner.bgname;
+                                            }
+                                        }
+                                        //</editor-fold>
+                                            if(subfam.equals(outfam)|| subfam.equals(inp1fam))
+                                            {
+                                                comboflag =0;
+                                                break;
+                                            }
+                                            if (subrunner.bgname.equals(xbgc.Inp1) || subrunner.bgname.equals(xbgc.Out)) 
+                                            {
                                                 comboflag = 0;
                                                 break;
                                             }
@@ -570,15 +1072,64 @@ public class HeuristicSearch {
                             {
                                 Map.Entry pairs = (Map.Entry) itinput.next();
                                 String tempinp = (String) pairs.getKey();
-                                if (!childnodeassign.contains(tempinp)) 
-                                {
+                                String tempinpfam = "";
+                                if (tempinp.contains("_")) {
+                                    String fam1[] = tempinp.split("_");
+                                    if (fam1[1].contains("-")) {
+                                        String fam2[] = fam1[1].split("-");
+                                        tempinpfam = fam2[1];
+                                    } else {
+                                        tempinpfam = fam1[1];
+                                    }
+                                } else {
+                                    if (tempinp.contains("-")) {
+                                        String fam2[] = tempinp.split("-");
+                                        tempinpfam = fam2[1];
+                                    } else {
+                                        tempinpfam = tempinp;
+                                    }
+                                }
+
+
+                                if (!childnodeassign.contains(tempinp)) {
                                     int inpflag = 0;
                                     BGateNode inpbgc = curr;
                                     while (inpbgc != null) 
                                     {
+                                        String inpbgcfam = "";
+                                        if (inpbgc.bgname.contains("_")) 
+                                        {
+                                            String fam1[] = inpbgc.bgname.split("_");
+                                            if (fam1[1].contains("-")) 
+                                            {
+                                                String fam2[] = fam1[1].split("-");
+                                                inpbgcfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                inpbgcfam = fam1[1];
+                                            }
+                                        } 
+                                        else 
+                                        {
+                                            if (inpbgc.bgname.contains("-")) 
+                                            {
+                                                String fam2[] = inpbgc.bgname.split("-");
+                                                inpbgcfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                inpbgcfam = inpbgc.bgname;
+                                            }
+                                        }
                                         if (inpbgc.bgname.equals(tempinp)) 
                                         {
                                             inpflag = 1;
+                                            break;
+                                        }
+                                        if(inpbgcfam.equals(tempinpfam))
+                                        {
+                                            inpflag =1;
                                             break;
                                         }
                                         inpbgc = inpbgc.parent;
@@ -594,12 +1145,65 @@ public class HeuristicSearch {
                             {
                                 Map.Entry pairs = (Map.Entry) itinput.next();
                                 String tempinp = (String) pairs.getKey();
+                                String tempinpfam = "";
+                                if (tempinp.contains("_")) {
+                                    String fam1[] = tempinp.split("_");
+                                    if (fam1[1].contains("-")) {
+                                        String fam2[] = fam1[1].split("-");
+                                        tempinpfam = fam2[1];
+                                    } else {
+                                        tempinpfam = fam1[1];
+                                    }
+                                } else {
+                                    if (tempinp.contains("-")) {
+                                        String fam2[] = tempinp.split("-");
+                                        tempinpfam = fam2[1];
+                                    } else {
+                                        tempinpfam = tempinp;
+                                    }
+                                }
                                 if (!childnodeassign.contains(tempinp)) 
                                 {
                                     int inpflag = 0;
                                     BGateNode inpbgc = curr;
                                     while (inpbgc != null) 
                                     {
+                                        String inpbgcfam = "";
+                                        if (inpbgc.bgname.contains("_")) 
+                                        {
+                                            String fam1[] = inpbgc.bgname.split("_");
+                                            if (fam1[1].contains("-")) 
+                                            {
+                                                String fam2[] = fam1[1].split("-");
+                                                inpbgcfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                inpbgcfam = fam1[1];
+                                            }
+                                        } 
+                                        else 
+                                        {
+                                            if (inpbgc.bgname.contains("-")) 
+                                            {
+                                                String fam2[] = inpbgc.bgname.split("-");
+                                                inpbgcfam = fam2[1];
+                                            } 
+                                            else 
+                                            {
+                                                inpbgcfam = inpbgc.bgname;
+                                            }
+                                        }
+                                        if (inpbgc.bgname.equals(tempinp)) 
+                                        {
+                                            inpflag = 1;
+                                            break;
+                                        }
+                                        if(inpbgcfam.equals(tempinpfam))
+                                        {
+                                            inpflag =1;
+                                            break;
+                                        }
                                         if (inpbgc.bgname.equals(tempinp)) 
                                         {
                                             inpflag = 1;
@@ -693,6 +1297,82 @@ public class HeuristicSearch {
                                 for(BGateCombo bgc:norcombos)
                                 {
                                     
+                                    
+                                    
+                                    //<editor-fold desc="Family of bg of bgatecombo">
+                                    String inp1fam="";
+                                    String inp2fam="";
+                                    String outfam="";
+                                    if(bgc.Out.contains("_"))
+                                    {
+                                        String fam1[] = bgc.Out.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            outfam= fam2[1];
+                                        }
+                                        else
+                                            outfam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(bgc.Out.contains("-"))
+                                        {
+                                            String fam2[] = bgc.Out.split("-");
+                                            outfam = fam2[1];
+                                        }
+                                        else
+                                            outfam = bgc.Out;
+                                    }
+                                    
+                                    if(bgc.Inp1.contains("_"))
+                                    {
+                                        String fam1[] = bgc.Inp1.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp1fam= fam2[1];
+                                        }
+                                        else
+                                            inp1fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(bgc.Inp1.contains("-"))
+                                        {
+                                            String fam2[] = bgc.Inp1.split("-");
+                                            inp1fam = fam2[1];
+                                        }
+                                        else
+                                            inp1fam = bgc.Inp1;
+                                    }
+                                    if(bgc.Inp2.contains("_"))
+                                    {
+                                        String fam1[] = bgc.Inp2.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp2fam= fam2[1];
+                                        }
+                                        else
+                                            inp2fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(bgc.Inp2.contains("-"))
+                                        {
+                                            String fam2[] = bgc.Inp2.split("-");
+                                            inp2fam = fam2[1];
+                                        }
+                                        else
+                                            inp2fam = bgc.Inp2;
+                                    }
+                                    //</editor-fold>
+                                    
+                                    
+                                    
+                                    
+                                    
                                     //<editor-fold desc="one of the inputs has been assigned already">
                                     if(found ==1) // one of the inputs has been assigned already
                                     {
@@ -714,6 +1394,41 @@ public class HeuristicSearch {
                                                             BGateNode inprunner = curr;
                                                             while(inprunner!=null)
                                                             {
+                                                                
+                                                                
+                                                                //<editor-fold desc="inprunner family">
+                                                                String inprunnerfam ="";
+                                                                if(inprunner.bgname.contains("_"))
+                                                                {
+                                                                    String fam1[] = inprunner.bgname.split("_");
+                                                                    if(fam1[1].contains("-"))
+                                                                    {
+                                                                        String fam2[]= fam1[1].split("-");
+                                                                        inprunnerfam = fam2[1];
+                                                                    }
+                                                                    else
+                                                                        inprunnerfam = fam1[1];
+                                                                }
+                                                                else 
+                                                                {
+                                                                    if(inprunner.bgname.contains("-"))
+                                                                    {
+                                                                        String fam2[] = inprunner.bgname.split("-");
+                                                                        inprunnerfam = fam2[1];
+                                                                    }
+                                                                    else 
+                                                                        inprunnerfam = inprunner.bgname;
+                                                                }
+                                                                
+                                                                
+                                                                //</editor-fold>
+                                                                
+                                                                if(inprunnerfam.equals(inp2fam))
+                                                                {
+                                                                    inpflag=1;
+                                                                    break;
+                                                                }
+                                                                
                                                                 if(inprunner.bgname.equals(bgc.Inp2))
                                                                 {
                                                                     inpflag =1;
@@ -738,6 +1453,42 @@ public class HeuristicSearch {
                                                             BGateNode inprunner = curr;
                                                             while(inprunner!=null)
                                                             {
+                                                                
+                                                                
+                                                                //<editor-fold desc="inprunner family">
+                                                                String inprunnerfam ="";
+                                                                if(inprunner.bgname.contains("_"))
+                                                                {
+                                                                    String fam1[] = inprunner.bgname.split("_");
+                                                                    if(fam1[1].contains("-"))
+                                                                    {
+                                                                        String fam2[]= fam1[1].split("-");
+                                                                        inprunnerfam = fam2[1];
+                                                                    }
+                                                                    else
+                                                                        inprunnerfam = fam1[1];
+                                                                }
+                                                                else 
+                                                                {
+                                                                    if(inprunner.bgname.contains("-"))
+                                                                    {
+                                                                        String fam2[] = inprunner.bgname.split("-");
+                                                                        inprunnerfam = fam2[1];
+                                                                    }
+                                                                    else 
+                                                                        inprunnerfam = inprunner.bgname;
+                                                                }
+                                                                
+                                                                
+                                                                //</editor-fold>
+                                                                
+                                                                if(inprunnerfam.equals(inp1fam))
+                                                                {
+                                                                    inpflag=1;
+                                                                    break;
+                                                                }
+                                                                
+                                                                
                                                                 if(inprunner.bgname.equals(bgc.Inp1))
                                                                 {
                                                                     inpflag =1;
@@ -768,6 +1519,41 @@ public class HeuristicSearch {
                                                    BGateNode inprunner = curr;
                                                    while(inprunner!=null)
                                                    {
+                                                       
+                                                       
+                                                                //<editor-fold desc="inprunner family">
+                                                                String inprunnerfam ="";
+                                                                if(inprunner.bgname.contains("_"))
+                                                                {
+                                                                    String fam1[] = inprunner.bgname.split("_");
+                                                                    if(fam1[1].contains("-"))
+                                                                    {
+                                                                        String fam2[]= fam1[1].split("-");
+                                                                        inprunnerfam = fam2[1];
+                                                                    }
+                                                                    else
+                                                                        inprunnerfam = fam1[1];
+                                                                }
+                                                                else 
+                                                                {
+                                                                    if(inprunner.bgname.contains("-"))
+                                                                    {
+                                                                        String fam2[] = inprunner.bgname.split("-");
+                                                                        inprunnerfam = fam2[1];
+                                                                    }
+                                                                    else 
+                                                                        inprunnerfam = inprunner.bgname;
+                                                                }
+                                                                
+                                                                
+                                                                //</editor-fold>
+                                                                
+                                                                if(inprunnerfam.equals(inp2fam))
+                                                                {
+                                                                    inpflag=1;
+                                                                    break;
+                                                                }
+                                                       
                                                        if(inprunner.bgname.equals(bgc.Inp2))
                                                        {
                                                            inpflag =1;
@@ -789,6 +1575,42 @@ public class HeuristicSearch {
                                                         BGateNode inprunner = curr;
                                                         while (inprunner != null) 
                                                         {
+                                                            
+                                                            
+                                                                //<editor-fold desc="inprunner family">
+                                                                String inprunnerfam ="";
+                                                                if(inprunner.bgname.contains("_"))
+                                                                {
+                                                                    String fam1[] = inprunner.bgname.split("_");
+                                                                    if(fam1[1].contains("-"))
+                                                                    {
+                                                                        String fam2[]= fam1[1].split("-");
+                                                                        inprunnerfam = fam2[1];
+                                                                    }
+                                                                    else
+                                                                        inprunnerfam = fam1[1];
+                                                                }
+                                                                else 
+                                                                {
+                                                                    if(inprunner.bgname.contains("-"))
+                                                                    {
+                                                                        String fam2[] = inprunner.bgname.split("-");
+                                                                        inprunnerfam = fam2[1];
+                                                                    }
+                                                                    else 
+                                                                        inprunnerfam = inprunner.bgname;
+                                                                }
+                                                                
+                                                                
+                                                                //</editor-fold>
+                                                                
+                                                                if(inprunnerfam.equals(inp1fam))
+                                                                {
+                                                                    inpflag=1;
+                                                                    break;
+                                                                }
+                                                            
+                                                            
                                                             if (inprunner.bgname.equals(bgc.Inp1)) 
                                                             {
                                                                 inpflag = 1;
@@ -824,6 +1646,63 @@ public class HeuristicSearch {
                                                 {
                                                     for (BGateCombo nbcg : norcombo_1_input) //move this!!
                                                     {
+                                                        
+                                                        
+                                                        //<editor-fold desc="Family of bg of bgatecombo NCB combos">
+                                                        String nbcinp1fam = "";
+                                                        String nbcinp2fam = "";
+                                                        String nbcoutfam = "";
+                                                        if (nbcg.Out.contains("_")) {
+                                                            String fam1[] = nbcg.Out.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Out.contains("-")) {
+                                                                String fam2[] = nbcg.Out.split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = nbcg.Out;
+                                                            }
+                                                        }
+
+                                                        if (nbcg.Inp1.contains("_")) {
+                                                            String fam1[] = nbcg.Inp1.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Inp1.contains("-")) {
+                                                                String fam2[] = nbcg.Inp1.split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = nbcg.Inp1;
+                                                            }
+                                                        }
+                                                        if (nbcg.Inp2.contains("_")) {
+                                                            String fam1[] = nbcg.Inp2.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcinp2fam = fam2[1];
+                                                            } else {
+                                                                nbcinp2fam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Inp2.contains("-")) {
+                                                                String fam2[] = nbcg.Inp2.split("-");
+                                                                nbcinp2fam = fam2[1];
+                                                            } else {
+                                                                nbcinp2fam = nbcg.Inp2;
+                                                            }
+                                                        }
+                                                        //</editor-fold>
+                                                        
                                                         if (childnodeassign.contains(xtempn)) 
                                                         {
                                                             continue;
@@ -834,6 +1713,41 @@ public class HeuristicSearch {
                                                             BGateNode deeprunner = curr;
                                                             while (deeprunner != null) 
                                                             {
+                                                                
+                                                                //<editor-fold desc="deeprunner fam">
+                                                                String deeprunnerfam ="";
+                                                                if(deeprunner.bgname.contains("_"))
+                                                                {
+                                                                    String fam1[] = deeprunner.bgname.split("_");
+                                                                    if(fam1[1].contains("-"))
+                                                                    {
+                                                                        String fam2[] = fam1[1].split("-");
+                                                                        deeprunnerfam =fam2[1];
+                                                                    }
+                                                                    else 
+                                                                    {
+                                                                        deeprunnerfam = fam1[1];
+                                                                    }
+                                                                }
+                                                                else 
+                                                                {
+                                                                    if(deeprunner.bgname.contains("-"))
+                                                                    {
+                                                                        String fam2[] = deeprunner.bgname.split("-");
+                                                                        deeprunnerfam = fam2[1];
+                                                                    }
+                                                                    else 
+                                                                        deeprunnerfam = deeprunner.bgname;
+                                                                }
+                                                                
+                                                                //</editor-fold>
+                                                                
+                                                                if(deeprunnerfam.equals(nbcoutfam) || deeprunnerfam.equals(nbcinp1fam) || deeprunnerfam.equals(nbcinp2fam))
+                                                                {
+                                                                    deepflag =0;
+                                                                    break;
+                                                                }
+                                                                
                                                                 if (deeprunner.bgname.equals(nbcg.Out) || deeprunner.bgname.equals(nbcg.Inp1) || deeprunner.bgname.equals(nbcg.Inp2)) 
                                                                 {
                                                                     deepflag = 0;
@@ -852,6 +1766,63 @@ public class HeuristicSearch {
                                                 {
                                                     for (BGateCombo nbcg : norcombo_2_inputs) //move this!!
                                                     {
+                                                        
+                                                        
+                                                        //<editor-fold desc="Family of bg of bgatecombo NCB combos">
+                                                        String nbcinp1fam = "";
+                                                        String nbcinp2fam = "";
+                                                        String nbcoutfam = "";
+                                                        if (nbcg.Out.contains("_")) {
+                                                            String fam1[] = nbcg.Out.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Out.contains("-")) {
+                                                                String fam2[] = nbcg.Out.split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = nbcg.Out;
+                                                            }
+                                                        }
+
+                                                        if (nbcg.Inp1.contains("_")) {
+                                                            String fam1[] = nbcg.Inp1.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Inp1.contains("-")) {
+                                                                String fam2[] = nbcg.Inp1.split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = nbcg.Inp1;
+                                                            }
+                                                        }
+                                                        if (nbcg.Inp2.contains("_")) {
+                                                            String fam1[] = nbcg.Inp2.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcinp2fam = fam2[1];
+                                                            } else {
+                                                                nbcinp2fam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Inp2.contains("-")) {
+                                                                String fam2[] = nbcg.Inp2.split("-");
+                                                                nbcinp2fam = fam2[1];
+                                                            } else {
+                                                                nbcinp2fam = nbcg.Inp2;
+                                                            }
+                                                        }
+                                                        //</editor-fold>
+                                                        
                                                         if (childnodeassign.contains(xtempn)) 
                                                         {
                                                             continue;
@@ -862,6 +1833,44 @@ public class HeuristicSearch {
                                                             BGateNode deeprunner = curr;
                                                             while (deeprunner != null) 
                                                             {
+                                                                
+                                                                
+                                                                //<editor-fold desc="deeprunner fam">
+                                                                String deeprunnerfam ="";
+                                                                if(deeprunner.bgname.contains("_"))
+                                                                {
+                                                                    String fam1[] = deeprunner.bgname.split("_");
+                                                                    if(fam1[1].contains("-"))
+                                                                    {
+                                                                        String fam2[] = fam1[1].split("-");
+                                                                        deeprunnerfam =fam2[1];
+                                                                    }
+                                                                    else 
+                                                                    {
+                                                                        deeprunnerfam = fam1[1];
+                                                                    }
+                                                                }
+                                                                else 
+                                                                {
+                                                                    if(deeprunner.bgname.contains("-"))
+                                                                    {
+                                                                        String fam2[] = deeprunner.bgname.split("-");
+                                                                        deeprunnerfam = fam2[1];
+                                                                    }
+                                                                    else 
+                                                                        deeprunnerfam = deeprunner.bgname;
+                                                                }
+                                                                
+                                                                //</editor-fold>
+                                                                
+                                                                if(deeprunnerfam.equals(nbcoutfam) || deeprunnerfam.equals(nbcinp1fam) || deeprunnerfam.equals(nbcinp2fam))
+                                                                {
+                                                                    deepflag =0;
+                                                                    break;
+                                                                }
+                                                                
+                                                                
+                                                                
                                                                 if (deeprunner.bgname.equals(nbcg.Out) || deeprunner.bgname.equals(nbcg.Inp1) || deeprunner.bgname.equals(nbcg.Inp2)) 
                                                                 {
                                                                     deepflag = 0;
@@ -881,6 +1890,64 @@ public class HeuristicSearch {
                                                 {
                                                     for (BGateCombo nbcg : norcombo_0_inputs) //move this!!
                                                     {
+                                                        
+                                                        
+                                                        //<editor-fold desc="Family of bg of bgatecombo NCB combos">
+                                                        String nbcinp1fam = "";
+                                                        String nbcinp2fam = "";
+                                                        String nbcoutfam = "";
+                                                        if (nbcg.Out.contains("_")) {
+                                                            String fam1[] = nbcg.Out.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Out.contains("-")) {
+                                                                String fam2[] = nbcg.Out.split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = nbcg.Out;
+                                                            }
+                                                        }
+
+                                                        if (nbcg.Inp1.contains("_")) {
+                                                            String fam1[] = nbcg.Inp1.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Inp1.contains("-")) {
+                                                                String fam2[] = nbcg.Inp1.split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = nbcg.Inp1;
+                                                            }
+                                                        }
+                                                        if (nbcg.Inp2.contains("_")) {
+                                                            String fam1[] = nbcg.Inp2.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcinp2fam = fam2[1];
+                                                            } else {
+                                                                nbcinp2fam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Inp2.contains("-")) {
+                                                                String fam2[] = nbcg.Inp2.split("-");
+                                                                nbcinp2fam = fam2[1];
+                                                            } else {
+                                                                nbcinp2fam = nbcg.Inp2;
+                                                            }
+                                                        }
+                                                        //</editor-fold>
+                                                        
+                                                        
                                                         if (childnodeassign.contains(xtempn)) 
                                                         {
                                                             continue;
@@ -891,6 +1958,43 @@ public class HeuristicSearch {
                                                             BGateNode deeprunner = curr;
                                                             while (deeprunner != null) 
                                                             {
+                                                                
+                                                                
+                                                                //<editor-fold desc="deeprunner fam">
+                                                                String deeprunnerfam ="";
+                                                                if(deeprunner.bgname.contains("_"))
+                                                                {
+                                                                    String fam1[] = deeprunner.bgname.split("_");
+                                                                    if(fam1[1].contains("-"))
+                                                                    {
+                                                                        String fam2[] = fam1[1].split("-");
+                                                                        deeprunnerfam =fam2[1];
+                                                                    }
+                                                                    else 
+                                                                    {
+                                                                        deeprunnerfam = fam1[1];
+                                                                    }
+                                                                }
+                                                                else 
+                                                                {
+                                                                    if(deeprunner.bgname.contains("-"))
+                                                                    {
+                                                                        String fam2[] = deeprunner.bgname.split("-");
+                                                                        deeprunnerfam = fam2[1];
+                                                                    }
+                                                                    else 
+                                                                        deeprunnerfam = deeprunner.bgname;
+                                                                }
+                                                                
+                                                                //</editor-fold>
+                                                                
+                                                                if(deeprunnerfam.equals(nbcoutfam) || deeprunnerfam.equals(nbcinp1fam) || deeprunnerfam.equals(nbcinp2fam))
+                                                                {
+                                                                    deepflag =0;
+                                                                    break;
+                                                                }
+                                                                
+                                                                
                                                                 if (deeprunner.bgname.equals(nbcg.Out) || deeprunner.bgname.equals(nbcg.Inp1) || deeprunner.bgname.equals(nbcg.Inp2)) 
                                                                 {
                                                                     deepflag = 0;
@@ -926,6 +2030,51 @@ public class HeuristicSearch {
                                                 {
                                                     for (BGateCombo nbcg : notcombo_1_input) //move this
                                                     {
+                                                        
+                                                        
+                                                        
+                                                        //<editor-fold desc="Family of bg of bgatecombo NCB NOT combos ">
+                                                        String nbcinp1fam = "";
+                                                      
+                                                        String nbcoutfam = "";
+                                                        if (nbcg.Out.contains("_")) {
+                                                            String fam1[] = nbcg.Out.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Out.contains("-")) {
+                                                                String fam2[] = nbcg.Out.split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = nbcg.Out;
+                                                            }
+                                                        }
+
+                                                        if (nbcg.Inp1.contains("_")) {
+                                                            String fam1[] = nbcg.Inp1.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Inp1.contains("-")) {
+                                                                String fam2[] = nbcg.Inp1.split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = nbcg.Inp1;
+                                                            }
+                                                        }
+                                                        
+                                                        //</editor-fold>
+                                                        
+                                                        
+                                                        
                                                         deepflag = 1;
                                                         if (childnodeassign.contains(xtempn)) 
                                                         {
@@ -936,8 +2085,44 @@ public class HeuristicSearch {
                                                             BGateNode deeprunner = curr;
                                                             while (deeprunner != null) 
                                                             {
-                                                                if (deeprunner.bgname.equals(nbcg.Out) || deeprunner.bgname.equals(nbcg.Inp1)) 
+                                                                
+                                                                //<editor-fold desc="deeprunner fam NOT gates">
+                                                                String deeprunnerfam ="";
+                                                                if(deeprunner.bgname.contains("_"))
                                                                 {
+                                                                    String fam1[] = deeprunner.bgname.split("_");
+                                                                    if(fam1[1].contains("-"))
+                                                                    {
+                                                                        String fam2[] = fam1[1].split("-");
+                                                                        deeprunnerfam =fam2[1];
+                                                                    }
+                                                                    else 
+                                                                    {
+                                                                        deeprunnerfam = fam1[1];
+                                                                    }
+                                                                }
+                                                                else 
+                                                                {
+                                                                    if(deeprunner.bgname.contains("-"))
+                                                                    {
+                                                                        String fam2[] = deeprunner.bgname.split("-");
+                                                                        deeprunnerfam = fam2[1];
+                                                                    }
+                                                                    else 
+                                                                        deeprunnerfam = deeprunner.bgname;
+                                                                }
+                                                                
+                                                                //</editor-fold>
+                                                                
+                                                                if(deeprunnerfam.equals(nbcoutfam) || deeprunnerfam.equals(nbcinp1fam))
+                                                                {
+                                                                    deepflag =0;
+                                                                    break;
+                                                                }
+                                                                
+                                                                if (deeprunner.bgname.equals(nbcg.Out) || deeprunner.bgname.equals(nbcg.Inp1)) 
+                                                                {                                                                       
+                                                                    
                                                                     deepflag = 0;
                                                                     break;
                                                                 }
@@ -954,6 +2139,48 @@ public class HeuristicSearch {
                                                 {
                                                     for (BGateCombo nbcg : notcombo_0_inputs) //move this
                                                     {
+                                                        
+                                                        //<editor-fold desc="Family of bg of bgatecombo NCB NOT combos ">
+                                                        String nbcinp1fam = "";
+                                                      
+                                                        String nbcoutfam = "";
+                                                        if (nbcg.Out.contains("_")) {
+                                                            String fam1[] = nbcg.Out.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Out.contains("-")) {
+                                                                String fam2[] = nbcg.Out.split("-");
+                                                                nbcoutfam = fam2[1];
+                                                            } else {
+                                                                nbcoutfam = nbcg.Out;
+                                                            }
+                                                        }
+
+                                                        if (nbcg.Inp1.contains("_")) {
+                                                            String fam1[] = nbcg.Inp1.split("_");
+                                                            if (fam1[1].contains("-")) {
+                                                                String fam2[] = fam1[1].split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = fam1[1];
+                                                            }
+                                                        } else {
+                                                            if (nbcg.Inp1.contains("-")) {
+                                                                String fam2[] = nbcg.Inp1.split("-");
+                                                                nbcinp1fam = fam2[1];
+                                                            } else {
+                                                                nbcinp1fam = nbcg.Inp1;
+                                                            }
+                                                        }
+                                                        
+                                                        //</editor-fold>
+                                                        
+                                                        
                                                         deepflag = 1;
                                                         if (childnodeassign.contains(xtempn)) 
                                                         {
@@ -964,6 +2191,43 @@ public class HeuristicSearch {
                                                             BGateNode deeprunner = curr;
                                                             while (deeprunner != null) 
                                                             {
+                                                                
+                                                                
+                                                                //<editor-fold desc="deeprunner fam NOT gates">
+                                                                String deeprunnerfam ="";
+                                                                if(deeprunner.bgname.contains("_"))
+                                                                {
+                                                                    String fam1[] = deeprunner.bgname.split("_");
+                                                                    if(fam1[1].contains("-"))
+                                                                    {
+                                                                        String fam2[] = fam1[1].split("-");
+                                                                        deeprunnerfam =fam2[1];
+                                                                    }
+                                                                    else 
+                                                                    {
+                                                                        deeprunnerfam = fam1[1];
+                                                                    }
+                                                                }
+                                                                else 
+                                                                {
+                                                                    if(deeprunner.bgname.contains("-"))
+                                                                    {
+                                                                        String fam2[] = deeprunner.bgname.split("-");
+                                                                        deeprunnerfam = fam2[1];
+                                                                    }
+                                                                    else 
+                                                                        deeprunnerfam = deeprunner.bgname;
+                                                                }
+                                                                
+                                                                //</editor-fold>
+                                                                
+                                                                if(deeprunnerfam.equals(nbcoutfam) || deeprunnerfam.equals(nbcinp1fam))
+                                                                {
+                                                                    deepflag =0;
+                                                                    break;
+                                                                }
+                                                                
+                                                                
                                                                 if (deeprunner.bgname.equals(nbcg.Out) || deeprunner.bgname.equals(nbcg.Inp1)) 
                                                                 {
                                                                     deepflag = 0;
@@ -1053,6 +2317,62 @@ public class HeuristicSearch {
                                                             { // 1 inducer
                                                                 for(BGateCombo deepbgc: norcombo_1_input)
                                                                 {
+                                                                    
+                                                                    //<editor-fold desc="Family of bg of bgatecombo DeepBGC combos">
+                                                                    String deepbgcinp1fam = "";
+                                                                    String deepbgcinp2fam = "";
+                                                                    String deepbgcoutfam = "";
+                                                                    if (deepbgc.Out.contains("_")) {
+                                                                        String fam1[] = deepbgc.Out.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Out.contains("-")) {
+                                                                            String fam2[] = deepbgc.Out.split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = deepbgc.Out;
+                                                                        }
+                                                                    }
+
+                                                                    if (deepbgc.Inp1.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp1.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp1.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp1.split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = deepbgc.Inp1;
+                                                                        }
+                                                                    }
+                                                                    if (deepbgc.Inp2.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp2.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp2.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp2.split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = deepbgc.Inp2;
+                                                                        }
+                                                                    }
+                                                                    //</editor-fold>
+
                                                                     flaginp1 =1;
                                                                     flaginp2 =1;
                                                                     if(deepbgc.Out.equals(bgc.Inp1))
@@ -1060,6 +2380,35 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam) || finalrunnerfam.equals(deepbgcinp2fam)) {
+                                                                                flaginp1 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
                                                                             {
                                                                                 flaginp1=0;
@@ -1078,6 +2427,33 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam) || finalrunnerfam.equals(deepbgcinp2fam)) {
+                                                                                flaginp2 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
                                                                             {
                                                                                 flaginp2=0;
@@ -1097,6 +2473,63 @@ public class HeuristicSearch {
                                                             { // 2 inducers
                                                                 for(BGateCombo deepbgc: norcombo_2_inputs)
                                                                 {
+                                                                    
+                                                                    //<editor-fold desc="Family of bg of bgatecombo DeepBGC combos">
+                                                                    String deepbgcinp1fam = "";
+                                                                    String deepbgcinp2fam = "";
+                                                                    String deepbgcoutfam = "";
+                                                                    if (deepbgc.Out.contains("_")) {
+                                                                        String fam1[] = deepbgc.Out.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Out.contains("-")) {
+                                                                            String fam2[] = deepbgc.Out.split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = deepbgc.Out;
+                                                                        }
+                                                                    }
+
+                                                                    if (deepbgc.Inp1.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp1.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp1.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp1.split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = deepbgc.Inp1;
+                                                                        }
+                                                                    }
+                                                                    if (deepbgc.Inp2.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp2.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp2.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp2.split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = deepbgc.Inp2;
+                                                                        }
+                                                                    }
+                                                                    //</editor-fold>
+
+                                                                    
                                                                     flaginp1 =1;
                                                                     flaginp2 =1;
                                                                     if(deepbgc.Out.equals(bgc.Inp1))
@@ -1104,6 +2537,36 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam) || finalrunnerfam.equals(deepbgcinp2fam)) {
+                                                                                flaginp1 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
+                                                                            
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
                                                                             {
                                                                                 flaginp1=0;
@@ -1122,6 +2585,33 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam) || finalrunnerfam.equals(deepbgcinp2fam)) {
+                                                                                flaginp2 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
                                                                             {
                                                                                 flaginp2=0;
@@ -1142,6 +2632,64 @@ public class HeuristicSearch {
                                                             { // 0 inducer
                                                                 for(BGateCombo deepbgc: norcombo_0_inputs)
                                                                 {
+                                                                    
+                                                                    //<editor-fold desc="Family of bg of bgatecombo DeepBGC combos">
+                                                                    String deepbgcinp1fam = "";
+                                                                    String deepbgcinp2fam = "";
+                                                                    String deepbgcoutfam = "";
+                                                                    if (deepbgc.Out.contains("_")) {
+                                                                        String fam1[] = deepbgc.Out.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Out.contains("-")) {
+                                                                            String fam2[] = deepbgc.Out.split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = deepbgc.Out;
+                                                                        }
+                                                                    }
+
+                                                                    if (deepbgc.Inp1.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp1.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp1.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp1.split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = deepbgc.Inp1;
+                                                                        }
+                                                                    }
+                                                                    if (deepbgc.Inp2.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp2.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp2.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp2.split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = deepbgc.Inp2;
+                                                                        }
+                                                                    }
+                                                                    //</editor-fold>
+
+                                                                    
+                                                                    
                                                                     flaginp1 =1;
                                                                     flaginp2 =1;
                                                                     if(deepbgc.Out.equals(bgc.Inp1))
@@ -1149,6 +2697,34 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam) || finalrunnerfam.equals(deepbgcinp2fam)) {
+                                                                                flaginp1 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
                                                                             {
                                                                                 flaginp1=0;
@@ -1167,6 +2743,35 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam) || finalrunnerfam.equals(deepbgcinp2fam)) {
+                                                                                flaginp2 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
                                                                             {
                                                                                 flaginp2=0;
@@ -1198,6 +2803,50 @@ public class HeuristicSearch {
                                                     { // 1 inducer
                                                         for (BGateCombo deepbgc : notcombo_1_input) 
                                                         {
+                                                            
+                                                            //<editor-fold desc="Family of bg of bgatecombo DeepBGC NOT combos">
+                                                            String deepbgcinp1fam = "";
+
+                                                            String deepbgcoutfam = "";
+                                                            if (deepbgc.Out.contains("_")) {
+                                                                String fam1[] = deepbgc.Out.split("_");
+                                                                if (fam1[1].contains("-")) {
+                                                                    String fam2[] = fam1[1].split("-");
+                                                                    deepbgcoutfam = fam2[1];
+                                                                } else {
+                                                                    deepbgcoutfam = fam1[1];
+                                                                }
+                                                            } else {
+                                                                if (deepbgc.Out.contains("-")) {
+                                                                    String fam2[] = deepbgc.Out.split("-");
+                                                                    deepbgcoutfam = fam2[1];
+                                                                } else {
+                                                                    deepbgcoutfam = deepbgc.Out;
+                                                                }
+                                                            }
+
+                                                            if (deepbgc.Inp1.contains("_")) {
+                                                                String fam1[] = deepbgc.Inp1.split("_");
+                                                                if (fam1[1].contains("-")) {
+                                                                    String fam2[] = fam1[1].split("-");
+                                                                    deepbgcinp1fam = fam2[1];
+                                                                } else {
+                                                                    deepbgcinp1fam = fam1[1];
+                                                                }
+                                                            } else {
+                                                                if (deepbgc.Inp1.contains("-")) {
+                                                                    String fam2[] = deepbgc.Inp1.split("-");
+                                                                    deepbgcinp1fam = fam2[1];
+                                                                } else {
+                                                                    deepbgcinp1fam = deepbgc.Inp1;
+                                                                }
+                                                            }
+
+                                                            //</editor-fold>
+                                                            
+
+
+                                                            
                                                             flaginp1 =1;
                                                             flaginp2 =1;
                                                             if (deepbgc.Out.equals(bgc.Inp1)) 
@@ -1205,6 +2854,34 @@ public class HeuristicSearch {
                                                                 BGateNode finalrunner = curr;
                                                                 while(finalrunner!=null)
                                                                 {
+                                                                    
+                                                                    //<editor-fold desc="finalrunner fam NOT">
+                                                                    String finalrunnerfam = "";
+                                                                    if (finalrunner.bgname.contains("_")) {
+                                                                        String fam1[] = finalrunner.bgname.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (finalrunner.bgname.contains("-")) {
+                                                                            String fam2[] = finalrunner.bgname.split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = finalrunner.bgname;
+                                                                        }
+                                                                    }
+
+                                                                    //</editor-fold>
+
+                                                                    if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam)) {
+                                                                        flaginp1 = 0;
+                                                                        break;
+                                                                    }
+                                                                    
+                                                                    
                                                                     if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1))
                                                                     {
                                                                         flaginp1=0;
@@ -1223,6 +2900,36 @@ public class HeuristicSearch {
                                                                 BGateNode finalrunner = curr;
                                                                 while(finalrunner!=null)
                                                                 {
+                                                                    
+                                                                    
+                                                                    //<editor-fold desc="finalrunner fam NOT">
+                                                                    String finalrunnerfam = "";
+                                                                    if (finalrunner.bgname.contains("_")) {
+                                                                        String fam1[] = finalrunner.bgname.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (finalrunner.bgname.contains("-")) {
+                                                                            String fam2[] = finalrunner.bgname.split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = finalrunner.bgname;
+                                                                        }
+                                                                    }
+
+                                                                    //</editor-fold>
+
+                                                                    if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam)) {
+                                                                        flaginp2 = 0;
+                                                                        break;
+                                                                    }
+                                                                    
+                                                                    
+                                                                    
                                                                     if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp2)) //this line was changed
                                                                     {
                                                                         flaginp2=0;
@@ -1242,6 +2949,49 @@ public class HeuristicSearch {
                                                     { // 0 inducers
                                                         for (BGateCombo deepbgc : notcombo_0_inputs) 
                                                         {
+                                                            
+                                                            
+                                                            //<editor-fold desc="Family of bg of bgatecombo DeepBGC NOT combos">
+                                                            String deepbgcinp1fam = "";
+
+                                                            String deepbgcoutfam = "";
+                                                            if (deepbgc.Out.contains("_")) {
+                                                                String fam1[] = deepbgc.Out.split("_");
+                                                                if (fam1[1].contains("-")) {
+                                                                    String fam2[] = fam1[1].split("-");
+                                                                    deepbgcoutfam = fam2[1];
+                                                                } else {
+                                                                    deepbgcoutfam = fam1[1];
+                                                                }
+                                                            } else {
+                                                                if (deepbgc.Out.contains("-")) {
+                                                                    String fam2[] = deepbgc.Out.split("-");
+                                                                    deepbgcoutfam = fam2[1];
+                                                                } else {
+                                                                    deepbgcoutfam = deepbgc.Out;
+                                                                }
+                                                            }
+
+                                                            if (deepbgc.Inp1.contains("_")) {
+                                                                String fam1[] = deepbgc.Inp1.split("_");
+                                                                if (fam1[1].contains("-")) {
+                                                                    String fam2[] = fam1[1].split("-");
+                                                                    deepbgcinp1fam = fam2[1];
+                                                                } else {
+                                                                    deepbgcinp1fam = fam1[1];
+                                                                }
+                                                            } else {
+                                                                if (deepbgc.Inp1.contains("-")) {
+                                                                    String fam2[] = deepbgc.Inp1.split("-");
+                                                                    deepbgcinp1fam = fam2[1];
+                                                                } else {
+                                                                    deepbgcinp1fam = deepbgc.Inp1;
+                                                                }
+                                                            }
+
+                                                            //</editor-fold>
+                                                            
+                                                            
                                                             flaginp1 =1;
                                                             flaginp2 =1;
                                                             if (deepbgc.Out.equals(bgc.Inp1)) 
@@ -1249,6 +2999,33 @@ public class HeuristicSearch {
                                                                 BGateNode finalrunner = curr;
                                                                 while(finalrunner!=null)
                                                                 {
+                                                                    
+                                                                    //<editor-fold desc="finalrunner fam NOT">
+                                                                    String finalrunnerfam = "";
+                                                                    if (finalrunner.bgname.contains("_")) {
+                                                                        String fam1[] = finalrunner.bgname.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (finalrunner.bgname.contains("-")) {
+                                                                            String fam2[] = finalrunner.bgname.split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = finalrunner.bgname;
+                                                                        }
+                                                                    }
+
+                                                                    //</editor-fold>
+
+                                                                    if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam)) {
+                                                                        flaginp1 = 0;
+                                                                        break;
+                                                                    }
+                                                                    
                                                                     if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1))
                                                                     {
                                                                         flaginp1=0;
@@ -1267,6 +3044,35 @@ public class HeuristicSearch {
                                                                 BGateNode finalrunner = curr;
                                                                 while(finalrunner!=null)
                                                                 {
+                                                                    
+                                                                    
+                                                                    //<editor-fold desc="finalrunner fam NOT">
+                                                                    String finalrunnerfam = "";
+                                                                    if (finalrunner.bgname.contains("_")) {
+                                                                        String fam1[] = finalrunner.bgname.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (finalrunner.bgname.contains("-")) {
+                                                                            String fam2[] = finalrunner.bgname.split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = finalrunner.bgname;
+                                                                        }
+                                                                    }
+
+                                                                    //</editor-fold>
+
+                                                                    if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam)) {
+                                                                        flaginp2 = 0;
+                                                                        break;
+                                                                    }
+                                                                    
+                                                                    
                                                                     if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp2)) //this line was changed
                                                                     {
                                                                         flaginp2=0;
@@ -1311,6 +3117,58 @@ public class HeuristicSearch {
                                 
                                 for(BGateCombo bgc:notcombos)
                                 {
+                                    
+                                    //<editor-fold desc="Family of bg of bgatecombo">
+                                    String inp1fam="";
+                                    
+                                    String outfam="";
+                                    if(bgc.Out.contains("_"))
+                                    {
+                                        String fam1[] = bgc.Out.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            outfam= fam2[1];
+                                        }
+                                        else
+                                            outfam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(bgc.Out.contains("-"))
+                                        {
+                                            String fam2[] = bgc.Out.split("-");
+                                            outfam = fam2[1];
+                                        }
+                                        else
+                                            outfam = bgc.Out;
+                                    }
+                                    
+                                    if(bgc.Inp1.contains("_"))
+                                    {
+                                        String fam1[] = bgc.Inp1.split("_");
+                                        if(fam1[1].contains("-"))
+                                        {
+                                            String fam2[] = fam1[1].split("-");
+                                            inp1fam= fam2[1];
+                                        }
+                                        else
+                                            inp1fam = fam1[1];
+                                    }
+                                    else 
+                                    {
+                                        if(bgc.Inp1.contains("-"))
+                                        {
+                                            String fam2[] = bgc.Inp1.split("-");
+                                            inp1fam = fam2[1];
+                                        }
+                                        else
+                                            inp1fam = bgc.Inp1;
+                                    }
+                                    
+                                    //</editor-fold>
+                                    
+                                    
                                     //<editor-fold desc="none of the inputs have been assigned">
                                        
                                         int niflag =0;
@@ -1343,6 +3201,38 @@ public class HeuristicSearch {
                                                     {
                                                         while(finalinprunner!=null)
                                                         {
+                                                            
+                                                            //<editor-fold desc="final inp runner fam">
+                                                            
+                                                                    //<editor-fold desc="finalinprunner fam NOT">
+                                                                    String finalrunnerfam = "";
+                                                                    if (finalinprunner.bgname.contains("_")) {
+                                                                        String fam1[] = finalinprunner.bgname.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (finalinprunner.bgname.contains("-")) {
+                                                                            String fam2[] = finalinprunner.bgname.split("-");
+                                                                            finalrunnerfam = fam2[1];
+                                                                        } else {
+                                                                            finalrunnerfam = finalinprunner.bgname;
+                                                                        }
+                                                                    }
+
+                                                                    //</editor-fold>
+
+                                                                    if (finalrunnerfam.equals(inp1fam)) {
+                                                                        finalinpflag =1;
+                                                                        break;
+                                                                    }
+                                                            
+                                                            //</editor-fold>
+                                                            
+                                                            
                                                             if(finalinprunner.bgname.equals(bgc.Inp1))
                                                             {
                                                                 finalinpflag =1;
@@ -1370,6 +3260,66 @@ public class HeuristicSearch {
                                                             { // 1 inducer
                                                                 for(BGateCombo deepbgc: norcombo_1_input)
                                                                 {
+                                                                    
+                                                                    
+                                                                    //<editor-fold desc="Family of bg of bgatecombo DeepBGC combos">
+                                                                    String deepbgcinp1fam = "";
+                                                                    String deepbgcinp2fam = "";
+                                                                    String deepbgcoutfam = "";
+                                                                    if (deepbgc.Out.contains("_")) {
+                                                                        String fam1[] = deepbgc.Out.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Out.contains("-")) {
+                                                                            String fam2[] = deepbgc.Out.split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = deepbgc.Out;
+                                                                        }
+                                                                    }
+
+                                                                    if (deepbgc.Inp1.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp1.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp1.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp1.split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = deepbgc.Inp1;
+                                                                        }
+                                                                    }
+                                                                    if (deepbgc.Inp2.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp2.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp2.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp2.split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = deepbgc.Inp2;
+                                                                        }
+                                                                    }
+                                                                    //</editor-fold>
+
+                                                                    
+                                                                    
+                                                                    
                                                                     flaginp1 =1;
                                                                     if(childnodeassign.contains(bgc.Inp1))
                                                                     {
@@ -1380,6 +3330,35 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam) || finalrunnerfam.equals(deepbgcinp2fam)) {
+                                                                                flaginp1 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
                                                                             {
                                                                                 flaginp1=0;
@@ -1398,6 +3377,66 @@ public class HeuristicSearch {
                                                             { // 2 inducers
                                                                 for(BGateCombo deepbgc: norcombo_2_inputs)
                                                                 {
+                                                                    
+                                                                    
+                                                                    //<editor-fold desc="Family of bg of bgatecombo DeepBGC combos">
+                                                                    String deepbgcinp1fam = "";
+                                                                    String deepbgcinp2fam = "";
+                                                                    String deepbgcoutfam = "";
+                                                                    if (deepbgc.Out.contains("_")) {
+                                                                        String fam1[] = deepbgc.Out.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Out.contains("-")) {
+                                                                            String fam2[] = deepbgc.Out.split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = deepbgc.Out;
+                                                                        }
+                                                                    }
+
+                                                                    if (deepbgc.Inp1.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp1.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp1.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp1.split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = deepbgc.Inp1;
+                                                                        }
+                                                                    }
+                                                                    if (deepbgc.Inp2.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp2.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp2.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp2.split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = deepbgc.Inp2;
+                                                                        }
+                                                                    }
+                                                                    //</editor-fold>
+
+                                                                    
+                                                                    
+                                                                    
                                                                     flaginp1 =1;
                                                                     if(childnodeassign.contains(bgc.Inp1))
                                                                     {
@@ -1408,6 +3447,34 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam) || finalrunnerfam.equals(deepbgcinp2fam)) {
+                                                                                flaginp1 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
                                                                             {
                                                                                 flaginp1=0;
@@ -1426,6 +3493,63 @@ public class HeuristicSearch {
                                                             { // 0 inducers
                                                                 for(BGateCombo deepbgc: norcombo_0_inputs)
                                                                 {
+                                                                    
+                                                                    //<editor-fold desc="Family of bg of bgatecombo DeepBGC combos">
+                                                                    String deepbgcinp1fam = "";
+                                                                    String deepbgcinp2fam = "";
+                                                                    String deepbgcoutfam = "";
+                                                                    if (deepbgc.Out.contains("_")) {
+                                                                        String fam1[] = deepbgc.Out.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Out.contains("-")) {
+                                                                            String fam2[] = deepbgc.Out.split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = deepbgc.Out;
+                                                                        }
+                                                                    }
+
+                                                                    if (deepbgc.Inp1.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp1.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp1.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp1.split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = deepbgc.Inp1;
+                                                                        }
+                                                                    }
+                                                                    if (deepbgc.Inp2.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp2.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp2.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp2.split("-");
+                                                                            deepbgcinp2fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp2fam = deepbgc.Inp2;
+                                                                        }
+                                                                    }
+                                                                    //</editor-fold>
+
+                                                                    
                                                                     flaginp1 =1;
                                                                     if(childnodeassign.contains(bgc.Inp1))
                                                                     {
@@ -1436,6 +3560,35 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam) || finalrunnerfam.equals(deepbgcinp2fam)) {
+                                                                                flaginp1 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1) ||finalrunner.bgname.equals(deepbgc.Inp2))
                                                                             {
                                                                                 flaginp1=0;
@@ -1467,6 +3620,49 @@ public class HeuristicSearch {
                                                                 
                                                                 for(BGateCombo deepbgc: notcombo_1_input)
                                                                 {
+                                                                    
+                                                                                                                                
+                                                                    //<editor-fold desc="Family of bg of bgatecombo DeepBGC NOT combos">
+                                                                    String deepbgcinp1fam = "";
+
+                                                                    String deepbgcoutfam = "";
+                                                                    if (deepbgc.Out.contains("_")) {
+                                                                        String fam1[] = deepbgc.Out.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Out.contains("-")) {
+                                                                            String fam2[] = deepbgc.Out.split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = deepbgc.Out;
+                                                                        }
+                                                                    }
+
+                                                                    if (deepbgc.Inp1.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp1.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp1.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp1.split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = deepbgc.Inp1;
+                                                                        }
+                                                                    }
+
+                                                                    //</editor-fold>
+                                                                    
+                                                                    
                                                                     if(childnodeassign.contains(bgc.Inp1))
                                                                         continue;
                                                                     flaginp1 =1;
@@ -1475,6 +3671,35 @@ public class HeuristicSearch {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                          
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam NOT">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam)) {
+                                                                                flaginp1 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
+                                                                    
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1))
                                                                             {
                                                                                 flaginp1=0;
@@ -1495,12 +3720,81 @@ public class HeuristicSearch {
                                                                 {
                                                                     if(childnodeassign.contains(bgc.Inp1))
                                                                         continue;
+                                                                                                                                
+                                                                    //<editor-fold desc="Family of bg of bgatecombo DeepBGC NOT combos">
+                                                                    String deepbgcinp1fam = "";
+
+                                                                    String deepbgcoutfam = "";
+                                                                    if (deepbgc.Out.contains("_")) {
+                                                                        String fam1[] = deepbgc.Out.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Out.contains("-")) {
+                                                                            String fam2[] = deepbgc.Out.split("-");
+                                                                            deepbgcoutfam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcoutfam = deepbgc.Out;
+                                                                        }
+                                                                    }
+
+                                                                    if (deepbgc.Inp1.contains("_")) {
+                                                                        String fam1[] = deepbgc.Inp1.split("_");
+                                                                        if (fam1[1].contains("-")) {
+                                                                            String fam2[] = fam1[1].split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = fam1[1];
+                                                                        }
+                                                                    } else {
+                                                                        if (deepbgc.Inp1.contains("-")) {
+                                                                            String fam2[] = deepbgc.Inp1.split("-");
+                                                                            deepbgcinp1fam = fam2[1];
+                                                                        } else {
+                                                                            deepbgcinp1fam = deepbgc.Inp1;
+                                                                        }
+                                                                    }
+
+                                                                    //</editor-fold>
+                                                                    
+                                                                    
                                                                     flaginp1 =1;
                                                                     if(deepbgc.Out.equals(bgc.Inp1))
                                                                     {
                                                                         BGateNode finalrunner = curr;
                                                                         while(finalrunner!=null)
                                                                         {
+                                                                            
+                                                                            //<editor-fold desc="finalrunner fam NOT">
+                                                                            String finalrunnerfam = "";
+                                                                            if (finalrunner.bgname.contains("_")) {
+                                                                                String fam1[] = finalrunner.bgname.split("_");
+                                                                                if (fam1[1].contains("-")) {
+                                                                                    String fam2[] = fam1[1].split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = fam1[1];
+                                                                                }
+                                                                            } else {
+                                                                                if (finalrunner.bgname.contains("-")) {
+                                                                                    String fam2[] = finalrunner.bgname.split("-");
+                                                                                    finalrunnerfam = fam2[1];
+                                                                                } else {
+                                                                                    finalrunnerfam = finalrunner.bgname;
+                                                                                }
+                                                                            }
+
+                                                                            //</editor-fold>
+
+                                                                            if (finalrunnerfam.equals(deepbgcoutfam) || finalrunnerfam.equals(deepbgcinp1fam)) {
+                                                                                flaginp1 = 0;
+                                                                                break;
+                                                                            }
+                                                                            
                                                                             if(finalrunner.bgname.equals(deepbgc.Out) || finalrunner.bgname.equals(deepbgc.Inp1))
                                                                             {
                                                                                 flaginp1=0;
@@ -2005,8 +4299,6 @@ public class HeuristicSearch {
             combos.get(pos).score = temp.score;
             
         }
-
-
 
     }
     
