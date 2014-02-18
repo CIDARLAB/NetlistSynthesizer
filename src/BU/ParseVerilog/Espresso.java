@@ -15,8 +15,13 @@ public class Espresso {
     public static List<String> createFile(CircuitDetails circ)
     {
         List<String> esfile = new ArrayList<String>();
-         int pw = (int) Math.pow(2, circ.inputNames.size());
-        String truthfunc = Convert.dectoBin(circ.inputgatetable, pw);
+        int pw = (int) Math.pow(2, circ.inputNames.size());
+        List<String> truthfunc = new ArrayList<String>();
+        for(int xtt:circ.inputgatetable)
+        {
+            String tempTT= Convert.dectoBin(xtt, pw);
+            truthfunc.add(tempTT);
+        }
         //System.out.println(truthfunc);
         String line = "";
         line += (".i " + circ.inputNames.size());
@@ -45,7 +50,10 @@ public class Espresso {
             String tempinp = Convert.dectoBin(i,circ.inputNames.size());
             line += tempinp;
             line += " ";
-            line += truthfunc.charAt(i);
+            for(int j=0;j<circ.outputNames.size();j++)
+            {
+                line += truthfunc.get(j).charAt(i);
+            }
             esfile.add(line);
         }
         line ="";

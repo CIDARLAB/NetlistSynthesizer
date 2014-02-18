@@ -275,22 +275,17 @@ public class parseCaseStatements {
                 }
                 
                 int truthtableval = Convert.bintoDec(new String(xbits)) ;
-                circuit.inputgatetable = truthtableval;
+                circuit.inputgatetable.add(truthtableval);
                 
             }
             else
             {
                 return null;
             }
-                
             
         }
         
-        
         return circuit;
     }
-    
-    
-    
-    
+   
 }

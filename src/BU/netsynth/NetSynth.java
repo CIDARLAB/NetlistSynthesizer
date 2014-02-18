@@ -98,8 +98,15 @@ public class NetSynth {
         
         //verifyinverse();
         //histogram();
-        DAGW xcasedag = testParser("",1,1);
-        HeuristicSearch.beginSearch(xcasedag, 0.95,0.992,-1,500,0);
+        
+        
+        
+        //DAGW xcasedag = testParser("",0,0);
+        //HeuristicSearch.beginSearch(xcasedag, 0.95,0.992,-1,500,0);
+        
+        
+        testespressogen();
+        
         
         //verifyprecomute();
         //DAGraph x = precompute(2);2
@@ -108,6 +115,60 @@ public class NetSynth {
         //testEspresso();
         
     }
+    
+    
+    public static void testespressogen()
+    {
+        List<String> eslines = new ArrayList<String>();
+        CircuitDetails circ = new CircuitDetails();
+        circ.inputNames.add("inp1");
+        circ.inputNames.add("inp2");
+        circ.inputNames.add("inp3");
+        circ.outputNames.add("out1");
+        circ.outputNames.add("out2");
+        circ.inputgatetable.add(69);
+        circ.inputgatetable.add(96);
+        List<String> espoutcirc = new ArrayList<String>();
+        espoutcirc = Espresso.createFile(circ);
+        for(String xesp:espoutcirc)
+        {
+            System.out.println(xesp);
+        }
+        String filestring = "";
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/espresso";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/espresso";
+        }
+        filestring += Global.espout++;
+        filestring += ".txt";
+          File fespinp = new File(filestring);
+        //Writer output;
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            //output = new BufferedWriter(new FileWriter(fespinp));
+             for (String xline : espoutcirc) 
+             {
+                String newl = (xline + "\n");
+                output.write(newl);
+             }
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+        List<String> espout = new ArrayList<String>();
+        espout = runEspresso(filestring);
+        List<DGate> espoutput = new ArrayList<DGate>();
+        espoutput = parseEspressoToNORNAND(espout);
+    }
+    
     
     public static void vtestfunc()
     {
@@ -232,7 +293,7 @@ public class NetSynth {
                 
                 
                 
-                circ.inputgatetable = i;
+                circ.inputgatetable.add(i);
                 List<String> eslines = new ArrayList<String>();
                 eslines = Espresso.createFile(circ);
                 String filestring2 = "";
@@ -321,15 +382,15 @@ public class NetSynth {
         
         
         
-        if(caseCirc.inputgatetable ==0 || caseCirc.inputgatetable ==255)
+        if(caseCirc.inputgatetable.get(0) ==0 || caseCirc.inputgatetable.get(0) ==255)
             return null;
         
-         // <editor-fold desc="If 3 input circuit">
+         // <editor-fold desc="If 3 input circuit and presynth option is true">
         if((caseCirc.inputNames.size() == 3) && (presynth ==1))
         {
-            DAGW circ = computeDAGW(caseCirc.inputgatetable-1);
+            DAGW circ = computeDAGW(caseCirc.inputgatetable.get(0)-1);
             circuitDAG = new DAGW(circ.Gates,circ.Wires);
-            DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable - 1);
+            DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable.get(0) - 1);
             circuitDAGinv = new DAGW(circinv.Gates,circinv.Wires);
             //System.out.println("Ratatatatatata Circus Afro"+circuitDAG.Gates.get(0).Type.toString());
             
@@ -449,10 +510,13 @@ public class NetSynth {
             List<String> eslines = new ArrayList<String>();
             List<String> eslinesinv = new ArrayList<String>();
             int powr = (int) Math.pow(2, caseCirc.inputNames.size());
-            String caseCirctt = Convert.dectoBin(caseCirc.inputgatetable, powr);
+            String caseCirctt = Convert.dectoBin(caseCirc.inputgatetable.get(0), powr);
             String caseCircttinv;
             caseCircttinv = Convert.invBin(caseCirctt);
-            int invval = Convert.bintoDec(caseCircttinv);
+            
+            List<Integer> invval = new ArrayList<Integer>();
+            invval.add(Convert.bintoDec(caseCircttinv));
+            //int invval = ;
             
             CircuitDetails invcaseCirc = new CircuitDetails(caseCirc.inputNames,caseCirc.outputNames,invval);
             
@@ -509,12 +573,12 @@ public class NetSynth {
                 System.out.println("\n\n==== CHECKING!!! ====");
                 
                 System.out.println("\n==== Primary Circuit ====");
-                System.out.println(BooleanSimulator.bpermuteEsynth(espoutput));
+                //System.out.println(BooleanSimulator.bpermuteEsynth(espoutput));
                 for(DGate dg:espoutput)
                     System.out.println(netlist(dg));
                 
                 System.out.println("\n==== Inverse Circuit ====");
-                System.out.println(BooleanSimulator.bpermuteEsynth(espoutputinv));
+                //System.out.println(BooleanSimulator.bpermuteEsynth(espoutputinv));
                 for(DGate dg:espoutputinv)
                     System.out.println(netlist(dg));
                 
@@ -642,7 +706,7 @@ public class NetSynth {
             
         }
         int ttpow = (int)Math.pow(2, caseCirc.inputNames.size());
-        String bintt = Convert.dectoBin(caseCirc.inputgatetable, ttpow);
+        String bintt = Convert.dectoBin(caseCirc.inputgatetable.get(0), ttpow);
         
         circuitDAG.truthtable = bintt;
         return circuitDAG;
@@ -1051,7 +1115,10 @@ public class NetSynth {
         one = new DWire("_one",DWireType.Source);
         zero = new DWire("_zero",DWireType.GND);
         
-      List<DGate> sopexp = new ArrayList<DGate>();
+        for(String lists: espinp)
+            System.out.println(lists);
+        
+        List<DGate> sopexp = new ArrayList<DGate>();
         List<DWire> wireInputs = new ArrayList<DWire>();
         List<DWire> wireOutputs = new ArrayList<DWire>();
         List<DWire> invWires = new ArrayList<DWire>();
@@ -1096,6 +1163,7 @@ public class NetSynth {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
                 splitInp += "I";
             wireInputs.add(new DWire(splitInp,DWireType.input));
+            System.out.println("INPUT : +splitInp");
         }
         // </editor-fold>
         
@@ -1116,6 +1184,7 @@ public class NetSynth {
             if(splitInp.equals(one.name) || splitInp.equals(zero.name))
                 splitInp += "O";
             wireOutputs.add(new DWire(splitInp,DWireType.output));
+            System.out.println("OUTPUT : +splitInp");
         }
         // </editor-fold>        
         
