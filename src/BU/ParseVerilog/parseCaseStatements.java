@@ -126,13 +126,16 @@ public class parseCaseStatements {
             }
             else if(IO.contains("output "))
             {
+                
                 IO = IO.substring(IO.indexOf("output ")+7);
                 IO = IO.trim();
                 outputs.add(IO);
+                
             }
             else
             {
-                unknownIO.add(IO);                
+                unknownIO.add(IO);   
+                
             }
         }
         //System.out.println(alllines);
@@ -223,7 +226,7 @@ public class parseCaseStatements {
                 caseblock = caseblock.trim();
                 caseStatements = caseblock.split(";");
                 
-                HashMap<Integer,Integer> truthtable = new HashMap<Integer,Integer>();
+                List<HashMap<Integer,Integer>> truthtable = new ArrayList<HashMap<Integer,Integer>>();
                 caseparam = caseparam.substring(caseparam.indexOf("{")+1, caseparam.indexOf("}"));
                 
                 String[] caseinp = caseparam.split(",");
@@ -234,49 +237,121 @@ public class parseCaseStatements {
                 
                 String output = caseStatements[0].substring(caseStatements[0].indexOf(":")+1,caseStatements[0].indexOf("="));
                 output = output.trim();
-                circuit.outputNames.add(output);
-                for(int i=0;i<caseStatements.length;i++)
+                if(output.contains("{"))
                 {
-                    String xcase = caseStatements[i].trim();
-                
-                    String cNum = xcase.substring(0,xcase.indexOf(":")).trim();
-                    int caseNumber = Convert.toDec(cNum);
-                    //System.out.println(caseNumber);
-                    String sNum = xcase.substring(xcase.indexOf("=")+1).trim();
-                    int swNumber = Convert.toDec(sNum);
-                    //System.out.println(swNumber);
-                    truthtable.put(caseNumber, swNumber);
+                    if(!output.contains("}"))
+                        System.out.println("Wrong Case Statement!!");
+                    else
+                    {
+                        output = output.substring(output.indexOf("{")+1, output.lastIndexOf("}"));
+                        String outputpieces[] = output.split(",");
+                        for(int i=0;i<outputpieces.length;i++)
+                        {
+                            circuit.outputNames.add(outputpieces[i].trim());
+                            System.out.println(outputpieces[i].trim());
+                        }
+                    }
                 }
+                else
+                {
+                    circuit.outputNames.add(output);
+                    System.out.println("OUTPUT : " + output);
+                }
+                
+                //System.out.println(output);
+                 HashMap<Integer,Integer> tt = new HashMap<Integer,Integer>();
+                for (int j = 0; j < circuit.outputNames.size(); j++) 
+                {
+                    tt = new HashMap<Integer,Integer>();
+                    for (int i = 0; i < caseStatements.length; i++) 
+                    {
+                        String xcase = caseStatements[i].trim();
+                        String cNum = xcase.substring(0, xcase.indexOf(":")).trim();
+                        int caseNumber = Convert.toDec(cNum);
+                        //System.out.println(caseNumber);
+                        String sNum = xcase.substring(xcase.indexOf("=") + 1).trim();
+                        if (sNum.contains("'")) 
+                        {
+                            if (sNum.contains("b")) 
+                            {
+                                String bintt = sNum.substring(sNum.indexOf("b")+1);
+                                int ttnum=0;
+                                if(bintt.charAt(j) =='1')
+                                    ttnum = 1;
+                                tt.put(caseNumber, ttnum);
+                            } 
+                            else if (sNum.contains("d")) 
+                            {
+                                int bitnum = Integer.parseInt(sNum.substring(0, sNum.indexOf("'")));
+                                String bintt = Convert.dectoBin(Integer.parseInt(sNum.substring(sNum.indexOf("d")+1)), circuit.outputNames.size()); 
+                                int ttnum=0;
+                                if(bintt.charAt(j) =='1')
+                                    ttnum = 1;
+                                tt.put(caseNumber, ttnum);
+                            }
+                        }
+                        else if (sNum.contains("’")) 
+                        {
+                            if (sNum.contains("b")) 
+                            {
+                                String bintt = sNum.substring(sNum.indexOf("b")+1);
+                                int ttnum=0;
+                                if(bintt.charAt(j) =='1')
+                                    ttnum = 1;
+                                tt.put(caseNumber, ttnum);
+                            } 
+                            else if (sNum.contains("d")) 
+                            {
+                                int bitnum = Integer.parseInt(sNum.substring(0, sNum.indexOf("’")));
+                                String bintt = Convert.dectoBin(Integer.parseInt(sNum.substring(sNum.indexOf("d")+1)), circuit.outputNames.size()); 
+                                int ttnum=0;
+                                if(bintt.charAt(j) =='1')
+                                    ttnum = 1;
+                                tt.put(caseNumber, ttnum);
+                            }
+                        }
+                        else 
+                        {
+                            String bintt = Convert.dectoBin(Integer.parseInt(sNum), circuit.outputNames.size());
+                            int ttnum=0;
+                            if(bintt.charAt(j) =='1')
+                                ttnum = 1;
+                            tt.put(caseNumber, ttnum);
+                        }
+                    }
+                    truthtable.add(tt);
+                }
+                
                 int numTT = (int) Math.pow(2, caseinp.length);
                 
                 char[] xbits = new char[numTT];
-                for(int i=0;i<numTT;i++)
+                
+                for (int j = 0; j < circuit.outputNames.size(); j++) 
                 {
-                    
-                    if(truthtable.containsKey(i))
+                    xbits = new char[numTT];
+                    for (int i = 0; i < numTT; i++) 
                     {
-                        
-                        xbits[i] = truthtable.get(i).toString().charAt(0);
-                        //System.out.println(i+ " " +xbits[i]);
-                        
-                    }
-                    else
-                    {
-                        if(truthtable.containsKey(-2))
+
+                        if (truthtable.get(j).containsKey(i)) 
                         {
-                            xbits[i] = truthtable.get(-2).toString().charAt(0);
-                        }
+
+                            xbits[i] = truthtable.get(j).get(i).toString().charAt(0);
+                        } 
                         else
                         {
-                            xbits[i] = '0';
+                            if (truthtable.get(j).containsKey(-2)) 
+                            {
+                                xbits[i] = truthtable.get(j).get(-2).toString().charAt(0);
+                            } 
+                            else 
+                            {
+                                xbits[i] = '0';
+                            }
                         }
                     }
-                   
+                    int truthtableval = Convert.bintoDec(new String(xbits));
+                    circuit.inputgatetable.add(truthtableval);
                 }
-                
-                int truthtableval = Convert.bintoDec(new String(xbits)) ;
-                circuit.inputgatetable.add(truthtableval);
-                
             }
             else
             {
