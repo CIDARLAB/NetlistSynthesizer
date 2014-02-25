@@ -568,8 +568,10 @@ public class NetSynth {
                 List<String> espout = new ArrayList<String>();
                 espout = runEspresso(filestring);
                 List<DGate> espoutput = new ArrayList<DGate>();
-                espoutput = parseEspressoToNORNAND(espout);
                 convertPOStoNORNOT(espout);
+                
+                espoutput = parseEspressoToNORNAND(espout);
+                
                 Writer outputinv = new BufferedWriter(new FileWriter(fespinpinv));
                 for(String xline:eslinesinv)
                 {
@@ -1200,9 +1202,51 @@ public class NetSynth {
         }
         // </editor-fold>        
         
+        List<List<DWire>> outputsum = new ArrayList<List<DWire>>();
         
+        for(int i=0;i<outputWires.size();i++)
+        {
+            List<DWire> outsums = new ArrayList<DWire>();
+            outputsum.add(outsums);
+        }
         
-        
+        for(int i=expInd;i<espinp.size()-1;i++)
+        {
+            List<DWire> sumterm  = new ArrayList<DWire>();
+            String maxterm[] = espinp.get(i).split(" ");
+            for(int j=0;j<inputWires.size();j++)
+            {
+                 
+                if(maxterm[0].charAt(j) == '0')
+                {
+                    netlist.add(inputINVGates.get(j));
+                    sumterm.add(inputINVWires.get(j));
+                }
+                else if(maxterm[0].charAt(j) == '1')
+                {
+                    sumterm.add(inputWires.get(j));
+                }
+            }
+            List<DGate> sumtermG = new ArrayList<DGate>();
+            DWire sumlast = new DWire();
+            if(sumterm.size() >0)
+            {
+                sumtermG = NORNANDGates(sumterm,DGateType.NOR2);
+                netlist.addAll(sumtermG);
+                sumlast = sumtermG.get(sumtermG.size()-1).output;
+            }
+            for(int j=0;j<outputWires.size();j++)
+            {
+                if(maxterm[1].charAt(j) == '1')
+                {
+                    outputsum.get(j).add(sumlast);
+                }
+            }
+        }
+        for(int j=0;j<outputWires.size();j++)
+        {
+            System.out.println("OUTPUT SUM Terms: " +outputsum.get(j).size());    
+        }
         return netlist;
     }
     
@@ -1212,8 +1256,8 @@ public class NetSynth {
         one = new DWire("_one",DWireType.Source);
         zero = new DWire("_zero",DWireType.GND);
         
-        //for(String lists: espinp)
-        //    System.out.println(lists);
+        for(String lists: espinp)
+            System.out.println(lists);
         
         List<DGate> sopexp = new ArrayList<DGate>();
         List<DWire> wireInputs = new ArrayList<DWire>();

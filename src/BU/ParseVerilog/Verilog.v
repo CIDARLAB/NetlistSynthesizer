@@ -4,13 +4,13 @@ module and3(output out1,out2, input in1,in2,in3);
   always@(in1, in2, in3)
     begin
       case({in3,in2,in1})
-        0: {out1,out2} = 2'b11;
-        1: {out1,out2} = 2'b00;
+        0: {out1,out2} = 2'b01;
+        1: {out1,out2} = 2'b10;
         2: {out1,out2} = 2'b11;
-        3: {out1,out2} = 2'b10;
-        4: {out1,out2} = 2'b11;
-        5: {out1,out2} = 2'b00;
-        6: {out1,out2} = 2'b10;
+        3: {out1,out2} = 2'b01;
+        4: {out1,out2} = 2'b01;
+        5: {out1,out2} = 2'b10;
+        6: {out1,out2} = 2'b11;
         7: {out1,out2} = 2'b00;
         default: out = 2'b00;
       endcase
