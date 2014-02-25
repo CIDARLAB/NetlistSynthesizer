@@ -54,5 +54,10 @@ public class DWire implements Serializable {
          this.wtype = wType;
          wValue = DWireValue._x;
      }
-     
+     public DWire(DWire xwire)
+     {
+        this.wtype = xwire.wtype;
+        this.wValue = xwire.wValue;
+        this.name = xwire.name;
+     }
 }

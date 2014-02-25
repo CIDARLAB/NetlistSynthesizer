@@ -36,8 +36,15 @@ public class HeuristicSearch {
     public static void beginSearch(DAGW dagCirc, double cutoff,double maxscore, long maxassign, long outputshift, int fixedinputs)
     {
         
-        Synthetic_Gates.genExistingGateInpFiles();
-        //Synthetic_Gates.genidealGateInpFiles(18, 4);
+        System.out.println("\n\n\n\n HEURISTIC DAGW!!!");
+        for(int i=0;i<dagCirc.Gates.size();i++)
+            System.out.println(dagCirc.Gates.get(i).Name + ":" + dagCirc.Gates.get(i).Type);
+        System.out.println("\n\n\n\n\n");
+        
+        
+        
+        //Synthetic_Gates.genExistingGateInpFiles();
+        Synthetic_Gates.genidealGateInpFiles(28, 4);
         //Synthetic_Gates.genrandomGateInpFiles(18, 4);
         List<HashMap<String,String>> roadblockingrules = new ArrayList<HashMap<String,String>>();
         roadblockingrules = Synthetic_Gates.genRules();
@@ -4014,7 +4021,7 @@ public class HeuristicSearch {
                     {
                         int prevind = xgate.Outgoing.To.Index;
                         truthList.add(reuList.get(prevind));
-                        if(dagCirc.truthtable.charAt(j) == '0')
+                        if(dagCirc.truthtable.get(0).charAt(j) == '0') // CHANGE THIS!!!
                             truthLow.add(reuList.get(prevind));
                         else
                             truthHigh.add(reuList.get(prevind));
@@ -4025,7 +4032,7 @@ public class HeuristicSearch {
                         int prevind2 = xgate.Outgoing.Next.To.Index;
                         Double tempscore = reuList.get(prevind1) + reuList.get(prevind2);  
                         truthList.add(tempscore);
-                            if(dagCirc.truthtable.charAt(j) == '0')
+                            if(dagCirc.truthtable.get(0).charAt(j) == '0')  //CHANGE THIS!!
                             truthLow.add(tempscore);
                         else
                             truthHigh.add(tempscore);

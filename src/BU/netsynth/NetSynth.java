@@ -568,9 +568,9 @@ public class NetSynth {
                 List<String> espout = new ArrayList<String>();
                 espout = runEspresso(filestring);
                 List<DGate> espoutput = new ArrayList<DGate>();
-                convertPOStoNORNOT(espout);
+                espoutput = convertPOStoNORNOT(espout);
                 
-                espoutput = parseEspressoToNORNAND(espout);
+                //espoutput = parseEspressoToNORNAND(espout);
                 
                 Writer outputinv = new BufferedWriter(new FileWriter(fespinpinv));
                 for(String xline:eslinesinv)
@@ -583,7 +583,9 @@ public class NetSynth {
                 List<String> espoutinv = new ArrayList<String>();
                 espoutinv = runEspresso(filestringinv);
                 List<DGate> espoutputinv = new ArrayList<DGate>();
-                espoutputinv = parseEspressoToNORNAND(espoutinv);
+                
+                //espoutputinv = parseEspressoToNORNAND(espoutinv);
+                espoutputinv = convertPOStoNORNOT(espoutinv);
                 
                 //System.out.println("\n\n==== CHECKING!!! ====");
                 
@@ -722,9 +724,15 @@ public class NetSynth {
             
         }
         int ttpow = (int)Math.pow(2, caseCirc.inputNames.size());
-        String bintt = Convert.dectoBin(caseCirc.inputgatetable.get(0), ttpow);
-        
-        circuitDAG.truthtable = bintt;
+        for(int i=0;i<caseCirc.inputgatetable.size();i++)
+        {
+            String bintt = Convert.dectoBin(caseCirc.inputgatetable.get(i), ttpow);
+            circuitDAG.truthtable.add(bintt);
+        }
+        System.out.println("\n\n\n\nDAGW!!!");
+        for(int i=0;i<circuitDAG.Gates.size();i++)
+            System.out.println(circuitDAG.Gates.get(i).Name + ":" + circuitDAG.Gates.get(i).Type);
+        System.out.println("\n\n\n\n\n");
         return circuitDAG;
         
     }
@@ -1129,8 +1137,6 @@ public class NetSynth {
         for(String xespinp:espinp)
             System.out.println(xespinp);
         
-        
-        
         List<DGate> netlist = new ArrayList<DGate>();
         one = new DWire("_one",DWireType.Source);
         zero = new DWire("_zero",DWireType.GND);
@@ -1212,6 +1218,7 @@ public class NetSynth {
         
         for(int i=expInd;i<espinp.size()-1;i++)
         {
+            //int null_literal =0;
             List<DWire> sumterm  = new ArrayList<DWire>();
             String maxterm[] = espinp.get(i).split(" ");
             for(int j=0;j<inputWires.size();j++)
@@ -1226,14 +1233,38 @@ public class NetSynth {
                 {
                     sumterm.add(inputWires.get(j));
                 }
+                /*else 
+                {
+                    null_literal++;
+                }*/
+                       
             }
             List<DGate> sumtermG = new ArrayList<DGate>();
             DWire sumlast = new DWire();
             if(sumterm.size() >0)
             {
-                sumtermG = NORNANDGates(sumterm,DGateType.NOR2);
-                netlist.addAll(sumtermG);
-                sumlast = sumtermG.get(sumtermG.size()-1).output;
+                if(sumterm.size() == 1)
+                {
+                    List<DWire> notsumterminp = new ArrayList<DWire>();
+                    notsumterminp.addAll(sumterm);
+                    String Wirename = "Wire" + Global.wirecount++;
+                    DWire notsumtermout = new DWire(Wirename);
+                    DGate notsumtermgate = new DGate(DGateType.NOT,notsumterminp,notsumtermout);
+                    netlist.add(notsumtermgate);
+                    sumlast = notsumtermout;
+                }
+                else
+                {
+                    System.out.println("Sumterm size :" + sumterm.size());
+                    sumtermG = NORNANDGates(sumterm,DGateType.NOR2);
+                    netlist.addAll(sumtermG);
+                    sumlast = sumtermG.get(sumtermG.size()-1).output;
+                }
+            }
+            else
+            {
+                sumlast = new DWire(zero);
+                System.out.println("Output connected to Ground");
             }
             for(int j=0;j<outputWires.size();j++)
             {
@@ -1243,9 +1274,50 @@ public class NetSynth {
                 }
             }
         }
+        
         for(int j=0;j<outputWires.size();j++)
         {
-            System.out.println("OUTPUT SUM Terms: " +outputsum.get(j).size());    
+            
+            if(outputsum.get(j).isEmpty())
+            {
+                List<DWire> inputbuflist = new ArrayList<DWire>();
+                inputbuflist.add(one);
+                DGate bufgate = new DGate(DGateType.BUF,inputbuflist,outputWires.get(j));
+                netlist.add(bufgate);
+                System.out.println("Source = output");
+            }
+            else if(outputsum.get(j).size() == 1)
+            {
+                if(outputsum.get(j).get(0).wtype == DWireType.GND)
+                {
+                    List<DWire> inputbuflist = new ArrayList<DWire>();
+                    inputbuflist.add(zero);
+                    DGate bufgate = new DGate(DGateType.BUF,inputbuflist,outputWires.get(j));
+                    netlist.add(bufgate);
+                    System.out.println("Ground = output");
+                }
+                else
+                {
+                    List<DWire> singleNOTmaxterm = new ArrayList<DWire>();
+                    singleNOTmaxterm.add(outputsum.get(j).get(0));
+                    DGate singlemaxtermgate = new DGate(DGateType.NOT, singleNOTmaxterm,outputWires.get(j));
+                    netlist.add(singlemaxtermgate);
+                    System.out.println("Single Maxterm which enters a not Gate, the output of which is a circuit output!!");
+                }
+            }
+            else
+            {
+                List<DGate> productGates = new ArrayList<DGate>();
+                productGates = NORNANDGates(outputsum.get(j),DGateType.NOR2);
+                productGates.get(productGates.size()-1).output = outputWires.get(j);
+                netlist.addAll(productGates);
+                
+                System.out.println("OUTPUT SUM Terms: " +outputsum.get(j).size());    
+            }
+        }
+        for(int i=0;i<netlist.size();i++)
+        {   
+            System.out.println(netlist(netlist.get(i)));
         }
         return netlist;
     }
