@@ -102,7 +102,7 @@ public class NetSynth {
         
         
         DAGW xcasedag = testParser("",0,0);
-        HeuristicSearch.beginSearch(xcasedag, 0.95,0.992,-1,500,0);
+        HeuristicSearch.beginSearch(xcasedag, 0.95,0.8,-1,500,20000);
         
         
         //testespressogen();
@@ -253,6 +253,9 @@ public class NetSynth {
              System.out.println("ERROR!!!");
          }
     }
+    
+    
+    
     
     public static void histogram()
     {
@@ -600,10 +603,13 @@ public class NetSynth {
                 //    System.out.println(netlist(dg));
                 
                 //DAGW circ = computeDAGW(caseCirc.inputgatetable-1);
-                circuitDAG = CreateDAGW(espoutput);
+                //circuitDAG = CreateDAGW(espoutput);
+                circuitDAG = CreateMultDAGW(espoutput);
+                
                 //DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable - 1);
-                circuitDAGinv = CreateDAGW(espoutputinv);
-
+                //circuitDAGinv = CreateDAGW(espoutputinv);
+                circuitDAGinv = CreateMultDAGW(espoutputinv);
+                
                 if (circuitDAGinv.Gates.size() > 1 && (inv == 1)) {
 
                     int gatessize = circuitDAGinv.Gates.size();
@@ -733,9 +739,14 @@ public class NetSynth {
         for(int i=0;i<circuitDAG.Gates.size();i++)
             System.out.println(circuitDAG.Gates.get(i).Name + ":" + circuitDAG.Gates.get(i).Type);
         System.out.println("\n\n\n\n\n");
+        
+        String graphs = circuitDAG.printGraph();
+        System.out.println(graphs);
         return circuitDAG;
         
     }
+    
+    
     
     public static DAGW computeDAGW(int x) 
     {
@@ -746,7 +757,9 @@ public class NetSynth {
         precomp = PreCompute.parseNetlistFile();
         DAGW circ = new DAGW();
         
-        circ = CreateDAGW(precomp.get(x));
+        //circ = CreateDAGW(precomp.get(x));
+        circ = CreateMultDAGW(precomp.get(x));
+        
         for(int i=0;i<precomp.get(x).size();i++)
             System.out.println(netlist(precomp.get(x).get(i)));
         
@@ -1224,12 +1237,16 @@ public class NetSynth {
             for(int j=0;j<inputWires.size();j++)
             {
                  
-                if(maxterm[0].charAt(j) == '0')
+                if(maxterm[0].charAt(j) == '1')
                 {
-                    netlist.add(inputINVGates.get(j));
+                    if(notGateexists.get(j) == false)
+                    {
+                        netlist.add(inputINVGates.get(j));
+                        notGateexists.set(j,true); 
+                    }
                     sumterm.add(inputINVWires.get(j));
                 }
-                else if(maxterm[0].charAt(j) == '1')
+                else if(maxterm[0].charAt(j) == '0')
                 {
                     sumterm.add(inputWires.get(j));
                 }
@@ -1319,7 +1336,18 @@ public class NetSynth {
         {   
             System.out.println(netlist(netlist.get(i)));
         }
+        
+        String ttval = BooleanSimulator.bpermuteEsynth(netlist);
+        System.out.println("This is the truthTable : "+ttval);
+        
         return netlist;
+    }
+    
+    
+    public static List<DGate> optimizeNetlist(List<DGate> netlistinp)
+    {
+        
+        return netlistinp;
     }
     
     public static List<DGate> parseEspressoToNORNAND(List<String> espinp)
@@ -1951,7 +1979,8 @@ public class NetSynth {
     */
     //</editor-fold>
    
-     public static DAGW CreateDAGW(List<DGate> netlist)
+    
+     public static DAGW CreateMultDAGW(List<DGate> netlist)
     {
          DAGW outDAG = new DAGW();
          List<DWire> inplist = new ArrayList<DWire>(); 
@@ -1964,7 +1993,10 @@ public class NetSynth {
         {
             System.out.println(netlist(xgate));
         }*/
-        if(netlist.size() == 1 && netlist.get(0).gtype == DGateType.BUF)
+         
+        
+        //<editor-fold desc="Single Gate in netlist of type Buffer" > 
+        if(netlist.size() == 1 && netlist.get(0).gtype == DGateType.BUF) // This step is incase there is a single gate in the netlist and it is of type Buffer
         {
             Gate outb = new Gate();
             Gate inpb = new Gate();
@@ -1994,8 +2026,10 @@ public class NetSynth {
             return outDAG;
             
         }
+        //</editor-fold>
         
-        for(int i=netlist.size()-1;i>=0;i--)
+        //<editor-fold  desc="Replace every Nor gate with one input as Ground, with a NOT gate">
+        for(int i=netlist.size()-1;i>=0;i--) // This step is for a NOR Gate that has a Zero as an input. Replace it with a simple NOT gate. 
         {
             DGate netg = netlist.get(i);
              if(netg.input.contains(zero))
@@ -2011,11 +2045,14 @@ public class NetSynth {
                 netlist.get(i).gtype = tempNot.gtype;
                 netlist.get(i).input = tempNot.input;
                 netlist.get(i).output = tempNot.output;
-                
-               
             }
         }
-        if(netlist.size()>1)
+        //</editor-fold>
+        
+        //<editor-fold desc="Replace NOR followed by NOT followed by an output with OUTPUT_OR - Commented out">
+        //This section replaces a NOR followed by a NOT followed by an output with an Output_OR
+        
+        /*if(netlist.size()>1)
         {
             int lastnet = netlist.size()-1;
             if((netlist.get(lastnet).gtype == DGateType.NOT) && (netlist.get(lastnet-1).gtype == DGateType.NOR2))
@@ -2024,8 +2061,346 @@ public class NetSynth {
                 netlist.get(lastnet).input = netlist.get(lastnet-1).input;
                 netlist.remove(lastnet-1);
             }
-
+        }*/
+        //</editor-fold>
+        
+        
+        List<String> inputwires = new ArrayList<String>();
+        List<String> outputwires = new ArrayList<String>();
+        
+        for(DGate xgate:netlist)
+        {
+            if(xgate.output.wtype.equals(DWireType.output))
+                outputwires.add(xgate.output.name.trim());
+            for(DWire xinp:xgate.input)
+            {
+                if(xinp.wtype.equals(DWireType.input))
+                {
+                    if(!inputwires.contains(xinp.name.trim()))
+                        inputwires.add(xinp.name.trim());
+                }
+                
+            }
         }
+        //int indx = (netlist.size() + inputwires.size() + outputwires.size()) -1;
+        int indx =0;
+        for(int i=0;i<outputwires.size();i++)
+        {
+            Gate outg = new Gate();
+            outg.Name = outputwires.get(i);
+            outg.Type = GateType.OUTPUT.toString();
+            outg.Index = indx;
+            indx++;
+            Gates.add(outg);
+        }
+        for(int i=netlist.size()-1;i>=0;i--)
+        {
+            DGate netg = netlist.get(i);
+            if(netg.gtype.equals(DGateType.NOR2))
+            {
+                Gate norg = new Gate(indx,GateType.NOR.toString());
+                norg.outW = netg.output;
+                indx++;
+                Gates.add(norg);
+            }
+            else if(netg.gtype.equals(DGateType.NOT))
+            {
+                Gate notg = new Gate(indx,GateType.NOR.toString());
+                notg.outW = netg.output;
+                indx++;
+                Gates.add(notg);
+            }
+        }
+        for(int i=0;i<inputwires.size();i++)
+        {
+            Gate ing = new Gate();
+            ing.Name = inputwires.get(i);
+            ing.Type = GateType.OUTPUT.toString();
+            ing.Index = indx;
+            indx++;
+            Gates.add(ing);
+        }
+        
+        for(int i=netlist.size()-1;i>=0;i--)
+        {
+            DGate netg = netlist.get(i);
+           
+           
+            for(DWire xi:netg.input)
+            {
+                if((xi.wtype == DWireType.input) && (!(inplist.contains(xi))))
+                {
+                    int flag =0;
+                    for(DWire di:inplist)
+                    {
+                        if(di.name.trim().equals(xi.name.trim()))
+                        {
+                            flag =1;
+                            break;
+                        }
+                    }
+                    if(flag ==0)
+                    {
+                        //System.out.println("Added : " + xi.name);
+                        inplist.add(xi);
+                    }
+                    
+                }
+            }
+            
+            if(netg.output.wtype == DWireType.output)
+            {
+                if(netg.gtype == DGateType.OR2)
+                {
+                    Gate outor = null;
+                    outpIndx = IndX;
+                    outor = new Gate(IndX++, VertexType.OUTPUT_OR.toString()); 
+                    outor.Name = netg.output.name;
+                    vertexhash.put(netg, outor);
+                    Gates.add(outor);
+                }
+                else
+                {
+                    Gate out =null;
+                    Gate lvert = null;
+                    if(netg.gtype == DGateType.NOT)
+                    {
+                        outpIndx = IndX;
+                        out = new Gate(IndX++, VertexType.OUTPUT.toString());                 
+                        lvert = new Gate(IndX++,VertexType.NOT.toString());
+                        vertexhash.put(netg, lvert);
+                    }
+                    else if(netg.gtype == DGateType.NOR2)
+                    {
+                        outpIndx = IndX;
+                        out = new Gate(IndX++, VertexType.OUTPUT.toString()); 
+                        lvert = new Gate(IndX++,VertexType.NOR.toString());
+                        vertexhash.put(netg, lvert);
+                    }
+                    out.Name = netg.output.name;
+                    lvert.outW = netg.output;
+                
+                    Gates.add(out);
+                    Gates.add(lvert);
+                }
+                //System.out.println(IndX);
+                
+            }
+            else
+            {
+                Gate vert=null;
+                if(netg.gtype == DGateType.NOT)
+                {
+                    vert = new Gate(IndX++,VertexType.NOT.toString());
+                }
+                else if(netg.gtype == DGateType.NOR2)
+                {
+                    vert = new Gate(IndX++,VertexType.NOR.toString());
+                }
+                vert.outW = netg.output;
+                
+                //System.out.println(netg.output.wtype.toString());
+                //System.out.println(netg.gtype.toString());
+                vertexhash.put(netg, vert);
+                Gates.add(vert);
+            }
+        }
+        for(DWire inpx:inplist)
+        {
+            Gate vert = new Gate(IndX++,VertexType.INPUT.toString());
+            vert.outW = inpx;
+            vert.Name = inpx.name;
+            vert.Outgoing = null;
+            
+            Gates.add(vert);
+        }
+        int eind=0;
+        
+        for(int i=netlist.size()-1;i>=0;i--)
+        {
+            DGate netg = netlist.get(i);
+           
+            if((netg.output.wtype == DWireType.output) && (netg.gtype != DGateType.OR2))
+            {
+                Wire out = new Wire();
+                out.From = Gates.get(outpIndx);
+                out.To = vertexhash.get(netg);
+                out.Index = eind++; 
+                out.Next = null;
+                Wires.add(out);
+            }
+            Wire temp = null;
+            
+            
+            
+            for(DWire inps:netg.input)
+            {
+                
+               Gate gTo= null;
+               //System.out.println(inps.name);
+               for(Gate xvert:Gates)
+               {
+                  
+                   if(xvert.outW.name.trim().equals(inps.name.trim()))
+                   {
+                       gTo = xvert;
+                       break;
+                   }
+               }
+               Gate gFrom = null;
+               gFrom = vertexhash.get(netg);
+               Wire newEdge = new Wire(eind++,gFrom,gTo,temp);
+               
+               temp = newEdge;
+               Wires.add(newEdge);
+               
+            }
+        }
+        
+        for(Wire edg:Wires)
+        {
+            if(edg.From.Type == "NOR" || edg.From.Type == "OUTPUT_OR")
+            {
+                if(!(edg.Next == null))
+                {
+                int count=0;
+                
+                for(Gate dvert:Gates)
+                {
+                    if(edg.From.equals(dvert))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+                
+                Gates.get(count).Outgoing = edg;
+                
+                }
+            }
+            else
+            {
+                if(edg.Next == null)
+                {
+                int count=0;
+                
+                for(Gate dvert:Gates)
+                {
+                    if(edg.From.equals(dvert))
+                    {
+                        break;
+                    }
+                    count++;
+                }
+                Gates.get(count).Outgoing = edg;
+                
+                }
+            }
+        }
+        
+        for(Wire xdedge:Wires)
+        {
+            outDAG.Wires.add(new Wire(xdedge));
+        }
+        for(Gate xdvert:Gates)
+        {
+            outDAG.Gates.add(new Gate(xdvert));
+        }
+        //DAGW outputDAG = new DAGW(outDAG.Gates,outDAG.Wires);
+        return outDAG;
+    }
+   
+   
+    
+    
+    
+    
+     public static DAGW CreateDAGW(List<DGate> netlist)
+    {
+         DAGW outDAG = new DAGW();
+         List<DWire> inplist = new ArrayList<DWire>(); 
+         List<Gate> Gates = new ArrayList<Gate>();
+         List<Wire> Wires = new ArrayList<Wire>();
+         HashMap<DGate,Gate> vertexhash = new HashMap<DGate,Gate>();
+         int IndX =0; 
+         int outpIndx=0;
+        /*for(DGate xgate:netlist)
+        {
+            System.out.println(netlist(xgate));
+        }*/
+         
+        
+        //<editor-fold desc="Single Gate in netlist of type Buffer" > 
+        if(netlist.size() == 1 && netlist.get(0).gtype == DGateType.BUF) // This step is incase there is a single gate in the netlist and it is of type Buffer
+        {
+            Gate outb = new Gate();
+            Gate inpb = new Gate();
+            
+            outb.Type = "OUTPUT";
+            outb.Name = netlist.get(0).output.name;
+            outb.Index =0;
+            
+            inpb.Index = 1;
+            inpb.Name = netlist.get(0).input.get(0).name;
+            inpb.Type = "INPUT";
+            
+            
+            Wire edge = new Wire();
+            
+            edge.From = outb;
+            edge.To = inpb;
+            edge.Index = 0;
+            edge.Next = null;
+            
+            outb.Outgoing = edge;
+            inpb.Outgoing = null;
+            
+            outDAG.Gates.add(outb);
+            outDAG.Gates.add(inpb);
+            outDAG.Wires.add(edge);
+            return outDAG;
+            
+        }
+        //</editor-fold>
+        
+        //<editor-fold  desc="Replace every Nor gate with one input as Ground, with a NOT gate">
+        for(int i=netlist.size()-1;i>=0;i--) // This step is for a NOR Gate that has a Zero as an input. Replace it with a simple NOT gate. 
+        {
+            DGate netg = netlist.get(i);
+             if(netg.input.contains(zero))
+             {
+                DGate tempNot = new DGate();
+                for(DWire xi:netg.input)
+                {
+                    if(!(xi.equals(zero)))
+                        tempNot.input.add(xi);
+                    tempNot.output = netg.output;
+                    tempNot.gtype = DGateType.NOT;
+                }
+                netlist.get(i).gtype = tempNot.gtype;
+                netlist.get(i).input = tempNot.input;
+                netlist.get(i).output = tempNot.output;
+            }
+        }
+        //</editor-fold>
+        
+        //<editor-fold desc="Replace NOR followed by NOT followed by an output with OUTPUT_OR - Commented out">
+        //This section replaces a NOR followed by a NOT followed by an output with an Output_OR
+        
+        /*if(netlist.size()>1)
+        {
+            int lastnet = netlist.size()-1;
+            if((netlist.get(lastnet).gtype == DGateType.NOT) && (netlist.get(lastnet-1).gtype == DGateType.NOR2))
+            {
+                netlist.get(lastnet).gtype = DGateType.OR2;
+                netlist.get(lastnet).input = netlist.get(lastnet-1).input;
+                netlist.remove(lastnet-1);
+            }
+        }*/
+        //</editor-fold>
+        
+        
+        
         
         
         for(int i=netlist.size()-1;i>=0;i--)

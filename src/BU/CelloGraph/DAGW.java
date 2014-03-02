@@ -88,6 +88,49 @@ public class DAGW {
         }
     }
     
+    public String printGraph() 
+    {
+        String s = "";
+
+        for (int i = 0; i < Gates.size(); ++i) 
+        {
+            Gate gi = Gates.get(i);
+            //s += String.format("Vertex: Name = %-18s Type = %-9s  Index = %-3d", gi.Name, gi.Type, gi.Index);
+
+
+            s += String.format("%-12s", gi.Type);
+            s += String.format("%-18s", gi.Name);
+            s += String.format("%-3d", gi.Index);
+
+
+            System.out.println(s);
+
+            String child_indx = "";
+            if (gi.Type.equals("NOT") || gi.Type.equals("OUTPUT")) 
+            {
+                System.out.println(gi.Type);
+                child_indx += "(" + gi.Outgoing.To.Index + ")";
+            }
+            if (gi.Type.equals("NOR") || gi.Type.equals("OUTPUT_OR")) 
+            {
+                child_indx += "(" + gi.Outgoing.To.Index + ",";
+                child_indx += gi.Outgoing.Next.To.Index + ")";
+            }
+            s += String.format("%-12s", child_indx);
+
+            if (gi.score != -1.0000) 
+            {
+                s += String.format("%-5.4f", gi.score);
+            }
+            s += "\n";
+        }
+        s += "\n";
+
+        return s;
+    }
+    
+    
+    
     public static String printDAGW()
     {
         return "";
