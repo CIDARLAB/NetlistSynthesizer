@@ -103,12 +103,12 @@ public class DAGW {
             s += String.format("%-3d", gi.Index);
 
 
-            System.out.println(s);
+            //System.out.println(s);
 
             String child_indx = "";
             if (gi.Type.equals("NOT") || gi.Type.equals("OUTPUT")) 
             {
-                System.out.println(gi.Type);
+                //System.out.println(gi.Type);
                 child_indx += "(" + gi.Outgoing.To.Index + ")";
             }
             if (gi.Type.equals("NOR") || gi.Type.equals("OUTPUT_OR")) 
