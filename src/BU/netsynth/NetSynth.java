@@ -572,8 +572,14 @@ public class NetSynth {
                 espout = runEspresso(filestring);
                 List<DGate> espoutput = new ArrayList<DGate>();
                 espoutput = convertPOStoNORNOT(espout);
-                
+                espoutput = optimizeNetlist(espoutput);
                 //espoutput = parseEspressoToNORNAND(espout);
+                
+                System.out.println("\nPOST-OPTIMIZATION : NETLIST\n");
+                for(int i=0;i<espoutput.size();i++)
+                {
+                    System.out.println(netlist(espoutput.get(i)));
+                }
                 
                 Writer outputinv = new BufferedWriter(new FileWriter(fespinpinv));
                 for(String xline:eslinesinv)
@@ -589,6 +595,13 @@ public class NetSynth {
                 
                 //espoutputinv = parseEspressoToNORNAND(espoutinv);
                 espoutputinv = convertPOStoNORNOT(espoutinv);
+                espoutputinv = optimizeNetlist(espoutputinv);
+                
+                System.out.println("\nPOST-OPTIMIZATION : INV NETLIST\n");
+                for(int i=0;i<espoutputinv.size();i++)
+                {
+                    System.out.println(netlist(espoutputinv.get(i)));
+                }
                 
                 //System.out.println("\n\n==== CHECKING!!! ====");
                 
@@ -1346,6 +1359,78 @@ public class NetSynth {
     
     public static List<DGate> optimizeNetlist(List<DGate> netlistinp)
     {
+        //Remove Redundant NOT Gates
+        List<Integer> removegates = new ArrayList<Integer>();
+        for(int i=0;i<netlistinp.size()-1;i++)
+        {
+            if(netlistinp.get(i).gtype.equals(DGateType.NOT))
+            {
+                //DWire inpwire = new DWire();
+                //DWire outpwire = new DWire();
+                //String inp_name = netlistinp.get(i).input.get(0).name;
+                //String outp_name = netlistinp.get(i).output.name;
+                
+                for(int j=(i+1);j<netlistinp.size();j++)
+                {
+                    if(netlistinp.get(j).gtype.equals(DGateType.NOT))
+                    {
+                        if(netlistinp.get(j).input.get(0).name.equals(netlistinp.get(i).output.name))
+                        {
+                            if(netlistinp.get(j).output.wtype.equals(DWireType.output))
+                            {
+                                if(netlistinp.get(i).input.get(0).wtype.equals(DWireType.input))
+                                {
+                                    netlistinp.get(j).input.get(0).name = netlistinp.get(i).input.get(0).name;
+                                    netlistinp.get(j).input.get(0).wtype = netlistinp.get(i).input.get(0).wtype;
+                                    netlistinp.get(j).gtype = DGateType.BUF;
+                                }
+                                else
+                                {
+                                    for(int k=0;k<=i;k++)
+                                    {
+                                        if(netlistinp.get(k).output.name.equals(netlistinp.get(i).input.get(0).name))
+                                        {
+                                            //netlistinp.get(k).output.name = netlistinp.get(j).output.name;
+                                            //netlistinp.get(k).output.wtype = netlistinp.get(j).output.wtype;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                            
+                                for(int k=j;k<netlistinp.size();k++)
+                                {
+                                    if(k!=j)
+                                    {
+                                        for(int m=0;m<netlistinp.get(k).input.size();m++)
+                                        {
+                                            if(netlistinp.get(k).input.get(m).name.equals(netlistinp.get(j).output.name))
+                                            {
+                                                //System.out.println("First "+k+ " is "+netlistinp.get(k).input.get(m).name);
+                                                //System.out.println("Second "+j+ " is "+netlistinp.get(j).output.name);
+                                            
+                                                netlistinp.get(k).input.get(m).name = netlistinp.get(i).input.get(0).name;
+                                                netlistinp.get(k).input.get(m).wtype = netlistinp.get(i).input.get(0).wtype;
+                                                //netlistinp.get(k).input.get(m).name = netlistinp.get(i).input.get(0).name;
+                                            }
+                                            //if(xinp)
+                                        }
+                                    }
+                                }
+                            }
+                            removegates.add(j);
+                        }
+                    }
+                }
+                //System.out.println("NOT Gate found : " + netlist(netlistinp.get(i)));
+            }
+        }
+        for(int i=0;i<removegates.size();i++)
+        {
+            netlistinp.remove(removegates.get(i));
+            
+        }
         
         return netlistinp;
     }
