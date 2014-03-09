@@ -102,7 +102,7 @@ public class NetSynth {
         
         
         DAGW xcasedag = testParser("",0,0);
-        HeuristicSearch.beginSearch(xcasedag, 0.95,0.8,-1,500,20000);
+        HeuristicSearch.beginSearch(xcasedag, 0.95,0.5,-1,500,20000);
         
         
         //testespressogen();
@@ -1160,8 +1160,8 @@ public class NetSynth {
     public static List<DGate> convertPOStoNORNOT(List<String> espinp)
     {
         
-        for(String xespinp:espinp)
-            System.out.println(xespinp);
+        //for(String xespinp:espinp)
+        //    System.out.println(xespinp);
         
         List<DGate> netlist = new ArrayList<DGate>();
         one = new DWire("_one",DWireType.Source);
@@ -1345,11 +1345,12 @@ public class NetSynth {
                 //System.out.println("OUTPUT SUM Terms: " +outputsum.get(j).size());    
             }
         }
+        System.out.println("\nNetlist after POS to NOT NOR conversion:\n");
         for(int i=0;i<netlist.size();i++)
         {   
             System.out.println(netlist(netlist.get(i)));
         }
-        
+        System.out.println("-----------\n");
         //String ttval = BooleanSimulator.bpermuteEsynth(netlist);
         //System.out.println("This is the truthTable : "+ttval);
         
@@ -1360,79 +1361,252 @@ public class NetSynth {
     public static List<DGate> optimizeNetlist(List<DGate> netlistinp)
     {
         //Remove Redundant NOT Gates
+        
+        
+        
         List<Integer> removegates = new ArrayList<Integer>();
         for(int i=0;i<netlistinp.size()-1;i++)
         {
-            if(netlistinp.get(i).gtype.equals(DGateType.NOT))
+            if(netlistinp.get(i).gtype.equals(DGateType.NOT)) //Gate i is a NOT gate
             {
-                //DWire inpwire = new DWire();
-                //DWire outpwire = new DWire();
-                //String inp_name = netlistinp.get(i).input.get(0).name;
-                //String outp_name = netlistinp.get(i).output.name;
-                
-                for(int j=(i+1);j<netlistinp.size();j++)
+                for(int j=(i+1);j<netlistinp.size();j++) // Look at all gates j after Gate i
                 {
                     if(netlistinp.get(j).gtype.equals(DGateType.NOT))
                     {
-                        if(netlistinp.get(j).input.get(0).name.equals(netlistinp.get(i).output.name))
-                        {
-                            if(netlistinp.get(j).output.wtype.equals(DWireType.output))
-                            {
-                                if(netlistinp.get(i).input.get(0).wtype.equals(DWireType.input))
-                                {
-                                    netlistinp.get(j).input.get(0).name = netlistinp.get(i).input.get(0).name;
-                                    netlistinp.get(j).input.get(0).wtype = netlistinp.get(i).input.get(0).wtype;
-                                    netlistinp.get(j).gtype = DGateType.BUF;
-                                }
-                                else
-                                {
-                                    for(int k=0;k<=i;k++)
-                                    {
-                                        if(netlistinp.get(k).output.name.equals(netlistinp.get(i).input.get(0).name))
-                                        {
-                                            //netlistinp.get(k).output.name = netlistinp.get(j).output.name;
-                                            //netlistinp.get(k).output.wtype = netlistinp.get(j).output.wtype;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                            
-                                for(int k=j;k<netlistinp.size();k++)
-                                {
-                                    if(k!=j)
-                                    {
+                   if(netlistinp.get(i).output.name.equals(netlistinp.get(j).input.get(0).name)) // If input of Gate j is the output of Gate i
+                   {
+                       if(netlistinp.get(j).output.wtype.equals(DWireType.output)) // if output of Gate j is an output for the circuit
+                       {
+                           if(netlistinp.get(i).input.get(0).wtype.equals(DWireType.input)) // input of Gate i is an input for the circuit
+                           {
+                               System.out.println("Before Step 1");
+                               System.out.println(i+":"+netlist(netlistinp.get(i)));
+                               System.out.println(j+":"+netlist(netlistinp.get(j)));
+                               DWire newW = new DWire(netlistinp.get(i).input.get(0).name,netlistinp.get(i).input.get(0).wtype);
+                               netlistinp.get(j).input.remove(0);
+                               netlistinp.get(j).input.add(newW);
+                               //System.out.println("Index i:"+i+" j:"+j);
+                               
+                               //netlistinp.get(j).input.get(0).name = netlistinp.get(i).input.get(0).name;
+                               netlistinp.get(j).gtype = DGateType.BUF;
+                               
+                               System.out.println("After Step 1");
+                               System.out.println(i+":"+netlist(netlistinp.get(i)));
+                               System.out.println(j+":"+netlist(netlistinp.get(j)));
+                               
+                               int dntremoveflag =0;
+                               for(int k=(i+1);k<netlistinp.size();k++)
+                               {
+                                   if((k!=j) && (!netlistinp.get(k).output.wtype.equals(DWireType.output)))
+                                   {
                                         for(int m=0;m<netlistinp.get(k).input.size();m++)
                                         {
                                             if(netlistinp.get(k).input.get(m).name.equals(netlistinp.get(j).output.name))
                                             {
-                                                //System.out.println("First "+k+ " is "+netlistinp.get(k).input.get(m).name);
-                                                //System.out.println("Second "+j+ " is "+netlistinp.get(j).output.name);
-                                            
-                                                netlistinp.get(k).input.get(m).name = netlistinp.get(i).input.get(0).name;
-                                                netlistinp.get(k).input.get(m).wtype = netlistinp.get(i).input.get(0).wtype;
-                                                //netlistinp.get(k).input.get(m).name = netlistinp.get(i).input.get(0).name;
+                                                dntremoveflag = 1;
                                             }
-                                            //if(xinp)
                                         }
-                                    }
-                                }
-                            }
-                            removegates.add(j);
+                                   }
+                               }
+                               if(dntremoveflag == 0)
+                               {
+                                   if(!removegates.contains(i))
+                                   {
+                                       System.out.println("Remove Gate index:"+i);
+                                       removegates.add(i);
+                                   }
+                               }
+                           }
+                           else // input of Gate i is a connecting wire from another gate. 
+                           {
+                               String outwName = "";
+                               int inpcount =0;
+                               int outwindx = 0;
+                               for(int k=0;k<netlistinp.size();k++)
+                               {
+                                   if(netlistinp.get(k).output.name.equals(netlistinp.get(i).input.get(0).name))
+                                   {
+                                       outwindx = k;
+                                       outwName = netlistinp.get(k).output.name;
+                                   }
+                               }
+                               for(int k=outwindx;k<netlistinp.size();k++)
+                               {
+                                   if(k!=i)
+                                   {
+                                       for(int m=0;m<netlistinp.get(k).input.size();m++)
+                                       {
+                                           if(netlistinp.get(k).input.get(m).name.equals(outwName))
+                                           {
+                                               inpcount++;
+                                           }
+                                       }
+                                   }
+                               }
+                               if(inpcount==0)
+                               {
+                                   
+                                   System.out.println("Before Step 2");
+                                   System.out.println(outwindx+":"+netlist(netlistinp.get(outwindx)));
+                                   System.out.println(j+":"+netlist(netlistinp.get(j)));
+                                   
+                                   //DWire newW = new DWire(netlistinp.get(j).output.name,netlistinp.get(j).output.wtype);
+                                   //netlistinp.get(outwindx).output = new DWire();
+                                   //netlistinp.get(outwindx).output = newW;
+                                   
+                                   netlistinp.get(outwindx).output.name = netlistinp.get(j).output.name;
+                                   netlistinp.get(outwindx).output.wtype = netlistinp.get(j).output.wtype;
+                                   
+                                   System.out.println("After Step 2");
+                                   System.out.println(outwindx+":"+netlist(netlistinp.get(outwindx)));
+                                   System.out.println(j+":"+netlist(netlistinp.get(j)));
+                                   
+                                   
+                                   if(!removegates.contains(j))
+                                   {
+                                       System.out.println("Remove Gate index:" + j);
+                                       removegates.add(j);
+                                   }
+                                   if(!removegates.contains(i))
+                                   {
+                                       System.out.println("Remove Gate index:"+i);
+                                       removegates.add(i);
+                                   }
+                                   
+                                   
+                                   
+                               }
+                           }
+                       }
+                       else // if output of Gate j is a connecting wire for another gate
+                       {
+                           for(int k=j;k<netlistinp.size();k++)
+                           {
+                               if(k!=j)
+                               {
+                                   for(int m=0;m<netlistinp.get(k).input.size();m++)
+                                   {
+                                       if(netlistinp.get(k).input.get(m).name.equals(netlistinp.get(j).output.name))
+                                       {
+                                           System.out.println("Before Step 3");
+                                           System.out.println(i+":"+netlist(netlistinp.get(i)));
+                                           System.out.println(j+":"+netlist(netlistinp.get(j)));
+                                           System.out.println(k+":"+netlist(netlistinp.get(k)));
+                                           
+                                           String wireJin = netlistinp.get(j).output.name;
+                                           DWireType wireJtype = netlistinp.get(j).output.wtype;
+                                           DWire newWout = new DWire(wireJin,wireJtype);
+                                           DWire newWin = new DWire(netlistinp.get(j).input.get(0).name,netlistinp.get(j).input.get(0).wtype);
+                                           List<DWire> jinp = new ArrayList<DWire>();
+                                           jinp.add(newWin);
+                                           DGate jGate = new DGate(netlistinp.get(j).gtype,jinp,newWout);
+                                           
+                                           netlistinp.set(j, jGate);
+                                           //netlistinp.get(j).input.remove(0);
+                                           //netlistinp.get(j).input.add(newWout);
+                                           
+                                           netlistinp.get(k).input.get(m).name = netlistinp.get(i).input.get(0).name;
+                                           netlistinp.get(k).input.get(m).wtype = netlistinp.get(i).input.get(0).wtype;
+                                           
+                                           
+                                           //DWire newW = new DWire(netlistinp.get(i).input.get(0).name,netlistinp.get(i).input.get(0).wtype);
+                                           //netlistinp.get(k).output = new DWire();
+                                           //netlistinp.get(k).output = newW;
+                                           
+                                           System.out.println("After Step 3");
+                                           //System.out.println("Wire safekeep:"+wireJout);
+                                           System.out.println(i+":"+netlist(netlistinp.get(i)));
+                                           System.out.println(j+":"+netlist(netlistinp.get(j)));
+                                           System.out.println(k+":"+netlist(netlistinp.get(k)));
+                                           
+                                           
+                                           if(!removegates.contains(j))
+                                           {
+                                               System.out.println("Remove Gate index:"+j);
+                                               removegates.add(j);
+                                           }
+                                           
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }
+                    }
+                }
+            }
+        }
+        List<DGate> optnetlist = new ArrayList<DGate>();
+        
+        System.out.println("\nBefore Removing Gates:");
+        for(int i=0;i<netlistinp.size();i++)
+        {
+            System.out.println(netlist(netlistinp.get(i)));
+        }
+        System.out.println("-------------------------\n");
+        for(int i=0;i<netlistinp.size();i++)
+        {
+            if(!removegates.contains(i))
+            {
+                System.out.println("Add:" + netlist(netlistinp.get(i)));
+                optnetlist.add(netlistinp.get(i));
+            }
+            else
+            {
+                System.out.println("Remove:" + netlist(netlistinp.get(i)));
+            }
+        }
+        
+        System.out.println("First Set of remove indices");
+        for(int i=0;i<removegates.size();i++)
+            System.out.println("Remove Gates :"+removegates.get(i));
+        removegates = new ArrayList<Integer>();
+        System.out.println("\nAfter Removing Gates:");
+        for(int i=0;i<optnetlist.size();i++)
+        {
+            System.out.println(netlist(optnetlist.get(i)));
+        }
+        System.out.println("-----------------------");
+        
+        for(int i=0;i<optnetlist.size()-1;i++)
+        {
+            String wireout = optnetlist.get(i).output.name;
+            if(optnetlist.get(i).output.wtype.equals(DWireType.connector))
+            {
+                int inpcount =0;
+                for(int j=i;j<optnetlist.size();j++)
+                {
+                    if(i!=j)
+                    {
+                        for(int m=0;m<optnetlist.get(j).input.size();m++)
+                        {
+                            if(optnetlist.get(j).input.get(m).name.equals(wireout))
+                                inpcount++;
                         }
                     }
                 }
-                //System.out.println("NOT Gate found : " + netlist(netlistinp.get(i)));
+                if(inpcount == 0)
+                    removegates.add(i);
             }
         }
+        System.out.println("Final Set of remove indices");
         for(int i=0;i<removegates.size();i++)
+            System.out.println(removegates.get(i));
+        
+        List<DGate> finalnetlist = new ArrayList<DGate>();
+        for(int i=0;i<optnetlist.size();i++)
         {
-            netlistinp.remove(removegates.get(i));
-            
+            if(!removegates.contains(i))
+                finalnetlist.add(optnetlist.get(i));
         }
         
-        return netlistinp;
+        System.out.println("\nFinal optimization");
+        for(int i=0;i<finalnetlist.size();i++)
+        {
+            System.out.println(netlist(finalnetlist.get(i)));
+        }
+        System.out.println("--------------------------------------------------");
+        return finalnetlist;
     }
     
     public static List<DGate> parseEspressoToNORNAND(List<String> espinp)

@@ -248,7 +248,7 @@ public class parseCaseStatements {
                         for(int i=0;i<outputpieces.length;i++)
                         {
                             circuit.outputNames.add(outputpieces[i].trim());
-                            System.out.println(outputpieces[i].trim());
+                            //System.out.println("These are the outputs!!"+outputpieces[i].trim());
                         }
                     }
                 }
