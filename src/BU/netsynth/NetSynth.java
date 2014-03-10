@@ -1606,7 +1606,60 @@ public class NetSynth {
             System.out.println(netlist(finalnetlist.get(i)));
         }
         System.out.println("--------------------------------------------------");
-        return finalnetlist;
+        
+        removegates = new ArrayList<Integer>();
+        
+        
+        System.out.println("\nBegin Output_OR optimization");
+        for(int i=0;i<finalnetlist.size()-1;i++)
+        {
+            if(finalnetlist.get(i).gtype.equals(DGateType.NOR2))
+            {
+                for(int j=i+1;j<finalnetlist.size();j++)
+                {
+                    if(finalnetlist.get(j).gtype.equals(DGateType.NOT) && finalnetlist.get(j).output.wtype.equals(DWireType.output))
+                    {
+                        int inpcount =0;
+                        for(int k=i+1;k<finalnetlist.size();k++)
+                        {
+                            if(k!=j)
+                            {
+                                for(int m=0;m<finalnetlist.get(k).input.size();m++)
+                                {
+                                    if(finalnetlist.get(i).output.name.equals(finalnetlist.get(k).input.get(m).name))
+                                    {
+                                        inpcount++;
+                                    }
+                                }
+                            }
+                        }
+                        if(inpcount==0)
+                        {
+                            removegates.add(j);
+                            finalnetlist.get(i).gtype = DGateType.OR2;
+                            finalnetlist.get(i).output.name = finalnetlist.get(j).output.name;
+                            finalnetlist.get(i).output.wtype = finalnetlist.get(j).output.wtype;
+                        }
+                    }
+                }
+            }
+            
+        }        
+        List<DGate> outputornetlist = new ArrayList<DGate>();
+        for(int i=0;i<finalnetlist.size();i++)
+        {
+            if(!removegates.contains(i))
+            {
+                outputornetlist.add(finalnetlist.get(i));
+            }
+        }
+        System.out.println("\nPost Output_OR optimization");
+        for(int i=0;i<outputornetlist.size();i++)
+        {
+            System.out.println(netlist(outputornetlist.get(i)));
+        }
+        System.out.println("--------------------------");
+        return outputornetlist;
     }
     
     public static List<DGate> parseEspressoToNORNAND(List<String> espinp)
@@ -2326,11 +2379,16 @@ public class NetSynth {
         
         List<String> inputwires = new ArrayList<String>();
         List<String> outputwires = new ArrayList<String>();
+        List<String> outputORwires = new ArrayList<String>();
         
         for(DGate xgate:netlist)
         {
             if(xgate.output.wtype.equals(DWireType.output))
+            {
                 outputwires.add(xgate.output.name.trim());
+                if(xgate.gtype.equals(DGateType.OR2))
+                    outputORwires.add(xgate.output.name.trim());
+            }
             for(DWire xinp:xgate.input)
             {
                 if(xinp.wtype.equals(DWireType.input))
@@ -2347,7 +2405,11 @@ public class NetSynth {
         {
             Gate outg = new Gate();
             outg.Name = outputwires.get(i);
-            outg.Type = GateType.OUTPUT.toString();
+            if(outputORwires.contains(outputwires.get(i)))
+                outg.Type = GateType.OUTPUT_OR.toString();
+            else
+                outg.Type = GateType.OUTPUT.toString();
+                
             outg.Index = indx;
             indx++;
             Gates.add(outg);
@@ -2415,7 +2477,7 @@ public class NetSynth {
             else
             {
                 Wire temp = null;
-                if(netg.output.wtype.equals(DWireType.output))
+                if(netg.output.wtype.equals(DWireType.output) && !netg.gtype.equals(DGateType.OR2))
                 {
                     Wire outpwire = new Wire();
                     int fromindx =0;
@@ -2511,8 +2573,6 @@ public class NetSynth {
                             temp = connwire;
                         }
                     }
-                    
-                    
                 }
                 else
                 {
