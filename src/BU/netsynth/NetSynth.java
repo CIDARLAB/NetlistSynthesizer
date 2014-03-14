@@ -46,6 +46,7 @@ import java.util.logging.Logger;
 
 import BU.netsynth.DGate.DGateType;
 import BU.netsynth.DWire.DWireType;
+import BU.precomputation.HistogramREU;
 import BU.precomputation.PreCompute;
 import BU.precomputation.genVerilogFile;
 import MIT.dnacompiler.HeuristicSearch;
@@ -100,9 +101,9 @@ public class NetSynth {
         //histogram();
         
         
-        
-        DAGW xcasedag = testParser("",0,0);
-        HeuristicSearch.beginSearch(xcasedag, 0.95,0.5,-1,500,20000);
+        HistogramREU.calcHist();
+        //DAGW xcasedag = testParser("",0,0);
+        //HeuristicSearch.beginSearch(xcasedag, 0.95,0.5,-1,500,20000);
         
         
         //testespressogen();
@@ -2406,7 +2407,10 @@ public class NetSynth {
             Gate outg = new Gate();
             outg.Name = outputwires.get(i);
             if(outputORwires.contains(outputwires.get(i)))
+            {
                 outg.Type = GateType.OUTPUT_OR.toString();
+                outg.outW = new DWire(outputwires.get(i),DWireType.output);
+            }
             else
                 outg.Type = GateType.OUTPUT.toString();
                 
