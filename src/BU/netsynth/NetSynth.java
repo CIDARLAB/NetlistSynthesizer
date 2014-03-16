@@ -101,7 +101,7 @@ public class NetSynth {
         //histogram();
         
         
-        HistogramREU.calcHist();
+        HistogramREU.calcHist(-0.803574133407);
         //DAGW xcasedag = testParser("",0,0);
         //HeuristicSearch.beginSearch(xcasedag, 0.95,0.5,-1,500,20000);
         

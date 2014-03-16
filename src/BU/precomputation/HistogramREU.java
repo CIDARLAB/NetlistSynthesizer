@@ -16,7 +16,7 @@ import java.io.IOException;
  * @author prashantvaidyanathan
  */
 public class HistogramREU {
-    public static void calcHist()
+    public static void calcHist(double titreval)
     {
         String Filepath;
         Filepath = HistogramREU.class.getClassLoader().getResource(".").getPath();
@@ -134,9 +134,36 @@ public class HistogramREU {
         {
             bluemean += (blue.x.get(i) * blue.y.get(i));
         }
-        black.mean = blackmean;
-        blue.mean = bluemean;
-        gray.mean = graymean;
+        double graymeanavg=0;
+        double bluemeanavg=0;
+        double blackmeanavg=0;
+        for(int i=0;i<black.x.size();i++)
+        {
+            if(black.x.get(i) >= blackmean)
+            {
+                blackmeanavg = black.x.get(i);
+                break;
+            }
+        }
+        for(int i=0;i<blue.x.size();i++)
+        {
+            if(blue.x.get(i) >= bluemean)
+            {
+                bluemeanavg = blue.x.get(i);
+                break;
+            }
+        }
+        for(int i=0;i<gray.x.size();i++)
+        {
+            if(gray.x.get(i) >= graymean)
+            {
+                graymeanavg = gray.x.get(i);
+                break;
+            }
+        }
+        black.mean = blackmeanavg;
+        blue.mean = bluemeanavg;
+        gray.mean = graymeanavg;
         
         System.out.println("Black Mean :"+black.mean);
         System.out.println("Blue Mean :"+blue.mean);
@@ -147,26 +174,154 @@ public class HistogramREU {
         blackshift.titrationpoint = black.titrationpoint;
         grayshift.titrationpoint = gray.titrationpoint;
         
+        
+        
         double shiftedgraymean =0;
         double shiftedblackmean =0;
         for(int i=0;i<black.x.size();i++)
         {
             blackshift.y.add(black.y.get(i));
-            double shiftx = black.x.get(i) - blackmean;
+            double shiftx = black.x.get(i) - blackmeanavg;
             blackshift.x.add(shiftx);
             shiftedblackmean +=  (shiftx*black.y.get(i));
         }
         for(int i=0;i<gray.x.size();i++)
         {
             grayshift.y.add(gray.y.get(i));
-            double shiftx = gray.x.get(i) - graymean;
+            double shiftx = gray.x.get(i) - graymeanavg;
             grayshift.x.add(shiftx);
             shiftedgraymean +=  (shiftx*gray.y.get(i));
         }
-        grayshift.mean = shiftedgraymean;
+        double shiftedgraymeanavg =0;
+        double shiftedblackmeanavg =0;
+        for(int i=0;i<black.x.size();i++)
+        {
+            if(blackshift.x.get(i)>= shiftedblackmean)
+            {
+                shiftedblackmeanavg = blackshift.x.get(i);
+                break;
+            }
+        }
+        for(int i=0;i<gray.x.size();i++)
+        {
+            if(grayshift.x.get(i)>= shiftedgraymean)
+            {
+                shiftedgraymeanavg = grayshift.x.get(i);
+                break;
+            }
+        }
         
-        System.out.println("Shifted Black Mean :"+shiftedblackmean);
-        System.out.println("Shifted Gray Mean :"+shiftedgraymean);
+        grayshift.mean = shiftedgraymeanavg;
+        blackshift.mean = shiftedblackmeanavg;
         
+        grayshift.titrationpoint = gray.titrationpoint;
+        blackshift.titrationpoint = black.titrationpoint;
+        
+        System.out.println("Shifted Black Mean :" + blackshift.mean);
+        System.out.println("Shifted Gray Mean :" + grayshift.mean);
+        reuHist greenshift = new reuHist();
+        greenshift.titrationpoint = titreval;
+        reuHist green = new reuHist();
+        green.titrationpoint = titreval;
+        double greenmean = 0;
+        greenmean = gray.mean - (((gray.titrationpoint-green.titrationpoint)/(gray.titrationpoint-black.titrationpoint))*(gray.mean-black.mean));
+        System.out.println("Predicted Green Mean :"+greenmean);
+        if(grayshift.x.get(grayshift.x.size()-1) > blackshift.x.get(blackshift.x.size()-1))
+        {
+            for(int i=0;i<blackshift.x.size();i++)
+            {
+                double y1 = blackshift.y.get(i);
+                int j=0;
+                for(j=0;j<grayshift.x.size();j++)
+                {
+                    if(grayshift.x.get(j) >= blackshift.x.get(i))
+                        break;
+                }
+                if(j==500)
+                    j--;
+                double y2 = grayshift.y.get(j);
+                double yval = line_eq(black.titrationpoint,y1,gray.titrationpoint,y2,titreval);
+                
+                greenshift.x.add(blackshift.x.get(i));
+                greenshift.y.add(yval);
+            }
+            int k=grayshift.x.size()-1;
+            for(int j=0;j<grayshift.x.size();j++)
+            {
+                if(grayshift.x.get(j)>blackshift.x.get(blackshift.x.size()-1))
+                {
+                    k=j;
+                    break;
+                }
+            }
+            for(int j=k;j<grayshift.x.size();j++)
+            {
+                double y2 = grayshift.y.get(j);
+                double y1 =0;
+                double yval = line_eq(black.titrationpoint,y1,gray.titrationpoint,y2,titreval);
+                greenshift.x.add(grayshift.x.get(j));
+                greenshift.y.add(yval);
+            }
+        }
+        else
+        {
+            for(int i=0;i<grayshift.x.size();i++)
+            {
+                double y1 = grayshift.y.get(i);
+                int j=0;
+                for(j=0;j<blackshift.x.size();j++)
+                {
+                    if(blackshift.x.get(j) >= grayshift.x.get(i))
+                        break;
+                }
+                if(j==500)
+                    j--;
+                double y2 = blackshift.y.get(j);
+                double yval = line_eq(gray.titrationpoint,y1,black.titrationpoint,y2,titreval);
+                greenshift.x.add(grayshift.x.get(i));
+                greenshift.y.add(yval);
+            }
+            int k=blackshift.x.size()-1;
+            for(int j=0;j<blackshift.x.size();j++)
+            {
+                if(blackshift.x.get(j)>grayshift.x.get(grayshift.x.size()-1))
+                {
+                    k=j;
+                    break;
+                }
+            }
+            for(int j=k;j<blackshift.x.size();j++)
+            {
+                double y2 = blackshift.y.get(j);
+                double y1 =0;
+                double yval = line_eq(gray.titrationpoint,y1,black.titrationpoint,y2,titreval);
+                greenshift.x.add(blackshift.x.get(j));
+                greenshift.y.add(yval);
+            }
+        }
+        //System.out.println("Shifted Black Mean :"+shiftedblackmean);
+        //System.out.println("Shifted Gray Mean :"+shiftedgraymean);
+        for(int i=0;i<greenshift.x.size();i++)
+        {
+            double tempx = greenshift.x.get(i) + greenmean;
+            if(tempx > black.x.get(0) && tempx< black.x.get(black.x.size()-1))
+            {
+                green.x.add(tempx);
+                green.y.add(greenshift.y.get(i));
+            }
+        }
+        for(int i=0;i<green.x.size();i++)
+        {
+            System.out.println(green.x.get(i)+" "+green.y.get(i));
+        }
+    }
+    public static double line_eq(double x1,double y1, double x2, double y2, double xval)
+    {
+        double yval=0;
+        if(x1 == x2)
+            return 0;
+        yval = y1 + (((y1-y2)*(xval-x1))/(x1-x2));
+        return yval;
     }
 }
+
