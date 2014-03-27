@@ -13,6 +13,7 @@ import BU.CelloGraph.DAGVertex.VertexType;
 import BU.CelloGraph.DAGW;
 import BU.CelloGraph.DAGraph;
 
+import BU.ParseVerilog.Blif;
 import MIT.dnacompiler.Gate;
 import MIT.dnacompiler.Gate.GateType;
 import MIT.dnacompiler.Wire;
@@ -100,8 +101,8 @@ public class NetSynth {
         //verifyinverse();
         //histogram();
         
-        
-        HistogramREU.calcHist(-0.803574133407);
+        testespressogen();
+        //HistogramREU.calcHist(-0.803574133407);
         //DAGW xcasedag = testParser("",0,0);
         //HeuristicSearch.beginSearch(xcasedag, 0.95,0.5,-1,500,20000);
         
@@ -131,6 +132,8 @@ public class NetSynth {
         circ.inputgatetable.add(96);
         List<String> espoutcirc = new ArrayList<String>();
         espoutcirc = Espresso.createFile(circ);
+        List<String> blifoutcirc = new ArrayList<String>();
+        blifoutcirc = Blif.createFile(circ);
         for(String xesp:espoutcirc)
         {
             System.out.println(xesp);
