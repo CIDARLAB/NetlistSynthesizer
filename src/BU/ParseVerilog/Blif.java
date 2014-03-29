@@ -76,8 +76,8 @@ public class Blif {
         line += ".end";
         esfile.add(line);
         
-        for(int i=0;i<esfile.size();i++)
-            System.out.println(esfile.get(i));
+        //for(int i=0;i<esfile.size();i++)
+        //    System.out.println(esfile.get(i));
         
         return esfile;
     }

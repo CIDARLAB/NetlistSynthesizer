@@ -52,6 +52,8 @@ import BU.precomputation.PreCompute;
 import BU.precomputation.genVerilogFile;
 import MIT.dnacompiler.HeuristicSearch;
 import MIT.dnacompiler.LoadTables;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 
 /**
@@ -101,7 +103,10 @@ public class NetSynth {
         //verifyinverse();
         //histogram();
         
-        testespressogen();
+        testABC();
+        
+        //EspressoVsABC(3);
+        //testespressogen();
         //HistogramREU.calcHist(-0.803574133407);
         //DAGW xcasedag = testParser("",0,0);
         //HeuristicSearch.beginSearch(xcasedag, 0.95,0.5,-1,500,20000);
@@ -118,6 +123,131 @@ public class NetSynth {
         
     }
     
+    public static void EspressoVsABC(int inpcount)
+    {
+        int truthsize = (int)Math.pow(2, inpcount);
+        int possiblecirc = (int)Math.pow(2, truthsize);
+        List<Integer> espressocount = new ArrayList<Integer>();
+        List<Integer> abccount = new ArrayList<Integer>();
+        
+        for(int i=0;i<possiblecirc;i++)
+        {
+            System.out.println("Truth Table "+i);
+            CircuitDetails circ = new CircuitDetails();
+            int inpc=0;
+            for(int j=0;j<inpcount;j++)
+            {
+                String inputname = "inp" + j;
+                circ.inputNames.add(inputname);
+            }
+            circ.outputNames.add("out");
+            circ.inputgatetable.add(i);
+            
+            List<String> espressoinput = new ArrayList<String>();
+            List<String> blifinput = new ArrayList<String>();
+            
+            espressoinput = Espresso.createFile(circ);
+            blifinput = Blif.createFile(circ);
+            
+            String filestring ="";
+            String filestringespresso = "";
+            String filestringblif = "";
+           
+            if(Filepath.contains("prashant"))
+            {
+                filestring += Filepath+ "src/BU/resources/";
+            }
+            else
+            {
+                filestring += Filepath+ "BU/resources/";
+            }
+            filestringespresso = filestring + "espressoinp";
+            filestringblif = filestring + "blifinp";
+            filestringespresso += Global.espout++ ;
+            //filestringblif += Global.espout++ ;
+            filestringespresso += ".txt";
+            filestringblif += ".blif";
+            
+            File fespinp = new File(filestringespresso);
+            File fabcinp = new File(filestringblif);
+            try 
+            {
+                Writer outputesp = new BufferedWriter(new FileWriter(fespinp));
+                for(String xline:espressoinput)
+                {
+                    String newl = (xline + "\n");
+                    outputesp.write(newl);
+                }
+                outputesp.close();
+                
+                Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+                for(String xline:blifinput)
+                {
+                    String newl = (xline + "\n");
+                    outputblif.write(newl);
+                }
+                outputblif.close();
+                
+                List<String> espout = new ArrayList<String>();
+                List<String> abcout = new ArrayList<String>();
+                
+                espout = runEspresso(filestringespresso);
+                
+                List<DGate> espoutput = new ArrayList<DGate>();
+                espoutput = convertPOStoNORNOT(espout);
+                espoutput = optimizeNetlist(espoutput);
+                
+                
+                int espoutcount = espoutput.size();
+                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
+                    espoutcount --;
+                System.out.println("Circuit count for No: "+i+" : "+espoutcount);
+                
+                fespinp.deleteOnExit();
+                fabcinp.deleteOnExit();
+                
+            } 
+            catch (IOException ex) 
+            {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        
+    }
+    public static void create_VerilogFile(int inputs,String hex)
+    {
+        List<String> filelines = new ArrayList<String>();
+        filelines = genVerilogFile.createVerilogFile(inputs, hex);
+        String filestring = "";
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/";
+        }
+        filestring += "testverilog.v";
+          File fespinp = new File(filestring);
+        //Writer output;
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            //output = new BufferedWriter(new FileWriter(fespinp));
+             for (String xline :filelines) 
+             {
+                String newl = (xline + "\n");
+                output.write(newl);
+             }
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     
     public static void testespressogen()
     {
@@ -852,7 +982,126 @@ public class NetSynth {
         }
         
     }
-   
+    public static void testABC()
+    {
+        String filename = "test";
+        
+        runABC(filename);
+        
+    }
+    
+    public static void runABC(String filename) {
+    
+        
+        String x = System.getProperty("os.name");
+        StringBuilder commandBuilder = null;
+        if(x.contains("Mac"))
+        {
+            commandBuilder = new StringBuilder(Filepath+"BU/resources/abc");
+        }
+        else if("Linux".equals(x))
+        {
+            if(Filepath.contains("prashant"))
+            {
+                commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+Filepath+"src/BU/resources/"+filename+".blif; strash; refactor; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
+            }
+            else
+            {
+                commandBuilder = new StringBuilder(Filepath+"BU/resources/abc -c \"read "+Filepath+"BU/resources/"+filename+".blif; strash; refactor; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
+            }
+            
+        }
+        
+        String command = commandBuilder.toString();
+        //System.out.println(command);
+        
+        String filestring = "";
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/script";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/script";
+        }
+        File fespinp = new File(filestring);
+        //Writer output;
+        try 
+        {
+             Writer output = new BufferedWriter(new FileWriter(fespinp));
+            //output = new BufferedWriter(new FileWriter(fespinp));
+             output.write(command);
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
+        String clist = Filepath+"src/BU/resources/script";
+        
+        
+        Runtime runtime = Runtime.getRuntime();
+        Process proc = null;
+        
+        try 
+        {
+            proc = runtime.exec(clist);
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+     
+        convertBenchToANDNOT();
+    }
+    
+    public static void convertBenchToANDNOT()
+    {
+        
+        List<String> benchlines = new ArrayList<String>();
+        String filestring = "";
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/abcOutput.bench";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/abcOutput.bench";
+        }
+        
+        
+        
+	File gate_file = new File(filestring);
+	BufferedReader brgate;
+	FileReader filebench;
+	
+	try {
+	    filebench = new FileReader(gate_file);
+	    brgate = new BufferedReader(filebench);
+	    String line;
+	    try 
+            {
+		while((line = brgate.readLine()) != null ) 
+                {
+	            benchlines.add(line);
+                }
+	    }
+	    catch (IOException ex) {
+		System.out.println("IOException when reading input file");
+	    }
+	} 
+	catch (FileNotFoundException ex) {
+	    System.out.println("FileNotFoundException when reading input file");
+	}
+        
+        for(int i=0;i<benchlines.size();i++)
+            System.out.println(benchlines.get(i));
+        
+    }
+    
     public static List<String> runEspresso(String pathFile) {
     
         
@@ -1349,12 +1598,14 @@ public class NetSynth {
                 //System.out.println("OUTPUT SUM Terms: " +outputsum.get(j).size());    
             }
         }
-        System.out.println("\nNetlist after POS to NOT NOR conversion:\n");
+        
+        /*System.out.println("\nNetlist after POS to NOT NOR conversion:\n");
         for(int i=0;i<netlist.size();i++)
         {   
             System.out.println(netlist(netlist.get(i)));
         }
-        System.out.println("-----------\n");
+        System.out.println("-----------\n");*/
+        
         //String ttval = BooleanSimulator.bpermuteEsynth(netlist);
         //System.out.println("This is the truthTable : "+ttval);
         
@@ -1383,20 +1634,18 @@ public class NetSynth {
                        {
                            if(netlistinp.get(i).input.get(0).wtype.equals(DWireType.input)) // input of Gate i is an input for the circuit
                            {
-                               System.out.println("Before Step 1");
+                               /*System.out.println("Before Step 1");
                                System.out.println(i+":"+netlist(netlistinp.get(i)));
-                               System.out.println(j+":"+netlist(netlistinp.get(j)));
+                               System.out.println(j+":"+netlist(netlistinp.get(j)));*/
                                DWire newW = new DWire(netlistinp.get(i).input.get(0).name,netlistinp.get(i).input.get(0).wtype);
                                netlistinp.get(j).input.remove(0);
                                netlistinp.get(j).input.add(newW);
-                               //System.out.println("Index i:"+i+" j:"+j);
                                
-                               //netlistinp.get(j).input.get(0).name = netlistinp.get(i).input.get(0).name;
                                netlistinp.get(j).gtype = DGateType.BUF;
                                
-                               System.out.println("After Step 1");
+                               /*System.out.println("After Step 1");
                                System.out.println(i+":"+netlist(netlistinp.get(i)));
-                               System.out.println(j+":"+netlist(netlistinp.get(j)));
+                               System.out.println(j+":"+netlist(netlistinp.get(j)));*/
                                
                                int dntremoveflag =0;
                                for(int k=(i+1);k<netlistinp.size();k++)
@@ -1416,7 +1665,7 @@ public class NetSynth {
                                {
                                    if(!removegates.contains(i))
                                    {
-                                       System.out.println("Remove Gate index:"+i);
+                                       //System.out.println("Remove Gate index:"+i);
                                        removegates.add(i);
                                    }
                                }
@@ -1450,30 +1699,27 @@ public class NetSynth {
                                if(inpcount==0)
                                {
                                    
-                                   System.out.println("Before Step 2");
+                                   /*System.out.println("Before Step 2");
                                    System.out.println(outwindx+":"+netlist(netlistinp.get(outwindx)));
                                    System.out.println(j+":"+netlist(netlistinp.get(j)));
-                                   
-                                   //DWire newW = new DWire(netlistinp.get(j).output.name,netlistinp.get(j).output.wtype);
-                                   //netlistinp.get(outwindx).output = new DWire();
-                                   //netlistinp.get(outwindx).output = newW;
+                                   */
                                    
                                    netlistinp.get(outwindx).output.name = netlistinp.get(j).output.name;
                                    netlistinp.get(outwindx).output.wtype = netlistinp.get(j).output.wtype;
                                    
-                                   System.out.println("After Step 2");
+                                   /*System.out.println("After Step 2");
                                    System.out.println(outwindx+":"+netlist(netlistinp.get(outwindx)));
                                    System.out.println(j+":"+netlist(netlistinp.get(j)));
-                                   
+                                   */
                                    
                                    if(!removegates.contains(j))
                                    {
-                                       System.out.println("Remove Gate index:" + j);
+                                       //System.out.println("Remove Gate index:" + j);
                                        removegates.add(j);
                                    }
                                    if(!removegates.contains(i))
                                    {
-                                       System.out.println("Remove Gate index:"+i);
+                                       //System.out.println("Remove Gate index:"+i);
                                        removegates.add(i);
                                    }
                                    
@@ -1492,10 +1738,11 @@ public class NetSynth {
                                    {
                                        if(netlistinp.get(k).input.get(m).name.equals(netlistinp.get(j).output.name))
                                        {
-                                           System.out.println("Before Step 3");
+                                           /*System.out.println("Before Step 3");
                                            System.out.println(i+":"+netlist(netlistinp.get(i)));
                                            System.out.println(j+":"+netlist(netlistinp.get(j)));
                                            System.out.println(k+":"+netlist(netlistinp.get(k)));
+                                           */
                                            
                                            String wireJin = netlistinp.get(j).output.name;
                                            DWireType wireJtype = netlistinp.get(j).output.wtype;
@@ -1506,27 +1753,22 @@ public class NetSynth {
                                            DGate jGate = new DGate(netlistinp.get(j).gtype,jinp,newWout);
                                            
                                            netlistinp.set(j, jGate);
-                                           //netlistinp.get(j).input.remove(0);
-                                           //netlistinp.get(j).input.add(newWout);
+                                           
                                            
                                            netlistinp.get(k).input.get(m).name = netlistinp.get(i).input.get(0).name;
                                            netlistinp.get(k).input.get(m).wtype = netlistinp.get(i).input.get(0).wtype;
                                            
                                            
-                                           //DWire newW = new DWire(netlistinp.get(i).input.get(0).name,netlistinp.get(i).input.get(0).wtype);
-                                           //netlistinp.get(k).output = new DWire();
-                                           //netlistinp.get(k).output = newW;
-                                           
-                                           System.out.println("After Step 3");
+                                           /*System.out.println("After Step 3");
                                            //System.out.println("Wire safekeep:"+wireJout);
                                            System.out.println(i+":"+netlist(netlistinp.get(i)));
                                            System.out.println(j+":"+netlist(netlistinp.get(j)));
                                            System.out.println(k+":"+netlist(netlistinp.get(k)));
-                                           
+                                           */
                                            
                                            if(!removegates.contains(j))
                                            {
-                                               System.out.println("Remove Gate index:"+j);
+                                               //System.out.println("Remove Gate index:"+j);
                                                removegates.add(j);
                                            }
                                            
@@ -1542,35 +1784,38 @@ public class NetSynth {
         }
         List<DGate> optnetlist = new ArrayList<DGate>();
         
-        System.out.println("\nBefore Removing Gates:");
+        /*System.out.println("\nBefore Removing Gates:");
         for(int i=0;i<netlistinp.size();i++)
         {
             System.out.println(netlist(netlistinp.get(i)));
-        }
-        System.out.println("-------------------------\n");
+        }*/
+        //System.out.println("-------------------------\n");
+        
         for(int i=0;i<netlistinp.size();i++)
         {
             if(!removegates.contains(i))
             {
-                System.out.println("Add:" + netlist(netlistinp.get(i)));
+                //System.out.println("Add:" + netlist(netlistinp.get(i)));
                 optnetlist.add(netlistinp.get(i));
             }
-            else
-            {
-                System.out.println("Remove:" + netlist(netlistinp.get(i)));
-            }
+            //else
+            //{
+                //System.out.println("Remove:" + netlist(netlistinp.get(i)));
+            //}
         }
         
-        System.out.println("First Set of remove indices");
-        for(int i=0;i<removegates.size();i++)
-            System.out.println("Remove Gates :"+removegates.get(i));
+        //System.out.println("First Set of remove indices");
+        //for(int i=0;i<removegates.size();i++)
+        //    System.out.println("Remove Gates :"+removegates.get(i));
+        
         removegates = new ArrayList<Integer>();
-        System.out.println("\nAfter Removing Gates:");
-        for(int i=0;i<optnetlist.size();i++)
-        {
-            System.out.println(netlist(optnetlist.get(i)));
-        }
-        System.out.println("-----------------------");
+        
+        //System.out.println("\nAfter Removing Gates:");
+        //for(int i=0;i<optnetlist.size();i++)
+        //{
+        //    System.out.println(netlist(optnetlist.get(i)));
+        //}
+        //System.out.println("-----------------------");
         
         for(int i=0;i<optnetlist.size()-1;i++)
         {
@@ -1593,9 +1838,10 @@ public class NetSynth {
                     removegates.add(i);
             }
         }
-        System.out.println("Final Set of remove indices");
-        for(int i=0;i<removegates.size();i++)
-            System.out.println(removegates.get(i));
+        
+        //System.out.println("Final Set of remove indices");
+        //for(int i=0;i<removegates.size();i++)
+        //    System.out.println(removegates.get(i));
         
         List<DGate> finalnetlist = new ArrayList<DGate>();
         for(int i=0;i<optnetlist.size();i++)
@@ -1604,17 +1850,17 @@ public class NetSynth {
                 finalnetlist.add(optnetlist.get(i));
         }
         
-        System.out.println("\nFinal optimization");
-        for(int i=0;i<finalnetlist.size();i++)
-        {
-            System.out.println(netlist(finalnetlist.get(i)));
-        }
-        System.out.println("--------------------------------------------------");
+        //System.out.println("\nFinal optimization");
+        //for(int i=0;i<finalnetlist.size();i++)
+        //{
+        //    System.out.println(netlist(finalnetlist.get(i)));
+        //}
+        //System.out.println("--------------------------------------------------");
         
         removegates = new ArrayList<Integer>();
         
         
-        System.out.println("\nBegin Output_OR optimization");
+        //System.out.println("\nBegin Output_OR optimization");
         for(int i=0;i<finalnetlist.size()-1;i++)
         {
             if(finalnetlist.get(i).gtype.equals(DGateType.NOR2))
@@ -1657,13 +1903,14 @@ public class NetSynth {
                 outputornetlist.add(finalnetlist.get(i));
             }
         }
-        System.out.println("\nPost Output_OR optimization");
+        /*System.out.println("\nPost Output_OR optimization");
         for(int i=0;i<outputornetlist.size();i++)
         {
             System.out.println(netlist(outputornetlist.get(i)));
         }
-        System.out.println("--------------------------");
-        return outputornetlist;
+        System.out.println("--------------------------");*/
+        
+         return outputornetlist;
     }
     
     public static List<DGate> parseEspressoToNORNAND(List<String> espinp)
