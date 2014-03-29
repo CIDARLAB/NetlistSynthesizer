@@ -1096,9 +1096,110 @@ public class NetSynth {
 	catch (FileNotFoundException ex) {
 	    System.out.println("FileNotFoundException when reading input file");
 	}
+        List<DGate> netlist = new ArrayList<DGate>();
+        List<DWire> inputwires = new ArrayList<DWire>();
+        List<DWire> outputwires = new ArrayList<DWire>();
+        List<DWire> allwires = new ArrayList<DWire>();
         
         for(int i=0;i<benchlines.size();i++)
+        {
             System.out.println(benchlines.get(i));
+        }
+        for(int i=0;i<benchlines.size();i++)
+        {
+            if(benchlines.get(i).contains("INPUT"))
+            {
+                String inpname = benchlines.get(i).substring(benchlines.get(i).indexOf("INPUT(")+6);
+                inpname = inpname.substring(0,inpname.indexOf(")"));
+                inpname = inpname.trim();
+                
+                DWire inpw = new DWire(inpname,DWireType.input);
+                inputwires.add(inpw);
+                allwires.add(inpw);
+            }
+            if(benchlines.get(i).contains("OUTPUT"))
+            {
+                String outpname = benchlines.get(i).substring(benchlines.get(i).indexOf("OUTPUT(")+7);
+                outpname = outpname.substring(0,outpname.indexOf(")"));
+                outpname = outpname.trim();
+                
+                DWire outpw = new DWire(outpname,DWireType.output);
+                outputwires.add(outpw);
+                allwires.add(outpw);
+            }
+            if(benchlines.get(i).contains("="))
+            {
+                String outpwire = benchlines.get(i).substring(0,benchlines.get(i).indexOf("="));
+                outpwire = outpwire.trim();
+                int flag =0;
+                for(DWire xwire:allwires)
+                {
+                    if(xwire.name.equals(outpwire))
+                    {
+                        flag =1;
+                        break;
+                    }
+                }
+                
+                if(flag ==0)
+                {
+                    DWire connwire = new DWire(outpwire,DWireType.connector);
+                    allwires.add(connwire);
+                }
+                String gatestring = benchlines.get(i).substring(benchlines.get(i).indexOf("=")+1);
+                gatestring = gatestring.trim();
+                if(gatestring.contains("NOT"))
+                {
+                    DGate xgate = new DGate();
+                    xgate.gtype = DGateType.NOT;
+                    String notconn = gatestring.substring(gatestring.indexOf("(")+1,gatestring.indexOf(")"));
+                    notconn = notconn.trim();
+                    for(DWire xwire:allwires)
+                    {
+                        if(xwire.name.equals(notconn))
+                        {
+                            xgate.input.add(xwire);
+                        }
+                        if(xwire.name.equals(outpwire))
+                        {
+                            xgate.output = xwire;
+                        }
+                    }
+                    netlist.add(xgate);
+                }
+                if(gatestring.contains("AND"))
+                {
+                    DGate xgate = new DGate();
+                    xgate.gtype = DGateType.AND2;
+                    
+                    String conn = gatestring.substring(gatestring.indexOf("(")+1,gatestring.indexOf(")"));
+                    conn = conn.trim();
+                    String[] connpieces = conn.split(",");
+                    String conn1 = connpieces[0].trim();
+                    String conn2 = connpieces[1].trim();
+                    conn1 = conn1.trim();
+                    conn2 = conn2.trim();
+                    for(DWire xwire:allwires)
+                    {
+                        if(xwire.name.equals(conn1))
+                        {
+                            xgate.input.add(xwire);
+                        }
+                        if(xwire.name.equals(conn2))
+                        {
+                            xgate.input.add(xwire);
+                        }
+                        if(xwire.name.equals(outpwire))
+                        {
+                            xgate.output = xwire;
+                        }
+                    }
+                    netlist.add(xgate);
+                }
+            }
+        }
+        for(int i=0;i<netlist.size();i++)
+            System.out.println(netlist(netlist.get(i)));
         
     }
     
