@@ -103,9 +103,10 @@ public class NetSynth {
         //verifyinverse();
         //histogram();
         
-        testABC();
+        //testABC();
         
-        //EspressoVsABC(3);
+        EspressoVsABC(3);
+        
         //testespressogen();
         //HistogramREU.calcHist(-0.803574133407);
         //DAGW xcasedag = testParser("",0,0);
@@ -129,7 +130,8 @@ public class NetSynth {
         int possiblecirc = (int)Math.pow(2, truthsize);
         List<Integer> espressocount = new ArrayList<Integer>();
         List<Integer> abccount = new ArrayList<Integer>();
-        
+        int totalabc=0;
+        int totalespresso =0;
         for(int i=0;i<possiblecirc;i++)
         {
             System.out.println("Truth Table "+i);
@@ -197,11 +199,24 @@ public class NetSynth {
                 espoutput = convertPOStoNORNOT(espout);
                 espoutput = optimizeNetlist(espoutput);
                 
+                List<DGate> abcoutput = new ArrayList<DGate>();
+                runABC("blifinp");
+                abcoutput = convertBenchToAIG();
+                int abcoutcount = abcoutput.size();
                 
                 int espoutcount = espoutput.size();
+                
+                if(!abcoutput.isEmpty())
+                {
+                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
+                    abcoutcount --;
+                }
                 if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
                     espoutcount --;
-                System.out.println("Circuit count for No: "+i+" : "+espoutcount);
+                System.out.println("Espresso Circuit count for No: "+i+" : "+espoutcount);
+                System.out.println("ABC Circuit count for No: "+i+" : "+abcoutcount);
+                totalabc += abcoutcount;
+                totalespresso += espoutcount;
                 
                 fespinp.deleteOnExit();
                 fabcinp.deleteOnExit();
@@ -213,6 +228,11 @@ public class NetSynth {
             }
             
         }
+        
+        System.out.println("\n\n Final Count -->");
+        System.out.println("ABC Count: "+ totalabc);
+        System.out.println("Espresso Count: "+ totalespresso);
+        
         
     }
     public static void create_VerilogFile(int inputs,String hex)
@@ -990,9 +1010,9 @@ public class NetSynth {
         
     }
     
-    public static void runABC(String filename) {
+    public static void runABC(String filename) 
+    {
     
-        
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if(x.contains("Mac"))
@@ -1055,10 +1075,10 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
      
-        convertBenchToANDNOT();
+        convertBenchToAIG();
     }
     
-    public static void convertBenchToANDNOT()
+    public static List<DGate> convertBenchToAIG()
     {
         
         List<String> benchlines = new ArrayList<String>();
@@ -1072,9 +1092,7 @@ public class NetSynth {
             filestring += Filepath + "BU/resources/abcOutput.bench";
         }
         
-        
-        
-	File gate_file = new File(filestring);
+        File gate_file = new File(filestring);
 	BufferedReader brgate;
 	FileReader filebench;
 	
@@ -1101,10 +1119,10 @@ public class NetSynth {
         List<DWire> outputwires = new ArrayList<DWire>();
         List<DWire> allwires = new ArrayList<DWire>();
         
-        for(int i=0;i<benchlines.size();i++)
-        {
-            System.out.println(benchlines.get(i));
-        }
+        //for(int i=0;i<benchlines.size();i++)
+        //{
+        //    System.out.println(benchlines.get(i));
+        //}
         for(int i=0;i<benchlines.size();i++)
         {
             if(benchlines.get(i).contains("INPUT"))
@@ -1198,9 +1216,85 @@ public class NetSynth {
                 }
             }
         }
-        for(int i=0;i<netlist.size();i++)
-            System.out.println(netlist(netlist.get(i)));
+        //for(int i=0;i<netlist.size();i++)
+        //    System.out.println(netlist(netlist.get(i)));
+        List<DGate> netout = new ArrayList<DGate>();
+        netout = convertAIGtoNORNOT(netlist);
         
+        return netout;
+    }
+    
+    
+    
+    public static List<DGate> convertAIGtoNORNOT(List<DGate> netlist)
+    {
+        List<DGate> netout = new ArrayList<DGate>();
+        
+        List<DGate> notcreated = new ArrayList<DGate>();
+        
+        for(int i=0;i<netlist.size();i++)
+        {
+            if(netlist.get(i).gtype.equals(DGateType.NOT))
+            {    
+                netout.add(netlist.get(i));
+            }
+            if(netlist.get(i).gtype.equals(DGateType.AND2))
+            {
+                int flag1 =0;
+                int flag2 =0;
+                DGate newnor = new DGate();
+                newnor.gtype = DGateType.NOR2;
+                newnor.output = netlist.get(i).output;
+                for(int j=0;j<notcreated.size();j++)
+                {
+                    if(netlist.get(i).input.get(0).name.equals(notcreated.get(j).input.get(0).name))
+                    {
+                        flag1 =1;
+                        newnor.input.add(notcreated.get(j).output);
+                        //break;
+                    }
+                    if(netlist.get(i).input.get(1).name.equals(notcreated.get(j).input.get(0).name))
+                    {
+                        flag2 =1;
+                        newnor.input.add(notcreated.get(j).output);
+                        //break;
+                    }
+                }
+                if(flag1 ==0)
+                {
+                    String wirename = "Wire" + Global.wirecount++;
+                    DWire notout1 = new DWire(wirename,DWireType.connector);
+                    DGate newnot1 = new DGate();
+                    newnot1.gtype = DGateType.NOT;
+                    newnot1.input.add(netlist.get(i).input.get(0));
+                    newnot1.output = notout1;
+                    newnor.input.add(newnot1.output);
+                    netout.add(newnot1);
+                    notcreated.add(newnot1);
+                    
+                }
+                if(flag2 ==0)
+                {
+                    String wirename = "Wire" + Global.wirecount++;
+                    DWire notout2 = new DWire(wirename,DWireType.connector);
+                    DGate newnot2 = new DGate();
+                    newnot2.gtype = DGateType.NOT;
+                    newnot2.input.add(netlist.get(i).input.get(1));
+                    newnot2.output = notout2;
+                    newnor.input.add(newnot2.output);
+                    netout.add(newnot2);
+                    notcreated.add(newnot2);
+                }
+                netout.add(newnor);
+            }
+        }
+        netout = optimizeNetlist(netout);
+        
+        //System.out.println("\n\n------------\nAfter AIG to NOR NOT and optmizing the result\n");
+        //for(int i=0;i<netout.size();i++)
+        //    System.out.println(netlist(netout.get(i)));
+        
+        return netout;
     }
     
     public static List<String> runEspresso(String pathFile) {

@@ -1,1 +1,1 @@
-/home/prashantvaidyanathan/CIDAR/verilogsynth/netSynth/src/BU/resources/abc -c "read /home/prashantvaidyanathan/CIDAR/verilogsynth/netSynth/src/BU/resources/test.blif; strash; refactor; write /home/prashantvaidyanathan/CIDAR/verilogsynth/netSynth/src/BU/resources/abcOutput.bench; quit"
+/home/prashantvaidyanathan/CIDAR/verilogsynth/netSynth/src/BU/resources/abc -c "read /home/prashantvaidyanathan/CIDAR/verilogsynth/netSynth/src/BU/resources/blifinp.blif; strash; refactor; write /home/prashantvaidyanathan/CIDAR/verilogsynth/netSynth/src/BU/resources/abcOutput.bench; quit"
