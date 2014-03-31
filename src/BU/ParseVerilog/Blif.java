@@ -53,7 +53,14 @@ public class Blif {
         String line3 ="";
         for(int i=0;i<circ.outputNames.size();i++)
         {
-            line3 = line2 + " " +circ.outputNames.get(i);
+            if(circ.inputgatetable.get(i)==0)
+            {
+                line3 = ".names "+ circ.outputNames.get(i);
+            }   
+            else
+            {
+                line3 = line2 + " " +circ.outputNames.get(i);
+            }
             esfile.add(line3);
             //System.out.println(truthfunc.get(i));
             for(int j=0;j<pw; j++)

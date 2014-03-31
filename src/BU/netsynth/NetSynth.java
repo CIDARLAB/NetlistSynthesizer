@@ -106,6 +106,8 @@ public class NetSynth {
         //testABC();
         
         EspressoVsABC(3);
+        //testABC();
+        //testABCsingle(0);
         
         //testespressogen();
         //HistogramREU.calcHist(-0.803574133407);
@@ -132,14 +134,21 @@ public class NetSynth {
         List<Integer> abccount = new ArrayList<Integer>();
         int totalabc=0;
         int totalespresso =0;
+        int totalmin =0;
+        int mincount =0;
+        
+        CircuitDetails circ;
         for(int i=0;i<possiblecirc;i++)
         {
-            System.out.println("Truth Table "+i);
-            CircuitDetails circ = new CircuitDetails();
+            //System.out.println("Truth Table "+i);
+            circ = new CircuitDetails();
             int inpc=0;
             for(int j=0;j<inpcount;j++)
             {
-                String inputname = "inp" + j;
+                char x = (char)(j+97);
+                String inputname = "";
+                inputname += x;
+                //System.out.println(inputname);
                 circ.inputNames.add(inputname);
             }
             circ.outputNames.add("out");
@@ -200,8 +209,12 @@ public class NetSynth {
                 espoutput = optimizeNetlist(espoutput);
                 
                 List<DGate> abcoutput = new ArrayList<DGate>();
-                runABC("blifinp");
-                abcoutput = convertBenchToAIG();
+                try {
+                    abcoutput = runABC("blifinp");
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //abcoutput = convertBenchToAIG();
                 int abcoutcount = abcoutput.size();
                 
                 int espoutcount = espoutput.size();
@@ -213,8 +226,49 @@ public class NetSynth {
                 }
                 if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
                     espoutcount --;
-                System.out.println("Espresso Circuit count for No: "+i+" : "+espoutcount);
-                System.out.println("ABC Circuit count for No: "+i+" : "+abcoutcount);
+                //System.out.println("Espresso Circuit count for No: "+i+" : "+espoutcount);
+                //System.out.println("ABC Circuit count for No: "+i+" : "+abcoutcount);
+                //System.out.println("\nEspresso Circuit:\n");
+                //for(int k=0;k<espoutput.size();k++)
+                //{
+                //    System.out.println(netlist(espoutput.get(k)));
+                //}
+                
+                mincount = abcoutcount;
+                if(espoutcount<abcoutcount)
+                    mincount = espoutcount;
+                
+                totalmin += mincount;
+                
+                //System.out.println(i+" "+abcoutcount);
+                //System.out.println(i+" "+espoutcount);
+                //System.out.println(i+","+mincount);
+                
+                //System.out.println("\nABC Circuit:\n");
+                
+                //for(int k=0;k<abcoutput.size();k++)
+                //{
+                //    System.out.println(netlist(abcoutput.get(k)));
+                //}
+                
+                String esptt = BooleanSimulator.bpermute(espoutput);
+                String abctt = BooleanSimulator.bpermute(abcoutput);
+                
+                int espttint = Convert.bintoDec(esptt);
+                int abcttint = Convert.bintoDec(abctt);
+                
+                /*if(abcttint != i)
+                {
+                    System.out.println("ABC truth table does not match for "+i);
+                }
+                
+                if(espttint != i)
+                {
+                    System.out.println("Espresso truth table does not match for "+i);
+                }*/
+                
+                
+                //System.out.println("\n----------------------------------\n");
                 totalabc += abcoutcount;
                 totalespresso += espoutcount;
                 
@@ -229,9 +283,125 @@ public class NetSynth {
             
         }
         
-        System.out.println("\n\n Final Count -->");
-        System.out.println("ABC Count: "+ totalabc);
-        System.out.println("Espresso Count: "+ totalespresso);
+        //System.out.println("\n\n Final Count -->");
+        //System.out.println("ABC Count: "+ totalabc);
+        //System.out.println("Espresso Count: "+ totalespresso);
+        System.out.println("Min Count: "+ totalmin);
+        
+    }
+    
+    
+    public static void testABCsingle(int ttval)
+    {
+               
+       
+        CircuitDetails circ;
+        
+            System.out.println("Truth Table "+ttval);
+            circ = new CircuitDetails();
+            int inpc=0;
+            List<DGate> abcoutput = new ArrayList<DGate>();
+            for(int j=0;j<3;j++)
+            {
+                String inputname = "inp" + j;
+                circ.inputNames.add(inputname);
+            }
+            circ.outputNames.add("out");
+            circ.inputgatetable.add(ttval);
+            
+            //List<String> espressoinput = new ArrayList<String>();
+            List<String> blifinput = new ArrayList<String>();
+            
+            //espressoinput = Espresso.createFile(circ);
+            blifinput = Blif.createFile(circ);
+            
+            String filestring ="";
+            //String filestringespresso = "";
+            String filestringblif = "";
+           
+            if(Filepath.contains("prashant"))
+            {
+                filestring += Filepath+ "src/BU/resources/";
+            }
+            else
+            {
+                filestring += Filepath+ "BU/resources/";
+            }
+            //filestringespresso = filestring + "espressoinp";
+            filestringblif = filestring + "blifinp";
+            //filestringespresso += Global.espout++ ;
+            //filestringespresso += ".txt";
+            filestringblif += ".blif";
+            
+            //File fespinp = new File(filestringespresso);
+            File fabcinp = new File(filestringblif);
+            try 
+            {
+                /*Writer outputesp = new BufferedWriter(new FileWriter(fespinp));
+                for(String xline:espressoinput)
+                {
+                    String newl = (xline + "\n");
+                    outputesp.write(newl);
+                }
+                outputesp.close();*/
+                
+                Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+                for(String xline:blifinput)
+                {
+                    String newl = (xline + "\n");
+                    outputblif.write(newl);
+                }
+                outputblif.close();
+                
+                List<String> espout = new ArrayList<String>();
+                List<String> abcout = new ArrayList<String>();
+                
+                //espout = runEspresso(filestringespresso);
+                
+                //List<DGate> espoutput = new ArrayList<DGate>();
+                //espoutput = convertPOStoNORNOT(espout);
+                //espoutput = optimizeNetlist(espoutput);
+            try {
+                abcoutput = runABC("blifinp");
+            } catch (InterruptedException ex) {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+              } 
+            catch (IOException ex) 
+            {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }  
+                //abcoutput = convertBenchToAIG();
+                int abcoutcount = abcoutput.size();
+                
+                //int espoutcount = espoutput.size();
+                
+                //if(!abcoutput.isEmpty())
+                //{
+                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
+                    abcoutcount --;
+                //}
+                //if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
+                //    espoutcount --;
+                //System.out.println("Espresso Circuit count for No: "+i+" : "+espoutcount);
+                System.out.println("ABC Circuit count for No: "+ttval+" : "+abcoutcount);
+                for(int k=0;k<abcoutput.size();k++)
+                    System.out.println(netlist(abcoutput.get(k)));
+                
+                System.out.println("\n----------------------------------\n");
+                //totalabc += abcoutcount;
+                //totalespresso += espoutcount;
+                
+                //fespinp.deleteOnExit();
+                //fabcinp.deleteOnExit();
+                
+           
+            
+        
+        
+        //System.out.println("\n\n Final Count -->");
+        //System.out.println("ABC Count: "+ totalabc);
+        //System.out.println("Espresso Count: "+ totalespresso);
         
         
     }
@@ -1004,13 +1174,16 @@ public class NetSynth {
     }
     public static void testABC()
     {
-        String filename = "test";
-        
-        runABC(filename);
+        String filename = "blifinp";
+        try {
+            runABC(filename);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }
     
-    public static void runABC(String filename) 
+    public static List<DGate> runABC(String filename) throws InterruptedException 
     {
     
         String x = System.getProperty("os.name");
@@ -1065,17 +1238,19 @@ public class NetSynth {
         
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
-        
+        List<DGate> finalnetlist = new ArrayList<DGate>();
         try 
         {
             proc = runtime.exec(clist);
+            proc.waitFor();
+            finalnetlist = convertBenchToAIG();
         } 
         catch (IOException ex) 
         {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
-     
-        convertBenchToAIG();
+        return finalnetlist;
+        //convertBenchToAIG();
     }
     
     public static List<DGate> convertBenchToAIG()
@@ -1166,6 +1341,40 @@ public class NetSynth {
                 }
                 String gatestring = benchlines.get(i).substring(benchlines.get(i).indexOf("=")+1);
                 gatestring = gatestring.trim();
+                if(gatestring.equals("vdd"))
+                {
+                    DGate xgate = new DGate();
+                    xgate.gtype = DGateType.BUF;
+                    xgate.input.add(one);
+                    for(DWire xwire:allwires)
+                    {
+                        
+                        if(xwire.name.equals(outpwire))
+                        {
+                            xgate.output = xwire;
+                        }
+                    }
+                    netlist.add(xgate);
+                }
+                
+                if(gatestring.contains("BUFF"))
+                {
+                    DGate xgate = new DGate();
+                    xgate.gtype = DGateType.BUF;
+                    String bufconn = gatestring.substring(gatestring.indexOf("(")+1,gatestring.indexOf(")"));
+                    for(DWire xwire:allwires)
+                    {
+                        if(xwire.name.equals(bufconn))
+                        {
+                            xgate.input.add(xwire);
+                        }
+                        if(xwire.name.equals(outpwire))
+                        {
+                            xgate.output = xwire;
+                        }
+                    }
+                    netlist.add(xgate);
+                } 
                 if(gatestring.contains("NOT"))
                 {
                     DGate xgate = new DGate();
@@ -1220,7 +1429,7 @@ public class NetSynth {
         //    System.out.println(netlist(netlist.get(i)));
         List<DGate> netout = new ArrayList<DGate>();
         netout = convertAIGtoNORNOT(netlist);
-        
+        gate_file.deleteOnExit();
         return netout;
     }
     
@@ -1235,6 +1444,10 @@ public class NetSynth {
         for(int i=0;i<netlist.size();i++)
         {
             if(netlist.get(i).gtype.equals(DGateType.NOT))
+            {    
+                netout.add(netlist.get(i));
+            }
+            if(netlist.get(i).gtype.equals(DGateType.BUF))
             {    
                 netout.add(netlist.get(i));
             }
