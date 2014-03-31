@@ -1,0 +1,2 @@
+roadblocking pairs
+NOT_rbs1-PhlF,NOT_rbs0-PhlF,NOT_rbs0-SrpR,NOT_rbs1-SrpR,NOT_rbs2-SrpR,NOT_rbs3-SrpR,NOT_rbs0-BM3R1,NOT_rbs1-BM3R1,inducer_pTac
