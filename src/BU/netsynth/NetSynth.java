@@ -104,10 +104,10 @@ public class NetSynth {
         //histogram();
         
         //testABC();
-        test2notstonor();
-        //EspressoVsABC(3);
+        //test2notstonor();
+        EspressoVsABC(3);
         //testABC();
-        //testABCsingle(0);
+        //testABCsingle(6);
         
         //testespressogen();
         //HistogramREU.calcHist(-0.803574133407);
@@ -206,11 +206,10 @@ public class NetSynth {
             //System.out.println("Truth Table "+i);
             circ = new CircuitDetails();
             int inpc=0;
-            for(int j=0;j<inpcount;j++)
+            for(int j=1;j<=inpcount;j++)
             {
-                char x = (char)(j+97);
-                String inputname = "";
-                inputname += x;
+                String inputname = "in" + j;
+               
                 //System.out.println(inputname);
                 circ.inputNames.add(inputname);
             }
@@ -270,13 +269,18 @@ public class NetSynth {
                 List<DGate> espoutput = new ArrayList<DGate>();
                 espoutput = convertPOStoNORNOT(espout);
                 espoutput = optimizeNetlist(espoutput);
-                
+                espoutput = convert2NOTsToNOR(espoutput);
+                espoutput = rewireNetlist(espoutput);
+                        
                 List<DGate> abcoutput = new ArrayList<DGate>();
                 try {
                     abcoutput = runABC("blifinp");
                 } catch (InterruptedException ex) {
                     Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                abcoutput = convert2NOTsToNOR(abcoutput);
+                abcoutput = rewireNetlist(abcoutput);
+                
                 //abcoutput = convertBenchToAIG();
                 int abcoutcount = abcoutput.size();
                 
@@ -297,11 +301,11 @@ public class NetSynth {
                 //    System.out.println(netlist(espoutput.get(k)));
                 //}
                 
-                mincount = abcoutcount;
-                if(espoutcount<abcoutcount)
-                    mincount = espoutcount;
+                //mincount = abcoutcount;
+                //if(espoutcount<abcoutcount)
+                //    mincount = espoutcount;
                 
-                totalmin += mincount;
+                //totalmin += mincount;
                 
                 //System.out.println(i+" "+abcoutcount);
                 //System.out.println(i+" "+espoutcount);
@@ -314,11 +318,13 @@ public class NetSynth {
                 //    System.out.println(netlist(abcoutput.get(k)));
                 //}
                 
-                String esptt = BooleanSimulator.bpermute(espoutput);
-                String abctt = BooleanSimulator.bpermute(abcoutput);
+                //String esptt = BooleanSimulator.bpermuteTest(espoutput);
+                //String abctt = BooleanSimulator.bpermuteTest(abcoutput);
                 
-                int espttint = Convert.bintoDec(esptt);
-                int abcttint = Convert.bintoDec(abctt);
+                //System.out.println(i+ " ABC Truth Table: "+abctt);
+                
+                //int espttint = Convert.bintoDec(esptt);
+                //int abcttint = Convert.bintoDec(abctt);
                 
                 /*if(abcttint != i)
                 {
@@ -346,10 +352,10 @@ public class NetSynth {
             
         }
         
-        //System.out.println("\n\n Final Count -->");
-        //System.out.println("ABC Count: "+ totalabc);
-        //System.out.println("Espresso Count: "+ totalespresso);
-        System.out.println("Min Count: "+ totalmin);
+        System.out.println("\n\n Final Count -->");
+        System.out.println("ABC Count: "+ totalabc);
+        System.out.println("Espresso Count: "+ totalespresso);
+        //System.out.println("Min Count: "+ totalmin);
         
     }
     
@@ -369,9 +375,9 @@ public class NetSynth {
             circ = new CircuitDetails();
             int inpc=0;
             List<DGate> abcoutput = new ArrayList<DGate>();
-            for(int j=0;j<3;j++)
+            for(int j=1;j<=3;j++)
             {
-                String inputname = "inp" + j;
+                String inputname = "in" + j;
                 circ.inputNames.add(inputname);
             }
             circ.outputNames.add("out");
@@ -446,6 +452,9 @@ public class NetSynth {
                 
                 //if(!abcoutput.isEmpty())
                 //{
+                
+                abcoutput = convert2NOTsToNOR(abcoutput);
+                abcoutput = rewireNetlist(abcoutput);
                 if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
                     abcoutcount --;
                 //}
@@ -455,6 +464,8 @@ public class NetSynth {
                 System.out.println("ABC Circuit count for No: "+ttval+" : "+abcoutcount);
                 for(int k=0;k<abcoutput.size();k++)
                     System.out.println(netlist(abcoutput.get(k)));
+                //System.out.println(abcoutput.get(abcoutput.size()-1).output.wtype);
+                System.out.println("Truth Table :" + BooleanSimulator.bpermuteTest(abcoutput));
                 
                 System.out.println("\n----------------------------------\n");
                 //totalabc += abcoutcount;
@@ -2087,7 +2098,26 @@ public class NetSynth {
         
         return netlist;
     }
-    
+    public static List<DGate> rewireNetlist(List<DGate> netlist)
+    {
+        for(int i=0;i<netlist.size();i++)
+        {
+            for(int j=0;j<=i;j++)
+            {
+                if(i!=j)
+                {
+                    for(int m=0;m<netlist.get(i).input.size();m++)
+                    {
+                        if(netlist.get(i).input.get(m).name.equals(netlist.get(j).output.name))
+                        {
+                            netlist.get(i).input.set(m, netlist.get(j).output);
+                        }
+                    }
+                }
+            }
+        }
+        return netlist;
+    }
     public static List<DGate> convert2NOTsToNOR(List<DGate> netlistinp)
     {
         List<Integer> removegates = new ArrayList<Integer>();
@@ -2095,9 +2125,9 @@ public class NetSynth {
         
         List<DGate> netlistout = new ArrayList<DGate>();
         List<DGate> gatestoadd = new ArrayList<DGate>();
-        System.out.println("Before\n----------------------------");
-         for(int i=0;i<netlistinp.size();i++)
-            System.out.println(netlist(netlistinp.get(i)));
+        //System.out.println("Before\n----------------------------");
+        // for(int i=0;i<netlistinp.size();i++)
+        //    System.out.println(netlist(netlistinp.get(i)));
         
         for(int i=0;i<netlistinp.size();i++)
         {
@@ -2383,9 +2413,9 @@ public class NetSynth {
                 finalnetout.add(finalnetlist.get(i));
         }
         
-        System.out.println("\nAfter-------------------------");
-        for(int i=0;i<finalnetout.size();i++)
-            System.out.println(netlist(finalnetout.get(i)));
+        //System.out.println("\nAfter-------------------------");
+        //for(int i=0;i<finalnetout.size();i++)
+        //    System.out.println(netlist(finalnetout.get(i)));
         return finalnetout;
     }
     public static List<DGate> optimizeNetlist(List<DGate> netlistinp)

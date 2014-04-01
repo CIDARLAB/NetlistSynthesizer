@@ -238,6 +238,109 @@ public class BooleanSimulator {
     }
     
     
+    public static String bpermuteTest(List<DGate> netlist)
+    {
+        //DWireValue outvalue = DWireValue._x;
+        String output = "";
+        HashMap <String,DWire> inputsW = new HashMap<String,DWire>();
+        List<DWire> inputL = new ArrayList<DWire>();
+        
+        for(DGate dg:netlist)
+        {
+            for(DWire dw:dg.input)
+            {
+                if(dw.wtype == DWireType.input)
+                {
+                    if(!inputsW.containsKey(dw.name.trim()))
+                    {   
+                        inputL.add(dw);
+                       
+                        inputsW.put(dw.name.trim(),dw);}
+                    }
+            }
+        }
+        
+        HashMap <String,Integer> inputWires = new HashMap<String,Integer>();
+        int inpcnt =0;
+        for(DWire dwl:inputL)
+        {
+            inputWires.put(dwl.name.trim(), inpcnt);
+            inpcnt++;
+        }
+        
+        /*Iterator it = inputsW.entrySet().iterator();
+        while(it.hasNext())
+        {
+            Map.Entry pair = (Map.Entry)it.next();
+            String val = (String) pair.getKey();
+            System.out.println(val);
+            inputWires.put(val, inpcnt);
+            inpcnt++;
+            //DWire temp = (DWire)pair.getValue();
+        }*/
+        
+        int inpsize = inputWires.size();
+        int inppow = (int) Math.pow(2, inpsize); 
+        
+        for(int i=0;i<inppow;i++)
+        {
+            String xi = Convert.dectoBin(i, inpsize);
+            for(DGate ng:netlist)
+            {
+                for(int j=0;j<ng.input.size();j++)
+                {
+                    DWire dw = ng.input.get(j);
+                    if(dw.wtype == DWireType.input)
+                    {
+                        int indx=0;
+                        if(dw.name.trim().equals("in1"))
+                        {
+                            indx = 0;
+                        }
+                        else if(dw.name.trim().equals("in2"))
+                        {
+                            indx = 1;
+                        }
+                        else if(dw.name.trim().equals("in3"))
+                        {
+                            indx = 2;
+                        }
+                        if(xi.charAt(indx) == '0')
+                            ng.input.get(j).wValue = DWireValue._0;
+                        else if(xi.charAt(indx) == '1')
+                            ng.input.get(j).wValue = DWireValue._1;
+                    }
+                    else if(dw.wtype == DWireType.Source)
+                    {
+                        ng.input.get(j).wValue = DWireValue._1;
+                    }
+                    else if(dw.wtype == DWireType.GND)
+                    {
+                        ng.input.get(j).wValue = DWireValue._0;
+                    }
+                    
+                
+                }
+                bfunction(ng);
+                
+            }
+            
+            //int 
+            
+            DWireValue finaldw = netlist.get(netlist.size()-1).output.wValue; 
+            if(finaldw == DWireValue._0)
+                output += "0";
+            else if(finaldw == DWireValue._1)
+                output += "1";
+            else if(finaldw == DWireValue._x)
+                output += "-";
+            
+        }
+        
+        return output;
+    }
+    
+    
     
      public static String bpermutePreComp(List<DGate> netlist)
     {
