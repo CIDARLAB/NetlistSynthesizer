@@ -136,7 +136,8 @@ public class NetSynth {
         DWire wire2 = new DWire("w2",DWireType.connector);
         DWire out1 = new DWire("out1",DWireType.output);
         DWire out2 = new DWire("out2",DWireType.output);
-        DWire out3 = new DWire("w3",DWireType.connector);
+        DWire w3 = new DWire("w3",DWireType.connector);
+        DWire out3 = new DWire("out3",DWireType.output);
         
         DGate not1 = new DGate();
         DGate not2 = new DGate();
@@ -166,7 +167,14 @@ public class NetSynth {
         nor3.gtype = DGateType.NOR2;
         nor3.input.add(inp1);
         nor3.input.add(inp2);
-        nor3.output = out3;
+        nor3.output = w3;
+        
+        DGate not3 = new DGate();
+        not3.gtype = DGateType.NOT;
+        not3.input.add(w3);
+        not3.output = out3;
+        
+        
         
         netlistn.add(not1);
         netlistn.add(not2); 
@@ -174,6 +182,7 @@ public class NetSynth {
         
         netlistn.add(nor2);
         netlistn.add(nor3);
+        netlistn.add(not3);
         
         
         convert2NOTsToNOR(netlistn);
@@ -2086,6 +2095,9 @@ public class NetSynth {
         
         List<DGate> netlistout = new ArrayList<DGate>();
         List<DGate> gatestoadd = new ArrayList<DGate>();
+        System.out.println("Before\n----------------------------");
+         for(int i=0;i<netlistinp.size();i++)
+            System.out.println(netlist(netlistinp.get(i)));
         
         for(int i=0;i<netlistinp.size();i++)
         {
@@ -2134,6 +2146,7 @@ public class NetSynth {
                 }
                 int inp2mainflag = 0;
                 int gate2flag = 0;
+                int secondnorgatepos =0;
                 String invstring2 = "";
                 for (int k = 0; k < netlistinp.size(); k++) 
                 {
@@ -2161,12 +2174,14 @@ public class NetSynth {
                                     if(netlistinp.get(j).input.get(0).name.equals(inpstring1) && netlistinp.get(j).input.get(1).name.equals(invstring2))
                                     {
                                         gate2flag = 1;
+                                        secondnorgatepos = j;
                                         //addgates.add(i);
                                         break;
                                     }
                                     if(netlistinp.get(j).input.get(1).name.equals(inpstring1) && netlistinp.get(j).input.get(0).name.equals(invstring2))
                                     {
                                         gate2flag = 2;
+                                        secondnorgatepos = j;
                                         //addgates.add(i);
                                         break;
                                     }
@@ -2195,6 +2210,7 @@ public class NetSynth {
                                                 addgates.add(i);
                                                 gatestoadd.add(netlistinp.get(k));
                                             }
+                                            break;
                                         }
                                     }
                                 }
@@ -2203,24 +2219,69 @@ public class NetSynth {
                         
                         if(norgateexists == 1)
                         {
-                            System.out.println(noroutW.name);
-                        }
-                        else
-                        {
-                            addgates.add(i);
                             if(gate2flag == 1)
                             {
-                                DGate addnor = new DGate();
-                                addnor.gtype = DGateType.NOR2;
-                                addnor.input.add(w1);
-                                addnor.input.add(w2);
-                                System.out.println("Gate flag is 1");
-                            
+                                //System.out.println("gate2flag =1");
+                                //System.out.println(secondnorgatepos+"+"+netlist(netlistinp.get(secondnorgatepos)));
+                                netlistinp.get(secondnorgatepos).input.remove(1);
+                                netlistinp.get(secondnorgatepos).input.add(noroutW);
                             }
                             else if(gate2flag == 2)
                             {
-                                System.out.println("Gate flag is 2");
+                                //System.out.println("gate2flag =2");
+                                //System.out.println(secondnorgatepos+"+"+netlist(netlistinp.get(secondnorgatepos)));
+                                netlistinp.get(secondnorgatepos).input.remove(0);
+                                netlistinp.get(secondnorgatepos).input.add(noroutW);
                             }
+                            if(inp1flag == 1)
+                            {
+                                //System.out.println("inp1flag =1");
+                                //System.out.println(norpos+"+"+netlist(netlistinp.get(i)));
+                                netlistinp.get(i).input.remove(0);
+                                netlistinp.get(i).input.add(noroutW);
+                            }
+                            else if(inp2flag == 1)
+                            {
+                                //System.out.println("inp2flag =1");
+                                //System.out.println(norpos+"+"+netlist(netlistinp.get(i)));
+                                netlistinp.get(i).input.remove(1);
+                                netlistinp.get(i).input.add(noroutW);
+                            }
+                            //System.out.println(noroutW.name);
+                        }
+                        else
+                        {
+                            
+                            DGate addnor = new DGate();
+                            addnor.gtype = DGateType.NOR2;
+                            addnor.input.add(w1);
+                            addnor.input.add(w2);
+                            
+                            String noroutWname = "Wire" + Global.wirecount++;
+                            noroutW = new DWire(noroutWname,DWireType.connector);
+                            addnor.output = noroutW;
+                            if(gate2flag == 1)
+                            {
+                                netlistinp.get(secondnorgatepos).input.remove(1);
+                                netlistinp.get(secondnorgatepos).input.add(noroutW);
+                            }
+                            else if(gate2flag == 2)
+                            {
+                                netlistinp.get(secondnorgatepos).input.remove(0);
+                                netlistinp.get(secondnorgatepos).input.add(noroutW);
+                            }
+                            if(inp1flag == 1)
+                            {
+                                netlistinp.get(i).input.remove(0);
+                                netlistinp.get(i).input.add(noroutW);
+                            }
+                            else if(inp2flag == 1)
+                            {
+                                netlistinp.get(i).input.remove(1);
+                                netlistinp.get(i).input.add(noroutW);
+                            }
+                            gatestoadd.add(addnor);
+                            addgates.add(i);
                         }
                         
                     }
@@ -2228,8 +2289,104 @@ public class NetSynth {
             }
         }
         
+        //List<DGate> netlistout = new ArrayList<DGate>();
+        for(int i=0;i<netlistinp.size();i++)
+        {
+            if(addgates.contains(i))
+            {
+                int pos = addgates.indexOf(i);
+                netlistout.add(gatestoadd.get(pos));
+            }
+            netlistout.add(netlistinp.get(i));
+        }
         
-        return netlistout;
+        
+        
+        
+        //<editor-fold desc="Remove Dangling Wires">
+        
+        removegates = new ArrayList<Integer>();
+        for(int i=0;i<netlistout.size()-1;i++)
+        {
+            String wireout = netlistout.get(i).output.name;
+            if(netlistout.get(i).output.wtype.equals(DWireType.connector))
+            {
+                int inpcount =0;
+                for(int j=i;j<netlistout.size();j++)
+                {
+                    if(i!=j)
+                    {
+                        for(int m=0;m<netlistout.get(j).input.size();m++)
+                        {
+                            if(netlistout.get(j).input.get(m).name.equals(wireout))
+                                inpcount++;
+                        }
+                    }
+                }
+                if(inpcount == 0)
+                    removegates.add(i);
+            }
+        }
+        List<DGate> finalnetlist = new ArrayList<DGate>();
+        for(int i=0;i<netlistout.size();i++)
+        {
+            if(!removegates.contains(i))
+                finalnetlist.add(netlistout.get(i));
+        }
+        //</editor-fold>
+        
+        //Start Removing duplicate NOR gates  
+        removegates = new ArrayList<Integer>();
+        for(int i=0;i<finalnetlist.size();i++)
+        {
+            if(finalnetlist.get(i).gtype.equals(DGateType.NOR2) && (!finalnetlist.get(i).output.wtype.equals(DWireType.output)))
+            {
+                String inp1name = finalnetlist.get(i).input.get(0).name;
+                String inp2name = finalnetlist.get(i).input.get(1).name;
+                DWire noroutW  = new DWire(finalnetlist.get(i).output.name,finalnetlist.get(i).output.wtype);
+                for(int j=i;j<finalnetlist.size();j++)
+                {
+                    if(i!=j)
+                    {
+                        if(finalnetlist.get(j).gtype.equals(DGateType.NOR2) && (!finalnetlist.get(j).output.wtype.equals(DWireType.output))  )
+                        {
+                            String outname = finalnetlist.get(j).output.name;
+                            if( (finalnetlist.get(j).input.get(0).name.equals(inp1name) && finalnetlist.get(j).input.get(1).name.equals(inp2name)) || (finalnetlist.get(j).input.get(0).name.equals(inp2name) && finalnetlist.get(j).input.get(1).name.equals(inp1name)) )
+                            {
+                                for(int k=j;k<finalnetlist.size();k++)
+                                {
+                                    if(k!=j)
+                                    {
+                                        for(int m=0;m<finalnetlist.get(k).input.size();m++)
+                                        {
+                                            if(finalnetlist.get(j).input.get(m).name.equals(outname))
+                                            {
+                                                finalnetlist.get(j).input.set(m, noroutW);
+                                            }
+                                        }
+                                    }
+                                }
+                                if(!removegates.contains(j))
+                                    removegates.add(j);
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+        
+        List<DGate> finalnetout = new ArrayList<DGate>();
+        for(int i=0;i<finalnetlist.size();i++)
+        {
+            if(!removegates.contains(i))
+                finalnetout.add(finalnetlist.get(i));
+        }
+        
+        System.out.println("\nAfter-------------------------");
+        for(int i=0;i<finalnetout.size();i++)
+            System.out.println(netlist(finalnetout.get(i)));
+        return finalnetout;
     }
     public static List<DGate> optimizeNetlist(List<DGate> netlistinp)
     {
