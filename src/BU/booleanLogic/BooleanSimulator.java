@@ -238,27 +238,21 @@ public class BooleanSimulator {
     }
     
     
-    public static String bpermuteTest(List<DGate> netlist)
+    public static String bpermuteTest(List<DGate> netlist,List<DWire> inpw, int inpcount)
     {
         //DWireValue outvalue = DWireValue._x;
         String output = "";
         HashMap <String,DWire> inputsW = new HashMap<String,DWire>();
         List<DWire> inputL = new ArrayList<DWire>();
         
-        for(DGate dg:netlist)
+        
+        for(DWire dw:inpw)
         {
-            for(DWire dw:dg.input)
-            {
-                if(dw.wtype == DWireType.input)
-                {
-                    if(!inputsW.containsKey(dw.name.trim()))
-                    {   
-                        inputL.add(dw);
-                       
-                        inputsW.put(dw.name.trim(),dw);}
-                    }
-            }
+             inputL.add(dw);
+             inputsW.put(dw.name.trim(),dw);
         }
+        
+        
         
         HashMap <String,Integer> inputWires = new HashMap<String,Integer>();
         int inpcnt =0;
@@ -280,7 +274,7 @@ public class BooleanSimulator {
         }*/
         
         int inpsize = inputWires.size();
-        int inppow = (int) Math.pow(2, inpsize); 
+        int inppow = (int) Math.pow(2, inpcount); 
         
         for(int i=0;i<inppow;i++)
         {

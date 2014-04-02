@@ -106,6 +106,8 @@ public class NetSynth {
         //testABC();
         //test2notstonor();
         EspressoVsABC(3);
+        //EspressoVsABCSingle(3,109);
+        
         //testABC();
         //testABCsingle(6);
         
@@ -281,7 +283,6 @@ public class NetSynth {
                 abcoutput = convert2NOTsToNOR(abcoutput);
                 abcoutput = rewireNetlist(abcoutput);
                 
-                //abcoutput = convertBenchToAIG();
                 int abcoutcount = abcoutput.size();
                 
                 int espoutcount = espoutput.size();
@@ -307,7 +308,7 @@ public class NetSynth {
                 
                 //totalmin += mincount;
                 
-                //System.out.println(i+" "+abcoutcount);
+                System.out.println(i+" "+abcoutcount +" "+i+" "+espoutcount);
                 //System.out.println(i+" "+espoutcount);
                 //System.out.println(i+","+mincount);
                 
@@ -317,14 +318,22 @@ public class NetSynth {
                 //{
                 //    System.out.println(netlist(abcoutput.get(k)));
                 //}
+                List<DWire> inputwires = new ArrayList<DWire>();
+                DWire w1 =new DWire("in1",DWireType.input);
+                DWire w2 =new DWire("in2",DWireType.input);
+                DWire w3 =new DWire("in3",DWireType.input);
                 
-                //String esptt = BooleanSimulator.bpermuteTest(espoutput);
-                //String abctt = BooleanSimulator.bpermuteTest(abcoutput);
+                inputwires.add(w1);
+                inputwires.add(w2);
+                inputwires.add(w3);
+                
+                String esptt = BooleanSimulator.bpermuteTest(espoutput,inputwires,inpcount);
+                String abctt = BooleanSimulator.bpermuteTest(abcoutput,inputwires,inpcount);
                 
                 //System.out.println(i+ " ABC Truth Table: "+abctt);
                 
-                //int espttint = Convert.bintoDec(esptt);
-                //int abcttint = Convert.bintoDec(abctt);
+                int espttint = Convert.bintoDec(esptt);
+                int abcttint = Convert.bintoDec(abctt);
                 
                 /*if(abcttint != i)
                 {
@@ -334,6 +343,12 @@ public class NetSynth {
                 if(espttint != i)
                 {
                     System.out.println("Espresso truth table does not match for "+i);
+                    //System.out.println("TT : "+esptt);
+                    //System.out.println("\nEspresso Circuit:\n");
+                    //for(int k=0;k<espoutput.size();k++)
+                    //{
+                    //    System.out.println(netlist(espoutput.get(k)));
+                    //}
                 }*/
                 
                 
@@ -358,6 +373,197 @@ public class NetSynth {
         //System.out.println("Min Count: "+ totalmin);
         
     }
+    
+    
+    
+    public static void EspressoVsABCSingle(int inpcount,int ttval)
+    {
+        int truthsize = (int)Math.pow(2, inpcount);
+        int possiblecirc = (int)Math.pow(2, truthsize);
+        List<Integer> espressocount = new ArrayList<Integer>();
+        List<Integer> abccount = new ArrayList<Integer>();
+        int totalabc=0;
+        int totalespresso =0;
+        int totalmin =0;
+        int mincount =0;
+        
+        CircuitDetails circ;
+        //for(int i=0;i<possiblecirc;i++)
+        //{
+        int i = ttval;
+            //System.out.println("Truth Table "+i);
+            circ = new CircuitDetails();
+            int inpc=0;
+            for(int j=1;j<=inpcount;j++)
+            {
+                String inputname = "in" + j;
+               
+                //System.out.println(inputname);
+                circ.inputNames.add(inputname);
+            }
+            circ.outputNames.add("out");
+            circ.inputgatetable.add(i);
+            
+            List<String> espressoinput = new ArrayList<String>();
+            List<String> blifinput = new ArrayList<String>();
+            
+            espressoinput = Espresso.createFile(circ);
+            blifinput = Blif.createFile(circ);
+            
+            String filestring ="";
+            String filestringespresso = "";
+            String filestringblif = "";
+           
+            if(Filepath.contains("prashant"))
+            {
+                filestring += Filepath+ "src/BU/resources/";
+            }
+            else
+            {
+                filestring += Filepath+ "BU/resources/";
+            }
+            filestringespresso = filestring + "espressoinp";
+            filestringblif = filestring + "blifinp";
+            filestringespresso += Global.espout++ ;
+            //filestringblif += Global.espout++ ;
+            filestringespresso += ".txt";
+            filestringblif += ".blif";
+            
+            File fespinp = new File(filestringespresso);
+            File fabcinp = new File(filestringblif);
+            try 
+            {
+                Writer outputesp = new BufferedWriter(new FileWriter(fespinp));
+                for(String xline:espressoinput)
+                {
+                    String newl = (xline + "\n");
+                    outputesp.write(newl);
+                }
+                outputesp.close();
+                
+                Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+                for(String xline:blifinput)
+                {
+                    String newl = (xline + "\n");
+                    outputblif.write(newl);
+                }
+                outputblif.close();
+                
+                List<String> espout = new ArrayList<String>();
+                List<String> abcout = new ArrayList<String>();
+                
+                espout = runEspresso(filestringespresso);
+                
+                List<DGate> espoutput = new ArrayList<DGate>();
+                espoutput = convertPOStoNORNOT(espout);
+                espoutput = optimizeNetlist(espoutput);
+                espoutput = convert2NOTsToNOR(espoutput);
+                espoutput = rewireNetlist(espoutput);
+                        
+                List<DGate> abcoutput = new ArrayList<DGate>();
+                try {
+                    abcoutput = runABC("blifinp");
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                abcoutput = convert2NOTsToNOR(abcoutput);
+                abcoutput = rewireNetlist(abcoutput);
+                
+                //abcoutput = convertBenchToAIG();
+                int abcoutcount = abcoutput.size();
+                
+                int espoutcount = espoutput.size();
+                
+                if(!abcoutput.isEmpty())
+                {
+                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
+                    abcoutcount --;
+                }
+                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
+                    espoutcount --;
+                //System.out.println("Espresso Circuit count for No: "+i+" : "+espoutcount);
+                //System.out.println("ABC Circuit count for No: "+i+" : "+abcoutcount);
+                
+                //System.out.println("\nEspresso Circuit:\n");
+                //for(int k=0;k<espoutput.size();k++)
+                //{
+                //    System.out.println(netlist(espoutput.get(k)));
+                //}
+                
+                //mincount = abcoutcount;
+                //if(espoutcount<abcoutcount)
+                //    mincount = espoutcount;
+                
+                //totalmin += mincount;
+                
+                //System.out.println(i+" "+abcoutcount);
+                //System.out.println(i+" "+espoutcount);
+                //System.out.println(i+","+mincount);
+                
+                //System.out.println("\nABC Circuit:\n");
+                //for(int k=0;k<abcoutput.size();k++)
+                //{
+                //    System.out.println(netlist(abcoutput.get(k)));
+                //}
+                
+                List<DWire> inputwires = new ArrayList<DWire>();
+                DWire w1 =new DWire("in1",DWireType.input);
+                DWire w2 =new DWire("in2",DWireType.input);
+                DWire w3 =new DWire("in3",DWireType.input);
+                
+                inputwires.add(w1);
+                inputwires.add(w2);
+                inputwires.add(w3);
+                
+                String esptt = BooleanSimulator.bpermuteTest(espoutput,inputwires,inpcount);
+                String abctt = BooleanSimulator.bpermuteTest(abcoutput,inputwires,inpcount);
+                
+                //System.out.println(i+ " ABC Truth Table: "+abctt);
+                
+                int espttint = Convert.bintoDec(esptt);
+                int abcttint = Convert.bintoDec(abctt);
+                //System.out.println("TT : "+esptt);
+                if(abcttint != i)
+                {
+                    System.out.println("ABC truth table does not match for "+i);
+                }
+                
+                if(espttint != i)
+                {
+                    System.out.println("Espresso truth table does not match for "+i);
+                    System.out.println("TT : "+esptt);
+                    //System.out.println("\nEspresso Circuit:\n");
+                    //for(int k=0;k<espoutput.size();k++)
+                    //{
+                    //    System.out.println(netlist(espoutput.get(k)));
+                    //}
+                }
+                
+                
+                //System.out.println("\n----------------------------------\n");
+                totalabc += abcoutcount;
+                totalespresso += espoutcount;
+                
+                fespinp.deleteOnExit();
+                fabcinp.deleteOnExit();
+                
+            } 
+            catch (IOException ex) 
+            {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        //}
+        
+        System.out.println("\n\n Final Count -->");
+        System.out.println("ABC Count: "+ totalabc);
+        System.out.println("Espresso Count: "+ totalespresso);
+        //System.out.println("Min Count: "+ totalmin);
+        
+    }
+    
+    
+    
     
     public static String createblif()
     {
@@ -465,7 +671,16 @@ public class NetSynth {
                 for(int k=0;k<abcoutput.size();k++)
                     System.out.println(netlist(abcoutput.get(k)));
                 //System.out.println(abcoutput.get(abcoutput.size()-1).output.wtype);
-                System.out.println("Truth Table :" + BooleanSimulator.bpermuteTest(abcoutput));
+                List<DWire> inputwires = new ArrayList<DWire>();
+                DWire w1 =new DWire("in1",DWireType.input);
+                DWire w2 =new DWire("in2",DWireType.input);
+                DWire w3 =new DWire("in3",DWireType.input);
+                
+                inputwires.add(w1);
+                inputwires.add(w2);
+                inputwires.add(w3);
+                
+                System.out.println("Truth Table :" + BooleanSimulator.bpermuteTest(abcoutput,inputwires,3));
                 
                 System.out.println("\n----------------------------------\n");
                 //totalabc += abcoutcount;
@@ -2126,8 +2341,8 @@ public class NetSynth {
         List<DGate> netlistout = new ArrayList<DGate>();
         List<DGate> gatestoadd = new ArrayList<DGate>();
         //System.out.println("Before\n----------------------------");
-        // for(int i=0;i<netlistinp.size();i++)
-        //    System.out.println(netlist(netlistinp.get(i)));
+         //for(int i=0;i<netlistinp.size();i++)
+         //   System.out.println(netlist(netlistinp.get(i)));
         
         for(int i=0;i<netlistinp.size();i++)
         {
@@ -2150,6 +2365,7 @@ public class NetSynth {
                         {
                             if(netlistinp.get(i).input.get(0).name.equals(netlistinp.get(k).output.name))
                             {
+                                //System.out.println(netlist(netlistinp.get(i)) + " trigger for inp1flag");
                                 inp1flag =1;
                                 inpstring1 = netlistinp.get(k).input.get(0).name;
                                 inpstring2 = netlistinp.get(i).input.get(1).name;
@@ -2162,6 +2378,8 @@ public class NetSynth {
                             if(netlistinp.get(i).input.get(1).name.equals(netlistinp.get(k).output.name))
                             {
                                 inp2flag =1;
+                                
+                                //System.out.println(netlist(netlistinp.get(i)) + " trigger for inp2flag");
                                 inpstring1 = netlistinp.get(k).input.get(0).name;
                                 inpstring2 = netlistinp.get(i).input.get(0).name;
                                 w1 = new DWire(netlistinp.get(k).input.get(0));
@@ -2186,7 +2404,7 @@ public class NetSynth {
                         {
                             invstring2 = netlistinp.get(k).output.name;
                             inp2mainflag = 1;
-                            //System.out.println("Inv String "+invstring2);
+                            //System.out.println(netlist(netlistinp.get(k))+" trigger for inp2mainflag");
                         }
                     }
                 }
@@ -2194,7 +2412,7 @@ public class NetSynth {
                 {
                     if (inp2mainflag == 1) 
                     {
-                        
+                        //System.out.println("inp1flag or inp2flag are 1 not both and inp2mainflag is on");
                         for (int j = i; j < netlistinp.size(); j++) 
                         {
                             if (j != i) 
@@ -2205,6 +2423,7 @@ public class NetSynth {
                                     {
                                         gate2flag = 1;
                                         secondnorgatepos = j;
+                                        //System.out.println(netlist(netlistinp.get(j))+" 2nd NOR gate located");
                                         //addgates.add(i);
                                         break;
                                     }
@@ -2212,6 +2431,7 @@ public class NetSynth {
                                     {
                                         gate2flag = 2;
                                         secondnorgatepos = j;
+                                        //System.out.println(netlist(netlistinp.get(j))+" 2nd NOR gate located");
                                         //addgates.add(i);
                                         break;
                                     }
@@ -2224,6 +2444,7 @@ public class NetSynth {
                         int norpos =0;
                         if((gate2flag == 1) || (gate2flag == 2))
                         {
+                            //System.out.println("gate2flag triggered");
                             for(int k=0;k<netlistinp.size();k++)
                             {
                                 if(netlistinp.get(k).gtype.equals(DGateType.NOR2))
@@ -2249,6 +2470,7 @@ public class NetSynth {
                         
                         if(norgateexists == 1)
                         {
+                            
                             if(gate2flag == 1)
                             {
                                 //System.out.println("gate2flag =1");
@@ -2282,36 +2504,42 @@ public class NetSynth {
                         else
                         {
                             
-                            DGate addnor = new DGate();
-                            addnor.gtype = DGateType.NOR2;
-                            addnor.input.add(w1);
-                            addnor.input.add(w2);
                             
-                            String noroutWname = "Wire" + Global.wirecount++;
-                            noroutW = new DWire(noroutWname,DWireType.connector);
-                            addnor.output = noroutW;
-                            if(gate2flag == 1)
+                            if(gate2flag == 1 || gate2flag == 2)
                             {
-                                netlistinp.get(secondnorgatepos).input.remove(1);
-                                netlistinp.get(secondnorgatepos).input.add(noroutW);
+                            
+                                //System.out.println("NOR Gate does not exist");
+                                DGate addnor = new DGate();
+                                addnor.gtype = DGateType.NOR2;
+                                addnor.input.add(w1);
+                                addnor.input.add(w2);
+                            
+                                String noroutWname = "Wire" + Global.wirecount++;
+                                noroutW = new DWire(noroutWname,DWireType.connector);
+                                addnor.output = noroutW;
+                                if(gate2flag == 1)
+                                {
+                                    netlistinp.get(secondnorgatepos).input.remove(1);
+                                    netlistinp.get(secondnorgatepos).input.add(noroutW);
+                                }
+                                else if(gate2flag == 2)
+                                {
+                                    netlistinp.get(secondnorgatepos).input.remove(0);
+                                    netlistinp.get(secondnorgatepos).input.add(noroutW);
+                                }
+                                if(inp1flag == 1)
+                                {
+                                    netlistinp.get(i).input.remove(0);
+                                    netlistinp.get(i).input.add(noroutW);
+                                }
+                                else if(inp2flag == 1)
+                                {
+                                    netlistinp.get(i).input.remove(1);
+                                    netlistinp.get(i).input.add(noroutW);
+                                }
+                                gatestoadd.add(addnor);
+                                addgates.add(i);
                             }
-                            else if(gate2flag == 2)
-                            {
-                                netlistinp.get(secondnorgatepos).input.remove(0);
-                                netlistinp.get(secondnorgatepos).input.add(noroutW);
-                            }
-                            if(inp1flag == 1)
-                            {
-                                netlistinp.get(i).input.remove(0);
-                                netlistinp.get(i).input.add(noroutW);
-                            }
-                            else if(inp2flag == 1)
-                            {
-                                netlistinp.get(i).input.remove(1);
-                                netlistinp.get(i).input.add(noroutW);
-                            }
-                            gatestoadd.add(addnor);
-                            addgates.add(i);
                         }
                         
                     }
