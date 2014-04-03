@@ -631,9 +631,19 @@ public class NetSynth {
                 }
                 else
                 {
+                    precomp = PreCompute.parseNetlistFile();
                     precompout = precomp.get(i-1);
-                    invprecompout = precomp.get(invi-1);
                     
+                    
+                    precompout = optimizeNetlist(precompout);
+                    precompout = convert2NOTsToNOR(precompout);
+                    precompout = rewireNetlist(precompout);
+                    precomputecount = precompout.size();
+                    if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR2))
+                        precomputecount --;
+                    
+                    precomp = PreCompute.parseNetlistFile();
+                    invprecompout = precomp.get(invi-1);
                     String invprewOUT = "WireW" + Global.wirecount++;
                     DWire invpoutW = new DWire(invprewOUT,DWireType.connector);
                     invprecompout.get(invprecompout.size()-1).output = new DWire(invprewOUT,DWireType.connector);
@@ -649,19 +659,17 @@ public class NetSynth {
                     invprecomputecount = invprecompout.size();
                     
                     
-                    precompout = optimizeNetlist(precompout);
-                    precompout = convert2NOTsToNOR(precompout);
-                    precompout = rewireNetlist(precompout);
-                    precomputecount = precompout.size();
+                    
                     
                     if(invprecompout.get(invprecompout.size()-1).gtype.equals(DGateType.OR2))
                         invprecomputecount --;
                     
-                    if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR2))
-                        precomputecount --;
+                    
                     prett = BooleanSimulator.bpermutePreComp(precompout);
                     invprett = BooleanSimulator.bpermutePreComp(invprecompout);
                 }
+                
+                int min =0;
                 
                 int abcoutcount = abcoutput.size();
                 int espoutcount = espoutput.size();
@@ -692,6 +700,23 @@ public class NetSynth {
                 
                 if(invabcoutcount < abcoutcount)
                     minabc = invabcoutcount;
+                
+                min = 0;
+                if(minesp <= minabc && minesp <= minpre)
+                {
+                    min = minesp;
+                }
+                else
+                {
+                    if(minabc<=minpre)
+                    {
+                        min = minabc;
+                    }
+                    else
+                    {
+                        min = minpre;
+                    }
+                }
                 
                 
                 //if(abcoutput.size() < invabcoutput.size())
@@ -738,27 +763,17 @@ public class NetSynth {
                 int invprettint = Convert.bintoDec(invprett);
                 
                 
-                if(prettint != i)
+                /*if(prettint != i)
                 {
                     System.out.println("Pre Compute truth table does not match for "+i);
-                    System.out.println("TT: "+prett);
-                    for(int j=0;j<precompout.size();j++)
-                    {
-                        System.out.println(netlist(precompout.get(j)));
-                    }
-                    System.out.println("---------\n");
+                    
                 }
                 if(invprettint != i)
                 {
                     System.out.println("Inverse Pre Compute truth table does not match for "+i);
-                    System.out.println("TT: "+invprett);
-                    for(int j=0;j<invprecompout.size();j++)
-                    {
-                        System.out.println(netlist(invprecompout.get(j)));
-                    }
-                    System.out.println("---------\n");
+                    
                 }
-                /*if(abcttint != i)
+                if(abcttint != i)
                 {
                     System.out.println("ABC truth table does not match for "+i);
                     //System.out.println("TT: "+abctt);
@@ -785,7 +800,7 @@ public class NetSynth {
                 
                 }*/
                 
-                
+                totalmin += min;
                 totalabc += minabc;
                 totalespresso += minesp;
                 invtotalabc += invabcoutcount;
@@ -811,7 +826,7 @@ public class NetSynth {
         //System.out.println("INV ABC Count: "+ invtotalabc);
         //System.out.println("INV Espresso Count: "+ invtotalespresso);
         System.out.println("Precompute Count: "+ totalprecompute);
-        //System.out.println("Min Count: "+ totalmin);
+        System.out.println("Min Count: "+ totalmin);
         
     }
     
