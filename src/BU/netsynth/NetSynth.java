@@ -696,8 +696,24 @@ public class NetSynth {
                     minesp = invespoutcount;
                 
                 if(invprecomputecount < precomputecount)
+                {
                     minpre = invprecomputecount;
-                
+                    //System.out.println(i+ ": INV Precomputed Cicruit\n----------");
+                    //for(int j=0;j<invprecompout.size();j++)
+                    //{
+                    //    System.out.println(netlist(invprecompout.get(j)));
+                    //}
+                    //System.out.println("------------------------\n");
+                }
+                else
+                {
+                    //System.out.println(i+ ": Precomputed Cicruit\n----------");
+                    //for(int j=0;j<precompout.size();j++)
+                    //{
+                    //    System.out.println(netlist(precompout.get(j)));
+                    //}
+                    //System.out.println("------------------------\n");
+                }
                 if(invabcoutcount < abcoutcount)
                     minabc = invabcoutcount;
                 
@@ -1953,11 +1969,11 @@ public class NetSynth {
         {
             if(Filepath.contains("prashant"))
             {
-                commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+Filepath+"src/BU/resources/"+filename+".blif; strash; refactor; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
+                commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+Filepath+"src/BU/resources/"+filename+".blif; strash; rewrite; refactor; balance; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
             }
             else
             {
-                commandBuilder = new StringBuilder(Filepath+"BU/resources/abc -c \"read "+Filepath+"BU/resources/"+filename+".blif; strash; refactor; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
+                commandBuilder = new StringBuilder(Filepath+"BU/resources/abc -c \"read "+Filepath+"BU/resources/"+filename+".blif; strash; rewrite; refactor; balance; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
             }
             
         }

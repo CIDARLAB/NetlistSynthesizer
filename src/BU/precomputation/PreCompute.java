@@ -122,6 +122,7 @@ public class PreCompute {
                 stset = stitchNetlist(set); 
                 stset.get(stset.size()-1).output.wtype = DWireType.output;
                 //System.out.println("Found" + cnt++);
+                stset = doubleinputnortonot(stset);
                 all_netlists.add(stset);
             }
             else  
@@ -133,6 +134,32 @@ public class PreCompute {
         return all_netlists;
     }
     
+    public static List<DGate> doubleinputnortonot(List<DGate> netlistinp)
+    {
+        for(int i=0;i<netlistinp.size();i++)
+        {
+            if(netlistinp.get(i).gtype.equals(DGateType.NOR2))
+            {
+                int norflag =0;
+                int pos =0;
+                for(int j=0;j<netlistinp.get(i).input.size();j++)
+                {
+                    if(netlistinp.get(i).input.get(j).wtype.equals(DWireType.GND))
+                    {
+                        pos = j;
+                        norflag = 1;
+                        break;
+                    }
+                }
+                if(norflag ==1)
+                {
+                    netlistinp.get(i).input.remove(pos);
+                    netlistinp.get(i).gtype = DGateType.NOT;
+                }
+            }
+        }
+        return netlistinp;
+    }
     
     public static List<DGate> stitchNetlist(List<DGate> set)
     {
