@@ -105,7 +105,8 @@ public class NetSynth {
         
         //testABC();
         //test2notstonor();
-        EspressoVsABC(3);
+        //EspressoVsABC(3);
+        EspressoVsABCinv(3);
         //EspressoVsABCSingle(3,109);
         
         //testABC();
@@ -199,8 +200,12 @@ public class NetSynth {
         List<Integer> abccount = new ArrayList<Integer>();
         int totalabc=0;
         int totalespresso =0;
+        int totalprecompute=0;
         int totalmin =0;
         int mincount =0;
+        
+        List<List<DGate>> precomp;
+        precomp = PreCompute.parseNetlistFile();
         
         CircuitDetails circ;
         for(int i=0;i<possiblecirc;i++)
@@ -280,8 +285,33 @@ public class NetSynth {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                abcoutput = optimizeNetlist(abcoutput);
                 abcoutput = convert2NOTsToNOR(abcoutput);
                 abcoutput = rewireNetlist(abcoutput);
+                
+                
+                List<DGate> precompout = new ArrayList<DGate>();
+                int precomputecount = 0 ;
+                String prett = "";
+                if(i==0 || i== 255)
+                {
+                    precomputecount = 1;
+                    if(i==0)
+                        prett = "00000000";
+                    else
+                        prett = "11111111";
+                }
+                else
+                {
+                    precompout = precomp.get(i-1);
+                    precompout = optimizeNetlist(precompout);
+                    precompout = convert2NOTsToNOR(precompout);
+                    precompout = rewireNetlist(precompout);
+                    precomputecount = precompout.size();
+                    if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR2))
+                        precomputecount --;
+                    prett = BooleanSimulator.bpermutePreComp(precompout);
+                }
                 
                 int abcoutcount = abcoutput.size();
                 
@@ -306,9 +336,11 @@ public class NetSynth {
                 //if(espoutcount<abcoutcount)
                 //    mincount = espoutcount;
                 
+                
+                
                 //totalmin += mincount;
                 
-                System.out.println(i+" "+abcoutcount +" "+i+" "+espoutcount);
+                //System.out.println(i+" "+abcoutcount +" "+i+" "+espoutcount);
                 //System.out.println(i+" "+espoutcount);
                 //System.out.println(i+","+mincount);
                 
@@ -334,12 +366,26 @@ public class NetSynth {
                 
                 int espttint = Convert.bintoDec(esptt);
                 int abcttint = Convert.bintoDec(abctt);
+                int prettint = Convert.bintoDec(prett);
                 
-                /*if(abcttint != i)
+                
+                 if(prettint != i)
+                {
+                    System.out.println("Pre Compute truth table does not match for "+i);
+                    //System.out.println("TT : "+prett);
+                    //System.out.println("\nPre Compute Circuit:\n");
+                    //for(int k=0;k<precompout.size();k++)
+                    //{
+                    //   System.out.println(netlist(precompout.get(k)));
+                    //}
+                }
+                
+                
+                if(abcttint != i)
                 {
                     System.out.println("ABC truth table does not match for "+i);
                 }
-                
+                /*
                 if(espttint != i)
                 {
                     System.out.println("Espresso truth table does not match for "+i);
@@ -355,7 +401,7 @@ public class NetSynth {
                 //System.out.println("\n----------------------------------\n");
                 totalabc += abcoutcount;
                 totalespresso += espoutcount;
-                
+                totalprecompute += precomputecount;
                 fespinp.deleteOnExit();
                 fabcinp.deleteOnExit();
                 
@@ -370,6 +416,401 @@ public class NetSynth {
         System.out.println("\n\n Final Count -->");
         System.out.println("ABC Count: "+ totalabc);
         System.out.println("Espresso Count: "+ totalespresso);
+        System.out.println("Precompute Count: "+ totalprecompute);
+        //System.out.println("Min Count: "+ totalmin);
+        
+    }
+    
+    public static void EspressoVsABCinv(int inpcount)
+    {
+        int truthsize = (int)Math.pow(2, inpcount);
+        int possiblecirc = (int)Math.pow(2, truthsize);
+        List<Integer> espressocount = new ArrayList<Integer>();
+        List<Integer> abccount = new ArrayList<Integer>();
+        int totalabc=0;
+        int invtotalabc=0;
+        int totalespresso =0;
+        int totalprecompute=0;
+        int invtotalespresso =0;
+        int invtotalprecompute=0;
+        int totalmin =0;
+        int mincount =0;
+        
+        List<List<DGate>> precomp;
+        precomp = PreCompute.parseNetlistFile();
+        
+        CircuitDetails circ;
+        CircuitDetails invcirc;
+        for(int i=0;i<possiblecirc;i++)
+        {
+            //System.out.println("Truth Table "+i);
+            circ = new CircuitDetails();
+            invcirc = new CircuitDetails();
+            int inpc=0;
+            for(int j=1;j<=inpcount;j++)
+            {
+                String inputname = "in" + j;
+               
+                //System.out.println(inputname);
+                circ.inputNames.add(inputname);
+                invcirc.inputNames.add(inputname);
+                
+            }
+            int invi = possiblecirc - i -1;
+            //System.out.println("inverse is:"+invi);
+            circ.outputNames.add("out");
+            circ.inputgatetable.add(i);
+            invcirc.outputNames.add("out");
+            invcirc.inputgatetable.add(invi);
+            
+            List<String> espressoinput = new ArrayList<String>();
+            List<String> blifinput = new ArrayList<String>();
+            
+            List<String> invespressoinput = new ArrayList<String>();
+            List<String> invblifinput = new ArrayList<String>();
+            
+            espressoinput = Espresso.createFile(circ);
+            blifinput = Blif.createFile(circ);
+            
+            invespressoinput = Espresso.createFile(invcirc);
+            invblifinput = Blif.createFile(invcirc);
+            
+            String filestring ="";
+            String filestringespresso = "";
+            String filestringblif = "";
+            String invfilestringespresso = "";
+            String invfilestringblif = "";
+            
+            if(Filepath.contains("prashant"))
+            {
+                filestring += Filepath+ "src/BU/resources/";
+            }
+            else
+            {
+                filestring += Filepath+ "BU/resources/";
+            }
+            
+            invfilestringespresso = filestring + "invespressoinpT";
+            invfilestringblif = filestring + "invblifinp";
+            //invfilestringespresso += Global.espout++ ;
+            
+            filestringespresso = filestring + "espressoinpT";
+            filestringblif = filestring + "blifinp";
+            //filestringespresso += Global.espout++ ;
+            //filestringblif += Global.espout++ ;
+            filestringespresso += ".txt";
+            filestringblif += ".blif";
+            invfilestringespresso += ".txt";
+            invfilestringblif += ".blif";
+            
+            File fespinp = new File(filestringespresso);
+            File fabcinp = new File(filestringblif);
+            File invfespinp = new File(invfilestringespresso);
+            File invfabcinp = new File(invfilestringblif);
+            
+            
+            
+            try 
+            {
+                Writer outputesp = new BufferedWriter(new FileWriter(fespinp));
+                for(String xline:espressoinput)
+                {
+                    String newl = (xline + "\n");
+                    outputesp.write(newl);
+                }
+                outputesp.close();
+                
+                Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+                for(String xline:blifinput)
+                {
+                    String newl = (xline + "\n");
+                    outputblif.write(newl);
+                }
+                outputblif.close();
+                
+                Writer invoutputesp = new BufferedWriter(new FileWriter(invfespinp));
+                for(String xline:invespressoinput)
+                {
+                    String newl = (xline + "\n");
+                    invoutputesp.write(newl);
+                }
+                invoutputesp.close();
+                
+                Writer invoutputblif = new BufferedWriter(new FileWriter(invfabcinp));
+                for(String xline:invblifinput)
+                {
+                    String newl = (xline + "\n");
+                    invoutputblif.write(newl);
+                }
+                invoutputblif.close();
+                
+                List<String> espout = new ArrayList<String>();
+                
+                List<String> invespout = new ArrayList<String>();
+                
+                
+                espout = runEspresso(filestringespresso);
+                invespout = runEspresso(invfilestringespresso);
+                
+                List<DGate> espoutput = new ArrayList<DGate>();
+                espoutput = convertPOStoNORNOT(espout);
+                espoutput = optimizeNetlist(espoutput);
+                espoutput = convert2NOTsToNOR(espoutput);
+                espoutput = rewireNetlist(espoutput);
+                
+                List<DGate> invespoutput = new ArrayList<DGate>();
+                
+                invespoutput = convertPOStoNORNOT(invespout);
+                String invespwOUT = "WireW" + Global.wirecount++;
+                DWire inveoutW = new DWire(invespwOUT,DWireType.connector);
+                invespoutput.get(invespoutput.size()-1).output = new DWire(invespwOUT,DWireType.connector);
+                DGate notoutesp = new DGate();
+                notoutesp.input.add(inveoutW);
+                notoutesp.gtype = DGateType.NOT;
+                notoutesp.output = new DWire("out",DWireType.output);
+                invespoutput.add(notoutesp);
+                invespoutput = optimizeNetlist(invespoutput);
+                invespoutput = convert2NOTsToNOR(invespoutput);
+                invespoutput = rewireNetlist(invespoutput);
+                        
+                List<DGate> abcoutput = new ArrayList<DGate>();
+                List<DGate> invabcoutput = new ArrayList<DGate>();
+                try {
+                    abcoutput = runABC("blifinp");
+                    invabcoutput = runABC("invblifinp");
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                abcoutput = optimizeNetlist(abcoutput);
+                abcoutput = convert2NOTsToNOR(abcoutput);
+                abcoutput = rewireNetlist(abcoutput);
+                
+                /*
+                try {
+                    invabcoutput = runABC("invblifinp");
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                */
+                
+                String invabcwOUT = "WireW" + Global.wirecount++;
+                DWire invaoutW = new DWire(invabcwOUT,DWireType.connector);
+                invabcoutput.get(invabcoutput.size()-1).output = new DWire(invabcwOUT,DWireType.connector);
+                DGate notoutabc = new DGate();
+                notoutabc.input.add(invaoutW);
+                notoutabc.gtype = DGateType.NOT;
+                notoutabc.output = new DWire("out",DWireType.output);
+                
+                invabcoutput.add(notoutabc);
+                invabcoutput = optimizeNetlist(invabcoutput);
+                invabcoutput = convert2NOTsToNOR(invabcoutput);
+                invabcoutput = rewireNetlist(invabcoutput);
+                
+                
+                List<DGate> precompout = new ArrayList<DGate>();
+                List<DGate> invprecompout = new ArrayList<DGate>();
+                int precomputecount = 0 ;
+                int invprecomputecount = 0 ;
+                String prett = "";
+                String invprett = "";
+                if(i==0 || i== 255)
+                {
+                    invprecomputecount = 1;
+                    precomputecount = 1;
+                    if(i==0)
+                    {
+                        prett = "00000000";
+                        invprett = "00000000";
+                    }
+                    else
+                    {
+                        prett = "11111111";
+                        invprett = "11111111";
+                    
+                    }
+                }
+                else
+                {
+                    precompout = precomp.get(i-1);
+                    invprecompout = precomp.get(invi-1);
+                    
+                    String invprewOUT = "WireW" + Global.wirecount++;
+                    DWire invpoutW = new DWire(invprewOUT,DWireType.connector);
+                    invprecompout.get(invprecompout.size()-1).output = new DWire(invprewOUT,DWireType.connector);
+                    DGate notoutpre = new DGate();
+                    notoutpre.input.add(invpoutW);
+                    notoutpre.gtype = DGateType.NOT;
+                    notoutpre.output = new DWire("out",DWireType.output);
+                    invprecompout.add(notoutpre);
+                    
+                    invprecompout = optimizeNetlist(invprecompout);
+                    invprecompout = convert2NOTsToNOR(invprecompout);
+                    invprecompout = rewireNetlist(invprecompout);
+                    invprecomputecount = invprecompout.size();
+                    
+                    
+                    precompout = optimizeNetlist(precompout);
+                    precompout = convert2NOTsToNOR(precompout);
+                    precompout = rewireNetlist(precompout);
+                    precomputecount = precompout.size();
+                    
+                    if(invprecompout.get(invprecompout.size()-1).gtype.equals(DGateType.OR2))
+                        invprecomputecount --;
+                    
+                    if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR2))
+                        precomputecount --;
+                    prett = BooleanSimulator.bpermutePreComp(precompout);
+                    invprett = BooleanSimulator.bpermutePreComp(invprecompout);
+                }
+                
+                int abcoutcount = abcoutput.size();
+                int espoutcount = espoutput.size();
+                int invabcoutcount = invabcoutput.size();
+                int invespoutcount = invespoutput.size();
+                
+                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
+                    abcoutcount --;
+                
+                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
+                    espoutcount --;
+                
+                if(invabcoutput.get(invabcoutput.size()-1).gtype.equals(DGateType.OR2))
+                    invabcoutcount --;
+                
+                if(invespoutput.get(invespoutput.size()-1).gtype.equals(DGateType.OR2))
+                    invespoutcount --;
+                
+                int minesp = espoutcount;
+                int minabc = abcoutcount;
+                int minpre = precomputecount;
+                
+                if(invespoutcount < espoutcount)
+                    minesp = invespoutcount;
+                
+                if(invprecomputecount < precomputecount)
+                    minpre = invprecomputecount;
+                
+                if(invabcoutcount < abcoutcount)
+                    minabc = invabcoutcount;
+                
+                
+                //if(abcoutput.size() < invabcoutput.size())
+                //    abcoutcount = abcoutput.size();
+                //else
+                //    abcoutcount = invabcoutput.size();
+                
+                //if(espoutput.size() < invespoutput.size())
+                //    espoutcount = espoutput.size();
+                //else
+                //    espoutcount = invespoutput.size();
+                    
+                
+                /*if(!abcoutput.isEmpty())
+                {
+                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
+                    abcoutcount --;
+                }
+                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
+                    espoutcount --;
+                */
+                List<DWire> inputwires = new ArrayList<DWire>();
+                DWire w1 =new DWire("in1",DWireType.input);
+                DWire w2 =new DWire("in2",DWireType.input);
+                DWire w3 =new DWire("in3",DWireType.input);
+                
+                inputwires.add(w1);
+                inputwires.add(w2);
+                inputwires.add(w3);
+                
+                String esptt = BooleanSimulator.bpermuteTest(espoutput,inputwires,inpcount);
+                String abctt = BooleanSimulator.bpermuteTest(abcoutput,inputwires,inpcount);
+                String invesptt = BooleanSimulator.bpermuteTest(invespoutput,inputwires,inpcount);
+                String invabctt = BooleanSimulator.bpermuteTest(invabcoutput,inputwires,inpcount);
+                
+                //System.out.println(i+ " ABC Truth Table: "+abctt);
+                
+                int espttint = Convert.bintoDec(esptt);
+                int abcttint = Convert.bintoDec(abctt);
+                int prettint = Convert.bintoDec(prett);
+                
+                int invespttint = Convert.bintoDec(invesptt);
+                int invabcttint = Convert.bintoDec(invabctt);
+                int invprettint = Convert.bintoDec(invprett);
+                
+                
+                if(prettint != i)
+                {
+                    System.out.println("Pre Compute truth table does not match for "+i);
+                    System.out.println("TT: "+prett);
+                    for(int j=0;j<precompout.size();j++)
+                    {
+                        System.out.println(netlist(precompout.get(j)));
+                    }
+                    System.out.println("---------\n");
+                }
+                if(invprettint != i)
+                {
+                    System.out.println("Inverse Pre Compute truth table does not match for "+i);
+                    System.out.println("TT: "+invprett);
+                    for(int j=0;j<invprecompout.size();j++)
+                    {
+                        System.out.println(netlist(invprecompout.get(j)));
+                    }
+                    System.out.println("---------\n");
+                }
+                /*if(abcttint != i)
+                {
+                    System.out.println("ABC truth table does not match for "+i);
+                    //System.out.println("TT: "+abctt);
+                
+                }
+                 if(invabcttint != i)
+                {
+                    System.out.println("Inverse ABC truth table does not match for "+i);
+                    //System.out.println("TT: "+invabctt);
+                
+                }
+                if(espttint != i)
+                {
+                    System.out.println("Espresso truth table does not match for "+i);
+                    //System.out.println("TT: "+esptt);
+                
+                }
+                
+               
+                if(invespttint != i)
+                {
+                    System.out.println("Inverse Espresso truth table does not match for "+i);
+                    //System.out.println("TT: " +invesptt);
+                
+                }*/
+                
+                
+                totalabc += minabc;
+                totalespresso += minesp;
+                invtotalabc += invabcoutcount;
+                invtotalespresso += invespoutcount;
+                totalprecompute += minpre;
+                
+                fespinp.deleteOnExit();
+                fabcinp.deleteOnExit();
+                invfespinp.deleteOnExit();
+                invfabcinp.deleteOnExit();
+                
+            } 
+            catch (IOException ex) 
+            {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        
+        System.out.println("\n\n Final Count -->");
+        System.out.println("ABC Count: "+ totalabc);
+        System.out.println("Espresso Count: "+ totalespresso);
+        //System.out.println("INV ABC Count: "+ invtotalabc);
+        //System.out.println("INV Espresso Count: "+ invtotalespresso);
+        System.out.println("Precompute Count: "+ totalprecompute);
         //System.out.println("Min Count: "+ totalmin);
         
     }
@@ -481,6 +922,10 @@ public class NetSynth {
                 }
                 if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
                     espoutcount --;
+                
+                
+                //<editor-fold desc="commented portion">
+                
                 //System.out.println("Espresso Circuit count for No: "+i+" : "+espoutcount);
                 //System.out.println("ABC Circuit count for No: "+i+" : "+abcoutcount);
                 
@@ -505,6 +950,9 @@ public class NetSynth {
                 //{
                 //    System.out.println(netlist(abcoutput.get(k)));
                 //}
+                //</editor-fold>
+                
+                
                 
                 List<DWire> inputwires = new ArrayList<DWire>();
                 DWire w1 =new DWire("in1",DWireType.input);
@@ -1795,7 +2243,7 @@ public class NetSynth {
                 netout.add(newnor);
             }
         }
-        netout = optimizeNetlist(netout);
+        //netout = optimizeNetlist(netout);
         
         //System.out.println("\n\n------------\nAfter AIG to NOR NOT and optmizing the result\n");
         //for(int i=0;i<netout.size();i++)
