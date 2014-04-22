@@ -102,11 +102,11 @@ public class NetSynth {
         
         //verifyinverse();
         //histogram();
-        
+        seg7dagw("seg7");
         //testABC();
         //test2notstonor();
         //EspressoVsABC(3);
-        EspressoVsABCinv(3);
+        //EspressoVsABCinv(3);
         //EspressoVsABCSingle(3,109);
         
         //testABC();
@@ -127,6 +127,13 @@ public class NetSynth {
         //testnetlistmodule();
         //testEspresso();
         
+    }
+    
+    
+    public static void testD7seg()
+    {
+        List<DGate> d7seg = new ArrayList<DGate>();
+        //d7seg 
     }
     
     public static void test2notstonor()
@@ -435,6 +442,7 @@ public class NetSynth {
         int invtotalprecompute=0;
         int totalmin =0;
         int mincount =0;
+        int totalminabcesp=0;
         
         List<List<DGate>> precomp;
         precomp = PreCompute.parseNetlistFile();
@@ -663,7 +671,22 @@ public class NetSynth {
                     
                     if(invprecompout.get(invprecompout.size()-1).gtype.equals(DGateType.OR2))
                         invprecomputecount --;
-                    
+                    /*if(i==110)
+                    {
+                        if(precompout.size()<=invprecompout.size())
+                        {
+                            System.out.println("precomp circuit");
+                            for(int j=0;j<precompout.size();j++)
+                                System.out.println(netlist(precompout.get(j)));
+                        }
+                        else
+                        {
+                            System.out.println("inverse precomp circuit");
+                            for(int j=0;j<invprecompout.size();j++)
+                                System.out.println(netlist(invprecompout.get(j)));
+                        
+                        }
+                    }*/
                     
                     prett = BooleanSimulator.bpermutePreComp(precompout);
                     invprett = BooleanSimulator.bpermutePreComp(invprecompout);
@@ -687,7 +710,6 @@ public class NetSynth {
                 
                 if(invespoutput.get(invespoutput.size()-1).gtype.equals(DGateType.OR2))
                     invespoutcount --;
-                
                 int minesp = espoutcount;
                 int minabc = abcoutcount;
                 int minpre = precomputecount;
@@ -733,7 +755,51 @@ public class NetSynth {
                         min = minpre;
                     }
                 }
+                int minabcesp=minabc;
+                if(minesp < minabc)
+                    minabcesp = minesp;
                 
+                
+                
+                //System.out.println(i+","+minesp+","+minabc+","+minpre);
+                
+                
+                /*if(i==110)
+                {
+                    if(abcoutput.size() <= invabcoutput.size())
+                    { 
+                        System.out.println("ABC Circuit");
+                        for(int j=0;j<abcoutput.size();j++)
+                        {
+                            System.out.println(netlist(abcoutput.get(j)));
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("INV ABC Circuit");
+                        for(int j=0;j<invabcoutput.size();j++)
+                        {
+                            System.out.println(netlist(invabcoutput.get(j)));
+                        }
+                    }
+                    if(espoutput.size() <= invespoutput.size())
+                    { 
+                        System.out.println("Esp Circuit");
+                        for(int j=0;j<espoutput.size();j++)
+                        {
+                            System.out.println(netlist(espoutput.get(j)));
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("INV Esp Circuit");
+                        for(int j=0;j<invespoutput.size();j++)
+                        {
+                            System.out.println(netlist(invespoutput.get(j)));
+                        }
+                    }
+                            
+                }*/
                 
                 //if(abcoutput.size() < invabcoutput.size())
                 //    abcoutcount = abcoutput.size();
@@ -822,6 +888,7 @@ public class NetSynth {
                 invtotalabc += invabcoutcount;
                 invtotalespresso += invespoutcount;
                 totalprecompute += minpre;
+                totalminabcesp += minabcesp;
                 
                 fespinp.deleteOnExit();
                 fabcinp.deleteOnExit();
@@ -839,6 +906,7 @@ public class NetSynth {
         System.out.println("\n\n Final Count -->");
         System.out.println("ABC Count: "+ totalabc);
         System.out.println("Espresso Count: "+ totalespresso);
+        System.out.println("Best out of ABC and Espresso "+totalminabcesp);
         //System.out.println("INV ABC Count: "+ invtotalabc);
         //System.out.println("INV Espresso Count: "+ invtotalespresso);
         System.out.println("Precompute Count: "+ totalprecompute);
@@ -1947,14 +2015,49 @@ public class NetSynth {
     }
     public static void testABC()
     {
-        String filename = "blifinp";
+        String filename = "seg7";
+        List<DGate> dseg7 = new ArrayList<DGate>();
+        
         try {
-            runABC(filename);
+            dseg7 = runABCverilog(filename);
         } catch (InterruptedException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        dseg7 = optimizeNetlist(dseg7);
+        dseg7 = convert2NOTsToNOR(dseg7);
+        dseg7 = rewireNetlist(dseg7);
+        
+        
+        for(int i=0;i<dseg7.size();i++)
+            System.out.println(netlist(dseg7.get(i)));
     }
+    
+    public static DAGW seg7dagw(String filename)
+    {
+        DAGW sevenseg = new DAGW();
+        //String filename = "seg7";
+        List<DGate> dseg7 = new ArrayList<DGate>();
+        
+        try {
+            dseg7 = runABCverilog(filename);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        dseg7 = optimizeNetlist(dseg7);
+        dseg7 = convert2NOTsToNOR(dseg7);
+        dseg7 = rewireNetlist(dseg7);
+        
+        
+        for(int i=0;i<dseg7.size();i++)
+            System.out.println(netlist(dseg7.get(i)));
+        sevenseg = CreateMultDAGW(dseg7);
+        
+        return sevenseg;
+    }
+    
+    
     
     public static List<DGate> runABC(String filename) throws InterruptedException 
     {
@@ -1969,11 +2072,83 @@ public class NetSynth {
         {
             if(Filepath.contains("prashant"))
             {
-                commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+Filepath+"src/BU/resources/"+filename+".blif; strash; rewrite; refactor; balance; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
+                commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+Filepath+"src/BU/resources/"+filename+".blif; strash; rewrite; refactor;  balance; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
             }
             else
             {
-                commandBuilder = new StringBuilder(Filepath+"BU/resources/abc -c \"read "+Filepath+"BU/resources/"+filename+".blif; strash; rewrite; refactor; balance; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
+                commandBuilder = new StringBuilder(Filepath+"BU/resources/abc -c \"read "+Filepath+"BU/resources/"+filename+".blif; strash;  rewrite; refactor; balance; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
+            }
+            
+        }
+        
+        String command = commandBuilder.toString();
+        //System.out.println(command);
+        
+        String filestring = "";
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/script";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/script";
+        }
+        File fespinp = new File(filestring);
+        //Writer output;
+        try 
+        {
+             Writer output = new BufferedWriter(new FileWriter(fespinp));
+            //output = new BufferedWriter(new FileWriter(fespinp));
+             output.write(command);
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
+        String clist = Filepath+"src/BU/resources/script";
+        
+        
+        Runtime runtime = Runtime.getRuntime();
+        Process proc = null;
+        List<DGate> finalnetlist = new ArrayList<DGate>();
+        try 
+        {
+            proc = runtime.exec(clist);
+            proc.waitFor();
+            finalnetlist = convertBenchToAIG();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return finalnetlist;
+        //convertBenchToAIG();
+    }
+    
+    
+    
+    public static List<DGate> runABCverilog(String filename) throws InterruptedException 
+    {
+    
+        String x = System.getProperty("os.name");
+        StringBuilder commandBuilder = null;
+        if(x.contains("Mac"))
+        {
+            commandBuilder = new StringBuilder(Filepath+"BU/resources/abc");
+        }
+        else if("Linux".equals(x))
+        {
+            if(Filepath.contains("prashant"))
+            {
+                commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+Filepath+"src/BU/resources/"+filename+".v; strash; rewrite; refactor;  balance; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
+            }
+            else
+            {
+                commandBuilder = new StringBuilder(Filepath+"BU/resources/abc -c \"read "+Filepath+"BU/resources/"+filename+".v; strash;  rewrite; refactor; balance; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
             }
             
         }
