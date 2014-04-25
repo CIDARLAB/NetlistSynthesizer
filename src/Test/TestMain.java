@@ -4,6 +4,7 @@
  */
 package Test;
 
+import BU.ParseVerilog.parseCaseStatements;
 import BU.netsynth.DGate.DGateType;
 
 /**
@@ -14,6 +15,7 @@ public class TestMain {
     public static void main(String[] args)
     {
        //TestSynthesis.testNORConversion(DGateType.XNOR);
-       TestSynthesis.testReducedFanin(DGateType.OR,3);
+       //TestSynthesis.testReducedFanin(DGateType.OR,3);
+        parseCaseStatements.parseStructural("");
     }
 }

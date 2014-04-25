@@ -4,6 +4,7 @@
  */
 package BU.ParseVerilog;
 
+import BU.netsynth.DGate;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -362,5 +363,158 @@ public class parseCaseStatements {
         
         return circuit;
     }
-   
+    
+    public static List<DGate> parseStructural(String Filepath)
+    {
+        
+         List<DGate> structnetlist = new ArrayList<DGate>();
+         List<String> inputs = new ArrayList<String>();
+         List<String> outputs = new ArrayList<String>();
+         List<String> unknownIO = new ArrayList<String>();
+         
+         int x = 0;
+        
+        CircuitDetails circuit = new CircuitDetails();
+        
+        String path = Filepath;
+        
+        Filepath = parseCaseStatements.class.getClassLoader().getResource(".").getPath();
+         
+        if(Filepath.contains("prashant"))
+        {
+            if(Filepath.contains("build/classes/"))
+                Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+            else if(Filepath.contains("src"))
+                Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+            Filepath += "src/BU/ParseVerilog/Verilog.v";
+            path = Filepath;
+        }
+                
+        
+        
+        
+        File file = new File(path);
+        
+        BufferedReader br;
+        FileReader fr;
+        boolean addCodelines =false;
+        String alllines="";
+        List<String> filelines = new ArrayList<String>();
+        try
+        {
+            fr = new FileReader(file);
+            br = new BufferedReader(fr);
+            String line;
+            try 
+            {
+                while((line = br.readLine()) != null )
+                {
+                    line = line.trim();
+                    if(!addCodelines)
+                    {
+                        if(line.contains("module ") && (!line.startsWith("//")))
+                        {
+                            if(line.indexOf("module ")>0)
+                            {
+                                if(((line.charAt((line.indexOf("module "))-1)) == ' '))
+                                {
+                                    addCodelines = true;
+                                }     
+                                    
+                            }
+                            else
+                                addCodelines = true;
+                        }
+                    }
+                    if((!line.isEmpty()) && addCodelines && (!line.startsWith("//")))
+                    {
+                        alllines+= (" " + line); 
+                        
+                        filelines.add(line);
+                        //System.out.println(line.trim());
+                    }
+                }
+            } 
+            catch (IOException ex) 
+            {
+                Logger.getLogger(parseCaseStatements.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } 
+        catch (FileNotFoundException ex) 
+        {
+            Logger.getLogger(parseCaseStatements.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        //System.out.println(alllines);
+        
+        //<editor-fold desc="Extract Module IO Contraints">
+        String moduleString = alllines.substring(alllines.indexOf(" module "),alllines.indexOf(";"));
+        alllines = alllines.substring((alllines.indexOf(moduleString) + moduleString.length()+1), alllines.indexOf(" endmodule"));
+        alllines = alllines.trim();
+        moduleString = moduleString.trim();
+        moduleString = moduleString.substring((moduleString.indexOf("(")+1),moduleString.indexOf(")"));
+        //System.out.println(alllines);
+        
+        //System.out.println(moduleString);
+        String[] modulePieces = moduleString.split(",");
+        for(int i=0;i<modulePieces.length;i++)
+        {
+            String IO = modulePieces[i].trim();
+            if(IO.contains("input "))
+            {
+                IO = IO.substring(IO.indexOf("input ")+6);
+                IO = IO.trim();
+                inputs.add(IO);
+                
+            }
+            else if(IO.contains("output "))
+            {
+                
+                IO = IO.substring(IO.indexOf("output ")+7);
+                IO = IO.trim();
+                outputs.add(IO);
+                
+            }
+            else
+            {
+                unknownIO.add(IO);   
+                
+            }
+        }
+        //System.out.println(alllines);
+        //</editor-fold>
+        
+        List<String> VerilogLines = new ArrayList<String>();
+        String temp="";
+        int caseLocation=-1;
+        int cnt =0;
+        //System.out.println(alllines);
+        while(alllines.contains(";") || alllines.length()>0)
+        {
+            
+            
+            if(alllines.contains(";"))
+            {
+                //System.out.println(alllines);
+                VerilogLines.add(alllines.substring(0,alllines.indexOf(";")));
+                alllines = alllines.substring(alllines.indexOf(";")+1);
+                alllines = alllines.trim();
+            }    
+            else
+            {
+                VerilogLines.add(alllines);
+                alllines = "";
+            }
+           
+            cnt++;
+        }
+        for(String xline:VerilogLines)
+            System.out.println(xline);
+        System.out.println("----------------------------\n");
+        
+        
+        
+        return structnetlist;
+    }
+    
 }

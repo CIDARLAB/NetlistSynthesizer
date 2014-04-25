@@ -471,8 +471,15 @@ public class NetlistConversionFunctions {
        }
        
        return nor_eq;
-    }  
+    }
     
+    
+    /**Function*************************************************************
+    Synopsis    [Returns equivalent netlist with each gate Fanin <= 2]
+    Description []
+    SideEffects []
+    SeeAlso     []
+    ***********************************************************************/
     public static List<DGate> ConvertToFanin2(DGate g)
     {
         List<DGate> fanin2 = new ArrayList<DGate>();
@@ -488,6 +495,15 @@ public class NetlistConversionFunctions {
         
         return fanin2;
     }
+    
+    /**Function*************************************************************
+    Synopsis    [Produces a Netlist where Fanin of each gate is 2]
+    Description [The final netlist is functionally equivalent to the input gate. The input gate can have fanin greater than 2. 
+                  The final netlist will comprise of gates where fanin is 2 or 1(in case of NOT gates)]
+    SideEffects [If the input is a nor, nand or xnor gate, all the gates in the netlist will comprise of a or, and or xor gate respectively 
+                  followed by a not gate at the end]
+    SeeAlso     []
+    ***********************************************************************/
     public static List<DGate> reduceTofanin2(DGate inpgate, DGateType gtype)
     {
         List<DGate> redfanin = new ArrayList<DGate>();
@@ -569,5 +585,6 @@ public class NetlistConversionFunctions {
         }
         return redfanin;
     }
+    
     
 }

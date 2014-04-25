@@ -74,4 +74,8 @@ public class TestSynthesis {
             System.out.println(NetSynth.netlist(convertednetlist.get(i)));
         }
     }
+    
+    
+    
+    
 }
