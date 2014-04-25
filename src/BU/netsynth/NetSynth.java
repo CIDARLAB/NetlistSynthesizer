@@ -1877,7 +1877,7 @@ public class NetSynth {
                 {
                     System.out.println("Special Condition");
                     espoutput = espoutputinv;
-                    String Wirename = "Wire" + Global.wirecount++;
+                    String Wirename = "0Wire" + Global.wirecount++;
                     espoutput.get(espoutput.size()-1).output.wtype = DWireType.connector;
                     List<DWire> inpwesp = new ArrayList<DWire>();
                     DWire outwesp = new DWire();
@@ -2178,10 +2178,16 @@ public class NetSynth {
         {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
+        String clist ="";
+        if (Filepath.contains("prashant")) 
+        {
+            clist = Filepath+"src/BU/resources/script";
+        } 
+        else 
+        {
+            clist = Filepath+"BU/resources/script";
+        }
         
-        
-        
-        String clist = Filepath+"src/BU/resources/script";
         
         
         Runtime runtime = Runtime.getRuntime();
@@ -2383,6 +2389,9 @@ public class NetSynth {
     
     
     
+          
+    
+    
     public static List<DGate> convertAIGtoNORNOT(List<DGate> netlist)
     {
         List<DGate> netout = new ArrayList<DGate>();
@@ -2423,7 +2432,7 @@ public class NetSynth {
                 }
                 if(flag1 ==0)
                 {
-                    String wirename = "Wire" + Global.wirecount++;
+                    String wirename = "0Wire" + Global.wirecount++;
                     DWire notout1 = new DWire(wirename,DWireType.connector);
                     DGate newnot1 = new DGate();
                     newnot1.gtype = DGateType.NOT;
@@ -2436,7 +2445,7 @@ public class NetSynth {
                 }
                 if(flag2 ==0)
                 {
-                    String wirename = "Wire" + Global.wirecount++;
+                    String wirename = "0Wire" + Global.wirecount++;
                     DWire notout2 = new DWire(wirename,DWireType.connector);
                     DGate newnot2 = new DGate();
                     newnot2.gtype = DGateType.NOT;
@@ -2886,7 +2895,7 @@ public class NetSynth {
                 {
                     List<DWire> notsumterminp = new ArrayList<DWire>();
                     notsumterminp.addAll(sumterm);
-                    String Wirename = "Wire" + Global.wirecount++;
+                    String Wirename = "0Wire" + Global.wirecount++;
                     DWire notsumtermout = new DWire(Wirename);
                     DGate notsumtermgate = new DGate(DGateType.NOT,notsumterminp,notsumtermout);
                     netlist.add(notsumtermgate);
@@ -3168,7 +3177,7 @@ public class NetSynth {
                                 addnor.input.add(w1);
                                 addnor.input.add(w2);
                             
-                                String noroutWname = "Wire" + Global.wirecount++;
+                                String noroutWname = "0Wire" + Global.wirecount++;
                                 noroutW = new DWire(noroutWname,DWireType.connector);
                                 addnor.output = noroutW;
                                 if(gate2flag == 1)
@@ -3872,7 +3881,7 @@ public class NetSynth {
             {
                 if(!((numberOfMinterms == 1) && (minTemp.size() == 1)))
                 {
-                String Wirename = "Wire" + Global.wirecount++;
+                String Wirename = "0Wire" + Global.wirecount++;
                 DWire aout = new DWire(Wirename);
                 List<DWire> notfinalinp = new ArrayList<DWire>();
                 notfinalinp.add(sopexp.get(sopexp.size()-1).output);
@@ -3894,7 +3903,7 @@ public class NetSynth {
         List<DGate> notInp = new ArrayList<DGate>();
         for(DWire xWire:inpWires)
         {
-            String Wirename = "Wire" + Global.wirecount++;
+            String Wirename = "0Wire" + Global.wirecount++;
             DWire aout = new DWire(Wirename);
             List<DWire> inpNot = new ArrayList<DWire>();
             inpNot.add(xWire);
@@ -3929,14 +3938,14 @@ public class NetSynth {
                 List<DWire> ainp = new ArrayList<DWire>();
                 ainp.add(temp.get(indx));
                 ainp.add(temp.get(indx+1));
-                String Wirename = "Wire" + Global.wirecount++;
+                String Wirename = "0Wire" + Global.wirecount++;
                 
                 DWire aout = new DWire(Wirename);
                 DGate andG = new DGate(gtype,ainp,aout);
                 minterm.add(andG);
                 if(wireCount>2)
                 {
-                    Wirename = "Wire" + Global.wirecount++;
+                    Wirename = "0Wire" + Global.wirecount++;
                     List<DWire> ninp = new ArrayList<DWire>();
                     ninp.add(aout);
                     DWire anout = new DWire(Wirename);
@@ -3961,7 +3970,7 @@ public class NetSynth {
                 List<DWire> ainp = new ArrayList<DWire>();
                 ainp.add(nextLevelWires.get(0));
                 ainp.add(nextLevelWires.get(1));
-                String Wirename = "Wire" + Global.wirecount++;
+                String Wirename = "0Wire" + Global.wirecount++;
                 DWire aout = new DWire(Wirename);
                 DGate andG = new DGate(gtype,ainp,aout);
                 minterm.add(andG);
@@ -3997,7 +4006,7 @@ public class NetSynth {
                 List<DWire> ainp = new ArrayList<DWire>();
                 ainp.add(temp.get(indx));
                 ainp.add(temp.get(indx+1));
-                String Wirename = "Wire" + Global.wirecount++;
+                String Wirename = "0Wire" + Global.wirecount++;
                 
                 DWire aout = new DWire(Wirename);
                 nextLevelWires.add(aout);
@@ -4016,7 +4025,7 @@ public class NetSynth {
                 List<DWire> ainp = new ArrayList<DWire>();
                 ainp.add(nextLevelWires.get(0));
                 ainp.add(nextLevelWires.get(1));
-                String Wirename = "Wire" + Global.wirecount++;
+                String Wirename = "0Wire" + Global.wirecount++;
                 DWire aout = new DWire(Wirename);
                 DGate andG = new DGate(gOrAnd,ainp,aout);
                 minterm.add(andG);

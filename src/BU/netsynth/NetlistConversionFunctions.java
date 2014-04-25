@@ -32,14 +32,14 @@ public class NetlistConversionFunctions {
            not1.gtype = DGateType.NOT;
            not1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            not1.output = outp1;
            
            DGate not2 = new DGate();
            not2.gtype = DGateType.NOT;
            not2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
-           outp2.name = "Wire" + Global.wirecount++;
+           outp2.name = "0Wire" + Global.wirecount++;
            not2.output = outp2;
            
            DGate nor1 = new DGate();
@@ -64,14 +64,14 @@ public class NetlistConversionFunctions {
            not1.gtype = DGateType.NOT;
            not1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            not1.output = outp1;
            
            DGate not2 = new DGate();
            not2.gtype = DGateType.NOT;
            not2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
-           outp2.name = "Wire" + Global.wirecount++;
+           outp2.name = "0Wire" + Global.wirecount++;
            not2.output = outp2;
            
            DGate nor1 = new DGate();
@@ -79,7 +79,7 @@ public class NetlistConversionFunctions {
            nor1.input.add(outp1);
            nor1.input.add(outp2);
            DWire outp3 = new DWire();
-           outp3.name = "Wire" + Global.wirecount++;
+           outp3.name = "0Wire" + Global.wirecount++;
            nor1.output = outp3;
            
            DGate not3 = new DGate();
@@ -107,7 +107,7 @@ public class NetlistConversionFunctions {
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(1));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            nor1.output = outp1;
            
            DGate not1 = new DGate();
@@ -135,14 +135,14 @@ public class NetlistConversionFunctions {
            not1.gtype = DGateType.NOT;
            not1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            not1.output = outp1;
            
            DGate not2 = new DGate();
            not2.gtype = DGateType.NOT;
            not2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
-           outp2.name = "Wire" + Global.wirecount++;
+           outp2.name = "0Wire" + Global.wirecount++;
            not2.output = outp2;
            
            DGate nor1 = new DGate();
@@ -150,7 +150,7 @@ public class NetlistConversionFunctions {
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(1));
            DWire outp3 = new DWire();
-           outp3.name = "Wire" + Global.wirecount++;
+           outp3.name = "0Wire" + Global.wirecount++;
            nor1.output = outp3;
            
            DGate nor2 = new DGate();
@@ -158,7 +158,7 @@ public class NetlistConversionFunctions {
            nor2.input.add(outp1);
            nor2.input.add(outp2);
            DWire outp4 = new DWire();
-           outp4.name = "Wire" + Global.wirecount++;
+           outp4.name = "0Wire" + Global.wirecount++;
            nor2.output = outp4;
            
            DGate nor3 = new DGate();
@@ -186,14 +186,14 @@ public class NetlistConversionFunctions {
            not1.gtype = DGateType.NOT;
            not1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            not1.output = outp1;
            
            DGate not2 = new DGate();
            not2.gtype = DGateType.NOT;
            not2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
-           outp2.name = "Wire" + Global.wirecount++;
+           outp2.name = "0Wire" + Global.wirecount++;
            not2.output = outp2;
            
            DGate nor1 = new DGate();
@@ -201,7 +201,7 @@ public class NetlistConversionFunctions {
            nor1.input.add(outp1);
            nor1.input.add(g.input.get(1));
            DWire outp3 = new DWire();
-           outp3.name = "Wire" + Global.wirecount++;
+           outp3.name = "0Wire" + Global.wirecount++;
            nor1.output = outp3;
            
            DGate nor2 = new DGate();
@@ -209,7 +209,7 @@ public class NetlistConversionFunctions {
            nor2.input.add(g.input.get(0));
            nor2.input.add(outp2);
            DWire outp4 = new DWire();
-           outp4.name = "Wire" + Global.wirecount++;
+           outp4.name = "0Wire" + Global.wirecount++;
            nor2.output = outp4;
            
            DGate nor3 = new DGate();
@@ -260,7 +260,7 @@ public class NetlistConversionFunctions {
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
@@ -268,7 +268,7 @@ public class NetlistConversionFunctions {
            nor2.input.add(g.input.get(1));
            nor2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
-           outp2.name = "Wire" + Global.wirecount++;
+           outp2.name = "0Wire" + Global.wirecount++;
            nor2.output = outp2;
            
            DGate nor3 = new DGate();
@@ -295,7 +295,7 @@ public class NetlistConversionFunctions {
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
@@ -303,7 +303,7 @@ public class NetlistConversionFunctions {
            nor2.input.add(g.input.get(1));
            nor2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
-           outp2.name = "Wire" + Global.wirecount++;
+           outp2.name = "0Wire" + Global.wirecount++;
            nor2.output = outp2;
            
            DGate nor3 = new DGate();
@@ -311,7 +311,7 @@ public class NetlistConversionFunctions {
            nor3.input.add(outp1);
            nor3.input.add(outp2);
            DWire outp3 = new DWire();
-           outp3.name = "Wire" + Global.wirecount++;
+           outp3.name = "0Wire" + Global.wirecount++;
            nor3.output = outp3;
            
            DGate nor4 = new DGate();
@@ -340,7 +340,7 @@ public class NetlistConversionFunctions {
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(1));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
@@ -370,7 +370,7 @@ public class NetlistConversionFunctions {
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
@@ -378,7 +378,7 @@ public class NetlistConversionFunctions {
            nor2.input.add(g.input.get(1));
            nor2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
-           outp2.name = "Wire" + Global.wirecount++;
+           outp2.name = "0Wire" + Global.wirecount++;
            nor2.output = outp2;
            
            DGate nor3 = new DGate();
@@ -386,7 +386,7 @@ public class NetlistConversionFunctions {
            nor3.input.add(g.input.get(0));
            nor3.input.add(g.input.get(1));
            DWire outp3 = new DWire();
-           outp3.name = "Wire" + Global.wirecount++;
+           outp3.name = "0Wire" + Global.wirecount++;
            nor3.output = outp3;
            
            DGate nor4 = new DGate();
@@ -394,7 +394,7 @@ public class NetlistConversionFunctions {
            nor4.input.add(outp1);
            nor4.input.add(outp2);
            DWire outp4 = new DWire();
-           outp4.name = "Wire" + Global.wirecount++;
+           outp4.name = "0Wire" + Global.wirecount++;
            nor4.output = outp4;
            
            DGate nor5 = new DGate();
@@ -423,7 +423,7 @@ public class NetlistConversionFunctions {
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
-           outp1.name = "Wire" + Global.wirecount++;
+           outp1.name = "0Wire" + Global.wirecount++;
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
@@ -431,7 +431,7 @@ public class NetlistConversionFunctions {
            nor2.input.add(g.input.get(1));
            nor2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
-           outp2.name = "Wire" + Global.wirecount++;
+           outp2.name = "0Wire" + Global.wirecount++;
            nor2.output = outp2;
            
            DGate nor3 = new DGate();
@@ -439,7 +439,7 @@ public class NetlistConversionFunctions {
            nor3.input.add(outp1);
            nor3.input.add(g.input.get(1));
            DWire outp3 = new DWire();
-           outp3.name = "Wire" + Global.wirecount++;
+           outp3.name = "0Wire" + Global.wirecount++;
            nor3.output = outp3;
            
            DGate nor4 = new DGate();
@@ -447,7 +447,7 @@ public class NetlistConversionFunctions {
            nor4.input.add(g.input.get(0));
            nor4.input.add(outp2);
            DWire outp4 = new DWire();
-           outp4.name = "Wire" + Global.wirecount++;
+           outp4.name = "0Wire" + Global.wirecount++;
            nor4.output = outp4;
            
            DGate nor5 = new DGate();
