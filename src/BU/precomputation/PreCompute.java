@@ -138,7 +138,7 @@ public class PreCompute {
     {
         for(int i=0;i<netlistinp.size();i++)
         {
-            if(netlistinp.get(i).gtype.equals(DGateType.NOR2))
+            if(netlistinp.get(i).gtype.equals(DGateType.NOR))
             {
                 int norflag =0;
                 int pos =0;
@@ -290,7 +290,7 @@ public class PreCompute {
            DGate xgate;
        DWire outw = null;
        List<DWire> inp = new ArrayList<DWire>();
-       DGateType gtype = DGateType.NOR2;
+       DGateType gtype = DGateType.NOR;
        String sub = xg.substring(xg.indexOf("(")+1);
        sub = sub.substring(0,sub.indexOf(")"));
        String[] parts = sub.split(",");

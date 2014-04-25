@@ -7,6 +7,7 @@ package BU.netsynth;
 import java.util.ArrayList;
 import java.util.List;
 import BU.netsynth.DGate.DGateType;
+import BU.netsynth.DWire.DWireType;
 
 /**
  *
@@ -26,7 +27,7 @@ public class NetlistConversionFunctions {
            nor_eq.add(g);
        }
        
-       else if(g.gtype == DGateType.AND2)
+       else if(g.gtype == DGateType.AND)
        {
            DGate not1 = new DGate();
            not1.gtype = DGateType.NOT;
@@ -43,7 +44,7 @@ public class NetlistConversionFunctions {
            not2.output = outp2;
            
            DGate nor1 = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(outp1);
            nor1.input.add(outp2);
            nor1.output = g.output;
@@ -58,7 +59,7 @@ public class NetlistConversionFunctions {
        }
        
        
-       else if(g.gtype == DGateType.NAND2)
+       else if(g.gtype == DGateType.NAND)
        {
            DGate not1 = new DGate();
            not1.gtype = DGateType.NOT;
@@ -75,7 +76,7 @@ public class NetlistConversionFunctions {
            not2.output = outp2;
            
            DGate nor1 = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(outp1);
            nor1.input.add(outp2);
            DWire outp3 = new DWire();
@@ -100,10 +101,10 @@ public class NetlistConversionFunctions {
        }
        
        
-       else if(g.gtype == DGateType.OR2)
+       else if(g.gtype == DGateType.OR)
        {
            DGate nor1  = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(1));
            DWire outp1 = new DWire();
@@ -123,13 +124,13 @@ public class NetlistConversionFunctions {
            
        }
        
-       else if(g.gtype == DGateType.NOR2)
+       else if(g.gtype == DGateType.NOR)
        {
            g.calculateStage();
            nor_eq.add(g);
        }
        
-       else if(g.gtype == DGateType.XOR2)
+       else if(g.gtype == DGateType.XOR)
        {
            DGate not1 = new DGate();
            not1.gtype = DGateType.NOT;
@@ -146,7 +147,7 @@ public class NetlistConversionFunctions {
            not2.output = outp2;
            
            DGate nor1 = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(1));
            DWire outp3 = new DWire();
@@ -154,7 +155,7 @@ public class NetlistConversionFunctions {
            nor1.output = outp3;
            
            DGate nor2 = new DGate();
-           nor2.gtype = DGateType.NOR2;
+           nor2.gtype = DGateType.NOR;
            nor2.input.add(outp1);
            nor2.input.add(outp2);
            DWire outp4 = new DWire();
@@ -162,7 +163,7 @@ public class NetlistConversionFunctions {
            nor2.output = outp4;
            
            DGate nor3 = new DGate();
-           nor3.gtype = DGateType.NOR2;
+           nor3.gtype = DGateType.NOR;
            nor3.input.add(outp3);
            nor3.input.add(outp4);
            nor3.output = g.output;
@@ -180,7 +181,7 @@ public class NetlistConversionFunctions {
            nor_eq.add(nor3);
                                                        
        }
-       else if(g.gtype == DGateType.XNOR2)
+       else if(g.gtype == DGateType.XNOR)
        {
            DGate not1 = new DGate();
            not1.gtype = DGateType.NOT;
@@ -197,7 +198,7 @@ public class NetlistConversionFunctions {
            not2.output = outp2;
            
            DGate nor1 = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(outp1);
            nor1.input.add(g.input.get(1));
            DWire outp3 = new DWire();
@@ -205,7 +206,7 @@ public class NetlistConversionFunctions {
            nor1.output = outp3;
            
            DGate nor2 = new DGate();
-           nor2.gtype = DGateType.NOR2;
+           nor2.gtype = DGateType.NOR;
            nor2.input.add(g.input.get(0));
            nor2.input.add(outp2);
            DWire outp4 = new DWire();
@@ -213,7 +214,7 @@ public class NetlistConversionFunctions {
            nor2.output = outp4;
            
            DGate nor3 = new DGate();
-           nor3.gtype = DGateType.NOR2;
+           nor3.gtype = DGateType.NOR;
            nor3.input.add(outp3);
            nor3.input.add(outp4);
            nor3.output = g.output;
@@ -242,7 +243,7 @@ public class NetlistConversionFunctions {
        if(g.gtype == DGateType.NOT)
        {
            DGate nor1 = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(0));
@@ -253,10 +254,10 @@ public class NetlistConversionFunctions {
            
        }
        
-       else if(g.gtype == DGateType.AND2)
+       else if(g.gtype == DGateType.AND)
        {
            DGate nor1 = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
@@ -264,7 +265,7 @@ public class NetlistConversionFunctions {
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
-           nor2.gtype = DGateType.NOR2;
+           nor2.gtype = DGateType.NOR;
            nor2.input.add(g.input.get(1));
            nor2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
@@ -272,7 +273,7 @@ public class NetlistConversionFunctions {
            nor2.output = outp2;
            
            DGate nor3 = new DGate();
-           nor3.gtype = DGateType.NOR2;
+           nor3.gtype = DGateType.NOR;
            nor3.input.add(outp1);
            nor3.input.add(outp2);
            nor3.output = g.output;
@@ -288,10 +289,10 @@ public class NetlistConversionFunctions {
        }
        
        
-       else if(g.gtype == DGateType.NAND2)
+       else if(g.gtype == DGateType.NAND)
        {
            DGate nor1 = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
@@ -299,7 +300,7 @@ public class NetlistConversionFunctions {
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
-           nor2.gtype = DGateType.NOR2;
+           nor2.gtype = DGateType.NOR;
            nor2.input.add(g.input.get(1));
            nor2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
@@ -307,7 +308,7 @@ public class NetlistConversionFunctions {
            nor2.output = outp2;
            
            DGate nor3 = new DGate();
-           nor3.gtype = DGateType.NOR2;
+           nor3.gtype = DGateType.NOR;
            nor3.input.add(outp1);
            nor3.input.add(outp2);
            DWire outp3 = new DWire();
@@ -315,7 +316,7 @@ public class NetlistConversionFunctions {
            nor3.output = outp3;
            
            DGate nor4 = new DGate();
-           nor4.gtype = DGateType.NOR2;
+           nor4.gtype = DGateType.NOR;
            nor4.input.add(outp3);
            nor4.input.add(outp3);
            nor4.output = g.output;
@@ -333,10 +334,10 @@ public class NetlistConversionFunctions {
        }
        
        
-       else if(g.gtype == DGateType.OR2)
+       else if(g.gtype == DGateType.OR)
        {
            DGate nor1  = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(1));
            DWire outp1 = new DWire();
@@ -344,7 +345,7 @@ public class NetlistConversionFunctions {
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
-           nor2.gtype = DGateType.NOR2;
+           nor2.gtype = DGateType.NOR;
            nor2.input.add(outp1);
            nor2.input.add(outp1);
            nor2.output = g.output;
@@ -357,16 +358,16 @@ public class NetlistConversionFunctions {
            
        }
        
-       else if(g.gtype == DGateType.NOR2)
+       else if(g.gtype == DGateType.NOR)
        {
            g.calculateStage();
            nor_eq.add(g);
        }
        
-       else if(g.gtype == DGateType.XOR2)
+       else if(g.gtype == DGateType.XOR)
        {
            DGate nor1 = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
@@ -374,7 +375,7 @@ public class NetlistConversionFunctions {
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
-           nor2.gtype = DGateType.NOR2;
+           nor2.gtype = DGateType.NOR;
            nor2.input.add(g.input.get(1));
            nor2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
@@ -382,7 +383,7 @@ public class NetlistConversionFunctions {
            nor2.output = outp2;
            
            DGate nor3 = new DGate();
-           nor3.gtype = DGateType.NOR2;
+           nor3.gtype = DGateType.NOR;
            nor3.input.add(g.input.get(0));
            nor3.input.add(g.input.get(1));
            DWire outp3 = new DWire();
@@ -390,7 +391,7 @@ public class NetlistConversionFunctions {
            nor3.output = outp3;
            
            DGate nor4 = new DGate();
-           nor4.gtype = DGateType.NOR2;
+           nor4.gtype = DGateType.NOR;
            nor4.input.add(outp1);
            nor4.input.add(outp2);
            DWire outp4 = new DWire();
@@ -398,7 +399,7 @@ public class NetlistConversionFunctions {
            nor4.output = outp4;
            
            DGate nor5 = new DGate();
-           nor5.gtype = DGateType.NOR2;
+           nor5.gtype = DGateType.NOR;
            nor5.input.add(outp3);
            nor5.input.add(outp4);
            nor5.output = g.output;
@@ -416,10 +417,10 @@ public class NetlistConversionFunctions {
            nor_eq.add(nor5);
                                                        
        }
-       else if(g.gtype == DGateType.XNOR2)
+       else if(g.gtype == DGateType.XNOR)
        {
            DGate nor1 = new DGate();
-           nor1.gtype = DGateType.NOR2;
+           nor1.gtype = DGateType.NOR;
            nor1.input.add(g.input.get(0));
            nor1.input.add(g.input.get(0));
            DWire outp1 = new DWire();
@@ -427,7 +428,7 @@ public class NetlistConversionFunctions {
            nor1.output = outp1;
            
            DGate nor2 = new DGate();
-           nor2.gtype = DGateType.NOR2;
+           nor2.gtype = DGateType.NOR;
            nor2.input.add(g.input.get(1));
            nor2.input.add(g.input.get(1));
            DWire outp2 = new DWire();
@@ -435,7 +436,7 @@ public class NetlistConversionFunctions {
            nor2.output = outp2;
            
            DGate nor3 = new DGate();
-           nor3.gtype = DGateType.NOR2;
+           nor3.gtype = DGateType.NOR;
            nor3.input.add(outp1);
            nor3.input.add(g.input.get(1));
            DWire outp3 = new DWire();
@@ -443,7 +444,7 @@ public class NetlistConversionFunctions {
            nor3.output = outp3;
            
            DGate nor4 = new DGate();
-           nor4.gtype = DGateType.NOR2;
+           nor4.gtype = DGateType.NOR;
            nor4.input.add(g.input.get(0));
            nor4.input.add(outp2);
            DWire outp4 = new DWire();
@@ -451,7 +452,7 @@ public class NetlistConversionFunctions {
            nor4.output = outp4;
            
            DGate nor5 = new DGate();
-           nor5.gtype = DGateType.NOR2;
+           nor5.gtype = DGateType.NOR;
            nor5.input.add(outp3);
            nor5.input.add(outp4);
            nor5.output = g.output;
@@ -471,6 +472,102 @@ public class NetlistConversionFunctions {
        
        return nor_eq;
     }  
-     
+    
+    public static List<DGate> ConvertToFanin2(DGate g)
+    {
+        List<DGate> fanin2 = new ArrayList<DGate>();
+        if(g.input.size()<3)
+            fanin2.add(g);
+        else
+        {
+            for(DGate xgate: reduceTofanin2(g,g.gtype))
+            {
+                fanin2.add(xgate);
+            }
+        }
+        
+        return fanin2;
+    }
+    public static List<DGate> reduceTofanin2(DGate inpgate, DGateType gtype)
+    {
+        List<DGate> redfanin = new ArrayList<DGate>();
+        List<DWire> remainingwires = new ArrayList<DWire>();
+        DGateType ngtype = gtype; 
+        int invflag =0;
+        if(gtype.equals(DGateType.NAND))
+        {
+            ngtype = DGateType.AND;
+            invflag =1;
+        }
+        if(gtype.equals(DGateType.NOR))
+        {
+            ngtype = DGateType.OR;
+            invflag =1;
+        }
+        if(gtype.equals(DGateType.XNOR))
+        {
+            ngtype = DGateType.XOR;
+            invflag =1;
+        }
+        
+        for(DWire xwire:inpgate.input)
+        {
+            remainingwires.add(xwire);
+        }
+        List<DWire> newinpwires = new ArrayList<DWire>();
+        while(remainingwires.size()>2)
+        {
+            newinpwires = new ArrayList<DWire>();
+            for(DWire xwire:remainingwires)
+            {
+                newinpwires.add(xwire);
+            }
+            remainingwires = new ArrayList<DWire>();
+            for(int i=0;i<newinpwires.size()-1;i+=2)
+            {
+                DGate ngate = new DGate();
+                ngate.input.add(newinpwires.get(i));
+                ngate.input.add(newinpwires.get(i+1));
+                String outWname = "0nWire"+Global.wirecount++;
+                DWire outW = new DWire(outWname,DWireType.connector);
+                ngate.output = outW;
+                remainingwires.add(outW);
+                ngate.gtype = ngtype;
+                redfanin.add(ngate);
+            }
+            if(newinpwires.size()%2 !=0)
+            {
+                remainingwires.add(newinpwires.get(newinpwires.size()-1));
+            }
+        }
+        
+        if(invflag == 1)
+        {
+            DGate ngate = new DGate();
+            ngate.input.add(remainingwires.get(0));
+            ngate.input.add(remainingwires.get(1));
+            String outWname = "0nWire"+Global.wirecount++;
+            DWire outW = new DWire(outWname,DWireType.connector);
+            ngate.output = outW;
+            remainingwires.add(outW);
+            ngate.gtype = ngtype;
+            redfanin.add(ngate);
+            DGate noutgate = new DGate();
+            noutgate.gtype = DGateType.NOT;
+            noutgate.input.add(outW);
+            noutgate.output = inpgate.output;
+            redfanin.add(noutgate);
+        }
+        else
+        {
+            DGate ngate = new DGate();
+            ngate.input.add(remainingwires.get(0));
+            ngate.input.add(remainingwires.get(1));
+            ngate.gtype = ngtype;
+            ngate.output = inpgate.output;
+            redfanin.add(ngate);
+        }
+        return redfanin;
+    }
     
 }

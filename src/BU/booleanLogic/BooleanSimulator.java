@@ -27,19 +27,19 @@ public class BooleanSimulator {
     {
         switch(gate.gtype)
         {
-            case AND2 : BooleanFunctions.bAND(gate);
+            case AND : BooleanFunctions.bAND(gate);
                         break;
-            case OR2 : BooleanFunctions.bOR(gate);
+            case OR : BooleanFunctions.bOR(gate);
                         break;
-            case NOR2 : BooleanFunctions.bNOR(gate);
+            case NOR : BooleanFunctions.bNOR(gate);
                         break;
-            case NAND2 : BooleanFunctions.bNAND(gate);
+            case NAND : BooleanFunctions.bNAND(gate);
                         break;
             case NOT : BooleanFunctions.bNOT(gate);
                         break;
-            case XOR2 : BooleanFunctions.bXOR(gate);
+            case XOR : BooleanFunctions.bXOR(gate);
                         break;
-            case XNOR2 : BooleanFunctions.bXNOR(gate);
+            case XNOR : BooleanFunctions.bXNOR(gate);
                         break;
         }
     }

@@ -102,7 +102,7 @@ public class NetSynth {
         
         //verifyinverse();
         //histogram();
-        seg7dagw("seg7");
+        //seg7dagw("seg7");
         //testABC();
         //test2notstonor();
         //EspressoVsABC(3);
@@ -164,17 +164,17 @@ public class NetSynth {
         DGate nor2 = new DGate();
         DGate nor3 = new DGate();
         
-        nor1.gtype = DGateType.NOR2;
+        nor1.gtype = DGateType.NOR;
         nor1.input.add(inp1);
         nor1.input.add(wire2);
         nor1.output = out1;
         
-        nor2.gtype = DGateType.NOR2;
+        nor2.gtype = DGateType.NOR;
         nor2.input.add(inp2);
         nor2.input.add(wire1);
         nor2.output = out2;
         
-        nor3.gtype = DGateType.NOR2;
+        nor3.gtype = DGateType.NOR;
         nor3.input.add(inp1);
         nor3.input.add(inp2);
         nor3.output = w3;
@@ -315,7 +315,7 @@ public class NetSynth {
                     precompout = convert2NOTsToNOR(precompout);
                     precompout = rewireNetlist(precompout);
                     precomputecount = precompout.size();
-                    if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR2))
+                    if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR))
                         precomputecount --;
                     prett = BooleanSimulator.bpermutePreComp(precompout);
                 }
@@ -326,10 +326,10 @@ public class NetSynth {
                 
                 if(!abcoutput.isEmpty())
                 {
-                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
+                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR))
                     abcoutcount --;
                 }
-                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
+                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR))
                     espoutcount --;
                 //System.out.println("Espresso Circuit count for No: "+i+" : "+espoutcount);
                 //System.out.println("ABC Circuit count for No: "+i+" : "+abcoutcount);
@@ -647,7 +647,7 @@ public class NetSynth {
                     precompout = convert2NOTsToNOR(precompout);
                     precompout = rewireNetlist(precompout);
                     precomputecount = precompout.size();
-                    if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR2))
+                    if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR))
                         precomputecount --;
                     
                     precomp = PreCompute.parseNetlistFile();
@@ -669,7 +669,7 @@ public class NetSynth {
                     
                     
                     
-                    if(invprecompout.get(invprecompout.size()-1).gtype.equals(DGateType.OR2))
+                    if(invprecompout.get(invprecompout.size()-1).gtype.equals(DGateType.OR))
                         invprecomputecount --;
                     /*if(i==110)
                     {
@@ -699,16 +699,16 @@ public class NetSynth {
                 int invabcoutcount = invabcoutput.size();
                 int invespoutcount = invespoutput.size();
                 
-                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
+                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR))
                     abcoutcount --;
                 
-                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
+                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR))
                     espoutcount --;
                 
-                if(invabcoutput.get(invabcoutput.size()-1).gtype.equals(DGateType.OR2))
+                if(invabcoutput.get(invabcoutput.size()-1).gtype.equals(DGateType.OR))
                     invabcoutcount --;
                 
-                if(invespoutput.get(invespoutput.size()-1).gtype.equals(DGateType.OR2))
+                if(invespoutput.get(invespoutput.size()-1).gtype.equals(DGateType.OR))
                     invespoutcount --;
                 int minesp = espoutcount;
                 int minabc = abcoutcount;
@@ -764,7 +764,7 @@ public class NetSynth {
                 //System.out.println(i+","+minesp+","+minabc+","+minpre);
                 
                 
-                /*if(i==110)
+                if(i==110)
                 {
                     if(abcoutput.size() <= invabcoutput.size())
                     { 
@@ -799,7 +799,7 @@ public class NetSynth {
                         }
                     }
                             
-                }*/
+                }
                 
                 //if(abcoutput.size() < invabcoutput.size())
                 //    abcoutcount = abcoutput.size();
@@ -1016,10 +1016,10 @@ public class NetSynth {
                 
                 if(!abcoutput.isEmpty())
                 {
-                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
+                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR))
                     abcoutcount --;
                 }
-                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
+                if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR))
                     espoutcount --;
                 
                 
@@ -1208,7 +1208,7 @@ public class NetSynth {
                 
                 abcoutput = convert2NOTsToNOR(abcoutput);
                 abcoutput = rewireNetlist(abcoutput);
-                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR2))
+                if(abcoutput.get(abcoutput.size()-1).gtype.equals(DGateType.OR))
                     abcoutcount --;
                 //}
                 //if(espoutput.get(espoutput.size()-1).gtype.equals(DGateType.OR2))
@@ -2351,7 +2351,7 @@ public class NetSynth {
                 if(gatestring.contains("AND"))
                 {
                     DGate xgate = new DGate();
-                    xgate.gtype = DGateType.AND2;
+                    xgate.gtype = DGateType.AND;
                     
                     String conn = gatestring.substring(gatestring.indexOf("(")+1,gatestring.indexOf(")"));
                     conn = conn.trim();
@@ -2408,12 +2408,12 @@ public class NetSynth {
             {    
                 netout.add(netlist.get(i));
             }
-            if(netlist.get(i).gtype.equals(DGateType.AND2))
+            if(netlist.get(i).gtype.equals(DGateType.AND))
             {
                 int flag1 =0;
                 int flag2 =0;
                 DGate newnor = new DGate();
-                newnor.gtype = DGateType.NOR2;
+                newnor.gtype = DGateType.NOR;
                 newnor.output = netlist.get(i).output;
                 for(int j=0;j<notcreated.size();j++)
                 {
@@ -2550,7 +2550,7 @@ public class NetSynth {
         inputWires.add(w2);
         
         DGateType testgateType;
-        testgateType = DGateType.NOR2;
+        testgateType = DGateType.NOR;
         DGate gtest = new DGate(testgateType,inputWires,outp);
         
         List<DGate> test = new ArrayList<DGate>();
@@ -2744,11 +2744,11 @@ public class NetSynth {
             {
                 if(POSmode)
                 {
-                    prodGates = AndORGates(minTemp,DGateType.OR2);         
+                    prodGates = AndORGates(minTemp,DGateType.OR);         
                 }
                 else
                 {
-                    prodGates = AndORGates(minTemp,DGateType.AND2);         
+                    prodGates = AndORGates(minTemp,DGateType.AND);         
                 }
                 orWires.add(prodGates.get(prodGates.size()-1).output);
                 sopexp.addAll(prodGates);
@@ -2758,11 +2758,11 @@ public class NetSynth {
         prodGates = new ArrayList<DGate>();
         if(POSmode)
         {
-            prodGates = AndORGates(orWires,DGateType.AND2);
+            prodGates = AndORGates(orWires,DGateType.AND);
         }
         else
         {
-            prodGates = AndORGates(orWires,DGateType.OR2);
+            prodGates = AndORGates(orWires,DGateType.OR);
         }
         sopexp.addAll(prodGates);
         if(sopexp.isEmpty())
@@ -2904,7 +2904,7 @@ public class NetSynth {
                 else
                 {
                     //System.out.println("Sumterm size :" + sumterm.size());
-                    sumtermG = NORNANDGates(sumterm,DGateType.NOR2);
+                    sumtermG = NORNANDGates(sumterm,DGateType.NOR);
                     netlist.addAll(sumtermG);
                     sumlast = sumtermG.get(sumtermG.size()-1).output;
                 }
@@ -2956,7 +2956,7 @@ public class NetSynth {
             else
             {
                 List<DGate> productGates = new ArrayList<DGate>();
-                productGates = NORNANDGates(outputsum.get(j),DGateType.NOR2);
+                productGates = NORNANDGates(outputsum.get(j),DGateType.NOR);
                 productGates.get(productGates.size()-1).output = outputWires.get(j);
                 netlist.addAll(productGates);
                 
@@ -3009,7 +3009,7 @@ public class NetSynth {
         
         for(int i=0;i<netlistinp.size();i++)
         {
-            if(netlistinp.get(i).gtype.equals(DGateType.NOR2))
+            if(netlistinp.get(i).gtype.equals(DGateType.NOR))
             {
                 int inp1flag =0;
                 int inp2flag =0;
@@ -3080,7 +3080,7 @@ public class NetSynth {
                         {
                             if (j != i) 
                             {
-                                if (netlistinp.get(j).gtype.equals(DGateType.NOR2)) 
+                                if (netlistinp.get(j).gtype.equals(DGateType.NOR)) 
                                 {
                                     if(netlistinp.get(j).input.get(0).name.equals(inpstring1) && netlistinp.get(j).input.get(1).name.equals(invstring2))
                                     {
@@ -3110,7 +3110,7 @@ public class NetSynth {
                             //System.out.println("gate2flag triggered");
                             for(int k=0;k<netlistinp.size();k++)
                             {
-                                if(netlistinp.get(k).gtype.equals(DGateType.NOR2))
+                                if(netlistinp.get(k).gtype.equals(DGateType.NOR))
                                 {
                                     if((netlistinp.get(k).input.get(0).name.equals(inpstring1) && netlistinp.get(k).input.get(1).name.equals(inpstring2))||(netlistinp.get(k).input.get(1).name.equals(inpstring1) && netlistinp.get(k).input.get(0).name.equals(inpstring2)))
                                     {
@@ -3173,7 +3173,7 @@ public class NetSynth {
                             
                                 //System.out.println("NOR Gate does not exist");
                                 DGate addnor = new DGate();
-                                addnor.gtype = DGateType.NOR2;
+                                addnor.gtype = DGateType.NOR;
                                 addnor.input.add(w1);
                                 addnor.input.add(w2);
                             
@@ -3260,7 +3260,7 @@ public class NetSynth {
         removegates = new ArrayList<Integer>();
         for(int i=0;i<finalnetlist.size();i++)
         {
-            if(finalnetlist.get(i).gtype.equals(DGateType.NOR2) && (!finalnetlist.get(i).output.wtype.equals(DWireType.output)))
+            if(finalnetlist.get(i).gtype.equals(DGateType.NOR) && (!finalnetlist.get(i).output.wtype.equals(DWireType.output)))
             {
                 String inp1name = finalnetlist.get(i).input.get(0).name;
                 String inp2name = finalnetlist.get(i).input.get(1).name;
@@ -3269,7 +3269,7 @@ public class NetSynth {
                 {
                     if(i!=j)
                     {
-                        if(finalnetlist.get(j).gtype.equals(DGateType.NOR2) && (!finalnetlist.get(j).output.wtype.equals(DWireType.output))  )
+                        if(finalnetlist.get(j).gtype.equals(DGateType.NOR) && (!finalnetlist.get(j).output.wtype.equals(DWireType.output))  )
                         {
                             String outname = finalnetlist.get(j).output.name;
                             if( (finalnetlist.get(j).input.get(0).name.equals(inp1name) && finalnetlist.get(j).input.get(1).name.equals(inp2name)) || (finalnetlist.get(j).input.get(0).name.equals(inp2name) && finalnetlist.get(j).input.get(1).name.equals(inp1name)) )
@@ -3561,7 +3561,7 @@ public class NetSynth {
         //System.out.println("\nBegin Output_OR optimization");
         for(int i=0;i<finalnetlist.size()-1;i++)
         {
-            if(finalnetlist.get(i).gtype.equals(DGateType.NOR2))
+            if(finalnetlist.get(i).gtype.equals(DGateType.NOR))
             {
                 for(int j=i+1;j<finalnetlist.size();j++)
                 {
@@ -3584,7 +3584,7 @@ public class NetSynth {
                         if(inpcount==0)
                         {
                             removegates.add(j);
-                            finalnetlist.get(i).gtype = DGateType.OR2;
+                            finalnetlist.get(i).gtype = DGateType.OR;
                             finalnetlist.get(i).output.name = finalnetlist.get(j).output.name;
                             finalnetlist.get(i).output.wtype = finalnetlist.get(j).output.wtype;
                         }
@@ -3843,11 +3843,11 @@ public class NetSynth {
             {
                 if(POSmode)
                 {
-                    prodGates = NORNANDGates(minTemp,DGateType.NOR2);         
+                    prodGates = NORNANDGates(minTemp,DGateType.NOR);         
                 }
                 else
                 {
-                    prodGates = NORNANDGates(minTemp,DGateType.NAND2);         
+                    prodGates = NORNANDGates(minTemp,DGateType.NAND);         
                 }
                 orWires.add(prodGates.get(prodGates.size()-1).output);
                 sopexp.addAll(prodGates);
@@ -3857,7 +3857,7 @@ public class NetSynth {
         prodGates = new ArrayList<DGate>();
         if(POSmode)
         {
-            prodGates = NORNANDGates(orWires,DGateType.NOR2);
+            prodGates = NORNANDGates(orWires,DGateType.NOR);
             
             if(prodGates.isEmpty())
             {
@@ -3867,7 +3867,7 @@ public class NetSynth {
         }
         else
         {
-            prodGates = NORNANDGates(orWires,DGateType.NAND2);
+            prodGates = NORNANDGates(orWires,DGateType.NAND);
         }
         sopexp.addAll(prodGates);
         if(sopexp.isEmpty())
@@ -4335,7 +4335,7 @@ public class NetSynth {
             if(xgate.output.wtype.equals(DWireType.output))
             {
                 outputwires.add(xgate.output.name.trim());
-                if(xgate.gtype.equals(DGateType.OR2))
+                if(xgate.gtype.equals(DGateType.OR))
                     outputORwires.add(xgate.output.name.trim());
             }
             for(DWire xinp:xgate.input)
@@ -4369,7 +4369,7 @@ public class NetSynth {
         for(int i=netlist.size()-1;i>=0;i--)
         {
             DGate netg = netlist.get(i);
-            if(netg.gtype.equals(DGateType.NOR2))
+            if(netg.gtype.equals(DGateType.NOR))
             {
                 Gate norg = new Gate(indx,GateType.NOR.toString());
                 norg.outW = netg.output;
@@ -4429,7 +4429,7 @@ public class NetSynth {
             else
             {
                 Wire temp = null;
-                if(netg.output.wtype.equals(DWireType.output) && !netg.gtype.equals(DGateType.OR2))
+                if(netg.output.wtype.equals(DWireType.output) && !netg.gtype.equals(DGateType.OR))
                 {
                     Wire outpwire = new Wire();
                     int fromindx =0;
@@ -4735,7 +4735,7 @@ public class NetSynth {
             
             if(netg.output.wtype == DWireType.output)
             {
-                if(netg.gtype == DGateType.OR2)
+                if(netg.gtype == DGateType.OR)
                 {
                     Gate outor = null;
                     outpIndx = IndX;
@@ -4755,7 +4755,7 @@ public class NetSynth {
                         lvert = new Gate(IndX++,VertexType.NOT.toString());
                         vertexhash.put(netg, lvert);
                     }
-                    else if(netg.gtype == DGateType.NOR2)
+                    else if(netg.gtype == DGateType.NOR)
                     {
                         outpIndx = IndX;
                         out = new Gate(IndX++, VertexType.OUTPUT.toString()); 
@@ -4778,7 +4778,7 @@ public class NetSynth {
                 {
                     vert = new Gate(IndX++,VertexType.NOT.toString());
                 }
-                else if(netg.gtype == DGateType.NOR2)
+                else if(netg.gtype == DGateType.NOR)
                 {
                     vert = new Gate(IndX++,VertexType.NOR.toString());
                 }
@@ -4805,7 +4805,7 @@ public class NetSynth {
         {
             DGate netg = netlist.get(i);
            
-            if((netg.output.wtype == DWireType.output) && (netg.gtype != DGateType.OR2))
+            if((netg.output.wtype == DWireType.output) && (netg.gtype != DGateType.OR))
             {
                 Wire out = new Wire();
                 out.From = Gates.get(outpIndx);

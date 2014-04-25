@@ -17,16 +17,12 @@ public class DGate implements Serializable{
     public enum DGateType{
            NOT,
            BUF,
-           NOR2, 
-           NOR3,
-           NAND2, 
-           NAND3,
-           AND2, 
-           AND3, 
-           OR2, 
-           OR3, 
-           XOR2,
-           XNOR2;
+           NOR, 
+           NAND, 
+           AND, 
+           OR, 
+           XOR,
+           XNOR;
     }
     public DGateType gtype;
     public List<DWire> input;

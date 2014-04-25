@@ -13,7 +13,7 @@ import BU.netsynth.DGate.DGateType;
 public class TestMain {
     public static void main(String[] args)
     {
-       TestSynthesis.testConversion(DGateType.AND2,3);
-
+       //TestSynthesis.testNORConversion(DGateType.XNOR);
+       TestSynthesis.testReducedFanin(DGateType.OR,3);
     }
 }

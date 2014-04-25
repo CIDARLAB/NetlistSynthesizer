@@ -27,11 +27,11 @@ public class TestSynthesis {
      * 
      * 
      */
-    public static void testConversion(DGateType gtype, int inputno)
+    public static void testNORConversion(DGateType gtype)
     {
         DGate inputgate = new DGate();
         inputgate.gtype = gtype;
-        for(int i=0;i<inputno;i++)
+        for(int i=0;i<2;i++)
         {
             String wirename = "InpWire" + Global.wirecount++;
             DWire inpW = new DWire(wirename,DWireType.input);
@@ -50,5 +50,28 @@ public class TestSynthesis {
             System.out.println(NetSynth.netlist(convertednetlist.get(i)));
         }
         
+    }
+    public static void testReducedFanin(DGateType gtype, int inputno)
+    {
+        DGate inputgate = new DGate();
+        inputgate.gtype = gtype;
+        for(int i=0;i<inputno;i++)
+        {
+            String wirename = "InpWire" + Global.wirecount++;
+            DWire inpW = new DWire(wirename,DWireType.input);
+            inputgate.input.add(inpW);
+        }
+        inputgate.output = new DWire("OutW",DWireType.output);
+        
+        System.out.println("----------------------------------\n Input Gate :");
+        System.out.println(NetSynth.netlist(inputgate));
+        
+        System.out.println("-----------------------------------\n Reduced Fanin Gates");
+        List<DGate> convertednetlist = new ArrayList<DGate>();
+        convertednetlist = NetlistConversionFunctions.ConvertToFanin2(inputgate);
+        for(int i=0;i<convertednetlist.size();i++)
+        {    
+            System.out.println(NetSynth.netlist(convertednetlist.get(i)));
+        }
     }
 }
