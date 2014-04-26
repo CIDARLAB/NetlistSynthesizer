@@ -5,6 +5,10 @@
 package BU.ParseVerilog;
 
 import BU.netsynth.DGate;
+import BU.netsynth.DGate.DGateType;
+import BU.netsynth.DWire;
+import BU.netsynth.DWire.DWireType;
+import BU.netsynth.NetSynth;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -370,6 +374,7 @@ public class parseCaseStatements {
          List<DGate> structnetlist = new ArrayList<DGate>();
          List<String> inputs = new ArrayList<String>();
          List<String> outputs = new ArrayList<String>();
+         List<String> wirenames = new ArrayList<String>();
          List<String> unknownIO = new ArrayList<String>();
          
          int x = 0;
@@ -464,7 +469,17 @@ public class parseCaseStatements {
             {
                 IO = IO.substring(IO.indexOf("input ")+6);
                 IO = IO.trim();
-                inputs.add(IO);
+                if(!inputs.contains(IO))
+                    inputs.add(IO);
+                
+                for(int j=i+1;j<modulePieces.length;j++)
+                {
+                    String IOnext = modulePieces[j].trim();
+                    if(IOnext.contains("output "))
+                        break;
+                    if(!inputs.contains(IOnext))
+                        inputs.add(IOnext);
+                }
                 
             }
             else if(IO.contains("output "))
@@ -472,8 +487,16 @@ public class parseCaseStatements {
                 
                 IO = IO.substring(IO.indexOf("output ")+7);
                 IO = IO.trim();
-                outputs.add(IO);
-                
+                if(!outputs.contains(IO))
+                    outputs.add(IO);
+                for(int j=i+1;j<modulePieces.length;j++)
+                {
+                    String IOnext = modulePieces[j].trim();
+                    if(IOnext.contains("input "))
+                        break;
+                    if(!outputs.contains(IOnext))
+                        outputs.add(IOnext);
+                }
             }
             else
             {
@@ -508,13 +531,221 @@ public class parseCaseStatements {
            
             cnt++;
         }
+        String wirekw = VerilogKeywords.WIRE.toString().toLowerCase();
+        
         for(String xline:VerilogLines)
-            System.out.println(xline);
-        System.out.println("----------------------------\n");
+        {
+            xline = xline.trim();
+            if(xline.contains(wirekw+" "))
+            {
+                
+                if(xline.substring(0,wirekw.length()+1).equals(wirekw+" "))
+                {
+                    xline = xline.substring(wirekw.length());
+                    String wNames[] = xline.split(",");
+                    for(int i=0;i<wNames.length;i++)
+                    {
+                        if(!wirenames.contains(wNames[i].trim()))
+                            wirenames.add(wNames[i].trim());
+                    }
+                }
+            }
+        }
+        List<DWire> inputWires = new ArrayList<DWire>();
+        List<DWire> outputWires = new ArrayList<DWire>();
+        List<DWire> connWires = new ArrayList<DWire>();
         
+        for(int i=0;i<inputs.size();i++)
+        {
+            DWire inpW = new DWire(inputs.get(i),DWireType.input);
+            inputWires.add(inpW);
+        }
+        for(int i=0;i<outputs.size();i++)
+        {
+            DWire outpW = new DWire(outputs.get(i),DWireType.output);
+            outputWires.add(outpW);
+        }
+        for(int i=0;i<wirenames.size();i++)
+        {
+            DWire connW = new DWire(wirenames.get(i),DWireType.connector);
+            connWires.add(connW);
+        }
         
+        String xnorkw = VerilogKeywords.XNOR.toString().toLowerCase();
+        String xorkw = VerilogKeywords.XOR.toString().toLowerCase();
+        String orkw = VerilogKeywords.OR.toString().toLowerCase();
+        String norkw = VerilogKeywords.NOR.toString().toLowerCase();
+        String andkw = VerilogKeywords.AND.toString().toLowerCase();
+        String nandkw = VerilogKeywords.NAND.toString().toLowerCase();
+        String notkw = VerilogKeywords.NOT.toString().toLowerCase();
+        String bufkw = VerilogKeywords.BUF.toString().toLowerCase();
         
+        for(String xline:VerilogLines)
+        {
+            xline = xline.trim();
+            if(xline.contains(xnorkw+" "))
+            {
+               if(xline.substring(0,xnorkw.length()+1).equals(xnorkw+" "))
+               {
+                   String templ = xline;
+                   templ = templ.substring(xnorkw.length());
+                   templ = templ.trim();
+                   String gateparam = templ.substring(templ.indexOf("(")+1);
+                   gateparam = gateparam.substring(0,gateparam.indexOf(")"));
+                   //System.out.println(gateparam);
+                   structnetlist.add(parseLineToGate(gateparam,xnorkw,inputWires,outputWires,connWires));
+               }
+            }
+            if(xline.contains(xorkw+" "))
+            {
+               if(xline.substring(0,xorkw.length()+1).equals(xorkw+" "))
+               {
+                   String templ = xline;
+                   templ = templ.substring(xorkw.length());
+                   templ = templ.trim();
+                   String gateparam = templ.substring(templ.indexOf("(")+1);
+                   gateparam = gateparam.substring(0,gateparam.indexOf(")"));
+                   //System.out.println(gateparam);
+                   structnetlist.add(parseLineToGate(gateparam,xorkw,inputWires,outputWires,connWires));
+               }
+            }
+            if(xline.contains(orkw+" "))
+            {
+               if(xline.substring(0,orkw.length()+1).equals(orkw+" "))
+               {
+                   String templ = xline;
+                   templ = templ.substring(orkw.length());
+                   templ = templ.trim();
+                   String gateparam = templ.substring(templ.indexOf("(")+1);
+                   gateparam = gateparam.substring(0,gateparam.indexOf(")"));
+                   //System.out.println(gateparam);
+                   structnetlist.add(parseLineToGate(gateparam,orkw,inputWires,outputWires,connWires));
+               }
+            }
+            if(xline.contains(norkw+" "))
+            {
+               if(xline.substring(0,norkw.length()+1).equals(norkw+" "))
+               {
+                   String templ = xline;
+                   templ = templ.substring(norkw.length());
+                   templ = templ.trim();
+                   String gateparam = templ.substring(templ.indexOf("(")+1);
+                   gateparam = gateparam.substring(0,gateparam.indexOf(")"));
+                   //System.out.println(gateparam);
+                   structnetlist.add(parseLineToGate(gateparam,norkw,inputWires,outputWires,connWires));
+               }
+            }
+            
+            if(xline.contains(nandkw+" "))
+            {
+               if(xline.substring(0,nandkw.length()+1).equals(nandkw+" "))
+               {
+                   String templ = xline;
+                   templ = templ.substring(nandkw.length());
+                   templ = templ.trim();
+                   String gateparam = templ.substring(templ.indexOf("(")+1);
+                   gateparam = gateparam.substring(0,gateparam.indexOf(")"));
+                   //System.out.println(gateparam);
+                   structnetlist.add(parseLineToGate(gateparam,nandkw,inputWires,outputWires,connWires));
+               }
+            }
+            if(xline.contains(andkw+" "))
+            {
+               if(xline.substring(0,andkw.length()+1).equals(andkw+" "))
+               {
+                   String templ = xline;
+                   templ = templ.substring(andkw.length());
+                   templ = templ.trim();
+                   String gateparam = templ.substring(templ.indexOf("(")+1);
+                   gateparam = gateparam.substring(0,gateparam.indexOf(")"));
+                   //System.out.println(gateparam);
+                   structnetlist.add(parseLineToGate(gateparam,andkw,inputWires,outputWires,connWires));
+               }
+            }
+            if(xline.contains(notkw+" "))
+            {
+               if(xline.substring(0,notkw.length()+1).equals(notkw+" "))
+               {
+                   String templ = xline;
+                   templ = templ.substring(notkw.length());
+                   templ = templ.trim();
+                   String gateparam = templ.substring(templ.indexOf("(")+1);
+                   gateparam = gateparam.substring(0,gateparam.indexOf(")"));
+                   //System.out.println(gateparam);
+                   structnetlist.add(parseLineToGate(gateparam,notkw,inputWires,outputWires,connWires));
+               }
+            }
+            if(xline.contains(bufkw+" "))
+            {
+               if(xline.substring(0,bufkw.length()+1).equals(bufkw+" "))
+               {
+                   String templ = xline;
+                   templ = templ.substring(bufkw.length());
+                   templ = templ.trim();
+                   String gateparam = templ.substring(templ.indexOf("(")+1);
+                   gateparam = gateparam.substring(0,gateparam.indexOf(")"));
+                   //System.out.println(gateparam);
+                   structnetlist.add(parseLineToGate(gateparam,bufkw,inputWires,outputWires,connWires));
+               }
+            }
+        }
+        //for(int i=0;i<structnetlist.size();i++)
+        //    System.out.println(NetSynth.netlist(structnetlist.get(i)));
         return structnetlist;
     }
-    
+    public static DGate parseLineToGate(String codeline,String gatetype,List<DWire> inputWires, List<DWire> outputWires, List<DWire> connWires)
+    {
+        DGate pgate = new DGate();
+        String params[] = codeline.split(",");
+        String gout = params[0].trim();
+        for(DWire xoutW:outputWires)
+        {
+            if(xoutW.name.equals(gout))
+            {
+                pgate.output = xoutW;
+            }
+        }
+        for(DWire xconnW:connWires)
+        {
+            if(xconnW.name.equals(gout))
+            {
+                pgate.output = xconnW;
+            }
+        }
+        for(int i=1;i<params.length;i++)
+        {
+            String gin = params[i].trim();
+            for(DWire xinW:inputWires)
+            {
+                if(xinW.name.equals(gin))
+                {
+                    pgate.input.add(xinW);
+                }
+            }
+            for(DWire xconnW:connWires)
+            {
+                if(xconnW.name.equals(gin))
+                {
+                    pgate.input.add(xconnW);
+                }
+            }
+        }
+        if(gatetype.equals("xnor"))
+            pgate.gtype = DGateType.XNOR;
+        if(gatetype.equals("xor"))
+            pgate.gtype = DGateType.XOR;
+        if(gatetype.equals("nor"))
+            pgate.gtype = DGateType.NOR;
+        if(gatetype.equals("or"))
+            pgate.gtype = DGateType.OR;
+        if(gatetype.equals("not"))
+            pgate.gtype = DGateType.NOT;
+        if(gatetype.equals("buf"))
+            pgate.gtype = DGateType.BUF;
+        if(gatetype.equals("and"))
+            pgate.gtype = DGateType.AND;
+        if(gatetype.equals("nand"))
+            pgate.gtype = DGateType.NAND;
+        return pgate;
+    }
 }
