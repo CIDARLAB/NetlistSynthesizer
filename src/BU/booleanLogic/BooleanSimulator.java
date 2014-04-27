@@ -430,6 +430,97 @@ public class BooleanSimulator {
         return output;
     }
     
-    
+    public static void printTruthTable(List<DGate> netlist)
+    {
+        List<String> inputnames = new ArrayList<String>();
+        List<String> outputnames = new ArrayList<String>();
+        HashMap<String,Integer> inpindex = new HashMap<String,Integer>();
+        //HashMap<String,Integer> outpindex = new HashMap<String,Integer>();
+        
+        int inpindx=0;
+        for(int i=0;i<netlist.size();i++)
+        {
+            for(int j=0;j<netlist.get(i).input.size();j++)
+            {
+                if(netlist.get(i).input.get(j).wtype.equals(DWireType.input))
+                {
+                    if(!inputnames.contains(netlist.get(i).input.get(j).name.trim()))
+                    {
+                        inputnames.add(netlist.get(i).input.get(j).name.trim());
+                        inpindex.put(netlist.get(i).input.get(j).name.trim(), inpindx);
+                        inpindx++;
+                    }
+                }
+            }
+            if (netlist.get(i).output.wtype.equals(DWireType.output)) {
+                if (!outputnames.contains(netlist.get(i).output.name.trim())) {
+                    outputnames.add(netlist.get(i).output.name.trim());
+                }
+            }
+        }
+        System.out.println("\n------------------------------------");
+        System.out.println("---------Truth Table----------------");
+        String inputstring = "Input Order  : ";
+        String outputstring = "Output Order : ";
+        for(int i=0;i<inputnames.size();i++)
+            inputstring += inputnames.get(i) + " ";
+        for(int i=0;i<outputnames.size();i++)
+            outputstring += outputnames.get(i) + " ";
+        System.out.println(inputstring);
+        System.out.println(outputstring);
+        System.out.println("------------------------------------");
+        int ttrows = (int)Math.pow(2, inputnames.size());
+        for(int i=0;i<ttrows;i++)
+        {
+            
+            String ttRow = "| ";
+            String rrinputrowboolean = Convert.dectoBin(i,inputnames.size());
+            for(int j=0;j<rrinputrowboolean.length();j++)
+            {
+                ttRow += (rrinputrowboolean.charAt(j) + " "); 
+            }
+            ttRow += "| ";
+            for(int j=0;j<netlist.size();j++)
+            {
+                for(int k=0;k<netlist.get(j).input.size();k++)
+                {
+                    if(netlist.get(j).input.get(k).wtype.equals(DWireType.input))
+                    {
+                        int tempindx = inpindex.get(netlist.get(j).input.get(k).name.trim());
+                        if(rrinputrowboolean.charAt(tempindx) == '1')
+                        {
+                            netlist.get(j).input.get(k).wValue = DWireValue._1;
+                        }
+                        else if(rrinputrowboolean.charAt(tempindx) == '0')
+                        {
+                            netlist.get(j).input.get(k).wValue = DWireValue._0;
+                        }
+                    }
+                    else if(netlist.get(j).input.get(k).wtype.equals(DWireType.GND))
+                    {
+                        netlist.get(j).input.get(k).wValue = DWireValue._0;
+                    }
+                    else if(netlist.get(j).input.get(k).wtype.equals(DWireType.Source))
+                    {
+                        netlist.get(j).input.get(k).wValue = DWireValue._1;
+                    }
+                }
+                bfunction(netlist.get(j));
+                if(netlist.get(j).output.wtype.equals(DWireType.output))
+                {
+                    if(netlist.get(j).output.wValue.equals(DWireValue._0))
+                        ttRow+= "0 ";
+                    if(netlist.get(j).output.wValue.equals(DWireValue._1))
+                        ttRow+= "1 ";
+                    if(netlist.get(j).output.wValue.equals(DWireValue._x))
+                        ttRow+= "- ";
+                }
+            }
+            System.out.println(ttRow);
+        
+        }
+        System.out.println("------------------------------------");
+        
+    }
     
 }

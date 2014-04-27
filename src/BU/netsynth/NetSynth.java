@@ -129,76 +129,7 @@ public class NetSynth {
         
     }
     
-    
-    public static void testD7seg()
-    {
-        List<DGate> d7seg = new ArrayList<DGate>();
-        //d7seg 
-    }
-    
-    public static void test2notstonor()
-    {
-        List<DGate> netlistn = new ArrayList<DGate>();
-        DWire inp1 = new DWire("a",DWireType.input);
-        DWire inp2 = new DWire("b",DWireType.input);
-        
-        DWire wire1 = new DWire("w1",DWireType.connector);
-        DWire wire2 = new DWire("w2",DWireType.connector);
-        DWire out1 = new DWire("out1",DWireType.output);
-        DWire out2 = new DWire("out2",DWireType.output);
-        DWire w3 = new DWire("w3",DWireType.connector);
-        DWire out3 = new DWire("out3",DWireType.output);
-        
-        DGate not1 = new DGate();
-        DGate not2 = new DGate();
-        not1.gtype = DGateType.NOT;
-        not1.input.add(inp1);
-        not1.output = wire1;
-        
-        not2.gtype = DGateType.NOT;
-        not2.input.add(inp2);
-        not2.output = wire2;
-        
-        
-        DGate nor1 = new DGate();
-        DGate nor2 = new DGate();
-        DGate nor3 = new DGate();
-        
-        nor1.gtype = DGateType.NOR;
-        nor1.input.add(inp1);
-        nor1.input.add(wire2);
-        nor1.output = out1;
-        
-        nor2.gtype = DGateType.NOR;
-        nor2.input.add(inp2);
-        nor2.input.add(wire1);
-        nor2.output = out2;
-        
-        nor3.gtype = DGateType.NOR;
-        nor3.input.add(inp1);
-        nor3.input.add(inp2);
-        nor3.output = w3;
-        
-        DGate not3 = new DGate();
-        not3.gtype = DGateType.NOT;
-        not3.input.add(w3);
-        not3.output = out3;
-        
-        
-        
-        netlistn.add(not1);
-        netlistn.add(not2); 
-        netlistn.add(nor1);
-        
-        netlistn.add(nor2);
-        netlistn.add(nor3);
-        netlistn.add(not3);
-        
-        
-        convert2NOTsToNOR(netlistn);
-        
-    }
-    
+  
     public static void EspressoVsABC(int inpcount)
     {
         int truthsize = (int)Math.pow(2, inpcount);
@@ -771,7 +702,7 @@ public class NetSynth {
                         System.out.println("ABC Circuit");
                         for(int j=0;j<abcoutput.size();j++)
                         {
-                            System.out.println(netlist(abcoutput.get(j)));
+                            System.out.println(printGate(abcoutput.get(j)));
                         }
                     }
                     else
@@ -779,7 +710,7 @@ public class NetSynth {
                         System.out.println("INV ABC Circuit");
                         for(int j=0;j<invabcoutput.size();j++)
                         {
-                            System.out.println(netlist(invabcoutput.get(j)));
+                            System.out.println(printGate(invabcoutput.get(j)));
                         }
                     }
                     if(espoutput.size() <= invespoutput.size())
@@ -787,7 +718,7 @@ public class NetSynth {
                         System.out.println("Esp Circuit");
                         for(int j=0;j<espoutput.size();j++)
                         {
-                            System.out.println(netlist(espoutput.get(j)));
+                            System.out.println(printGate(espoutput.get(j)));
                         }
                     }
                     else
@@ -795,7 +726,7 @@ public class NetSynth {
                         System.out.println("INV Esp Circuit");
                         for(int j=0;j<invespoutput.size();j++)
                         {
-                            System.out.println(netlist(invespoutput.get(j)));
+                            System.out.println(printGate(invespoutput.get(j)));
                         }
                     }
                             
@@ -1109,15 +1040,6 @@ public class NetSynth {
         
     }
     
-    
-    
-    
-    public static String createblif()
-    {
-        String filename = "";
-        return filename;
-    }
-    
     public static void testABCsingle(int ttval)
     {
                
@@ -1216,7 +1138,7 @@ public class NetSynth {
                 //System.out.println("Espresso Circuit count for No: "+i+" : "+espoutcount);
                 System.out.println("ABC Circuit count for No: "+ttval+" : "+abcoutcount);
                 for(int k=0;k<abcoutput.size();k++)
-                    System.out.println(netlist(abcoutput.get(k)));
+                    System.out.println(printGate(abcoutput.get(k)));
                 //System.out.println(abcoutput.get(abcoutput.size()-1).output.wtype);
                 List<DWire> inputwires = new ArrayList<DWire>();
                 DWire w1 =new DWire("in1",DWireType.input);
@@ -1743,7 +1665,7 @@ public class NetSynth {
                 System.out.println("\nPOST-OPTIMIZATION : NETLIST\n");
                 for(int i=0;i<espoutput.size();i++)
                 {
-                    System.out.println(netlist(espoutput.get(i)));
+                    System.out.println(printGate(espoutput.get(i)));
                 }
                 
                 Writer outputinv = new BufferedWriter(new FileWriter(fespinpinv));
@@ -1765,7 +1687,7 @@ public class NetSynth {
                 System.out.println("\nPOST-OPTIMIZATION : INV NETLIST\n");
                 for(int i=0;i<espoutputinv.size();i++)
                 {
-                    System.out.println(netlist(espoutputinv.get(i)));
+                    System.out.println(printGate(espoutputinv.get(i)));
                 }
                 
                 //System.out.println("\n\n==== CHECKING!!! ====");
@@ -1939,7 +1861,7 @@ public class NetSynth {
         circ = CreateMultDAGW(precomp.get(x));
         
         for(int i=0;i<precomp.get(x).size();i++)
-            System.out.println(netlist(precomp.get(x).get(i)));
+            System.out.println(printGate(precomp.get(x).get(i)));
         
         for(int i=0;i<circ.Gates.size();i++)
             System.out.println(circ.Gates.get(i).Name);
@@ -1979,7 +1901,7 @@ public class NetSynth {
         
         if(functionOutp)
         {
-                String gateString = netlist(SOPgates.get(0));
+                String gateString = printGate(SOPgates.get(0));
                 System.out.println(gateString);
             
         }
@@ -1988,7 +1910,7 @@ public class NetSynth {
             for(DGate g:SOPgates)
             {
                
-                String gateString = netlist(g);
+                String gateString = printGate(g);
                 System.out.println(gateString);
             }
         }
@@ -1998,7 +1920,7 @@ public class NetSynth {
         System.out.println("\nUniversal Gates : ");
         if(functionOutp)
         {
-                String gateString = netlist(NORgates.get(0));
+                String gateString = printGate(NORgates.get(0));
                 System.out.println(gateString);
             
         }
@@ -2006,7 +1928,7 @@ public class NetSynth {
         {
             for(DGate g:NORgates)
             {  
-                String gateString = netlist(g);
+                String gateString = printGate(g);
                 System.out.println(gateString);
             }
            
@@ -2030,7 +1952,7 @@ public class NetSynth {
         
         
         for(int i=0;i<dseg7.size();i++)
-            System.out.println(netlist(dseg7.get(i)));
+            System.out.println(printGate(dseg7.get(i)));
     }
     
     public static DAGW seg7dagw(String filename)
@@ -2051,7 +1973,7 @@ public class NetSynth {
         
         
         for(int i=0;i<dseg7.size();i++)
-            System.out.println(netlist(dseg7.get(i)));
+            System.out.println(printGate(dseg7.get(i)));
         sevenseg = CreateMultDAGW(dseg7);
         
         return sevenseg;
@@ -2560,7 +2482,7 @@ public class NetSynth {
         {
             
             String netbuilder = "";
-            netbuilder = netlist(gout);
+            netbuilder = printGate(gout);
             System.out.println(netbuilder);
         
         }   
@@ -3610,6 +3532,35 @@ public class NetSynth {
         
          return outputornetlist;
     }
+    
+    public static List<DGate> parseStructuralVtoNORNOT(String filepath)
+    {
+        List<DGate> structnetlist = new ArrayList<DGate>();
+        List<DGate> naivenetlist = new ArrayList<DGate>();
+        naivenetlist = parseCaseStatements.parseStructural(filepath);
+        List<DGate> reducedfanin = new ArrayList<DGate>();
+        for(int i=0;i<naivenetlist.size();i++)
+        {
+            for(DGate redgate: NetlistConversionFunctions.ConvertToFanin2(naivenetlist.get(i)))
+            {
+                reducedfanin.add(redgate);
+            }
+        }
+        for(int i=0;i<reducedfanin.size();i++)
+        {
+            for(DGate structgate: NetlistConversionFunctions.GatetoNORNOT(reducedfanin.get(i)))
+            {
+                structnetlist.add(structgate);
+            }
+        }
+        
+        structnetlist = optimizeNetlist(structnetlist);
+        //structnetlist = convert2NOTsToNOR(structnetlist);
+        structnetlist = rewireNetlist(structnetlist);
+        printNetlist(structnetlist);
+        return structnetlist;
+    }
+    
     
     public static List<DGate> parseEspressoToNORNAND(List<String> espinp)
     {
@@ -4896,10 +4847,14 @@ public class NetSynth {
     }
    
    
+    public static void printNetlist(List<DGate> netlist)
+    {
+        for(int i=0;i<netlist.size();i++)
+            System.out.println(printGate(netlist.get(i)));
+    }
     
     
-    
-    public static String netlist(DGate g)
+    public static String printGate(DGate g)
     {
         String netbuilder="";
         netbuilder += g.gtype;
