@@ -126,7 +126,7 @@ public class TestSynthesis {
     {
         List<DGate> samplenetlist = new ArrayList<DGate>();
         samplenetlist = NetSynth.parseStructuralVtoNORNOT("");
-        
+        NetSynth.printNetlist(samplenetlist);
         BooleanSimulator.printTruthTable(samplenetlist);
     }
     public static void testGetTT()

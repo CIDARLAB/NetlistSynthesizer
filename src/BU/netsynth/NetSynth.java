@@ -695,7 +695,7 @@ public class NetSynth {
                 //System.out.println(i+","+minesp+","+minabc+","+minpre);
                 
                 
-                if(i==110)
+                /*if(i==110)
                 {
                     if(abcoutput.size() <= invabcoutput.size())
                     { 
@@ -730,7 +730,7 @@ public class NetSynth {
                         }
                     }
                             
-                }
+                }*/
                 
                 //if(abcoutput.size() < invabcoutput.size())
                 //    abcoutcount = abcoutput.size();
@@ -3598,6 +3598,7 @@ public class NetSynth {
         
         naivenetlist = removeDanglingGates(naivenetlist);
         //printNetlist(naivenetlist);
+        //System.out.println("------------------------------------");
         List<DGate> reducedfanin = new ArrayList<DGate>();
         for(int i=0;i<naivenetlist.size();i++)
         {
@@ -3614,8 +3615,23 @@ public class NetSynth {
             }
         }
         
+        //System.out.println("Before Optimizing");
+        //printNetlist(structnetlist);
+        //System.out.println("------------------------------------");
+        
+        structnetlist = removeDanglingGates(structnetlist);
+        
         structnetlist = optimizeNetlist(structnetlist);
+        
+        //System.out.println("Optimized Netlist: (Output OR and Double NOTS");
+        //printNetlist(structnetlist);
+        //System.out.println("------------------------------------");
+        
         structnetlist = convert2NOTsToNOR(structnetlist);
+        //System.out.println("After 2 Nots to Nor");
+        //printNetlist(structnetlist);
+        //System.out.println("------------------------------------");
+        
         structnetlist = rewireNetlist(structnetlist);
         //printNetlist(structnetlist);
         return structnetlist;
