@@ -20,5 +20,6 @@ public class TestMain {
         //parseCaseStatements.parseStructural("");
         // NetSynth.parseStructuralVtoNORNOT("");
         TestSynthesis.testprintNetsynth();
+        TestSynthesis.testGetTT();
     }
 }

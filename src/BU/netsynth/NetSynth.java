@@ -106,7 +106,7 @@ public class NetSynth {
         //testABC();
         //test2notstonor();
         //EspressoVsABC(3);
-        //EspressoVsABCinv(3);
+        EspressoVsABCinv(3);
         //EspressoVsABCSingle(3,109);
         
         //testABC();
@@ -1168,7 +1168,10 @@ public class NetSynth {
         
         
     }
-    public static void create_VerilogFile(int inputs,String hex)
+    
+    
+    
+    public static void create_VerilogFile(int inputs,String hex, String filename)
     {
         List<String> filelines = new ArrayList<String>();
         filelines = genVerilogFile.createVerilogFile(inputs, hex);
@@ -1181,7 +1184,7 @@ public class NetSynth {
         {
             filestring += Filepath + "BU/resources/";
         }
-        filestring += "testverilog.v";
+        filestring += filename +".v";
           File fespinp = new File(filestring);
         //Writer output;
         try 

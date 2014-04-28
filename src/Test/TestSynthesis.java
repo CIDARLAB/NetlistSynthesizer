@@ -129,7 +129,20 @@ public class TestSynthesis {
         
         BooleanSimulator.printTruthTable(samplenetlist);
     }
-    
+    public static void testGetTT()
+    {
+        List<DGate> samplenetlist = new ArrayList<DGate>();
+        samplenetlist = NetSynth.parseStructuralVtoNORNOT("");
+        List<String> ttvals = new ArrayList<String>();
+        
+        ttvals = BooleanSimulator.getTruthTable(samplenetlist);
+        
+        System.out.println("Truth Table Values :");
+        for(String xtt:ttvals)
+        {
+            System.out.println(xtt);
+        }
+    }
     
     public static void testReducedFanin(DGateType gtype, int inputno)
     {

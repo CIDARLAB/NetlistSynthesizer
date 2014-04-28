@@ -523,4 +523,101 @@ public class BooleanSimulator {
         
     }
     
+    
+    public static List<String> getTruthTable(List<DGate> netlist)
+    {
+        List<String> inputnames = new ArrayList<String>();
+        List<String> outputnames = new ArrayList<String>();
+        HashMap<String,Integer> inpindex = new HashMap<String,Integer>();
+        HashMap<String,Integer> outpindex = new HashMap<String,Integer>();
+        List<String> outTruthTables = new ArrayList<String>();
+        int inpindx=0;
+        int outindx =0;
+        for(int i=0;i<netlist.size();i++)
+        {
+            for(int j=0;j<netlist.get(i).input.size();j++)
+            {
+                if(netlist.get(i).input.get(j).wtype.equals(DWireType.input))
+                {
+                    if(!inputnames.contains(netlist.get(i).input.get(j).name.trim()))
+                    {
+                        inputnames.add(netlist.get(i).input.get(j).name.trim());
+                        inpindex.put(netlist.get(i).input.get(j).name.trim(), inpindx);
+                        inpindx++;
+                    }
+                }
+            }
+            if (netlist.get(i).output.wtype.equals(DWireType.output)) {
+                if (!outputnames.contains(netlist.get(i).output.name.trim())) 
+                {
+                    outputnames.add(netlist.get(i).output.name.trim());
+                    outpindex.put(netlist.get(i).output.name.trim(), outindx);
+                    outindx++;
+                    String outTT = "";
+                    outTruthTables.add(outTT);
+                }
+            }
+        }
+        
+       
+        int ttrows = (int)Math.pow(2, inputnames.size());
+        for(int i=0;i<ttrows;i++)
+        {
+            
+            
+            String rrinputrowboolean = Convert.dectoBin(i,inputnames.size());
+            for(int j=0;j<netlist.size();j++)
+            {
+                for(int k=0;k<netlist.get(j).input.size();k++)
+                {
+                    if(netlist.get(j).input.get(k).wtype.equals(DWireType.input))
+                    {
+                        int tempindx = inpindex.get(netlist.get(j).input.get(k).name.trim());
+                        if(rrinputrowboolean.charAt(tempindx) == '1')
+                        {
+                            netlist.get(j).input.get(k).wValue = DWireValue._1;
+                        }
+                        else if(rrinputrowboolean.charAt(tempindx) == '0')
+                        {
+                            netlist.get(j).input.get(k).wValue = DWireValue._0;
+                        }
+                    }
+                    else if(netlist.get(j).input.get(k).wtype.equals(DWireType.GND))
+                    {
+                        netlist.get(j).input.get(k).wValue = DWireValue._0;
+                    }
+                    else if(netlist.get(j).input.get(k).wtype.equals(DWireType.Source))
+                    {
+                        netlist.get(j).input.get(k).wValue = DWireValue._1;
+                    }
+                }
+                bfunction(netlist.get(j));
+                if(netlist.get(j).output.wtype.equals(DWireType.output))
+                {
+                    int tempoutindx = outpindex.get(netlist.get(j).output.name.trim());
+                    if(netlist.get(j).output.wValue.equals(DWireValue._0))
+                    {
+                        String ttRow = outTruthTables.get(tempoutindx);
+                        ttRow+= "0";
+                        outTruthTables.set(tempoutindx, ttRow);
+                    }
+                    if(netlist.get(j).output.wValue.equals(DWireValue._1))
+                    {
+                        String ttRow = outTruthTables.get(tempoutindx);
+                        ttRow+= "1";
+                        outTruthTables.set(tempoutindx, ttRow);
+                    }    
+                    if(netlist.get(j).output.wValue.equals(DWireValue._x))
+                    {
+                        String ttRow = outTruthTables.get(tempoutindx);
+                        ttRow+= "-";
+                        outTruthTables.set(tempoutindx, ttRow);
+                    }    
+                }
+            }
+        }
+        return outTruthTables;
+    }
+    
+    
 }
