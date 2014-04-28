@@ -2926,8 +2926,8 @@ public class NetSynth {
         List<DGate> netlistout = new ArrayList<DGate>();
         List<DGate> gatestoadd = new ArrayList<DGate>();
         //System.out.println("Before\n----------------------------");
-         //for(int i=0;i<netlistinp.size();i++)
-         //   System.out.println(netlist(netlistinp.get(i)));
+        //for(int i=0;i<netlistinp.size();i++)
+        //    System.out.println(i+ " :" +printGate(netlistinp.get(i)));
         
         for(int i=0;i<netlistinp.size();i++)
         {
@@ -3145,9 +3145,9 @@ public class NetSynth {
         
         
         
-        
+        List<DGate> finalnetlist;
         //<editor-fold desc="Remove Dangling Wires">
-        
+        //do{
         removegates = new ArrayList<Integer>();
         for(int i=0;i<netlistout.size()-1;i++)
         {
@@ -3170,12 +3170,16 @@ public class NetSynth {
                     removegates.add(i);
             }
         }
-        List<DGate> finalnetlist = new ArrayList<DGate>();
-        for(int i=0;i<netlistout.size();i++)
-        {
-            if(!removegates.contains(i))
-                finalnetlist.add(netlistout.get(i));
-        }
+            finalnetlist = new ArrayList<DGate>();
+            for(int i=0;i<netlistout.size();i++)
+            {
+                if(!removegates.contains(i))
+                    finalnetlist.add(netlistout.get(i));
+            }
+        //    netlistout = new ArrayList<DGate>();
+        //    for(int i=0;i<finalnetlist.size();i++)
+        //        netlistout.add(finalnetlist.get(i));
+        //}while(removegates.size()!=0);
         //</editor-fold>
         
         //Start Removing duplicate NOR gates  
@@ -3184,8 +3188,8 @@ public class NetSynth {
         {
             if(finalnetlist.get(i).gtype.equals(DGateType.NOR) && (!finalnetlist.get(i).output.wtype.equals(DWireType.output)))
             {
-                String inp1name = finalnetlist.get(i).input.get(0).name;
-                String inp2name = finalnetlist.get(i).input.get(1).name;
+                String inp1name = finalnetlist.get(i).input.get(0).name.trim();
+                String inp2name = finalnetlist.get(i).input.get(1).name.trim();
                 DWire noroutW  = new DWire(finalnetlist.get(i).output.name,finalnetlist.get(i).output.wtype);
                 for(int j=i;j<finalnetlist.size();j++)
                 {
@@ -3193,18 +3197,19 @@ public class NetSynth {
                     {
                         if(finalnetlist.get(j).gtype.equals(DGateType.NOR) && (!finalnetlist.get(j).output.wtype.equals(DWireType.output))  )
                         {
-                            String outname = finalnetlist.get(j).output.name;
+                            String outname = finalnetlist.get(j).output.name.trim();
                             if( (finalnetlist.get(j).input.get(0).name.equals(inp1name) && finalnetlist.get(j).input.get(1).name.equals(inp2name)) || (finalnetlist.get(j).input.get(0).name.equals(inp2name) && finalnetlist.get(j).input.get(1).name.equals(inp1name)) )
                             {
+                                //System.out.println(noroutW.name);
                                 for(int k=j;k<finalnetlist.size();k++)
                                 {
                                     if(k!=j)
                                     {
                                         for(int m=0;m<finalnetlist.get(k).input.size();m++)
                                         {
-                                            if(finalnetlist.get(j).input.get(m).name.equals(outname))
+                                            if(finalnetlist.get(k).input.get(m).name.equals(outname))
                                             {
-                                                finalnetlist.get(j).input.set(m, noroutW);
+                                                finalnetlist.get(k).input.set(m, noroutW);
                                             }
                                         }
                                     }
@@ -3226,9 +3231,11 @@ public class NetSynth {
                 finalnetout.add(finalnetlist.get(i));
         }
         
-        //System.out.println("\nAfter-------------------------");
+        //System.out.println("\n\n\nAfter-------------------------");
         //for(int i=0;i<finalnetout.size();i++)
-        //    System.out.println(netlist(finalnetout.get(i)));
+        //    System.out.println(printGate(finalnetout.get(i)));
+        //System.out.println("--------------------------\n\n");
+        
         return finalnetout;
     }
     public static List<DGate> optimizeNetlist(List<DGate> netlistinp)
@@ -3532,12 +3539,62 @@ public class NetSynth {
         
          return outputornetlist;
     }
-    
+    public static List<DGate> removeDanglingGates(List<DGate> netlist)
+    {
+        List<DGate> tempnetlist = new ArrayList<DGate>();
+        for(int i=0;i<netlist.size();i++)
+        {
+            tempnetlist.add(netlist.get(i));
+        }
+        List<DGate> reducednetlist = new ArrayList<DGate>();
+        List<Integer> removegates = new ArrayList<Integer>();
+        do{
+        
+        removegates = new ArrayList<Integer>();
+        for(int i=0;i<tempnetlist.size()-1;i++)
+        {
+            if(!tempnetlist.get(i).output.wtype.equals(DWireType.output))
+            {
+                String outname = tempnetlist.get(i).output.name.trim();
+                int inpcount =0;
+                for(int j=i+1;j<tempnetlist.size();j++)
+                {
+                    for(int m=0;m<tempnetlist.get(j).input.size();m++)
+                    {
+                        String inpname = tempnetlist.get(j).input.get(m).name.trim();
+                        if(inpname.equals(outname))
+                            inpcount++;
+                    }
+                }
+                if(inpcount == 0)
+                {
+                    removegates.add(i);
+                }
+            }
+        }
+        reducednetlist = new ArrayList<DGate>();
+        for(int i=0;i<tempnetlist.size();i++)
+        {
+            if(!removegates.contains(i))
+                reducednetlist.add(tempnetlist.get(i));
+        }
+        tempnetlist = new ArrayList<DGate>();
+        for(int i=0;i<reducednetlist.size();i++)
+        {
+            tempnetlist.add(reducednetlist.get(i));
+        }
+        }while(!removegates.isEmpty());
+        
+        return reducednetlist;
+    }
     public static List<DGate> parseStructuralVtoNORNOT(String filepath)
     {
         List<DGate> structnetlist = new ArrayList<DGate>();
         List<DGate> naivenetlist = new ArrayList<DGate>();
         naivenetlist = parseCaseStatements.parseStructural(filepath);
+        
+        naivenetlist = removeDanglingGates(naivenetlist);
+        //printNetlist(naivenetlist);
         List<DGate> reducedfanin = new ArrayList<DGate>();
         for(int i=0;i<naivenetlist.size();i++)
         {
@@ -3555,9 +3612,9 @@ public class NetSynth {
         }
         
         structnetlist = optimizeNetlist(structnetlist);
-        //structnetlist = convert2NOTsToNOR(structnetlist);
+        structnetlist = convert2NOTsToNOR(structnetlist);
         structnetlist = rewireNetlist(structnetlist);
-        printNetlist(structnetlist);
+        //printNetlist(structnetlist);
         return structnetlist;
     }
     
