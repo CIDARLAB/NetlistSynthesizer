@@ -359,6 +359,74 @@ public class NetSynth {
         
     }
     
+    public static List<DGate> parseVerilogABC(String filename)
+    {
+        List<DGate> netlistResult = new ArrayList<DGate>();
+        List<String> blifinput = new ArrayList<String>();
+        CircuitDetails circ = new CircuitDetails();
+        circ = parseCaseStatements.input3case(filename);
+        blifinput = Blif.createFile(circ);
+        String filestring ="";
+        String filestringblif = "";
+        if(Filepath.contains("prashant"))
+            {
+                filestring += Filepath+ "src/BU/resources/";
+            }
+            else
+            {
+                filestring += Filepath+ "BU/resources/";
+            }
+        filestringblif = filestring + "blifinp";
+        filestringblif += ".blif";
+           
+            
+          
+            File fabcinp = new File(filestringblif);
+        try 
+            {
+                
+                
+                Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+                for(String xline:blifinput)
+                {
+                    String newl = (xline + "\n");
+                    outputblif.write(newl);
+                }
+                outputblif.close();
+                
+              
+               
+               
+                        
+                List<DGate> abcoutput = new ArrayList<DGate>();
+              
+                try {
+                    abcoutput = runABC("blifinp");
+                   
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                abcoutput = optimizeNetlist(abcoutput);
+                abcoutput = convert2NOTsToNOR(abcoutput);
+                abcoutput = rewireNetlist(abcoutput);
+                
+                for(DGate xgate:abcoutput)
+                {
+                    netlistResult.add(xgate);
+                }
+                netlistResult = removeDanglingGates(netlistResult);
+                fabcinp.deleteOnExit();
+               
+            } 
+            catch (IOException ex) 
+            {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
+        return netlistResult;
+    }
+    
+    
     public static void EspressoVsABCinv(int inpcount)
     {
         int truthsize = (int)Math.pow(2, inpcount);
