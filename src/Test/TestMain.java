@@ -19,7 +19,8 @@ public class TestMain {
         //TestSynthesis.testReducedFanin(DGateType.OR,3);
         //parseCaseStatements.parseStructural("");
         // NetSynth.parseStructuralVtoNORNOT("");
-        TestSynthesis.testprintNetsynth();
-        TestSynthesis.testGetTT();
+        //TestSynthesis.testprintNetsynth();
+        //TestSynthesis.testGetTT();
+        TestSynthesis.testespressotoabc();
     }
 }

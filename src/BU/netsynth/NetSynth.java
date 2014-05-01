@@ -1509,6 +1509,17 @@ public class NetSynth {
         }
     }
     
+    public static List<DGate> parseEspressoToABC(String filename) 
+    {
+        List<DGate> netlistout = new ArrayList<DGate>();
+        List<String> espout = new ArrayList<String>();
+        espout = runEspresso(filename);
+        for(String xline:espout)
+        {
+            System.out.println(xline);
+        }
+        return netlistout;
+    }
     
     /*private static Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>()
     {
@@ -2462,7 +2473,11 @@ public class NetSynth {
     
     public static List<String> runEspresso(String pathFile) {
     
-        
+        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         List<String> espressoOutput = new ArrayList<String>();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;

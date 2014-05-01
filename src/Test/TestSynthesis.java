@@ -28,7 +28,26 @@ public class TestSynthesis {
      * 
      * 
      */
-    
+    public static void testespressotoabc()
+    {
+        String Filepath;
+        String filestring ="";
+        Filepath = TestSynthesis.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/testespfile.txt";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/testespfile.txt";
+        }
+        
+        NetSynth.parseEspressoToABC(filestring);
+    }
       
     public static void test2notstonor()
     {
@@ -93,9 +112,6 @@ public class TestSynthesis {
         
     }
     
-    
-    
-    
     public static void testNORConversion(DGateType gtype)
     {
         DGate inputgate = new DGate();
@@ -121,7 +137,6 @@ public class TestSynthesis {
         
     }
     
-    
     public static void testprintNetsynth()
     {
         List<DGate> samplenetlist = new ArrayList<DGate>();
@@ -129,6 +144,7 @@ public class TestSynthesis {
         NetSynth.printNetlist(samplenetlist);
         BooleanSimulator.printTruthTable(samplenetlist);
     }
+    
     public static void testGetTT()
     {
         List<DGate> samplenetlist = new ArrayList<DGate>();
