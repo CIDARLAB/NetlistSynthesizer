@@ -1233,8 +1233,41 @@ public class NetSynth {
         //System.out.println("\n\n Final Count -->");
         //System.out.println("ABC Count: "+ totalabc);
         //System.out.println("Espresso Count: "+ totalespresso);
-        
-        
+    }
+    
+    
+    
+    
+    public static String create_VerilogFile(List<String> filelines, String filename)
+    {
+        String filestring = "";
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/";
+        }
+        filestring += filename +".v";
+          File fespinp = new File(filestring);
+        //Writer output;
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            //output = new BufferedWriter(new FileWriter(fespinp));
+             for (String xline :filelines) 
+             {
+                String newl = (xline + "\n");
+                output.write(newl);
+             }
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return filestring;
     }
     
     
@@ -1514,12 +1547,24 @@ public class NetSynth {
         List<DGate> netlistout = new ArrayList<DGate>();
         List<String> espout = new ArrayList<String>();
         espout = runEspresso(filename);
-        for(String xline:espout)
+        /*for(String xline:espout)
         {
             System.out.println(xline);
+        }*/
+        List<String> vfilelines = new ArrayList<String>();
+        
+        vfilelines = convertEspressoOutputToVerilog(espout);
+        String vfilepath = "";
+        vfilepath = create_VerilogFile(vfilelines,"espressoVerilog");
+        try {
+            netlistout = runABCverilog("espressoVerilog");
+            netlistout = optimizeNetlist(netlistout);
+            netlistout = convert2NOTsToNOR(netlistout);
+            netlistout = rewireNetlist(netlistout);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        convertEspressoOutputToVerilog(espout);
         return netlistout;
     }
     

@@ -46,7 +46,9 @@ public class TestSynthesis {
             filestring += Filepath + "BU/resources/testespfile.txt";
         }
         
-        NetSynth.parseEspressoToABC(filestring);
+        List<DGate> netlistoutp = new ArrayList<DGate>();
+        netlistoutp = NetSynth.parseEspressoToABC(filestring);
+        NetSynth.printNetlist(netlistoutp);
     }
       
     public static void test2notstonor()
