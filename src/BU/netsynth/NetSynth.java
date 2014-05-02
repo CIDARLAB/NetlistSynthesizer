@@ -1518,6 +1518,8 @@ public class NetSynth {
         {
             System.out.println(xline);
         }
+        
+        convertEspressoOutputToVerilog(espout);
         return netlistout;
     }
     
@@ -2574,6 +2576,265 @@ public class NetSynth {
         }   
     }
     
+    public static List<String> convertEspressoOutputToVerilog(List<String> espinp)
+    {
+        List<String> verilogfile = new ArrayList<String>();
+        
+        one = new DWire("_one",DWireType.Source);
+        zero = new DWire("_zero",DWireType.GND);
+        String inpNames = null;
+        String outNames = null;
+        int numberOfMinterms=0;
+        int expInd=0;     
+        List<String> inputWires = new ArrayList<String>();
+        List<String> outputWires = new ArrayList<String>();
+        
+        List<DWire> inputINVWires = new ArrayList<DWire>();
+        List<DGate> inputINVGates = new ArrayList<DGate>();
+        List<Boolean> notGateexists = new ArrayList<Boolean>();
+        List<Boolean> notGateAdd = new ArrayList<Boolean>();
+        
+        
+        // <editor-fold defaultstate="collapsed" desc="Extract Input output and minterm lines from Espresso Output">
+        for(int i=0;i<espinp.size();i++)
+        {
+            if(espinp.get(i).startsWith(".ilb"))
+            {
+                inpNames = (espinp.get(i).substring(5));
+            }
+            else if(espinp.get(i).startsWith(".ob"))
+            {
+                outNames = (espinp.get(i).substring(4));
+            }
+            else if(espinp.get(i).startsWith("#.phase"))
+            {
+                POSmode = true;
+            }
+            else if(espinp.get(i).startsWith(".p"))
+            {
+                numberOfMinterms = Integer.parseInt(espinp.get(i).substring(3));
+                expInd = i+1;
+                break;
+            }
+        }
+        // </editor-fold>
+                
+        // <editor-fold defaultstate="collapsed" desc="Get Input Names">
+        for(String splitInp:inpNames.split(" "))
+        {
+            if(splitInp.equals(one.name) || splitInp.equals(zero.name))
+                splitInp += "I";
+            inputWires.add(splitInp.trim());
+            //System.out.println("INPUT : "+splitInp);
+        }
+        // </editor-fold>
+             
+        // <editor-fold defaultstate="collapsed" desc="Get Output Names">
+        for(String splitInp:outNames.split(" "))
+        {
+            if(splitInp.equals(one.name) || splitInp.equals(zero.name))
+                splitInp += "O";
+            outputWires.add(splitInp.trim());
+            //System.out.println("OUTPUT : "+splitInp);
+        }
+        // </editor-fold>        
+        
+        verilogfile.add("module EspToVerilog (");
+        String inputlist = "";
+        for(int i=0;i<inputWires.size();i++)
+        {
+            inputlist += inputWires.get(i);
+            if(i!= (inputWires.size()-1))
+                inputlist += ", ";
+        }
+        String moduleinput = inputlist + ",";
+        verilogfile.add(moduleinput);
+        
+        String outputlist = "";
+        for(int i=0;i<outputWires.size();i++)
+        {
+            outputlist += outputWires.get(i);
+            if(i!= (outputWires.size()-1))
+                outputlist += ", ";
+        }
+        String moduleoutput = outputlist + " );";
+        verilogfile.add(moduleoutput);
+        String inputdeclare = "input "  + inputlist + ";";
+        String outputdeclare = "output "  + outputlist + ";";
+        verilogfile.add(inputdeclare);
+        verilogfile.add(outputdeclare);
+        // <editor-fold defaultstate="collapsed" desc="Declare wires for verilog file">
+        String wiredeclaration = "wire";
+        List<String> wirenames = new ArrayList<String>();
+        for(int i=0;i<numberOfMinterms;i++)
+        {
+            String wName = "w" + i;
+            wiredeclaration += (" " + wName);
+            wirenames.add(wName);
+            if(i== numberOfMinterms-1)
+                wiredeclaration += ";";
+            else
+                wiredeclaration += ",";
+        }
+        // </editor-fold>
+        
+        verilogfile.add(wiredeclaration);
+        
+        List<List<DWire>> outputsum = new ArrayList<List<DWire>>();
+        List<List<String>> outputassignlines = new ArrayList<List<String>>();
+        
+        
+        for(int i=0;i<outputWires.size();i++)
+        {
+            List<String> outassign = new ArrayList<String>();
+            outputassignlines.add(outassign);
+            List<DWire> outsums = new ArrayList<DWire>();
+            outputsum.add(outsums);
+        }
+        
+        int wIndx =0;
+        for(int i=expInd;i<espinp.size()-1;i++)
+        {
+            //int null_literal =0;
+            List<DWire> sumterm  = new ArrayList<DWire>();
+            String assgnwires = ("assign " + wirenames.get(wIndx) + " =");
+            String maxterm[] = espinp.get(i).split(" ");
+            boolean startassign = false;
+            for(int j=0;j<inputWires.size();j++)
+            {
+                if(maxterm[0].charAt(j) == '1')
+                {
+                    if(startassign)
+                    {
+                        assgnwires += " |";
+                    }
+                    startassign = true;
+                    assgnwires += " "+inputWires.get(j);
+                    
+                }
+                else if(maxterm[0].charAt(j) == '0')
+                {
+                    if(startassign)
+                    {
+                        assgnwires += " |";
+                    }
+                    startassign = true;
+                    assgnwires += " ~"+inputWires.get(j);
+                }
+                
+                if (j == (inputWires.size() - 1)) 
+                {
+                    assgnwires += ";";
+                }
+                
+            }
+           
+            verilogfile.add(assgnwires);
+            
+            
+            
+            
+            
+            /*List<DGate> sumtermG = new ArrayList<DGate>();
+            DWire sumlast = new DWire();
+            if(sumterm.size() >0)
+            {
+                if(sumterm.size() == 1)
+                {
+                    List<DWire> notsumterminp = new ArrayList<DWire>();
+                    notsumterminp.addAll(sumterm);
+                    String Wirename = "0Wire" + Global.wirecount++;
+                    DWire notsumtermout = new DWire(Wirename);
+                    DGate notsumtermgate = new DGate(DGateType.NOT,notsumterminp,notsumtermout);
+                    
+                    sumlast = notsumtermout;
+                }
+                else
+                {
+                    //System.out.println("Sumterm size :" + sumterm.size());
+                    sumtermG = NORNANDGates(sumterm,DGateType.NOR);
+                   
+                    sumlast = sumtermG.get(sumtermG.size()-1).output;
+                }
+            }
+            else
+            {
+                sumlast = new DWire(zero);
+                //System.out.println("Output connected to Ground");
+            }*/
+            for(int j=0;j<outputWires.size();j++)
+            {
+                if(maxterm[1].charAt(j) == '1')
+                {
+                    outputassignlines.get(j).add(wirenames.get(wIndx));
+                    //outputsum.get(j).add(sumlast);
+                }
+            }
+            wIndx++;
+        }
+        
+        for(int i=0;i<outputassignlines.size();i++)
+        {
+            String tempoutassign = "assign " + outputWires.get(i) + " = ";
+            for(int j=0;j<outputassignlines.get(i).size();j++)
+            {
+                tempoutassign += (" " +outputassignlines.get(i).get(j));
+                if(j==(outputassignlines.get(i).size()-1))
+                    tempoutassign += ";";
+                else
+                    tempoutassign += " &";
+            }
+            verilogfile.add(tempoutassign);
+        }
+        verilogfile.add("endmodule");
+        /*for(int j=0;j<outputWires.size();j++)
+        {
+            
+            if(outputsum.get(j).isEmpty())
+            {
+                List<DWire> inputbuflist = new ArrayList<DWire>();
+                inputbuflist.add(one);
+                //DGate bufgate = new DGate(DGateType.BUF,inputbuflist,outputWires.get(j));
+                
+                //System.out.println("Source = output");
+            }
+            else if(outputsum.get(j).size() == 1)
+            {
+                if(outputsum.get(j).get(0).wtype == DWireType.GND)
+                {
+                    List<DWire> inputbuflist = new ArrayList<DWire>();
+                    inputbuflist.add(zero);
+                    //DGate bufgate = new DGate(DGateType.BUF,inputbuflist,outputWires.get(j));
+                    
+                    //System.out.println("Ground = output");
+                }
+                else
+                {
+                    List<DWire> singleNOTmaxterm = new ArrayList<DWire>();
+                    singleNOTmaxterm.add(outputsum.get(j).get(0));
+                    //DGate singlemaxtermgate = new DGate(DGateType.NOT, singleNOTmaxterm,outputWires.get(j));
+                    
+                    //System.out.println("Single Maxterm which enters a not Gate, the output of which is a circuit output!!");
+                }
+            }
+            else
+            {
+                List<DGate> productGates = new ArrayList<DGate>();
+                productGates = NORNANDGates(outputsum.get(j),DGateType.NOR);
+                //productGates.get(productGates.size()-1).output = outputWires.get(j);
+               
+                
+                //System.out.println("OUTPUT SUM Terms: " +outputsum.get(j).size());    
+            }
+        }*/
+        System.out.println("\n----------------------------\nVerilog File\n----------------------------\n");
+        for(String xline:verilogfile)
+            System.out.println(xline);
+        
+        return verilogfile;
+      
+    }
+    
     
     public static List<DGate> parseEspressoOutput(List<String> espinp)
     {
@@ -2984,6 +3245,7 @@ public class NetSynth {
         
         return netlist;
     }
+    
     public static List<DGate> rewireNetlist(List<DGate> netlist)
     {
         for(int i=0;i<netlist.size();i++)
