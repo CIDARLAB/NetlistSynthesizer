@@ -133,19 +133,31 @@ public class NetSynth {
     public static DAGW runNetSynth(String vfilepath)
     {
         DAGW finaldag = new DAGW();
+        List<DGate> naivenetlist = new ArrayList<DGate>();
+        List<DGate> structnetlist = new ArrayList<DGate>();
         boolean isStructural = false;
         boolean hasCaseStatements = false;
         String alllines = parseVerilogFile.verilogFileLines(vfilepath);
         isStructural = parseVerilogFile.isStructural(alllines);
         if(isStructural)
-            System.out.println("Structural Verilog Code!");
+        {
+            naivenetlist = parseVerilogFile.parseStructural(alllines);
+            structnetlist = parseStructuralVtoNORNOT(naivenetlist);
+            List<String> inputnames = new ArrayList<String>();
+            inputnames = parseVerilogFile.getInputNames(alllines);
+            BooleanSimulator.printTruthTable(structnetlist, inputnames);
+        }
         else
         {
             hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
             if(hasCaseStatements)
+            {
                 System.out.println("Has Case Statements!");
+            }
             else
-                System.out.println("No case statements");
+            {
+                System.out.println("No case statements.\nWill be supported soon");
+            }
         }
         return finaldag;
     }
@@ -4001,11 +4013,11 @@ public class NetSynth {
         
         return reducednetlist;
     }
-    public static List<DGate> parseStructuralVtoNORNOT(String filepath)
+    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist)
     {
         List<DGate> structnetlist = new ArrayList<DGate>();
-        List<DGate> naivenetlist = new ArrayList<DGate>();
-        naivenetlist = parseVerilogFile.parseStructural(filepath);
+        //List<DGate> naivenetlist = new ArrayList<DGate>();
+        //naivenetlist = parseVerilogFile.parseStructural(filepath);
         
         naivenetlist = removeDanglingGates(naivenetlist);
         //printNetlist(naivenetlist);
@@ -4028,12 +4040,14 @@ public class NetSynth {
         
         //System.out.println("Before Optimizing");
         //printNetlist(structnetlist);
-        //System.out.println("------------------------------------");
+        
         
         structnetlist = removeDanglingGates(structnetlist);
-        
+        //printNetlist(structnetlist);
+        //System.out.println("------------------------------------");
         structnetlist = optimizeNetlist(structnetlist);
-        
+        //printNetlist(structnetlist);
+        //System.out.println("------------------------------------");
         //System.out.println("Optimized Netlist: (Output OR and Double NOTS");
         //printNetlist(structnetlist);
         //System.out.println("------------------------------------");

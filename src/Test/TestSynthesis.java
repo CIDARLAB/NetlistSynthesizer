@@ -177,7 +177,7 @@ public class TestSynthesis {
     public static void testprintNetsynth()
     {
         List<DGate> samplenetlist = new ArrayList<DGate>();
-        samplenetlist = NetSynth.parseStructuralVtoNORNOT("");
+        //samplenetlist = NetSynth.parseStructuralVtoNORNOT("");
         NetSynth.printNetlist(samplenetlist);
         BooleanSimulator.printTruthTable(samplenetlist);
     }
@@ -185,7 +185,7 @@ public class TestSynthesis {
     public static void testGetTT()
     {
         List<DGate> samplenetlist = new ArrayList<DGate>();
-        samplenetlist = NetSynth.parseStructuralVtoNORNOT("");
+        //samplenetlist = NetSynth.parseStructuralVtoNORNOT("");
         List<String> ttvals = new ArrayList<String>();
         
         ttvals = BooleanSimulator.getTruthTable(samplenetlist);
