@@ -183,7 +183,7 @@ public class Parser {
     public static CircuitDetails beginParsing(String Filepath)
     {
         
-         Filepath = parseCaseStatements.class.getClassLoader().getResource(".").getPath();
+         Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
          
         
          int x = 0;
@@ -248,12 +248,12 @@ public class Parser {
             } 
             catch (IOException ex) 
             {
-                Logger.getLogger(parseCaseStatements.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(parseVerilogFile.class.getName()).log(Level.SEVERE, null, ex);
             }
         } 
         catch (FileNotFoundException ex) 
         {
-            Logger.getLogger(parseCaseStatements.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(parseVerilogFile.class.getName()).log(Level.SEVERE, null, ex);
         }
         circuit = findIO(alllines);
         return circuit;

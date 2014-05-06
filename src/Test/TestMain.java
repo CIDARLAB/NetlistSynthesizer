@@ -4,7 +4,7 @@
  */
 package Test;
 
-import BU.ParseVerilog.parseCaseStatements;
+import BU.ParseVerilog.parseVerilogFile;
 import BU.netsynth.DGate.DGateType;
 import BU.netsynth.NetSynth;
 
@@ -21,6 +21,7 @@ public class TestMain {
         // NetSynth.parseStructuralVtoNORNOT("");
         //TestSynthesis.testprintNetsynth();
         //TestSynthesis.testGetTT();
-        TestSynthesis.testespressotoabc();
+        //TestSynthesis.testespressotoabc();
+        TestSynthesis.testParseVerilogFileFunctions();
     }
 }

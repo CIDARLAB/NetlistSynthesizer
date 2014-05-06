@@ -4,6 +4,7 @@
  */
 package Test;
 
+import BU.ParseVerilog.parseVerilogFile;
 import BU.booleanLogic.BooleanSimulator;
 import BU.netsynth.DGate;
 import BU.netsynth.DGate.DGateType;
@@ -28,6 +29,40 @@ public class TestSynthesis {
      * 
      * 
      */
+    
+    public static void testParseVerilogFileFunctions()
+    {
+        String Filepath;
+        String filestring ="";
+        Filepath = TestSynthesis.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/ParseVerilog/Verilog.v";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/ParseVerilog/Verilog.v";
+        }
+        NetSynth.runNetSynth(filestring);
+        /*String alllines = parseVerilogFile.verilogFileLines(filestring);
+        boolean isStructural = parseVerilogFile.isStructural(alllines);
+        if(isStructural)
+            System.out.println("Structural Verilog Code!");
+        else
+        {
+            boolean hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
+            if(hasCaseStatements)
+                System.out.println("Has Case Statements!");
+            else
+                System.out.println("No case statements");
+        }*/
+    }
+    
+    
     public static void testespressotoabc()
     {
         String Filepath;

@@ -24,23 +24,14 @@ import java.util.logging.Logger;
  *
  * @author prashantvaidyanathan
  */
-public class parseCaseStatements {
+public class parseVerilogFile {
     
-    public static CircuitDetails input3case(String Filepath)
+    public static String verilogFileLines(String Filepath)
     {
-        
-         
-         List<String> inputs = new ArrayList<String>();
-         List<String> outputs = new ArrayList<String>();
-         List<String> unknownIO = new ArrayList<String>();
-         
-         int x = 0;
-        
-        CircuitDetails circuit = new CircuitDetails();
+       
         
         String path = Filepath;
-        
-        Filepath = parseCaseStatements.class.getClassLoader().getResource(".").getPath();
+        Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
          
         if(Filepath.contains("prashant"))
         {
@@ -51,12 +42,8 @@ public class parseCaseStatements {
             Filepath += "src/BU/ParseVerilog/Verilog.v";
             path = Filepath;
         }
-                
-        
-        
         
         File file = new File(path);
-        
         BufferedReader br;
         FileReader fr;
         boolean addCodelines =false;
@@ -99,13 +86,30 @@ public class parseCaseStatements {
             } 
             catch (IOException ex) 
             {
-                Logger.getLogger(parseCaseStatements.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(parseVerilogFile.class.getName()).log(Level.SEVERE, null, ex);
             }
         } 
         catch (FileNotFoundException ex) 
         {
-            Logger.getLogger(parseCaseStatements.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(parseVerilogFile.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //System.out.println(alllines);
+        alllines = alllines.trim();
+        return alllines;
+    }
+    
+    
+    public static CircuitDetails parseCaseStatements(String alllines)
+    {
+        
+         
+         List<String> inputs = new ArrayList<String>();
+         List<String> outputs = new ArrayList<String>();
+         List<String> unknownIO = new ArrayList<String>();
+         
+         int x = 0;
+        
+        CircuitDetails circuit = new CircuitDetails();
         
         //System.out.println(alllines);
         
@@ -368,7 +372,7 @@ public class parseCaseStatements {
         return circuit;
     }
     
-    public static List<DGate> parseStructural(String Filepath)
+    public static List<DGate> parseStructural(String alllines)
     {
         
          List<DGate> structnetlist = new ArrayList<DGate>();
@@ -381,77 +385,7 @@ public class parseCaseStatements {
         
         CircuitDetails circuit = new CircuitDetails();
         
-        String path = Filepath;
-        
-        Filepath = parseCaseStatements.class.getClassLoader().getResource(".").getPath();
-         
-        if(Filepath.contains("prashant"))
-        {
-            if(Filepath.contains("build/classes/"))
-                Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
-            else if(Filepath.contains("src"))
-                Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-            Filepath += "src/BU/ParseVerilog/Verilog.v";
-            path = Filepath;
-        }
-                
-        
-        
-        
-        File file = new File(path);
-        
-        BufferedReader br;
-        FileReader fr;
-        boolean addCodelines =false;
-        String alllines="";
-        List<String> filelines = new ArrayList<String>();
-        try
-        {
-            fr = new FileReader(file);
-            br = new BufferedReader(fr);
-            String line;
-            try 
-            {
-                while((line = br.readLine()) != null )
-                {
-                    line = line.trim();
-                    if(!addCodelines)
-                    {
-                        if(line.contains("module ") && (!line.startsWith("//")))
-                        {
-                            if(line.indexOf("module ")>0)
-                            {
-                                if(((line.charAt((line.indexOf("module "))-1)) == ' '))
-                                {
-                                    addCodelines = true;
-                                }     
-                                    
-                            }
-                            else
-                                addCodelines = true;
-                        }
-                    }
-                    if((!line.isEmpty()) && addCodelines && (!line.startsWith("//")))
-                    {
-                        alllines+= (" " + line); 
-                        
-                        filelines.add(line);
-                        //System.out.println(line.trim());
-                    }
-                }
-            } 
-            catch (IOException ex) 
-            {
-                Logger.getLogger(parseCaseStatements.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } 
-        catch (FileNotFoundException ex) 
-        {
-            Logger.getLogger(parseCaseStatements.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         //System.out.println(alllines);
-        
         //<editor-fold desc="Extract Module IO Contraints">
         String moduleString = alllines.substring(alllines.indexOf(" module "),alllines.indexOf(";"));
         alllines = alllines.substring((alllines.indexOf(moduleString) + moduleString.length()+1), alllines.indexOf(" endmodule"));
@@ -693,6 +627,86 @@ public class parseCaseStatements {
         //    System.out.println(NetSynth.netlist(structnetlist.get(i)));
         return structnetlist;
     }
+    
+    
+    
+    public static boolean isStructural(String alllines)
+    {
+        boolean noAlwaysBlock = true;
+        while(alllines.contains(";") || alllines.length()>0)
+        {
+            if(alllines.startsWith("always ") || alllines.startsWith("always@") || alllines.startsWith("assign "))
+            {
+                noAlwaysBlock = false;
+                break;
+            }
+            else if(alllines.contains(";"))
+            {
+                //System.out.println(alllines);
+                alllines = alllines.substring(alllines.indexOf(";")+1);
+                alllines = alllines.trim();
+            }    
+            else
+            {
+                alllines = "";
+            }
+        }
+        return noAlwaysBlock;
+    }
+    
+    public static boolean hasCaseStatements(String alllines)
+    {
+        boolean hascasestatements = true;
+        String temp="";
+        int caseLocation=-1;
+        int cnt =0;
+        while(alllines.contains(";") || alllines.length()>0)
+        {
+            
+            if(alllines.startsWith("always ") || alllines.startsWith("always@"))
+            {
+                if(alllines.contains(" begin "))
+                {
+                    int lastbeginIndx=0;
+                    if((alllines.lastIndexOf(" end")+4) == alllines.length())
+                    {
+                        temp = alllines.substring(0, alllines.lastIndexOf(" end")+4);
+                        //VerilogLines.add(temp);
+                        alllines = alllines.substring(alllines.lastIndexOf(" end")+4);
+                    }
+                    else
+                    {
+                        temp = alllines.substring(0, alllines.lastIndexOf(" end ")+5);
+                        //VerilogLines.add(temp);
+                        alllines = alllines.substring(alllines.lastIndexOf(" end ")+5);
+                    }
+                if(temp.contains(" endcase "))
+                    caseLocation = cnt;
+                alllines = alllines.trim();
+                }
+                
+            }
+            else if(alllines.contains(";"))
+            {
+                //System.out.println(alllines);
+                alllines = alllines.substring(alllines.indexOf(";")+1);
+                alllines = alllines.trim();
+            }    
+            else
+            {
+                alllines = "";
+            }
+           
+            cnt++;
+        }
+        
+        if(caseLocation == -1)
+        {
+            hascasestatements = false;
+        }
+        return hascasestatements;
+    }
+    
     public static DGate parseLineToGate(String codeline,String gatetype,List<DWire> inputWires, List<DWire> outputWires, List<DWire> connWires)
     {
         DGate pgate = new DGate();

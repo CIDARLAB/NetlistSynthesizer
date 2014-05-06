@@ -22,7 +22,7 @@ import BU.ParseVerilog.CircuitDetails;
 import BU.ParseVerilog.Convert;
 import BU.ParseVerilog.Espresso;
 import BU.ParseVerilog.Parser;
-import BU.ParseVerilog.parseCaseStatements;
+import BU.ParseVerilog.parseVerilogFile;
 import BU.booleanLogic.BooleanSimulator;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -106,7 +106,7 @@ public class NetSynth {
         //testABC();
         //test2notstonor();
         //EspressoVsABC(3);
-        EspressoVsABCinv(3);
+        //EspressoVsABCinv(3);
         //EspressoVsABCSingle(3,109);
         
         //testABC();
@@ -127,6 +127,27 @@ public class NetSynth {
         //testnetlistmodule();
         //testEspresso();
         
+    }
+    
+    
+    public static DAGW runNetSynth(String vfilepath)
+    {
+        DAGW finaldag = new DAGW();
+        boolean isStructural = false;
+        boolean hasCaseStatements = false;
+        String alllines = parseVerilogFile.verilogFileLines(vfilepath);
+        isStructural = parseVerilogFile.isStructural(alllines);
+        if(isStructural)
+            System.out.println("Structural Verilog Code!");
+        else
+        {
+            hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
+            if(hasCaseStatements)
+                System.out.println("Has Case Statements!");
+            else
+                System.out.println("No case statements");
+        }
+        return finaldag;
     }
     
   
@@ -364,7 +385,7 @@ public class NetSynth {
         List<DGate> netlistResult = new ArrayList<DGate>();
         List<String> blifinput = new ArrayList<String>();
         CircuitDetails circ = new CircuitDetails();
-        circ = parseCaseStatements.input3case(filename);
+        circ = parseVerilogFile.parseCaseStatements(filename);
         blifinput = Blif.createFile(circ);
         String filestring ="";
         String filestringblif = "";
@@ -1593,7 +1614,7 @@ public class NetSynth {
         
         
         caseCirc = new CircuitDetails();
-        caseCirc = parseCaseStatements.input3case(path);
+        caseCirc = parseVerilogFile.parseCaseStatements(path);
         //System.out.println(caseCirc.inputgatetable);
         DAGW circuitDAG = new DAGW();
         DAGW circuitDAGinv = new DAGW();
@@ -3984,7 +4005,7 @@ public class NetSynth {
     {
         List<DGate> structnetlist = new ArrayList<DGate>();
         List<DGate> naivenetlist = new ArrayList<DGate>();
-        naivenetlist = parseCaseStatements.parseStructural(filepath);
+        naivenetlist = parseVerilogFile.parseStructural(filepath);
         
         naivenetlist = removeDanglingGates(naivenetlist);
         //printNetlist(naivenetlist);
