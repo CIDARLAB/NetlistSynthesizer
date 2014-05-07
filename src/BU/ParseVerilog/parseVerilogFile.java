@@ -416,8 +416,9 @@ public class parseVerilogFile {
                             }
                         }
                     }
-                    int truthtableval = Convert.bintoDec(new String(xbits));
-                    circuit.inputgatetable.add(truthtableval);
+                    //int truthtableval = Convert.bintoDec(new String(xbits));
+                    String truthtableval = new String(xbits);
+                    circuit.truthTable.add(truthtableval);
                 }
             }
             else

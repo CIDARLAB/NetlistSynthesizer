@@ -15,13 +15,13 @@ public class CircuitDetails {
     public List<String> inputNames ;
     
     public List<String> outputNames;
-    public List<Integer> inputgatetable;
+    public List<String> truthTable;
     //public int inputgatetable;
     public CircuitDetails()
     {
         inputNames = new ArrayList<String>();
         outputNames = new ArrayList<String>();
-        inputgatetable = new ArrayList<Integer>();
+        truthTable = new ArrayList<String>();
     }
     /*public CircuitDetails(List<String> inp, List<String> outp, int inpgttt)
     {
@@ -39,11 +39,11 @@ public class CircuitDetails {
         inputgatetable = inpgttt;
     }*/
     
-    public CircuitDetails(List<String> inp, List<String> outp, List<Integer> inpgttt)
+    public CircuitDetails(List<String> inp, List<String> outp, List<String> inpgttt)
     {
         inputNames = new ArrayList<String>();
         outputNames = new ArrayList<String>();
-        inputgatetable = new ArrayList<Integer>();
+        truthTable = new ArrayList<String>();
         for(String xinp:inp)
         {
             inputNames.add(xinp);
@@ -52,9 +52,9 @@ public class CircuitDetails {
         {
             outputNames.add(xoutp);
         }
-        for(int xtt:inpgttt)
+        for(String xtt:inpgttt)
         {
-            inputgatetable.add(xtt);
+            truthTable.add(xtt);
         }
     }
     

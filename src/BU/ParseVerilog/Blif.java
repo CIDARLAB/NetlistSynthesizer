@@ -17,10 +17,10 @@ public class Blif {
         List<String> esfile = new ArrayList<String>();
         int pw = (int) Math.pow(2, circ.inputNames.size());
         List<String> truthfunc = new ArrayList<String>();
-        for(int xtt:circ.inputgatetable)
+        for(String xtt:circ.truthTable)
         {
-            String tempTT= Convert.dectoBin(xtt, pw);
-            truthfunc.add(tempTT);
+            //String tempTT= Convert.dectoBin(xtt, pw);
+            truthfunc.add(xtt);
         }
         //System.out.println(truthfunc);
         String line = "";
@@ -53,7 +53,7 @@ public class Blif {
         String line3 ="";
         for(int i=0;i<circ.outputNames.size();i++)
         {
-            if(circ.inputgatetable.get(i)==0)
+            if(Convert.bintoDec(circ.truthTable.get(i))==0)
             {
                 line3 = ".names "+ circ.outputNames.get(i);
             }   

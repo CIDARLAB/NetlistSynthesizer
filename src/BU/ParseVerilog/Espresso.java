@@ -17,10 +17,10 @@ public class Espresso {
         List<String> esfile = new ArrayList<String>();
         int pw = (int) Math.pow(2, circ.inputNames.size());
         List<String> truthfunc = new ArrayList<String>();
-        for(int xtt:circ.inputgatetable)
+        for(String xtt:circ.truthTable)
         {
-            String tempTT= Convert.dectoBin(xtt, pw);
-            truthfunc.add(tempTT);
+            //String tempTT= Convert.dectoBin(xtt, pw);
+            truthfunc.add(xtt);
         }
         //System.out.println(truthfunc);
         String line = "";

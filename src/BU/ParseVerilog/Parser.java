@@ -434,8 +434,9 @@ public class Parser {
                         }
                     }
                 }
-                int truthtableval = Convert.bintoDec(new String(xbits)) ;
-                circuit.inputgatetable.add(truthtableval);
+                //int truthtableval = Convert.bintoDec(new String(xbits)) ;
+                String finaltt = new String(xbits);
+                circuit.truthTable.add(finaltt);
                 //System.out.println(truthtableval);
                 
             }

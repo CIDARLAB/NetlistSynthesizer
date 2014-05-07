@@ -145,7 +145,12 @@ public class NetSynth {
             structnetlist = parseStructuralVtoNORNOT(naivenetlist);
             List<String> inputnames = new ArrayList<String>();
             inputnames = parseVerilogFile.getInputNames(alllines);
-            BooleanSimulator.printTruthTable(structnetlist, inputnames);
+            List<String> ttValues = new ArrayList<String>();
+            ttValues = BooleanSimulator.getTruthTable(structnetlist, inputnames);
+            
+            CircuitDetails direct = new CircuitDetails();
+            
+            //BooleanSimulator.printTruthTable(structnetlist, inputnames);
         }
         else
         {
@@ -192,7 +197,8 @@ public class NetSynth {
                 circ.inputNames.add(inputname);
             }
             circ.outputNames.add("out");
-            circ.inputgatetable.add(i);
+            //circ.truthTable.add(i);
+            circ.truthTable.add(Convert.dectoBin(i, circ.inputNames.size()));
             
             List<String> espressoinput = new ArrayList<String>();
             List<String> blifinput = new ArrayList<String>();
@@ -499,9 +505,11 @@ public class NetSynth {
             int invi = possiblecirc - i -1;
             //System.out.println("inverse is:"+invi);
             circ.outputNames.add("out");
-            circ.inputgatetable.add(i);
+            //circ.truthTable.add(i);
+            circ.truthTable.add(Convert.dectoBin(i, circ.inputNames.size()));
             invcirc.outputNames.add("out");
-            invcirc.inputgatetable.add(invi);
+            invcirc.truthTable.add(Convert.dectoBin(invi, invcirc.inputNames.size()));
+            //invcirc.truthTable.add(invi);
             
             List<String> espressoinput = new ArrayList<String>();
             List<String> blifinput = new ArrayList<String>();
@@ -974,8 +982,9 @@ public class NetSynth {
                 circ.inputNames.add(inputname);
             }
             circ.outputNames.add("out");
-            circ.inputgatetable.add(i);
             
+            //circ.truthTable.add(i);
+            circ.truthTable.add(Convert.dectoBin(i, circ.inputNames.size()));
             List<String> espressoinput = new ArrayList<String>();
             List<String> blifinput = new ArrayList<String>();
             
@@ -1157,7 +1166,7 @@ public class NetSynth {
                 circ.inputNames.add(inputname);
             }
             circ.outputNames.add("out");
-            circ.inputgatetable.add(ttval);
+            circ.truthTable.add(Convert.dectoBin(ttval, circ.inputNames.size()));
             
             //List<String> espressoinput = new ArrayList<String>();
             List<String> blifinput = new ArrayList<String>();
@@ -1348,8 +1357,8 @@ public class NetSynth {
         circ.inputNames.add("inp3");
         circ.outputNames.add("out1");
         circ.outputNames.add("out2");
-        circ.inputgatetable.add(69);
-        circ.inputgatetable.add(96);
+        circ.truthTable.add(Convert.dectoBin(69, 3));
+        circ.truthTable.add(Convert.dectoBin(96, 3));
         List<String> espoutcirc = new ArrayList<String>();
         espoutcirc = Espresso.createFile(circ);
         List<String> blifoutcirc = new ArrayList<String>();
@@ -1519,8 +1528,7 @@ public class NetSynth {
                     Line += (precomp.get(i-1).size() + ",");
                 
                 
-                
-                circ.inputgatetable.add(i);
+                circ.truthTable.add(Convert.dectoBin(i,circ.inputNames.size() ));
                 List<String> eslines = new ArrayList<String>();
                 eslines = Espresso.createFile(circ);
                 String filestring2 = "";
@@ -1634,15 +1642,15 @@ public class NetSynth {
         
         
         
-        if(caseCirc.inputgatetable.get(0) ==0 || caseCirc.inputgatetable.get(0) ==255)
+        if(Convert.bintoDec(caseCirc.truthTable.get(0)) ==0 || Convert.bintoDec(caseCirc.truthTable.get(0)) ==255)
             return null;
         
          // <editor-fold desc="If 3 input circuit and presynth option is true">
         if((caseCirc.inputNames.size() == 3) && (presynth ==1))
         {
-            DAGW circ = computeDAGW(caseCirc.inputgatetable.get(0)-1);
+            DAGW circ = computeDAGW(Convert.bintoDec(caseCirc.truthTable.get(0))-1);
             circuitDAG = new DAGW(circ.Gates,circ.Wires);
-            DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable.get(0) - 1);
+            DAGW circinv = computeDAGW(255 - Convert.bintoDec(caseCirc.truthTable.get(0)) - 1);
             circuitDAGinv = new DAGW(circinv.Gates,circinv.Wires);
             //System.out.println("Ratatatatatata Circus Afro"+circuitDAG.Gates.get(0).Type.toString());
             
@@ -1764,20 +1772,20 @@ public class NetSynth {
             int powr = (int) Math.pow(2, caseCirc.inputNames.size());
             
             List<String> caseCirctt = new ArrayList<String>();
-            for(int i=0;i<caseCirc.inputgatetable.size();i++)
+            for(int i=0;i<caseCirc.truthTable.size();i++)
             {
                 //System.out.println("Truth Table value!!" + caseCirc.inputgatetable.get(i));
-                caseCirctt.add(Convert.dectoBin(caseCirc.inputgatetable.get(i), powr));
+                caseCirctt.add(caseCirc.truthTable.get(i));
             }
             List<String> caseCircttinv = new ArrayList<String>();
-            for(int i=0;i<caseCirc.inputgatetable.size();i++)
+            for(int i=0;i<caseCirc.truthTable.size();i++)
             {
                 caseCircttinv.add(Convert.invBin(caseCirctt.get(i)));
             }
-            List<Integer> invval = new ArrayList<Integer>();
-            for(int i=0;i<caseCirc.inputgatetable.size();i++)
+            List<String> invval = new ArrayList<String>();
+            for(int i=0;i<caseCirc.truthTable.size();i++)
             {
-                invval.add(Convert.bintoDec(caseCircttinv.get(i)));
+                invval.add(caseCircttinv.get(i));
             }
             
             
@@ -1992,9 +2000,9 @@ public class NetSynth {
             
         }
         int ttpow = (int)Math.pow(2, caseCirc.inputNames.size());
-        for(int i=0;i<caseCirc.inputgatetable.size();i++)
+        for(int i=0;i<caseCirc.truthTable.size();i++)
         {
-            String bintt = Convert.dectoBin(caseCirc.inputgatetable.get(i), ttpow);
+            String bintt = caseCirc.truthTable.get(i);
             circuitDAG.truthtable.add(bintt);
         }
         System.out.println("\n\n\n\nDAGW!!!");
