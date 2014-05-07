@@ -134,7 +134,6 @@ public class BooleanSimulator {
         return output;
     }
     
-    
     public static String bpermuteEsynth(List<DGate> netlist)
     {
         //DWireValue outvalue = DWireValue._x;
@@ -237,7 +236,6 @@ public class BooleanSimulator {
         return output;
     }
     
-    
     public static String bpermuteTest(List<DGate> netlist,List<DWire> inpw, int inpcount)
     {
         //DWireValue outvalue = DWireValue._x;
@@ -334,8 +332,6 @@ public class BooleanSimulator {
         return output;
     }
     
-    
-    
     public static String bpermutePreComp(List<DGate> netlist)
     {
         //DWireValue outvalue = DWireValue._x;
@@ -429,7 +425,6 @@ public class BooleanSimulator {
         
         return output;
     }
-    
      
     public static void printTruthTable(List<DGate> netlist)
     {
@@ -523,8 +518,6 @@ public class BooleanSimulator {
         System.out.println("------------------------------------");
         
     }
-    
-    
      
     public static void printTruthTable(List<DGate> netlist, List<String> inpnames)
     {
@@ -629,7 +622,6 @@ public class BooleanSimulator {
         System.out.println("------------------------------------");
         
     }
-    
     
     public static List<String> getTruthTable(List<DGate> netlist)
     {
@@ -830,6 +822,28 @@ public class BooleanSimulator {
             }
         }
         return outTruthTables;
+    }
+    
+    public static List<String> invertTruthTable(List<String> ttVals)
+    {
+        List<String> invttVals = new ArrayList<String>();
+        
+        for(int i=0;i<ttVals.size();i++)
+        {
+            String invtt = "";
+            for(int j=0;j<ttVals.get(i).length();j++)
+            {
+                if(ttVals.get(i).charAt(j) == '1')
+                    invtt += "0";
+                else if(ttVals.get(i).charAt(j) == '0')
+                    invtt += "1";
+                else
+                    invtt += "-";
+            }
+            invttVals.add(invtt);
+        }
+        return invttVals;
+      
     }
     
     

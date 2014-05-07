@@ -135,6 +135,11 @@ public class NetSynth {
         DAGW finaldag = new DAGW();
         List<DGate> naivenetlist = new ArrayList<DGate>();
         List<DGate> structnetlist = new ArrayList<DGate>();
+        
+        List<DGate> dirnetlist = new ArrayList<DGate>();
+        List<DGate> invnetlist = new ArrayList<DGate>();
+        
+        List<DGate> netlist = new ArrayList<DGate>();
         boolean isStructural = false;
         boolean hasCaseStatements = false;
         String alllines = parseVerilogFile.verilogFileLines(vfilepath);
@@ -144,13 +149,49 @@ public class NetSynth {
             naivenetlist = parseVerilogFile.parseStructural(alllines);
             structnetlist = parseStructuralVtoNORNOT(naivenetlist);
             List<String> inputnames = new ArrayList<String>();
+            List<String> outputnames = new ArrayList<String>();
             inputnames = parseVerilogFile.getInputNames(alllines);
+            outputnames = parseVerilogFile.getOutputNames(alllines);
+            
             List<String> ttValues = new ArrayList<String>();
+            List<String> invttValues = new ArrayList<String>();
             ttValues = BooleanSimulator.getTruthTable(structnetlist, inputnames);
+            invttValues = BooleanSimulator.invertTruthTable(ttValues);
+            for(String invString:invttValues)
+            System.out.println(invString);
             
-            CircuitDetails direct = new CircuitDetails();
+            System.out.println("Naive Netlist");
+            printNetlist(naivenetlist);
+            BooleanSimulator.printTruthTable(naivenetlist, inputnames);
             
-            //BooleanSimulator.printTruthTable(structnetlist, inputnames);
+            
+            CircuitDetails direct = new CircuitDetails(inputnames,outputnames,ttValues);
+            CircuitDetails inverted = new CircuitDetails(inputnames, outputnames,invttValues);
+            dirnetlist = runEspressoAndABC(direct);
+            invnetlist = runEspressoAndABC(inverted);
+            System.out.println("Direct Netlist");
+            printNetlist(dirnetlist);
+            BooleanSimulator.printTruthTable(dirnetlist, inputnames);
+            System.out.println("\nInverted Netlist");
+            printNetlist(invnetlist);
+            BooleanSimulator.printTruthTable(invnetlist, inputnames);
+            
+            
+            if(dirnetlist.size() < invnetlist.size())
+            {
+                for(DGate xgate:dirnetlist)
+                    netlist.add(xgate);
+            }
+            else
+            {
+                for(DGate xgate:invnetlist)
+                    netlist.add(xgate);
+            }
+            System.out.println("\nFinal Netlist");
+            netlist = rewireNetlist(netlist);
+            printNetlist(netlist);
+            BooleanSimulator.printTruthTable(netlist, inputnames);
+            
         }
         else
         {
@@ -167,7 +208,116 @@ public class NetSynth {
         return finaldag;
     }
     
-  
+    public static List<DGate> runEspressoAndABC(CircuitDetails circ)
+    {
+        List<DGate> EspCircuit = new ArrayList<DGate>();
+        List<DGate> ABCCircuit = new ArrayList<DGate>();
+        List<String> espressoFile = new ArrayList<String>();
+        List<String> blifFile = new ArrayList<String>();
+        
+        espressoFile = Espresso.createFile(circ);
+        blifFile = Blif.createFile(circ);
+        String filestring = "";
+        String Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/";
+        }
+        String filestringblif = "";
+        filestringblif = filestring + "Blif_File";
+        filestringblif += ".blif";
+        String filestringesp = "";
+        
+        filestringesp += filestring + "Espresso_File" +".txt";
+        File fespinp = new File(filestringesp);
+        //Writer output;
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            
+             for (String xline :espressoFile) 
+             {
+                String newl = (xline + "\n");
+                output.write(newl);
+             }
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> EspOutput = new ArrayList<String>();
+        EspOutput = runEspresso(filestringesp);
+        fespinp.deleteOnExit();
+        
+        EspCircuit = convertPOStoNORNOT(EspOutput);
+        //EspCircuit = optimizeNetlist(EspCircuit);
+        //EspCircuit = convert2NOTsToNOR(EspCircuit);
+        //EspCircuit = removeDanglingGates(EspCircuit);
+        EspCircuit = rewireNetlist(EspCircuit);
+        
+        
+        
+           
+            
+          
+        File fabcinp = new File(filestringblif);
+        try 
+        {
+            Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+            for (String xline : blifFile) 
+            {
+                String newl = (xline + "\n");
+                outputblif.write(newl);
+            }
+            outputblif.close();
+            List<DGate> abcoutput = new ArrayList<DGate>();
+            
+            try 
+            {
+                abcoutput = runABC("Blif_File");
+
+            } 
+            catch (InterruptedException ex) 
+            {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            //abcoutput = optimizeNetlist(abcoutput);
+            abcoutput = convert2NOTsToNOR(abcoutput);
+            abcoutput = rewireNetlist(abcoutput);
+
+            for (DGate xgate : abcoutput) 
+            {
+                ABCCircuit.add(xgate);
+            }
+            //ABCCircuit = removeDanglingGates(ABCCircuit);
+            fabcinp.deleteOnExit();
+
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
+        fabcinp.deleteOnExit();
+        
+        if(EspCircuit.size() < ABCCircuit.size())
+            return EspCircuit;
+        else
+            return ABCCircuit;
+    
+    }
+    
     public static void EspressoVsABC(int inpcount)
     {
         int truthsize = (int)Math.pow(2, inpcount);
@@ -420,47 +570,43 @@ public class NetSynth {
            
             
           
-            File fabcinp = new File(filestringblif);
+        File fabcinp = new File(filestringblif);
         try 
+        {
+            Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+            for (String xline : blifinput) 
             {
-                
-                
-                Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
-                for(String xline:blifinput)
-                {
-                    String newl = (xline + "\n");
-                    outputblif.write(newl);
-                }
-                outputblif.close();
-                
-              
-               
-               
-                        
-                List<DGate> abcoutput = new ArrayList<DGate>();
-              
-                try {
-                    abcoutput = runABC("blifinp");
-                   
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                abcoutput = optimizeNetlist(abcoutput);
-                abcoutput = convert2NOTsToNOR(abcoutput);
-                abcoutput = rewireNetlist(abcoutput);
-                
-                for(DGate xgate:abcoutput)
-                {
-                    netlistResult.add(xgate);
-                }
-                netlistResult = removeDanglingGates(netlistResult);
-                fabcinp.deleteOnExit();
-               
+                String newl = (xline + "\n");
+                outputblif.write(newl);
+            }
+            outputblif.close();
+            List<DGate> abcoutput = new ArrayList<DGate>();
+            
+            try 
+            {
+                abcoutput = runABC("blifinp");
+
             } 
-            catch (IOException ex) 
+            catch (InterruptedException ex) 
             {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
             }
+            abcoutput = optimizeNetlist(abcoutput);
+            abcoutput = convert2NOTsToNOR(abcoutput);
+            abcoutput = rewireNetlist(abcoutput);
+
+            for (DGate xgate : abcoutput) 
+            {
+                netlistResult.add(xgate);
+            }
+            netlistResult = removeDanglingGates(netlistResult);
+            fabcinp.deleteOnExit();
+
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         return netlistResult;
     }
