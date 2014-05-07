@@ -157,24 +157,24 @@ public class NetSynth {
             List<String> invttValues = new ArrayList<String>();
             ttValues = BooleanSimulator.getTruthTable(structnetlist, inputnames);
             invttValues = BooleanSimulator.invertTruthTable(ttValues);
-            for(String invString:invttValues)
-            System.out.println(invString);
+            //for(String invString:invttValues)
+            //System.out.println(invString);
             
-            System.out.println("Naive Netlist");
-            printNetlist(naivenetlist);
-            BooleanSimulator.printTruthTable(naivenetlist, inputnames);
+            //System.out.println("Naive Netlist");
+            //printNetlist(naivenetlist);
+            //BooleanSimulator.printTruthTable(naivenetlist, inputnames);
             
             
             CircuitDetails direct = new CircuitDetails(inputnames,outputnames,ttValues);
             CircuitDetails inverted = new CircuitDetails(inputnames, outputnames,invttValues);
             dirnetlist = runEspressoAndABC(direct);
             invnetlist = runEspressoAndABC(inverted);
-            System.out.println("Direct Netlist");
-            printNetlist(dirnetlist);
-            BooleanSimulator.printTruthTable(dirnetlist, inputnames);
-            System.out.println("\nInverted Netlist");
-            printNetlist(invnetlist);
-            BooleanSimulator.printTruthTable(invnetlist, inputnames);
+            //System.out.println("Direct Netlist");
+            //printNetlist(dirnetlist);
+            //BooleanSimulator.printTruthTable(dirnetlist, inputnames);
+            //System.out.println("\nInverted Netlist");
+            //printNetlist(invnetlist);
+            //BooleanSimulator.printTruthTable(invnetlist, inputnames);
             
             
             if(dirnetlist.size() < invnetlist.size())
@@ -214,6 +214,8 @@ public class NetSynth {
         List<DGate> ABCCircuit = new ArrayList<DGate>();
         List<String> espressoFile = new ArrayList<String>();
         List<String> blifFile = new ArrayList<String>();
+        
+        
         
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
@@ -259,9 +261,9 @@ public class NetSynth {
         fespinp.deleteOnExit();
         
         EspCircuit = convertPOStoNORNOT(EspOutput);
-        //EspCircuit = optimizeNetlist(EspCircuit);
-        //EspCircuit = convert2NOTsToNOR(EspCircuit);
-        //EspCircuit = removeDanglingGates(EspCircuit);
+        EspCircuit = optimizeNetlist(EspCircuit);
+        EspCircuit = convert2NOTsToNOR(EspCircuit);
+        EspCircuit = removeDanglingGates(EspCircuit);
         EspCircuit = rewireNetlist(EspCircuit);
         
         
@@ -290,7 +292,7 @@ public class NetSynth {
             {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
             }
-            //abcoutput = optimizeNetlist(abcoutput);
+            abcoutput = optimizeNetlist(abcoutput);
             abcoutput = convert2NOTsToNOR(abcoutput);
             abcoutput = rewireNetlist(abcoutput);
 
@@ -298,7 +300,7 @@ public class NetSynth {
             {
                 ABCCircuit.add(xgate);
             }
-            //ABCCircuit = removeDanglingGates(ABCCircuit);
+            ABCCircuit = removeDanglingGates(ABCCircuit);
             fabcinp.deleteOnExit();
 
         } 
@@ -312,10 +314,15 @@ public class NetSynth {
         fabcinp.deleteOnExit();
         
         if(EspCircuit.size() < ABCCircuit.size())
+        {
+            //System.out.println("Espresso wins!");
             return EspCircuit;
+        }
         else
+        {
+            //System.out.println("ABC wins!");
             return ABCCircuit;
-    
+        }
     }
     
     public static void EspressoVsABC(int inpcount)
@@ -3822,7 +3829,8 @@ public class NetSynth {
     {
         //Remove Redundant NOT Gates
         
-        
+        //System.out.println("Before Optimizing anything.");
+        //printNetlist(netlistinp);
         
         List<Integer> removegates = new ArrayList<Integer>();
         for(int i=0;i<netlistinp.size()-1;i++)
@@ -3990,12 +3998,9 @@ public class NetSynth {
         List<DGate> optnetlist = new ArrayList<DGate>();
         
         /*System.out.println("\nBefore Removing Gates:");
-        for(int i=0;i<netlistinp.size();i++)
-        {
-            System.out.println(netlist(netlistinp.get(i)));
-        }*/
-        //System.out.println("-------------------------\n");
-        
+        printNetlist(netlistinp);
+        System.out.println("-------------------------\n");
+        */
         for(int i=0;i<netlistinp.size();i++)
         {
             if(!removegates.contains(i))
@@ -4015,13 +4020,10 @@ public class NetSynth {
         
         removegates = new ArrayList<Integer>();
         
-        //System.out.println("\nAfter Removing Gates:");
-        //for(int i=0;i<optnetlist.size();i++)
-        //{
-        //    System.out.println(netlist(optnetlist.get(i)));
-        //}
-        //System.out.println("-----------------------");
-        
+        /*System.out.println("\nAfter Removing Gates:");
+        printNetlist(optnetlist);
+        System.out.println("-----------------------");
+        */
         
         //Remove Dangling Wires ---------------------------------------------------------------------------
         for(int i=0;i<optnetlist.size()-1;i++)
@@ -4057,13 +4059,10 @@ public class NetSynth {
         //    System.out.println(removegates.get(i));
         
         
-        //System.out.println("\nFinal optimization");
-        //for(int i=0;i<finalnetlist.size();i++)
-        //{
-        //    System.out.println(netlist(finalnetlist.get(i)));
-        //}
-        //System.out.println("--------------------------------------------------");
-        
+        /*System.out.println("\nFinal optimization");
+        printNetlist(finalnetlist);
+        System.out.println("--------------------------------------------------");
+        */
         removegates = new ArrayList<Integer>();
         
         
@@ -4074,7 +4073,7 @@ public class NetSynth {
             {
                 for(int j=i+1;j<finalnetlist.size();j++)
                 {
-                    if(finalnetlist.get(j).gtype.equals(DGateType.NOT) && finalnetlist.get(j).output.wtype.equals(DWireType.output))
+                    if(finalnetlist.get(j).gtype.equals(DGateType.NOT) && finalnetlist.get(j).output.wtype.equals(DWireType.output) && (finalnetlist.get(i).output.name.trim().equals(finalnetlist.get(j).input.get(0).name.trim())))
                     {
                         int inpcount =0;
                         for(int k=i+1;k<finalnetlist.size();k++)
@@ -4110,13 +4109,11 @@ public class NetSynth {
                 outputornetlist.add(finalnetlist.get(i));
             }
         }
-        /*System.out.println("\nPost Output_OR optimization");
-        for(int i=0;i<outputornetlist.size();i++)
-        {
-            System.out.println(netlist(outputornetlist.get(i)));
-        }
-        System.out.println("--------------------------");*/
         
+        /*System.out.println("\nPost Output_OR optimization");
+        printNetlist(outputornetlist);
+        System.out.println("--------------------------");
+        */
          return outputornetlist;
     }
     public static List<DGate> removeDanglingGates(List<DGate> netlist)
