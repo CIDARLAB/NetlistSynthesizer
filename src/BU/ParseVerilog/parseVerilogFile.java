@@ -378,7 +378,7 @@ public class parseVerilogFile {
                 else
                 {
                     circuit.outputNames.add(output);
-                    System.out.println("OUTPUT : " + output);
+                    //System.out.println("OUTPUT : " + output);
                 }
                 
                 //System.out.println(output);

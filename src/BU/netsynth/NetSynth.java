@@ -138,20 +138,22 @@ public class NetSynth {
         
         List<DGate> dirnetlist = new ArrayList<DGate>();
         List<DGate> invnetlist = new ArrayList<DGate>();
-        
+        List<String> inputnames = new ArrayList<String>();
+        List<String> outputnames = new ArrayList<String>();
         List<DGate> netlist = new ArrayList<DGate>();
         boolean isStructural = false;
         boolean hasCaseStatements = false;
         String alllines = parseVerilogFile.verilogFileLines(vfilepath);
         isStructural = parseVerilogFile.isStructural(alllines);
+        inputnames = parseVerilogFile.getInputNames(alllines);
+        outputnames = parseVerilogFile.getOutputNames(alllines);
+        
         if(isStructural)
         {
             naivenetlist = parseVerilogFile.parseStructural(alllines);
             structnetlist = parseStructuralVtoNORNOT(naivenetlist);
-            List<String> inputnames = new ArrayList<String>();
-            List<String> outputnames = new ArrayList<String>();
-            inputnames = parseVerilogFile.getInputNames(alllines);
-            outputnames = parseVerilogFile.getOutputNames(alllines);
+            
+            
             
             List<String> ttValues = new ArrayList<String>();
             List<String> invttValues = new ArrayList<String>();
@@ -168,7 +170,7 @@ public class NetSynth {
             CircuitDetails direct = new CircuitDetails(inputnames,outputnames,ttValues);
             CircuitDetails inverted = new CircuitDetails(inputnames, outputnames,invttValues);
             dirnetlist = runEspressoAndABC(direct);
-            invnetlist = runEspressoAndABC(inverted);
+            invnetlist = runInvertedEspressoAndABC(inverted);
             //System.out.println("Direct Netlist");
             //printNetlist(dirnetlist);
             //BooleanSimulator.printTruthTable(dirnetlist, inputnames);
@@ -187,10 +189,7 @@ public class NetSynth {
                 for(DGate xgate:invnetlist)
                     netlist.add(xgate);
             }
-            System.out.println("\nFinal Netlist");
-            netlist = rewireNetlist(netlist);
-            printNetlist(netlist);
-            BooleanSimulator.printTruthTable(netlist, inputnames);
+            
             
         }
         else
@@ -199,14 +198,78 @@ public class NetSynth {
             if(hasCaseStatements)
             {
                 System.out.println("Has Case Statements!");
+                CircuitDetails direct = new CircuitDetails();
+                direct = parseVerilogFile.parseCaseStatements(alllines);
+                List<String> invttValues = new ArrayList<String>();
+                invttValues = BooleanSimulator.invertTruthTable(direct.truthTable);
+                CircuitDetails inverted = new CircuitDetails(direct.inputNames, direct.outputNames, invttValues);
+                dirnetlist = runEspressoAndABC(direct);
+                invnetlist = runInvertedEspressoAndABC(inverted);
+                if (dirnetlist.size() < invnetlist.size()) 
+                {
+                    for(DGate xgate : dirnetlist) 
+                    {
+                        netlist.add(xgate);
+                    }
+                } 
+                else 
+                {
+                    for(DGate xgate : invnetlist) 
+                    {
+                        netlist.add(xgate);
+                    }
+                }
+                
             }
             else
             {
                 System.out.println("No case statements.\nWill be supported soon");
             }
         }
+        
+        System.out.println("\nFinal Netlist");
+        netlist = rewireNetlist(netlist);
+        printNetlist(netlist);
+        BooleanSimulator.printTruthTable(netlist, inputnames);
+
         return finaldag;
     }
+    
+    public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ)
+    {
+        List<DGate> initialnetlist = new ArrayList<DGate>();
+        initialnetlist = runEspressoAndABC(circ);
+        List<DGate> finalnetlist = new ArrayList<DGate>();
+        
+        for(int i=0;i<initialnetlist.size();i++)
+        {
+            if(initialnetlist.get(i).output.wtype.equals(DWireType.output))
+            {
+                String outname = "";
+                outname = initialnetlist.get(i).output.name.trim();
+                String notinpwirename = "0Wire" +Global.wirecount++;
+                DWire notinp = new DWire(notinpwirename,DWireType.connector);
+                initialnetlist.get(i).output = notinp;
+                finalnetlist.add(initialnetlist.get(i));
+                DGate outnot = new DGate();
+                outnot.gtype = DGateType.NOT;
+                outnot.input.add(notinp);
+                outnot.output = new DWire(outname,DWireType.output);
+                finalnetlist.add(outnot);
+            }
+            else
+            {
+                finalnetlist.add(initialnetlist.get(i));
+            }
+        }
+        
+        finalnetlist = optimizeNetlist(finalnetlist);
+        finalnetlist = convert2NOTsToNOR(finalnetlist);
+        finalnetlist = removeDanglingGates(finalnetlist);
+        finalnetlist = rewireNetlist(finalnetlist);
+        return finalnetlist;
+    }
+    
     
     public static List<DGate> runEspressoAndABC(CircuitDetails circ)
     {
@@ -266,11 +329,7 @@ public class NetSynth {
         EspCircuit = removeDanglingGates(EspCircuit);
         EspCircuit = rewireNetlist(EspCircuit);
         
-        
-        
-           
-            
-          
+         
         File fabcinp = new File(filestringblif);
         try 
         {
