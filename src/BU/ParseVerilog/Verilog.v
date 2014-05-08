@@ -1,9 +1,9 @@
-module and3(output out1,out2,out3 input in3,in2,in1);
+module and3(output out1,out2,out3 input in1,in2,in3);
   reg r_out;
   assign out = r_out;
   always@(in1, in2, in3)
     begin
-      case({in3,in2,in1})
+      case({in1,in2,in3})
         0: {out1,out2,out3} = 3'b111;
         1: {out1,out2,out3} = 3'b110;
         2: {out1,out2,out3} = 3'b100;

@@ -231,7 +231,11 @@ public class NetSynth {
         netlist = rewireNetlist(netlist);
         printNetlist(netlist);
         BooleanSimulator.printTruthTable(netlist, inputnames);
-
+        finaldag = CreateMultDAGW(netlist);
+        for(Gate xgate:finaldag.Gates)
+        {
+            System.out.println(xgate.Name +" : " + xgate.Type);
+        }
         return finaldag;
     }
     
