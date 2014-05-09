@@ -118,10 +118,6 @@ public class DAGW {
             }
             s += String.format("%-12s", child_indx);
 
-            if (gi.score != -1.0000) 
-            {
-                s += String.format("%-5.4f", gi.score);
-            }
             s += "\n";
         }
         s += "\n";

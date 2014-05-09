@@ -128,6 +128,14 @@ public class NetSynth {
         //testEspresso();
         
     }
+
+    public static void initializeFilepath() {
+        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/"));
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+    }
     
     
     public static DAGW runNetSynth(String vfilepath)
@@ -2377,12 +2385,12 @@ public class NetSynth {
     
     public static List<DGate> runABC(String filename) throws InterruptedException 
     {
-    
+        initializeFilepath();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if(x.contains("Mac"))
         {
-            commandBuilder = new StringBuilder(Filepath+"BU/resources/abc");
+            commandBuilder = new StringBuilder(Filepath+"BU/resources/abc.mac -c \"read "+Filepath+"BU/resources/"+filename+".blif; strash;  rewrite; refactor; balance; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
         }
         else if("Linux".equals(x))
         {
@@ -2401,13 +2409,16 @@ public class NetSynth {
         //System.out.println(command);
         
         String filestring = "";
+        String clist = "";
         if (Filepath.contains("prashant")) 
         {
             filestring += Filepath + "src/BU/resources/script";
+            clist = Filepath+"src/BU/resources/script";
         } 
         else 
         {
             filestring += Filepath + "BU/resources/script";
+            clist = Filepath+"BU/resources/script";
         }
         File fespinp = new File(filestring);
         //Writer output;
@@ -2424,9 +2435,7 @@ public class NetSynth {
         }
         
         
-        
-        String clist = Filepath+"src/BU/resources/script";
-        
+
         
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
