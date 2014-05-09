@@ -143,6 +143,7 @@ public class NetSynth {
         List<DGate> netlist = new ArrayList<DGate>();
         boolean isStructural = false;
         boolean hasCaseStatements = false;
+        boolean hasDontCares = false;
         String alllines = parseVerilogFile.verilogFileLines(vfilepath);
         isStructural = parseVerilogFile.isStructural(alllines);
         inputnames = parseVerilogFile.getInputNames(alllines);
@@ -203,23 +204,32 @@ public class NetSynth {
                 List<String> invttValues = new ArrayList<String>();
                 invttValues = BooleanSimulator.invertTruthTable(direct.truthTable);
                 CircuitDetails inverted = new CircuitDetails(direct.inputNames, direct.outputNames, invttValues);
-                dirnetlist = runEspressoAndABC(direct);
-                invnetlist = runInvertedEspressoAndABC(inverted);
-                if (dirnetlist.size() < invnetlist.size()) 
+                
+                hasDontCares = parseVerilogFile.hasDontCares(direct.truthTable);
+                if(hasDontCares)
                 {
-                    for(DGate xgate : dirnetlist) 
-                    {
-                        netlist.add(xgate);
-                    }
-                } 
-                else 
+                    System.out.println("Dont Cares exist!!");
+                }
+                else
                 {
-                    for(DGate xgate : invnetlist) 
+                    System.out.println("No Dont Cares");
+                    dirnetlist = runEspressoAndABC(direct);
+                    invnetlist = runInvertedEspressoAndABC(inverted);
+                    if (dirnetlist.size() < invnetlist.size()) 
                     {
-                        netlist.add(xgate);
+                        for (DGate xgate : dirnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    } 
+                    else 
+                    {
+                        for (DGate xgate : invnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
                     }
                 }
-                
             }
             else
             {
@@ -281,8 +291,6 @@ public class NetSynth {
         List<DGate> ABCCircuit = new ArrayList<DGate>();
         List<String> espressoFile = new ArrayList<String>();
         List<String> blifFile = new ArrayList<String>();
-        
-        
         
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);

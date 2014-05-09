@@ -350,6 +350,7 @@ public class parseVerilogFile {
                 caseStatements = caseblock.split(";");
                 
                 List<HashMap<Integer,Integer>> truthtable = new ArrayList<HashMap<Integer,Integer>>();
+                List<HashMap<Integer,Character>> charTruthTable = new ArrayList<HashMap<Integer,Character>>();
                 caseparam = caseparam.substring(caseparam.indexOf("{")+1, caseparam.indexOf("}"));
                 
                 String[] caseinp = caseparam.split(",");
@@ -382,8 +383,67 @@ public class parseVerilogFile {
                 }
                 
                 //System.out.println(output);
-                 HashMap<Integer,Integer> tt = new HashMap<Integer,Integer>();
+                 HashMap<Integer,Character> tt = new HashMap<Integer,Character>();
                 for (int j = 0; j < circuit.outputNames.size(); j++) 
+                {
+                    tt = new HashMap<Integer,Character>();
+                    for (int i = 0; i < caseStatements.length; i++) 
+                    {
+                        String xcase = caseStatements[i].trim();
+                        String cNum = xcase.substring(0, xcase.indexOf(":")).trim();
+                        int caseNumber = Convert.toDec(cNum);
+                        //System.out.println(caseNumber);
+                        String sNum = xcase.substring(xcase.indexOf("=") + 1).trim();
+                        //System.out.println("xcase : "+xcase);
+                        //System.out.println("cNum : "+cNum);
+                        //System.out.println("sNum : "+sNum);
+                        
+                        if (sNum.contains("'")) 
+                        {
+                            if (sNum.contains("b")) 
+                            {
+                                String bintt = sNum.substring(sNum.indexOf("b")+1);
+                                char ttnum = bintt.charAt(j);
+                                //if(bintt.charAt(j) =='1')
+                                //    ttnum = '1';
+                                tt.put(caseNumber, ttnum);
+                            } 
+                            else if (sNum.contains("d")) 
+                            {
+                                System.out.println("Feature not yet supported");
+                            }
+                        }
+                        else if (sNum.contains("’")) 
+                        {
+                            if (sNum.contains("b")) 
+                            {
+                                String bintt = sNum.substring(sNum.indexOf("b")+1);
+                                char ttnum = bintt.charAt(j);
+                                //if(bintt.charAt(j) =='1')
+                                //    ttnum = '1';
+                                tt.put(caseNumber, ttnum);
+                            } 
+                            else if (sNum.contains("d")) 
+                            {
+                                System.out.println("Feature not yet supported");
+                            }
+                        }
+                        else 
+                        {
+                            System.out.println("Feature not yet supported");
+                            //String bintt = Convert.dectoBin(Integer.parseInt(sNum), circuit.outputNames.size());
+                            //int ttnum=0;
+                            //if(bintt.charAt(j) =='1')
+                            //    ttnum = 1;
+                            //tt.put(caseNumber, ttnum);
+                        }
+                    }
+                    //truthtable.add(tt);
+                    charTruthTable.add(tt);
+                }
+                
+                //<editor-fold desc="Commented out code that could handle all types of assigments in case statements">
+                /*for (int j = 0; j < circuit.outputNames.size(); j++) 
                 {
                     tt = new HashMap<Integer,Integer>();
                     for (int i = 0; i < caseStatements.length; i++) 
@@ -393,6 +453,10 @@ public class parseVerilogFile {
                         int caseNumber = Convert.toDec(cNum);
                         //System.out.println(caseNumber);
                         String sNum = xcase.substring(xcase.indexOf("=") + 1).trim();
+                        System.out.println("xcase : "+xcase);
+                        System.out.println("cNum : "+cNum);
+                        System.out.println("sNum : "+sNum);
+                        
                         if (sNum.contains("'")) 
                         {
                             if (sNum.contains("b")) 
@@ -443,7 +507,8 @@ public class parseVerilogFile {
                         }
                     }
                     truthtable.add(tt);
-                }
+                }*/
+                //</editor-fold>
                 
                 int numTT = (int) Math.pow(2, caseinp.length);
                 
@@ -455,16 +520,16 @@ public class parseVerilogFile {
                     for (int i = 0; i < numTT; i++) 
                     {
 
-                        if (truthtable.get(j).containsKey(i)) 
+                        if (charTruthTable.get(j).containsKey(i)) 
                         {
 
-                            xbits[i] = truthtable.get(j).get(i).toString().charAt(0);
+                            xbits[i] = charTruthTable.get(j).get(i).toString().charAt(0);
                         } 
                         else
                         {
-                            if (truthtable.get(j).containsKey(-2)) 
+                            if (charTruthTable.get(j).containsKey(-2)) 
                             {
-                                xbits[i] = truthtable.get(j).get(-2).toString().charAt(0);
+                                xbits[i] = charTruthTable.get(j).get(-2).toString().charAt(0);
                             } 
                             else 
                             {
@@ -474,6 +539,7 @@ public class parseVerilogFile {
                     }
                     //int truthtableval = Convert.bintoDec(new String(xbits));
                     String truthtableval = new String(xbits);
+                    System.out.println(truthtableval);
                     circuit.truthTable.add(truthtableval);
                 }
             }
@@ -742,6 +808,24 @@ public class parseVerilogFile {
         //    System.out.println(NetSynth.netlist(structnetlist.get(i)));
         return structnetlist;
     }
+    
+    public static boolean hasDontCares(List<String> TruthTableVals)
+    {
+        boolean hasdontcares = false;
+        
+        for(int i=0;i<TruthTableVals.size();i++)
+        {
+            if(TruthTableVals.get(i).contains("x"))
+            {
+                hasdontcares = true;
+                return hasdontcares;
+                //return true;
+            }
+        }
+        
+        return hasdontcares;
+    }
+    
     
     public static boolean isStructural(String alllines)
     {

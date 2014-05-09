@@ -37,6 +37,8 @@ public class BooleanSimulator {
                         break;
             case NOT : BooleanFunctions.bNOT(gate);
                         break;
+            case BUF : BooleanFunctions.bBUF(gate);
+                        break;
             case XOR : BooleanFunctions.bXOR(gate);
                         break;
             case XNOR : BooleanFunctions.bXNOR(gate);
@@ -838,7 +840,7 @@ public class BooleanSimulator {
                 else if(ttVals.get(i).charAt(j) == '0')
                     invtt += "1";
                 else
-                    invtt += "-";
+                    invtt += "x";
             }
             invttVals.add(invtt);
         }

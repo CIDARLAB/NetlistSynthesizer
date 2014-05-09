@@ -131,6 +131,24 @@ public class BooleanFunctions {
         
     }
     
+    public static void bBUF(DGate buf)
+    {
+        for(DWire xw:buf.input)
+        {
+            if(xw.wValue == DWireValue._x)
+            {
+                buf.output.wValue = DWireValue._x;
+                return;
+            }
+            if(xw.wValue == DWireValue._0)
+                buf.output.wValue = DWireValue._0;
+            else
+                buf.output.wValue = DWireValue._1;
+        }
+        
+    }
+    
+    
     public static void bXOR(DGate xor)
     {
         int cnt =0;
