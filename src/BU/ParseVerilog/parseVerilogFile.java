@@ -539,7 +539,7 @@ public class parseVerilogFile {
                     }
                     //int truthtableval = Convert.bintoDec(new String(xbits));
                     String truthtableval = new String(xbits);
-                    System.out.println(truthtableval);
+                    //System.out.println(truthtableval);
                     circuit.truthTable.add(truthtableval);
                 }
             }

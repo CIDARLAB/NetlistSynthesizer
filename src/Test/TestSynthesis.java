@@ -4,6 +4,9 @@
  */
 package Test;
 
+import BU.ParseVerilog.CircuitDetails;
+import BU.ParseVerilog.Convert;
+import BU.ParseVerilog.Espresso;
 import BU.ParseVerilog.parseVerilogFile;
 import BU.booleanLogic.BooleanSimulator;
 import BU.netsynth.DGate;
@@ -12,9 +15,20 @@ import BU.netsynth.DWire;
 import BU.netsynth.DWire.DWireType;
 import BU.netsynth.Global;
 import BU.netsynth.NetSynth;
+import static BU.netsynth.NetSynth.Filepath;
+import static BU.netsynth.NetSynth.parseEspressoToNORNAND;
+import static BU.netsynth.NetSynth.runEspresso;
 import BU.netsynth.NetlistConversionFunctions;
+import BU.precomputation.PreCompute;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -29,6 +43,103 @@ public class TestSynthesis {
      * 
      * 
      */
+    
+    
+    
+    public static void histogram()
+    {
+        String filestring ="";
+          if(Filepath.contains("prashant"))
+          {
+              filestring += Filepath+ "src/BU/resources/Histogram";
+          }
+          else
+          {
+              filestring += Filepath+ "BU/resources/Histogram";
+          }
+        
+          
+            //filestring += Global.espout++ ;
+            filestring += ".csv";
+            File fespinp = new File(filestring);
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            String Line = "SrNo,PreComputer,Espresspo\n";
+            output.write(Line);
+            List<List<DGate>> precomp;
+            precomp = PreCompute.parseNetlistFile();
+            CircuitDetails circ = new CircuitDetails();
+            circ.inputNames.add("A");
+            circ.inputNames.add("B");
+            circ.inputNames.add("C");
+            circ.outputNames.add("O");
+            for(int i=0;i<256;i++)
+            {
+                Line = "";
+                Line += (i + ",");
+                if(i==0 || i==255)
+                    Line += ("1,"); 
+                else
+                    Line += (precomp.get(i-1).size() + ",");
+                
+                
+                circ.truthTable.add(Convert.dectoBin(i,circ.inputNames.size() ));
+                List<String> eslines = new ArrayList<String>();
+                eslines = Espresso.createFile(circ);
+                String filestring2 = "";
+                if(Filepath.contains("prashant"))
+                {
+                    filestring2 += Filepath+ "src/BU/resources/espresso";
+                }
+                else
+                {
+                    filestring2 += Filepath+ "BU/resources/espresso";
+                }
+                filestring2 += Global.espout++ ;
+                filestring2 += ".txt";
+                File fespinp2 = new File(filestring2);
+                try 
+                {
+                    Writer output2 = new BufferedWriter(new FileWriter(fespinp2));
+                    for(String xline:eslines)
+                    {
+                        String newl = (xline + "\n");
+                        output2.write(newl);
+                    }
+                    output2.close();
+                    List<String> espout2 = new ArrayList<String>();
+                    espout2 = runEspresso(filestring2);
+                    List<DGate> espoutput2 = new ArrayList<DGate>();
+                    espoutput2 = parseEspressoToNORNAND(espout2);
+                    String xf ="";
+                    xf = BooleanSimulator.bpermute(espoutput2);
+                    
+                    //if(i==2)
+                    //if(i==253 || i == 254 || i==251 || i==239)
+                        //System.out.println(xf);
+                    Line += espoutput2.size();
+                    fespinp2.deleteOnExit();
+              
+                } 
+                catch (IOException ex) 
+                {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                Line += "\n";
+                output.write(Line);
+            }
+            output.close();
+        
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
     
     public static void testParseVerilogFileFunctions()
     {
@@ -82,7 +193,7 @@ public class TestSynthesis {
         }
         
         List<DGate> netlistoutp = new ArrayList<DGate>();
-        netlistoutp = NetSynth.parseEspressoToABC(filestring);
+        netlistoutp = NetSynth.parseEspressoFileToABC(filestring);
         NetSynth.printNetlist(netlistoutp);
     }
       

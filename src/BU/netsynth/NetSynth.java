@@ -216,7 +216,23 @@ public class NetSynth {
                 hasDontCares = parseVerilogFile.hasDontCares(direct.truthTable);
                 if(hasDontCares)
                 {
-                    System.out.println("Dont Cares exist!!");
+                    System.out.println("Dont Cares exist.");
+                    dirnetlist = runDCEspressoAndABC(direct);
+                    invnetlist = runInvertedEspressoAndABC(inverted);
+                    if (dirnetlist.size() < invnetlist.size()) 
+                    {
+                        for (DGate xgate : dirnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    } 
+                    else 
+                    {
+                        for (DGate xgate : invnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    }
                 }
                 else
                 {
@@ -259,37 +275,368 @@ public class NetSynth {
     
     public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ)
     {
-        List<DGate> initialnetlist = new ArrayList<DGate>();
-        initialnetlist = runEspressoAndABC(circ);
-        List<DGate> finalnetlist = new ArrayList<DGate>();
         
-        for(int i=0;i<initialnetlist.size();i++)
+        
+        List<DGate> EspCircuit = new ArrayList<DGate>();
+        List<DGate> ABCCircuit = new ArrayList<DGate>();
+        List<String> espressoFile = new ArrayList<String>();
+        List<String> blifFile = new ArrayList<String>();
+        
+        espressoFile = Espresso.createFile(circ);
+        blifFile = Blif.createFile(circ);
+        String filestring = "";
+        String Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if (Filepath.contains("prashant")) 
         {
-            if(initialnetlist.get(i).output.wtype.equals(DWireType.output))
+            filestring += Filepath + "src/BU/resources/";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/";
+        }
+        String filestringblif = "";
+        filestringblif = filestring + "Blif_File";
+        filestringblif += ".blif";
+        String filestringesp = "";
+        
+        filestringesp += filestring + "Espresso_File" +".txt";
+        File fespinp = new File(filestringesp);
+        //Writer output;
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            
+             for (String xline :espressoFile) 
+             {
+                String newl = (xline + "\n");
+                output.write(newl);
+             }
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> EspOutput = new ArrayList<String>();
+        EspOutput = runEspresso(filestringesp);
+        fespinp.deleteOnExit();
+        
+        EspCircuit = convertPOStoNORNOT(EspOutput);
+         
+        File fabcinp = new File(filestringblif);
+        try 
+        {
+            Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+            for (String xline : blifFile) 
+            {
+                String newl = (xline + "\n");
+                outputblif.write(newl);
+            }
+            outputblif.close();
+            List<DGate> abcoutput = new ArrayList<DGate>();
+            
+            try 
+            {
+                abcoutput = runABC("Blif_File");
+
+            } 
+            catch (InterruptedException ex) 
+            {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+
+            for (DGate xgate : abcoutput) 
+            {
+                ABCCircuit.add(xgate);
+            }
+            ABCCircuit = removeDanglingGates(ABCCircuit);
+            fabcinp.deleteOnExit();
+
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
+        fabcinp.deleteOnExit();
+        
+        List<DGate> finalEspCircuit = new ArrayList<DGate>();
+        List<DGate> finalABCCircuit = new ArrayList<DGate>();
+        
+        
+        
+        for(int i=0;i<EspCircuit.size();i++)
+        {
+            if(EspCircuit.get(i).output.wtype.equals(DWireType.output))
             {
                 String outname = "";
-                outname = initialnetlist.get(i).output.name.trim();
+                outname = EspCircuit.get(i).output.name.trim();
                 String notinpwirename = "0Wire" +Global.wirecount++;
                 DWire notinp = new DWire(notinpwirename,DWireType.connector);
-                initialnetlist.get(i).output = notinp;
-                finalnetlist.add(initialnetlist.get(i));
+                EspCircuit.get(i).output = notinp;
+                finalEspCircuit.add(EspCircuit.get(i));
                 DGate outnot = new DGate();
                 outnot.gtype = DGateType.NOT;
                 outnot.input.add(notinp);
                 outnot.output = new DWire(outname,DWireType.output);
-                finalnetlist.add(outnot);
+                finalEspCircuit.add(outnot);
             }
             else
             {
-                finalnetlist.add(initialnetlist.get(i));
+                finalEspCircuit.add(EspCircuit.get(i));
+            }
+        }
+        for(int i=0;i<ABCCircuit.size();i++)
+        {
+            if(ABCCircuit.get(i).output.wtype.equals(DWireType.output))
+            {
+                String outname = "";
+                outname = ABCCircuit.get(i).output.name.trim();
+                String notinpwirename = "0Wire" +Global.wirecount++;
+                DWire notinp = new DWire(notinpwirename,DWireType.connector);
+                ABCCircuit.get(i).output = notinp;
+                finalABCCircuit.add(ABCCircuit.get(i));
+                DGate outnot = new DGate();
+                outnot.gtype = DGateType.NOT;
+                outnot.input.add(notinp);
+                outnot.output = new DWire(outname,DWireType.output);
+                finalABCCircuit.add(outnot);
+            }
+            else
+            {
+                finalABCCircuit.add(ABCCircuit.get(i));
             }
         }
         
-        finalnetlist = optimizeNetlist(finalnetlist);
-        finalnetlist = convert2NOTsToNOR(finalnetlist);
-        finalnetlist = removeDanglingGates(finalnetlist);
-        finalnetlist = rewireNetlist(finalnetlist);
-        return finalnetlist;
+        finalEspCircuit = optimizeNetlist(finalEspCircuit);
+        finalEspCircuit = convert2NOTsToNOR(finalEspCircuit);
+        finalEspCircuit = removeDanglingGates(finalEspCircuit);
+        finalEspCircuit = rewireNetlist(finalEspCircuit);
+        
+        finalABCCircuit = optimizeNetlist(finalABCCircuit);
+        finalABCCircuit = convert2NOTsToNOR(finalABCCircuit);
+        finalABCCircuit = removeDanglingGates(finalABCCircuit);
+        finalABCCircuit = rewireNetlist(finalABCCircuit);
+        
+        if(finalEspCircuit.size() < finalABCCircuit.size())
+        {
+            //System.out.println("Espresso wins!");
+            return finalEspCircuit;
+        }
+        else
+        {
+            //System.out.println("ABC wins!");
+            return finalABCCircuit;
+        }
+        
+        
+        
+    }
+    
+    public static List<DGate> runDCEspressoAndABC(CircuitDetails circ) 
+    {
+        List<DGate> EspCircuit = new ArrayList<DGate>();
+        List<DGate> ABCCircuit = new ArrayList<DGate>();
+        List<String> espressoFile = new ArrayList<String>();
+        List<String> blifFile = new ArrayList<String>();
+        
+        espressoFile = Espresso.createFile(circ);
+        blifFile = Blif.createFile(circ);
+        String filestring = "";
+        String Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/";
+        }
+        String filestringblif = "";
+        filestringblif = filestring + "Blif_File";
+        filestringblif += ".blif";
+        String filestringesp = "";
+        
+        filestringesp += filestring + "Espresso_File" +".txt";
+        File fespinp = new File(filestringesp);
+        //Writer output;
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            
+             for (String xline :espressoFile) 
+             {
+                String newl = (xline + "\n");
+                output.write(newl);
+             }
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> EspOutput = new ArrayList<String>();
+        EspOutput = runEspresso(filestringesp);
+        fespinp.deleteOnExit();
+        
+        EspCircuit = convertPOStoNORNOT(EspOutput);
+        EspCircuit = optimizeNetlist(EspCircuit);
+        EspCircuit = convert2NOTsToNOR(EspCircuit);
+        EspCircuit = removeDanglingGates(EspCircuit);
+        EspCircuit = rewireNetlist(EspCircuit);
+        
+        
+        ABCCircuit = parseEspressoOutToABC(EspOutput);
+        if(EspCircuit.size() < ABCCircuit.size())
+        {
+            //System.out.println("Espresso wins!");
+            return EspCircuit;
+        }
+        else
+        {
+            //System.out.println("ABC wins!");
+            return ABCCircuit;
+        }
+    }
+    
+    
+    public static List<DGate> runInvertedDCEspressoAndABC(CircuitDetails circ)
+    {
+        
+        
+        List<DGate> EspCircuit = new ArrayList<DGate>();
+        List<DGate> ABCCircuit = new ArrayList<DGate>();
+        List<String> espressoFile = new ArrayList<String>();
+        List<String> blifFile = new ArrayList<String>();
+        
+        espressoFile = Espresso.createFile(circ);
+        blifFile = Blif.createFile(circ);
+        String filestring = "";
+        String Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/";
+        }
+        String filestringblif = "";
+        filestringblif = filestring + "Blif_File";
+        filestringblif += ".blif";
+        String filestringesp = "";
+        
+        filestringesp += filestring + "Espresso_File" +".txt";
+        File fespinp = new File(filestringesp);
+        //Writer output;
+        try 
+        {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            
+             for (String xline :espressoFile) 
+             {
+                String newl = (xline + "\n");
+                output.write(newl);
+             }
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> EspOutput = new ArrayList<String>();
+        EspOutput = runEspresso(filestringesp);
+        fespinp.deleteOnExit();
+        
+        EspCircuit = convertPOStoNORNOT(EspOutput);
+        ABCCircuit = parseINVEspressoOutToABC(EspOutput);
+        
+        List<DGate> finalEspCircuit = new ArrayList<DGate>();
+        List<DGate> finalABCCircuit = new ArrayList<DGate>();
+        
+        
+        
+        for(int i=0;i<EspCircuit.size();i++)
+        {
+            if(EspCircuit.get(i).output.wtype.equals(DWireType.output))
+            {
+                String outname = "";
+                outname = EspCircuit.get(i).output.name.trim();
+                String notinpwirename = "0Wire" +Global.wirecount++;
+                DWire notinp = new DWire(notinpwirename,DWireType.connector);
+                EspCircuit.get(i).output = notinp;
+                finalEspCircuit.add(EspCircuit.get(i));
+                DGate outnot = new DGate();
+                outnot.gtype = DGateType.NOT;
+                outnot.input.add(notinp);
+                outnot.output = new DWire(outname,DWireType.output);
+                finalEspCircuit.add(outnot);
+            }
+            else
+            {
+                finalEspCircuit.add(EspCircuit.get(i));
+            }
+        }
+        for(int i=0;i<ABCCircuit.size();i++)
+        {
+            if(ABCCircuit.get(i).output.wtype.equals(DWireType.output))
+            {
+                String outname = "";
+                outname = ABCCircuit.get(i).output.name.trim();
+                String notinpwirename = "0Wire" +Global.wirecount++;
+                DWire notinp = new DWire(notinpwirename,DWireType.connector);
+                ABCCircuit.get(i).output = notinp;
+                finalABCCircuit.add(ABCCircuit.get(i));
+                DGate outnot = new DGate();
+                outnot.gtype = DGateType.NOT;
+                outnot.input.add(notinp);
+                outnot.output = new DWire(outname,DWireType.output);
+                finalABCCircuit.add(outnot);
+            }
+            else
+            {
+                finalABCCircuit.add(ABCCircuit.get(i));
+            }
+        }
+        
+        finalEspCircuit = optimizeNetlist(finalEspCircuit);
+        finalEspCircuit = convert2NOTsToNOR(finalEspCircuit);
+        finalEspCircuit = removeDanglingGates(finalEspCircuit);
+        finalEspCircuit = rewireNetlist(finalEspCircuit);
+        
+        finalABCCircuit = optimizeNetlist(finalABCCircuit);
+        finalABCCircuit = convert2NOTsToNOR(finalABCCircuit);
+        finalABCCircuit = removeDanglingGates(finalABCCircuit);
+        finalABCCircuit = rewireNetlist(finalABCCircuit);
+        
+        if(finalEspCircuit.size() < finalABCCircuit.size())
+        {
+            //System.out.println("Espresso wins!");
+            return finalEspCircuit;
+        }
+        else
+        {
+            //System.out.println("ABC wins!");
+            return finalABCCircuit;
+        }
+        
+        
+        
     }
     
     
@@ -403,6 +750,8 @@ public class NetSynth {
             return ABCCircuit;
         }
     }
+    
+    
     
     public static void EspressoVsABC(int inpcount)
     {
@@ -1722,100 +2071,58 @@ public class NetSynth {
     
     
     
-    public static void histogram()
+    
+    public static List<DGate> parseEspressoOutToABC(List<String> espout) 
     {
-        String filestring ="";
-          if(Filepath.contains("prashant"))
-          {
-              filestring += Filepath+ "src/BU/resources/Histogram";
-          }
-          else
-          {
-              filestring += Filepath+ "BU/resources/Histogram";
-          }
-        
-          
-            //filestring += Global.espout++ ;
-            filestring += ".csv";
-            File fespinp = new File(filestring);
-        try 
+        List<DGate> netlistout = new ArrayList<DGate>();
+        //List<String> espout = new ArrayList<String>();
+        //espout = runEspresso(filename);
+        /*for(String xline:espout)
         {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-            String Line = "SrNo,PreComputer,Espresspo\n";
-            output.write(Line);
-            List<List<DGate>> precomp;
-            precomp = PreCompute.parseNetlistFile();
-            CircuitDetails circ = new CircuitDetails();
-            circ.inputNames.add("A");
-            circ.inputNames.add("B");
-            circ.inputNames.add("C");
-            circ.outputNames.add("O");
-            for(int i=0;i<256;i++)
-            {
-                Line = "";
-                Line += (i + ",");
-                if(i==0 || i==255)
-                    Line += ("1,"); 
-                else
-                    Line += (precomp.get(i-1).size() + ",");
-                
-                
-                circ.truthTable.add(Convert.dectoBin(i,circ.inputNames.size() ));
-                List<String> eslines = new ArrayList<String>();
-                eslines = Espresso.createFile(circ);
-                String filestring2 = "";
-                if(Filepath.contains("prashant"))
-                {
-                    filestring2 += Filepath+ "src/BU/resources/espresso";
-                }
-                else
-                {
-                    filestring2 += Filepath+ "BU/resources/espresso";
-                }
-                filestring2 += Global.espout++ ;
-                filestring2 += ".txt";
-                File fespinp2 = new File(filestring2);
-                try 
-                {
-                    Writer output2 = new BufferedWriter(new FileWriter(fespinp2));
-                    for(String xline:eslines)
-                    {
-                        String newl = (xline + "\n");
-                        output2.write(newl);
-                    }
-                    output2.close();
-                    List<String> espout2 = new ArrayList<String>();
-                    espout2 = runEspresso(filestring2);
-                    List<DGate> espoutput2 = new ArrayList<DGate>();
-                    espoutput2 = parseEspressoToNORNAND(espout2);
-                    String xf ="";
-                    xf = BooleanSimulator.bpermute(espoutput2);
-                    
-                    //if(i==2)
-                    //if(i==253 || i == 254 || i==251 || i==239)
-                        //System.out.println(xf);
-                    Line += espoutput2.size();
-                    fespinp2.deleteOnExit();
-              
-                } 
-                catch (IOException ex) 
-                {
-                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                Line += "\n";
-                output.write(Line);
-            }
-            output.close();
+            System.out.println(xline);
+        }*/
+        List<String> vfilelines = new ArrayList<String>();
         
-        } 
-        catch (IOException ex) 
-        {
+        vfilelines = convertEspressoOutputToVerilog(espout);
+        String vfilepath = "";
+        vfilepath = create_VerilogFile(vfilelines,"espressoVerilog");
+        try {
+            netlistout = runABCverilog("espressoVerilog");
+            netlistout = optimizeNetlist(netlistout);
+            netlistout = convert2NOTsToNOR(netlistout);
+            netlistout = rewireNetlist(netlistout);
+        } catch (InterruptedException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        return netlistout;
+    }
+    public static List<DGate> parseINVEspressoOutToABC(List<String> espout) 
+    {
+        List<DGate> netlistout = new ArrayList<DGate>();
+        //List<String> espout = new ArrayList<String>();
+        //espout = runEspresso(filename);
+        /*for(String xline:espout)
+        {
+            System.out.println(xline);
+        }*/
+        List<String> vfilelines = new ArrayList<String>();
+        
+        vfilelines = convertEspressoOutputToVerilog(espout);
+        String vfilepath = "";
+        vfilepath = create_VerilogFile(vfilelines,"espressoVerilog");
+        try {
+            netlistout = runABCverilog("espressoVerilog");
+            
+        } catch (InterruptedException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return netlistout;
     }
     
-    public static List<DGate> parseEspressoToABC(String filename) 
+    
+    public static List<DGate> parseEspressoFileToABC(String filename) 
     {
         List<DGate> netlistout = new ArrayList<DGate>();
         List<String> espout = new ArrayList<String>();
