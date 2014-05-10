@@ -2770,7 +2770,7 @@ public class NetSynth {
         StringBuilder commandBuilder = null;
         if(x.contains("Mac"))
         {
-            commandBuilder = new StringBuilder(Filepath+"BU/resources/abc");
+            commandBuilder = new StringBuilder(Filepath+"BU/resources/abc.mac -c \"read "+Filepath+"BU/resources/"+filename+".v; strash;  rewrite; refactor; balance; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
         }
         else if("Linux".equals(x))
         {
