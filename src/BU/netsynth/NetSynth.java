@@ -218,7 +218,7 @@ public class NetSynth {
                 {
                     System.out.println("Dont Cares exist.");
                     dirnetlist = runDCEspressoAndABC(direct);
-                    invnetlist = runInvertedEspressoAndABC(inverted);
+                    invnetlist = runInvertedDCEspressoAndABC(inverted);
                     if (dirnetlist.size() < invnetlist.size()) 
                     {
                         for (DGate xgate : dirnetlist) 
