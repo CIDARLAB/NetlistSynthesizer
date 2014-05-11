@@ -1,11 +1,12 @@
 module EspToVerilog (
-in3, in2, in1,
-out1, out2 );
-input in3, in2, in1;
-output out1, out2;
-wire w0, w1;
-assign w0 = ~in3 | ~in2 | ~in1;
-assign w1 = ~in3 | in2 | in1;
-assign out1 =  w1;
-assign out2 =  w0 & w1;
+in1, in2, in3, in4,
+out );
+input in1, in2, in3, in4;
+output out;
+wire w0, w1, w2, w3;
+assign w0 = in2 | in4;
+assign w1 = ~in1 | ~in2;
+assign w2 = ~in3 | in4;
+assign w3 = ~in1 | ~in3;
+assign out =  w0 & w1 & w2 & w3;
 endmodule

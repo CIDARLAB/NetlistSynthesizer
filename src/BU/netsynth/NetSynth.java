@@ -216,9 +216,21 @@ public class NetSynth {
                 hasDontCares = parseVerilogFile.hasDontCares(direct.truthTable);
                 if(hasDontCares)
                 {
+                    
                     System.out.println("Dont Cares exist.");
+                    
+                    //for(String xtt:direct.truthTable)
+                    //    System.out.println(xtt);
+                    
                     dirnetlist = runDCEspressoAndABC(direct);
+                    //System.out.println("Direct");
+                    //printNetlist(dirnetlist);
+                    //BooleanSimulator.printTruthTable(dirnetlist, direct.inputNames);
+                    
+                    
                     invnetlist = runInvertedDCEspressoAndABC(inverted);
+                    //System.out.println("Inverted");
+                    //BooleanSimulator.printTruthTable(invnetlist, inputnames);
                     if (dirnetlist.size() < invnetlist.size()) 
                     {
                         for (DGate xgate : dirnetlist) 
@@ -489,6 +501,9 @@ public class NetSynth {
         List<String> EspOutput = new ArrayList<String>();
         EspOutput = runEspresso(filestringesp);
         fespinp.deleteOnExit();
+        //System.out.println("Esp out");
+        //for(String xespout:EspOutput)
+        //    System.out.println(xespout);
         
         EspCircuit = convertPOStoNORNOT(EspOutput);
         EspCircuit = optimizeNetlist(EspCircuit);
@@ -496,8 +511,16 @@ public class NetSynth {
         EspCircuit = removeDanglingGates(EspCircuit);
         EspCircuit = rewireNetlist(EspCircuit);
         
+        //System.out.println("TruthTable for EspCircuit");
+        //printNetlist(EspCircuit);
+        //BooleanSimulator.printTruthTable(EspCircuit, circ.inputNames);
         
         ABCCircuit = parseEspressoOutToABC(EspOutput);
+        
+        //System.out.println("TruthTable for ABCCircuit");
+        //printNetlist(ABCCircuit);
+        //BooleanSimulator.printTruthTable(ABCCircuit, circ.inputNames);
+        
         if(EspCircuit.size() < ABCCircuit.size())
         {
             //System.out.println("Espresso wins!");
@@ -3335,7 +3358,7 @@ public class NetSynth {
                         assgnwires += " |";
                     }
                     startassign = true;
-                    assgnwires += " "+inputWires.get(j);
+                    assgnwires += " ~"+inputWires.get(j);
                     
                 }
                 else if(maxterm[0].charAt(j) == '0')
@@ -3345,7 +3368,7 @@ public class NetSynth {
                         assgnwires += " |";
                     }
                     startassign = true;
-                    assgnwires += " ~"+inputWires.get(j);
+                    assgnwires += " "+inputWires.get(j);
                 }
                 
                 if (j == (inputWires.size() - 1)) 
@@ -3453,9 +3476,9 @@ public class NetSynth {
                 //System.out.println("OUTPUT SUM Terms: " +outputsum.get(j).size());    
             }
         }*/
-        System.out.println("\n----------------------------\nVerilog File\n----------------------------\n");
-        for(String xline:verilogfile)
-            System.out.println(xline);
+        //System.out.println("\n----------------------------\nVerilog File\n----------------------------\n");
+        //for(String xline:verilogfile)
+        //    System.out.println(xline);
         
         return verilogfile;
       
