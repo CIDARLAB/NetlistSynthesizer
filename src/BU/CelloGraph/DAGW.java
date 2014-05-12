@@ -5,9 +5,11 @@
 package BU.CelloGraph;
 
 import MIT.dnacompiler.Gate;
+import MIT.dnacompiler.Gate.GateType;
 import MIT.dnacompiler.Wire;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -125,7 +127,53 @@ public class DAGW {
         return s;
     }
     
-    
+    public static DAGW reorderinputs(DAGW obj, List<String> inputnames)
+    {
+        DAGW reorderedDAGW = new DAGW();
+        int firstindex =0;
+        int tempfirstindx =0;
+        
+        HashMap<Integer, Gate> inpGates = new HashMap<Integer, Gate>(); 
+        for(int i=0;i<obj.Gates.size();i++)
+        {
+            if(obj.Gates.get(i).Type.equals(GateType.INPUT.toString()))
+            {
+                firstindex = i;
+                break;
+            }
+        }
+        tempfirstindx = firstindex;
+        for(int i=0;i<inputnames.size();i++)
+        {
+            for(int j=0;j<obj.Gates.size();j++)
+            {
+                if(inputnames.get(i).trim().equals(obj.Gates.get(j).Name.trim()))
+                {
+                    inpGates.put(firstindex, obj.Gates.get(j));
+                    firstindex++;
+                }
+            }
+         }
+        
+        for(int i=0;i<tempfirstindx;i++)
+        {
+            reorderedDAGW.Gates.add(obj.Gates.get(i));
+        }
+        
+        for(int i=tempfirstindx;i<obj.Gates.size();i++)
+        {
+            reorderedDAGW.Gates.add(inpGates.get(i));
+        }
+        
+        
+        
+        for(Wire xwire:obj.Wires)
+            reorderedDAGW.Wires.add(xwire);
+        for(String xtt:obj.truthtable)
+            reorderedDAGW.truthtable.add(xtt);
+        
+        return reorderedDAGW;
+    }
     
     public static String printDAGW()
     {

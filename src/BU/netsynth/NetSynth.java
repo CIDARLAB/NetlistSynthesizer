@@ -11,22 +11,31 @@ import BU.CelloGraph.DAGEdge;
 import BU.CelloGraph.DAGVertex;
 import BU.CelloGraph.DAGVertex.VertexType;
 import BU.CelloGraph.DAGW;
+import static BU.CelloGraph.DAGW.reorderinputs;
 import BU.CelloGraph.DAGraph;
 
 import BU.ParseVerilog.Blif;
-import MIT.dnacompiler.Gate;
-import MIT.dnacompiler.Gate.GateType;
-import MIT.dnacompiler.Wire;
-
 import BU.ParseVerilog.CircuitDetails;
 import BU.ParseVerilog.Convert;
 import BU.ParseVerilog.Espresso;
 import BU.ParseVerilog.Parser;
 import BU.ParseVerilog.parseVerilogFile;
 import BU.booleanLogic.BooleanSimulator;
+import BU.netsynth.DGate.DGateType;
+import BU.netsynth.DWire.DWireType;
+import BU.precomputation.HistogramREU;
+import BU.precomputation.PreCompute;
+import BU.precomputation.genVerilogFile;
+import MIT.dnacompiler.Gate;
+import MIT.dnacompiler.Gate.GateType;
+import MIT.dnacompiler.HeuristicSearch;
+import MIT.dnacompiler.LoadTables;
+import MIT.dnacompiler.Wire;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,16 +53,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import BU.netsynth.DGate.DGateType;
-import BU.netsynth.DWire.DWireType;
-import BU.precomputation.HistogramREU;
-import BU.precomputation.PreCompute;
-import BU.precomputation.genVerilogFile;
-import MIT.dnacompiler.HeuristicSearch;
-import MIT.dnacompiler.LoadTables;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 
 
 /**
@@ -278,10 +277,13 @@ public class NetSynth {
         printNetlist(netlist);
         BooleanSimulator.printTruthTable(netlist, inputnames);
         finaldag = CreateMultDAGW(netlist);
+        
+        finaldag = reorderinputs(finaldag,inputnames);
         for(Gate xgate:finaldag.Gates)
         {
             System.out.println(xgate.Name +" : " + xgate.Type);
         }
+        
         return finaldag;
     }
     
