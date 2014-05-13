@@ -278,7 +278,13 @@ public class NetSynth {
         BooleanSimulator.printTruthTable(netlist, inputnames);
         finaldag = CreateMultDAGW(netlist);
         
-        finaldag = reorderinputs(finaldag,inputnames);
+        
+        if(hasCaseStatements)
+        {
+            finaldag = DAGW.addDanglingInputs(finaldag,inputnames);
+        }
+        
+        finaldag = DAGW.reorderinputs(finaldag,inputnames);
         for(Gate xgate:finaldag.Gates)
         {
             System.out.println(xgate.Name +" : " + xgate.Type);

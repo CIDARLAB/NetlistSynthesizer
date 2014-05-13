@@ -127,6 +127,52 @@ public class DAGW {
         return s;
     }
     
+    
+    public static DAGW addDanglingInputs(DAGW obj, List<String> inputnames)
+    {
+        DAGW reorderedDAGW = new DAGW();
+        List<Gate> inpGates = new ArrayList<Gate>();
+        int indx = -1;
+        for(int i=0;i<inputnames.size();i++)
+        {
+            int flag =0;
+            for(int j=0;j<obj.Gates.size();j++)
+            {
+                if(obj.Gates.get(j).Type.equals(GateType.INPUT.toString()))
+                {
+                    if(obj.Gates.get(j).Name.trim().equals(inputnames.get(i).trim()))
+                    {
+                        flag =1;
+                    }
+                }
+            }
+            if(flag == 0)
+            {
+                Gate dangGate = new Gate();
+                dangGate.Index = indx;
+                dangGate.Name = inputnames.get(i).trim();
+                dangGate.Type = GateType.INPUT.toString();
+                indx--;
+                inpGates.add(dangGate);
+            }
+        }
+        
+        
+        for(Gate xgate:obj.Gates)
+            reorderedDAGW.Gates.add(xgate);
+        
+        for(Gate xgate:inpGates)
+            reorderedDAGW.Gates.add(xgate);
+        
+        
+        for(Wire xwire:obj.Wires)
+            reorderedDAGW.Wires.add(xwire);
+        for(String xtt:obj.truthtable)
+            reorderedDAGW.truthtable.add(xtt);
+        
+        return reorderedDAGW;
+    }
+    
     public static DAGW reorderinputs(DAGW obj, List<String> inputnames)
     {
         DAGW reorderedDAGW = new DAGW();
