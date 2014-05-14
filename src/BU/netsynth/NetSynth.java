@@ -216,7 +216,7 @@ public class NetSynth {
                 if(hasDontCares)
                 {
                     
-                    System.out.println("Dont Cares exist.");
+                    //System.out.println("Dont Cares exist.");
                     
                     //for(String xtt:direct.truthTable)
                     //    System.out.println(xtt);
@@ -268,6 +268,7 @@ public class NetSynth {
             }
             else
             {
+                //System.out.println(alllines);
                 System.out.println("No case statements.\nWill be supported soon");
             }
         }
@@ -440,6 +441,7 @@ public class NetSynth {
         finalEspCircuit = removeDanglingGates(finalEspCircuit);
         finalEspCircuit = rewireNetlist(finalEspCircuit);
         
+        finalABCCircuit = separateOutputGates(finalABCCircuit);
         finalABCCircuit = optimizeNetlist(finalABCCircuit);
         finalABCCircuit = convert2NOTsToNOR(finalABCCircuit);
         finalABCCircuit = removeDanglingGates(finalABCCircuit);
@@ -650,6 +652,8 @@ public class NetSynth {
         finalEspCircuit = removeDanglingGates(finalEspCircuit);
         finalEspCircuit = rewireNetlist(finalEspCircuit);
         
+        
+        finalABCCircuit = separateOutputGates(finalABCCircuit);
         finalABCCircuit = optimizeNetlist(finalABCCircuit);
         finalABCCircuit = convert2NOTsToNOR(finalABCCircuit);
         finalABCCircuit = removeDanglingGates(finalABCCircuit);
@@ -727,7 +731,10 @@ public class NetSynth {
         EspCircuit = removeDanglingGates(EspCircuit);
         EspCircuit = rewireNetlist(EspCircuit);
         
-         
+        
+        
+        
+        
         File fabcinp = new File(filestringblif);
         try 
         {
@@ -749,10 +756,14 @@ public class NetSynth {
             {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            abcoutput = separateOutputGates(abcoutput);
             abcoutput = optimizeNetlist(abcoutput);
             abcoutput = convert2NOTsToNOR(abcoutput);
             abcoutput = rewireNetlist(abcoutput);
-
+            
+           
+            
             for (DGate xgate : abcoutput) 
             {
                 ABCCircuit.add(xgate);
@@ -782,7 +793,78 @@ public class NetSynth {
         }
     }
     
-    
+    public static List<DGate> separateOutputGates(List<DGate> netlist)
+    {
+        List<DGate> finalnetlist = new ArrayList<DGate>();
+        HashMap<Integer,DGate> addgate = new HashMap<Integer,DGate>();
+        int outToOutflag = 0;
+        
+        do
+        {
+        addgate = new HashMap<Integer,DGate>();
+        for(int i=0;i<(netlist.size()-1);i++)
+        {
+            
+            outToOutflag = 0;
+            if(netlist.get(i).output.wtype.equals(DWireType.output))
+            {
+                for(int j=(i+1);j<netlist.size();j++)
+                {
+                    if(netlist.get(j).output.wtype.equals(DWireType.output))
+                    {
+                        for(int m=0;m<netlist.get(j).input.size();m++)
+                        {
+                            if(netlist.get(j).input.get(m).wtype.equals(DWireType.output) && netlist.get(j).input.get(m).name.trim().equals(netlist.get(i).output.name.trim()))
+                            {
+                                outToOutflag = 1;
+                                //System.out.println("Found that case!!");
+                            }
+                        }
+                    }
+                }
+                if(outToOutflag == 1)
+                {
+                    DGate newg = new DGate();
+                    newg.gtype = netlist.get(i).gtype;
+                    newg.input.addAll(netlist.get(i).input);
+                    String Wname = "0Wire" + Global.wirecount++;
+                    DWire outW = new DWire(Wname, DWireType.connector);
+                    newg.output = outW;
+                    addgate.put(i, newg);
+                    for(int j=(i+1);j<netlist.size();j++)
+                    {
+                        if(netlist.get(j).output.wtype.equals(DWireType.output))
+                        {
+                            for(int m=0;m<netlist.get(j).input.size();m++)
+                            {
+                                if(netlist.get(j).input.get(m).wtype.equals(DWireType.output) && netlist.get(j).input.get(m).name.trim().equals(netlist.get(i).output.name.trim()))
+                                {
+                                    netlist.get(j).input.set(m, outW);
+                                    //System.out.println("Found that case!!");
+                                }
+                            }   
+                        }
+                    }
+                }
+            }
+        }
+        finalnetlist = new ArrayList<DGate>();
+        for(int i=0;i<netlist.size();i++)
+        {
+            if(addgate.containsKey(i))
+            {
+                finalnetlist.add(addgate.get(i));
+            }
+            finalnetlist.add(netlist.get(i));
+        }
+        netlist = new ArrayList<DGate>();
+        netlist.addAll(finalnetlist);
+        }while(!addgate.isEmpty());
+        
+        
+        
+        return finalnetlist;
+    }
     
     public static void EspressoVsABC(int inpcount)
     {
@@ -2119,6 +2201,7 @@ public class NetSynth {
         vfilepath = create_VerilogFile(vfilelines,"espressoVerilog");
         try {
             netlistout = runABCverilog("espressoVerilog");
+            netlistout = separateOutputGates(netlistout);
             netlistout = optimizeNetlist(netlistout);
             netlistout = convert2NOTsToNOR(netlistout);
             netlistout = rewireNetlist(netlistout);
@@ -4247,8 +4330,7 @@ public class NetSynth {
     {
         //Remove Redundant NOT Gates
         
-        //System.out.println("Before Optimizing anything.");
-        //printNetlist(netlistinp);
+        
         
         List<Integer> removegates = new ArrayList<Integer>();
         for(int i=0;i<netlistinp.size()-1;i++)
@@ -4296,8 +4378,24 @@ public class NetSynth {
                                {
                                    if(!removegates.contains(i))
                                    {
-                                       //System.out.println("Remove Gate index:"+i);
-                                       removegates.add(i);
+                                       int finalflag =0;
+                                       for(int m=i+1;m<netlistinp.size();m++)
+                                       {
+                                           if(netlistinp.get(m).gtype.equals(DGateType.NOR))
+                                           {
+                                               for(DWire xinp: netlistinp.get(m).input)
+                                               {
+                                                   if(xinp.name.trim().equals(netlistinp.get(i).output.name.trim()))
+                                                   {
+                                                       finalflag =1;
+                                                   }
+                                               }
+                                           }
+                                       }
+                                       if(finalflag == 0)
+                                           removegates.add(i);
+                                        //System.out.println("Remove Gate index:"+i);
+                                       
                                    }
                                }
                            }
@@ -4345,11 +4443,42 @@ public class NetSynth {
                                    
                                    if(!removegates.contains(j))
                                    {
+                                       
+                                       int finalflag =0;
+                                       for(int m=j+1;m<netlistinp.size();m++)
+                                       {
+                                           if(netlistinp.get(m).gtype.equals(DGateType.NOR))
+                                           {
+                                               for(DWire xinp: netlistinp.get(m).input)
+                                               {
+                                                   if(xinp.name.trim().equals(netlistinp.get(j).output.name.trim()))
+                                                   {
+                                                       finalflag =1;
+                                                   }
+                                               }
+                                           }
+                                       }
+                                       if(finalflag == 0)
                                        //System.out.println("Remove Gate index:" + j);
                                        removegates.add(j);
                                    }
                                    if(!removegates.contains(i))
                                    {
+                                       int finalflag =0;
+                                       for(int m=i+1;m<netlistinp.size();m++)
+                                       {
+                                           if(netlistinp.get(m).gtype.equals(DGateType.NOR))
+                                           {
+                                               for(DWire xinp: netlistinp.get(m).input)
+                                               {
+                                                   if(xinp.name.trim().equals(netlistinp.get(i).output.name.trim()))
+                                                   {
+                                                       finalflag =1;
+                                                   }
+                                               }
+                                           }
+                                       }
+                                       if(finalflag == 0)
                                        //System.out.println("Remove Gate index:"+i);
                                        removegates.add(i);
                                    }
@@ -4399,8 +4528,19 @@ public class NetSynth {
                                            
                                            if(!removegates.contains(j))
                                            {
-                                               //System.out.println("Remove Gate index:"+j);
-                                               removegates.add(j);
+                                               int finalflag = 0;
+                                               for (int z = j + 1; z < netlistinp.size(); z++) {
+                                                   if (netlistinp.get(z).gtype.equals(DGateType.NOR)) {
+                                                       for (DWire xinp : netlistinp.get(z).input) {
+                                                           if (xinp.name.trim().equals(netlistinp.get(j).output.name.trim())) {
+                                                               finalflag = 1;
+                                                           }
+                                                       }
+                                                   }
+                                               }
+                                               if (finalflag == 0)
+                                                   //System.out.println("Remove Gate index:"+j);
+                                                   removegates.add(j);
                                            }
                                            
                                        }
@@ -5941,6 +6081,4 @@ public class NetSynth {
             //netbuilder += g.gatestage;
         return netbuilder;
     }
-    
-    
 }

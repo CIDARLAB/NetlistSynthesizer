@@ -1,27 +1,14 @@
-module E7seg09(output out, input in1, in2, in3, in4);
+module AND_A(output out1, out2, input in1, in2);
   reg r_out;
   assign out = r_out;
-  always@(in1, in2, in3, in4)
+  always@(in1, in2)
     begin
-      case({in1, in2, in3, in4})
-        4'b0000: out = 1'b1;
-        4'b0001: out = 1'b1;
-        4'b0010: out = 1'bx;
-        4'b0011: out = 1'b1;
-        4'b0100: out = 1'b1;
-        4'b0101: out = 1'bx;
-        4'b0110: out = 1'b1;
-        4'b0111: out = 1'b1;
-	4'b1000: out = 1'bx;
-        4'b1001: out = 1'bx;
-        4'b1010: out = 1'bx;
-        4'b1011: out = 1'bx;
-        4'b1100: out = 1'bx;
-        4'b1101: out = 1'bx;
-        4'b1110: out = 1'bx;
-        4'b1111: out = 1'bx;
-	
-        default: out = 1'b0;
+      case({in1,in2})
+        2'b00: {out1,out2} = 2'b00;
+        2'b01: {out1,out2} = 2'b00;
+        2'b10: {out1,out2} = 2'b01;
+        2'b11: {out1,out2} = 2'b11;
+        default: {out1,out2} = 2'b00;
       endcase
     end
 endmodule
