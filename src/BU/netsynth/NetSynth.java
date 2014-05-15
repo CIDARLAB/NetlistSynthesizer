@@ -161,7 +161,8 @@ public class NetSynth {
             naivenetlist = parseVerilogFile.parseStructural(alllines);
             structnetlist = parseStructuralVtoNORNOT(naivenetlist);
             
-            
+            //System.out.println("Structural Stuff");
+            printNetlist(structnetlist);
             
             List<String> ttValues = new ArrayList<String>();
             List<String> invttValues = new ArrayList<String>();
@@ -186,19 +187,28 @@ public class NetSynth {
             //printNetlist(invnetlist);
             //BooleanSimulator.printTruthTable(invnetlist, inputnames);
             
-            
-            if(dirnetlist.size() < invnetlist.size())
+            if((structnetlist.size() < dirnetlist.size()) && (structnetlist.size() < invnetlist.size()))
             {
-                for(DGate xgate:dirnetlist)
+                for(DGate xgate:structnetlist)
                     netlist.add(xgate);
             }
             else
             {
-                for(DGate xgate:invnetlist)
-                    netlist.add(xgate);
+                if (dirnetlist.size() < invnetlist.size()) 
+                {
+                    for (DGate xgate : dirnetlist) 
+                    {
+                        netlist.add(xgate);
+                    }
+                } 
+                else 
+                {
+                    for (DGate xgate : invnetlist) 
+                    {
+                        netlist.add(xgate);
+                    }
+                }
             }
-            
-            
         }
         else
         {
