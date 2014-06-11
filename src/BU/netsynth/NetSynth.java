@@ -439,18 +439,20 @@ public class NetSynth {
             }
         }
         
-        finalEspCircuit = removeDoubleInverters(finalEspCircuit);
-        finalEspCircuit = outputORopt(finalEspCircuit);
-        finalEspCircuit = convert2NOTsToNOR(finalEspCircuit);
-        finalEspCircuit = removeDanglingGates(finalEspCircuit);
-        finalEspCircuit = rewireNetlist(finalEspCircuit);
+        finalEspCircuit = optimizeNetlist(finalEspCircuit,true,true,true);
+        //finalEspCircuit = removeDoubleInverters(finalEspCircuit);
+        //finalEspCircuit = outputORopt(finalEspCircuit);
+        //finalEspCircuit = convert2NOTsToNOR(finalEspCircuit);
+        //finalEspCircuit = removeDanglingGates(finalEspCircuit);
+        //finalEspCircuit = rewireNetlist(finalEspCircuit);
         
         finalABCCircuit = separateOutputGates(finalABCCircuit);
-        finalABCCircuit = removeDoubleInverters(finalABCCircuit);
-        finalABCCircuit = outputORopt(finalABCCircuit);
-        finalABCCircuit = convert2NOTsToNOR(finalABCCircuit);
-        finalABCCircuit = removeDanglingGates(finalABCCircuit);
-        finalABCCircuit = rewireNetlist(finalABCCircuit);
+        finalABCCircuit = optimizeNetlist(finalABCCircuit,true,true,true);
+        //finalABCCircuit = removeDoubleInverters(finalABCCircuit);
+        //finalABCCircuit = outputORopt(finalABCCircuit);
+        //finalABCCircuit = convert2NOTsToNOR(finalABCCircuit);
+        //finalABCCircuit = removeDanglingGates(finalABCCircuit);
+        //finalABCCircuit = rewireNetlist(finalABCCircuit);
         
         if(finalEspCircuit.size() < finalABCCircuit.size())
         {
@@ -521,11 +523,13 @@ public class NetSynth {
         //    System.out.println(xespout);
         
         EspCircuit = convertPOStoNORNOT(EspOutput);
-        EspCircuit = removeDoubleInverters(EspCircuit);
-        EspCircuit = outputORopt(EspCircuit);
-        EspCircuit = convert2NOTsToNOR(EspCircuit);
-        EspCircuit = removeDanglingGates(EspCircuit);
-        EspCircuit = rewireNetlist(EspCircuit);
+        
+        EspCircuit = optimizeNetlist(EspCircuit,true,true,true);
+        //EspCircuit = removeDoubleInverters(EspCircuit);
+        //EspCircuit = outputORopt(EspCircuit);
+        //EspCircuit = convert2NOTsToNOR(EspCircuit);
+        //EspCircuit = removeDanglingGates(EspCircuit);
+        //EspCircuit = rewireNetlist(EspCircuit);
         
         //System.out.println("TruthTable for EspCircuit");
         //printNetlist(EspCircuit);
@@ -652,19 +656,24 @@ public class NetSynth {
                 finalABCCircuit.add(ABCCircuit.get(i));
             }
         }
-        finalEspCircuit = removeDoubleInverters(finalEspCircuit);
-        finalEspCircuit = outputORopt(finalEspCircuit);
-        finalEspCircuit = convert2NOTsToNOR(finalEspCircuit);
-        finalEspCircuit = removeDanglingGates(finalEspCircuit);
-        finalEspCircuit = rewireNetlist(finalEspCircuit);
+        
+        finalEspCircuit = optimizeNetlist(finalEspCircuit,true,true,true);
+        //finalEspCircuit = removeDoubleInverters(finalEspCircuit);
+        //finalEspCircuit = outputORopt(finalEspCircuit);
+        //finalEspCircuit = convert2NOTsToNOR(finalEspCircuit);
+        //finalEspCircuit = removeDanglingGates(finalEspCircuit);
+        //finalEspCircuit = rewireNetlist(finalEspCircuit);
         
         
         finalABCCircuit = separateOutputGates(finalABCCircuit);
-        finalABCCircuit = removeDoubleInverters(finalABCCircuit);
-        finalABCCircuit = outputORopt(finalABCCircuit);
-        finalABCCircuit = convert2NOTsToNOR(finalABCCircuit);
-        finalABCCircuit = removeDanglingGates(finalABCCircuit);
-        finalABCCircuit = rewireNetlist(finalABCCircuit);
+        
+        
+        finalABCCircuit = optimizeNetlist(finalABCCircuit,true,true,true);
+        //finalABCCircuit = removeDoubleInverters(finalABCCircuit);
+        //finalABCCircuit = outputORopt(finalABCCircuit);
+        //finalABCCircuit = convert2NOTsToNOR(finalABCCircuit);
+        //finalABCCircuit = removeDanglingGates(finalABCCircuit);
+        //finalABCCircuit = rewireNetlist(finalABCCircuit);
         
         if(finalEspCircuit.size() < finalABCCircuit.size())
         {
@@ -733,11 +742,13 @@ public class NetSynth {
         fespinp.deleteOnExit();
         
         EspCircuit = convertPOStoNORNOT(EspOutput);
-        EspCircuit = removeDoubleInverters(EspCircuit);
-        EspCircuit = outputORopt(EspCircuit);
-        EspCircuit = convert2NOTsToNOR(EspCircuit);
-        EspCircuit = removeDanglingGates(EspCircuit);
-        EspCircuit = rewireNetlist(EspCircuit);
+        
+        EspCircuit = optimizeNetlist(EspCircuit,true,true,true);
+        //EspCircuit = removeDoubleInverters(EspCircuit);
+        //EspCircuit = outputORopt(EspCircuit);
+        //EspCircuit = convert2NOTsToNOR(EspCircuit);
+        //EspCircuit = removeDanglingGates(EspCircuit);
+        //EspCircuit = rewireNetlist(EspCircuit);
         
         
         
@@ -766,10 +777,12 @@ public class NetSynth {
             }
             
             abcoutput = separateOutputGates(abcoutput);
-            abcoutput = removeDoubleInverters(abcoutput);
-            abcoutput = outputORopt(abcoutput);
-            abcoutput = convert2NOTsToNOR(abcoutput);
-            abcoutput = rewireNetlist(abcoutput);
+            
+            abcoutput = optimizeNetlist(abcoutput,true,true,true);
+            //abcoutput = removeDoubleInverters(abcoutput);
+            //abcoutput = outputORopt(abcoutput);
+            //abcoutput = convert2NOTsToNOR(abcoutput);
+            //abcoutput = rewireNetlist(abcoutput);
             
            
             
@@ -959,10 +972,13 @@ public class NetSynth {
                 
                 List<DGate> espoutput = new ArrayList<DGate>();
                 espoutput = convertPOStoNORNOT(espout);
-                espoutput = removeDoubleInverters(espoutput);
-                espoutput = outputORopt(espoutput);
-                espoutput = convert2NOTsToNOR(espoutput);
-                espoutput = rewireNetlist(espoutput);
+                
+                
+                espoutput = optimizeNetlist(espoutput,true,true,true);
+                //espoutput = removeDoubleInverters(espoutput);
+                //espoutput = outputORopt(espoutput);
+                //espoutput = convert2NOTsToNOR(espoutput);
+                //espoutput = rewireNetlist(espoutput);
                         
                 List<DGate> abcoutput = new ArrayList<DGate>();
                 try {
@@ -970,10 +986,12 @@ public class NetSynth {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                abcoutput = removeDoubleInverters(abcoutput);
-                abcoutput = outputORopt(abcoutput);
-                abcoutput = convert2NOTsToNOR(abcoutput);
-                abcoutput = rewireNetlist(abcoutput);
+                
+                abcoutput = optimizeNetlist(abcoutput,true,true,true);
+                //abcoutput = removeDoubleInverters(abcoutput);
+                //abcoutput = outputORopt(abcoutput);
+                //abcoutput = convert2NOTsToNOR(abcoutput);
+                //abcoutput = rewireNetlist(abcoutput);
                 
                 
                 List<DGate> precompout = new ArrayList<DGate>();
@@ -990,10 +1008,12 @@ public class NetSynth {
                 else
                 {
                     precompout = precomp.get(i-1);
-                    precompout = removeDoubleInverters(precompout);
-                    precompout = outputORopt(precompout);
-                    precompout = convert2NOTsToNOR(precompout);
-                    precompout = rewireNetlist(precompout);
+                    
+                    precompout = optimizeNetlist(precompout,true,true,true);
+                    //precompout = removeDoubleInverters(precompout);
+                    //precompout = outputORopt(precompout);
+                    //precompout = convert2NOTsToNOR(precompout);
+                    //precompout = rewireNetlist(precompout);
                     precomputecount = precompout.size();
                     if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR))
                         precomputecount --;
@@ -1152,10 +1172,11 @@ public class NetSynth {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            abcoutput = removeDoubleInverters(abcoutput);
-            abcoutput = outputORopt(abcoutput);
-            abcoutput = convert2NOTsToNOR(abcoutput);
-            abcoutput = rewireNetlist(abcoutput);
+            abcoutput = optimizeNetlist(abcoutput,true,true,true);
+            //abcoutput = removeDoubleInverters(abcoutput);
+            //abcoutput = outputORopt(abcoutput);
+            //abcoutput = convert2NOTsToNOR(abcoutput);
+            //abcoutput = rewireNetlist(abcoutput);
 
             for (DGate xgate : abcoutput) 
             {
@@ -1310,10 +1331,12 @@ public class NetSynth {
                 
                 List<DGate> espoutput = new ArrayList<DGate>();
                 espoutput = convertPOStoNORNOT(espout);
-                espoutput = removeDoubleInverters(espoutput);
-                espoutput = outputORopt(espoutput);
-                espoutput = convert2NOTsToNOR(espoutput);
-                espoutput = rewireNetlist(espoutput);
+                
+                espoutput = optimizeNetlist(espoutput,true,true,true);
+                //espoutput = removeDoubleInverters(espoutput);
+                //espoutput = outputORopt(espoutput);
+                //espoutput = convert2NOTsToNOR(espoutput);
+                //espoutput = rewireNetlist(espoutput);
                 
                 List<DGate> invespoutput = new ArrayList<DGate>();
                 
@@ -1326,10 +1349,13 @@ public class NetSynth {
                 notoutesp.gtype = DGateType.NOT;
                 notoutesp.output = new DWire("out",DWireType.output);
                 invespoutput.add(notoutesp);
-                invespoutput = removeDoubleInverters(invespoutput);
-                invespoutput = outputORopt(invespoutput);
-                invespoutput = convert2NOTsToNOR(invespoutput);
-                invespoutput = rewireNetlist(invespoutput);
+                
+                
+                invespoutput = optimizeNetlist(invespoutput,true,true,true);
+                //invespoutput = removeDoubleInverters(invespoutput);
+                //invespoutput = outputORopt(invespoutput);
+                //invespoutput = convert2NOTsToNOR(invespoutput);
+                //invespoutput = rewireNetlist(invespoutput);
                         
                 List<DGate> abcoutput = new ArrayList<DGate>();
                 List<DGate> invabcoutput = new ArrayList<DGate>();
@@ -1339,10 +1365,12 @@ public class NetSynth {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                abcoutput = removeDoubleInverters(abcoutput);
-                abcoutput = outputORopt(abcoutput);
-                abcoutput = convert2NOTsToNOR(abcoutput);
-                abcoutput = rewireNetlist(abcoutput);
+                
+                abcoutput = optimizeNetlist(abcoutput,true,true,true);
+                //abcoutput = removeDoubleInverters(abcoutput);
+                //abcoutput = outputORopt(abcoutput);
+                //abcoutput = convert2NOTsToNOR(abcoutput);
+                //abcoutput = rewireNetlist(abcoutput);
                 
                 /*
                 try {
@@ -1361,10 +1389,12 @@ public class NetSynth {
                 notoutabc.output = new DWire("out",DWireType.output);
                 
                 invabcoutput.add(notoutabc);
-                invabcoutput = removeDoubleInverters(invabcoutput);
-                invabcoutput = outputORopt(invabcoutput);
-                invabcoutput = convert2NOTsToNOR(invabcoutput);
-                invabcoutput = rewireNetlist(invabcoutput);
+                
+                invabcoutput = optimizeNetlist(invabcoutput,true,true,true);
+                //invabcoutput = removeDoubleInverters(invabcoutput);
+                //invabcoutput = outputORopt(invabcoutput);
+                //invabcoutput = convert2NOTsToNOR(invabcoutput);
+                //invabcoutput = rewireNetlist(invabcoutput);
                 
                 
                 List<DGate> precompout = new ArrayList<DGate>();
@@ -1394,10 +1424,11 @@ public class NetSynth {
                     precomp = PreCompute.parseNetlistFile();
                     precompout = precomp.get(i-1);
                     
-                    precompout = removeDoubleInverters(precompout);
-                    precompout = outputORopt(precompout);
-                    precompout = convert2NOTsToNOR(precompout);
-                    precompout = rewireNetlist(precompout);
+                    precompout = optimizeNetlist(precompout,true,true,true);
+                    //precompout = removeDoubleInverters(precompout);
+                    //precompout = outputORopt(precompout);
+                    //precompout = convert2NOTsToNOR(precompout);
+                    //precompout = rewireNetlist(precompout);
                     precomputecount = precompout.size();
                     if(precompout.get(precompout.size()-1).gtype.equals(DGateType.OR))
                         precomputecount --;
@@ -1412,11 +1443,11 @@ public class NetSynth {
                     notoutpre.gtype = DGateType.NOT;
                     notoutpre.output = new DWire("out",DWireType.output);
                     invprecompout.add(notoutpre);
-                    
-                    invprecompout = removeDoubleInverters(invprecompout);
-                    invprecompout = outputORopt(invprecompout);
-                    invprecompout = convert2NOTsToNOR(invprecompout);
-                    invprecompout = rewireNetlist(invprecompout);
+                    invprecompout = optimizeNetlist(invprecompout,true,true,true);
+                    //invprecompout = removeDoubleInverters(invprecompout);
+                    //invprecompout = outputORopt(invprecompout);
+                    //invprecompout = convert2NOTsToNOR(invprecompout);
+                    //invprecompout = rewireNetlist(invprecompout);
                     invprecomputecount = invprecompout.size();
                     
                     
@@ -1750,10 +1781,11 @@ public class NetSynth {
                 
                 List<DGate> espoutput = new ArrayList<DGate>();
                 espoutput = convertPOStoNORNOT(espout);
-                espoutput = removeDoubleInverters(espoutput);
-                espoutput = outputORopt(espoutput);
-                espoutput = convert2NOTsToNOR(espoutput);
-                espoutput = rewireNetlist(espoutput);
+                espoutput = optimizeNetlist(espoutput,true,true,true);
+                //espoutput = removeDoubleInverters(espoutput);
+                //espoutput = outputORopt(espoutput);
+                //espoutput = convert2NOTsToNOR(espoutput);
+                //espoutput = rewireNetlist(espoutput);
                         
                 List<DGate> abcoutput = new ArrayList<DGate>();
                 try {
@@ -2222,10 +2254,11 @@ public class NetSynth {
         try {
             netlistout = runABCverilog("espressoVerilog");
             netlistout = separateOutputGates(netlistout);
-            netlistout = removeDoubleInverters(netlistout);
-            netlistout = outputORopt(netlistout);
-            netlistout = convert2NOTsToNOR(netlistout);
-            netlistout = rewireNetlist(netlistout);
+            netlistout = optimizeNetlist(netlistout,true,true,true);
+            //netlistout = removeDoubleInverters(netlistout);
+            //netlistout = outputORopt(netlistout);
+            //netlistout = convert2NOTsToNOR(netlistout);
+            //netlistout = rewireNetlist(netlistout);
         } catch (InterruptedException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -2272,11 +2305,13 @@ public class NetSynth {
         String vfilepath = "";
         vfilepath = create_VerilogFile(vfilelines,"espressoVerilog");
         try {
+            
             netlistout = runABCverilog("espressoVerilog");
-            netlistout = removeDoubleInverters(netlistout);
-            netlistout = outputORopt(netlistout);
-            netlistout = convert2NOTsToNOR(netlistout);
-            netlistout = rewireNetlist(netlistout);
+            netlistout = optimizeNetlist(netlistout,true,true,true);            
+            //netlistout = removeDoubleInverters(netlistout);
+            //netlistout = outputORopt(netlistout);
+            //netlistout = convert2NOTsToNOR(netlistout);
+            //netlistout = rewireNetlist(netlistout);
         } catch (InterruptedException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -2504,8 +2539,10 @@ public class NetSynth {
                 espout = runEspresso(filestring);
                 List<DGate> espoutput = new ArrayList<DGate>();
                 espoutput = convertPOStoNORNOT(espout);
-                espoutput = removeDoubleInverters(espoutput);
-                espoutput = outputORopt(espoutput);
+                
+                espoutput = optimizeNetlist(espoutput,true,true,true);
+                //espoutput = removeDoubleInverters(espoutput);
+                //espoutput = outputORopt(espoutput);
                 //espoutput = parseEspressoToNORNAND(espout);
                 
                 System.out.println("\nPOST-OPTIMIZATION : NETLIST\n");
@@ -2528,8 +2565,10 @@ public class NetSynth {
                 
                 //espoutputinv = parseEspressoToNORNAND(espoutinv);
                 espoutputinv = convertPOStoNORNOT(espoutinv);
-                espoutputinv = removeDoubleInverters(espoutputinv);
-                espoutputinv = outputORopt(espoutputinv);
+                
+                espoutputinv = optimizeNetlist(espoutputinv,true,true,true);
+                //espoutputinv = removeDoubleInverters(espoutputinv);
+                //espoutputinv = outputORopt(espoutputinv);
                 
                 System.out.println("\nPOST-OPTIMIZATION : INV NETLIST\n");
                 for(int i=0;i<espoutputinv.size();i++)
@@ -2793,11 +2832,11 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        dseg7 = removeDoubleInverters(dseg7);
-        dseg7 = outputORopt(dseg7);
-        dseg7 = convert2NOTsToNOR(dseg7);
-        dseg7 = rewireNetlist(dseg7);
-        
+        //dseg7 = removeDoubleInverters(dseg7);
+        //dseg7 = outputORopt(dseg7);
+        //dseg7 = convert2NOTsToNOR(dseg7);
+        //dseg7 = rewireNetlist(dseg7);
+        dseg7 = optimizeNetlist(dseg7,true,true,true);
         
         for(int i=0;i<dseg7.size();i++)
             System.out.println(printGate(dseg7.get(i)));
@@ -2814,11 +2853,15 @@ public class NetSynth {
         } catch (InterruptedException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
-        dseg7 = removeDoubleInverters(dseg7);
-        dseg7 = outputORopt(dseg7);
-        dseg7 = convert2NOTsToNOR(dseg7);
-        dseg7 = rewireNetlist(dseg7);
         
+        
+        
+        //dseg7 = removeDoubleInverters(dseg7);
+        //dseg7 = outputORopt(dseg7);
+        //dseg7 = convert2NOTsToNOR(dseg7);
+        //dseg7 = rewireNetlist(dseg7);
+        
+        dseg7 = optimizeNetlist(dseg7,true,true,true);
         
         for(int i=0;i<dseg7.size();i++)
             System.out.println(printGate(dseg7.get(i)));
@@ -4821,24 +4864,24 @@ public class NetSynth {
         //System.out.println("Before Optimizing");
         //printNetlist(structnetlist);
         
-        
-        structnetlist = removeDanglingGates(structnetlist);
+        structnetlist = optimizeNetlist(structnetlist,true,true,true);
+        //structnetlist = removeDanglingGates(structnetlist);
         //printNetlist(structnetlist);
         //System.out.println("------------------------------------");
-        structnetlist = removeDoubleInverters(structnetlist);
-        structnetlist = outputORopt(structnetlist);
+        //structnetlist = removeDoubleInverters(structnetlist);
+        //structnetlist = outputORopt(structnetlist);
         //printNetlist(structnetlist);
         //System.out.println("------------------------------------");
         //System.out.println("Optimized Netlist: (Output OR and Double NOTS");
         //printNetlist(structnetlist);
         //System.out.println("------------------------------------");
         
-        structnetlist = convert2NOTsToNOR(structnetlist);
+        //structnetlist = convert2NOTsToNOR(structnetlist);
         //System.out.println("After 2 Nots to Nor");
         //printNetlist(structnetlist);
         //System.out.println("------------------------------------");
         
-        structnetlist = rewireNetlist(structnetlist);
+        //structnetlist = rewireNetlist(structnetlist);
         //printNetlist(structnetlist);
         return structnetlist;
     }
@@ -4854,6 +4897,16 @@ public class NetSynth {
         
         return outpNetlist;
     }*/
+
+    /**
+     *
+     * @param inpNetlist This is the input Netlist you want to optimize
+     * @param doubleinv Remove Double Inverters
+     * @param outputor OutputOR Optimization
+     * @param twoNotsToNor 2NOTStoNOR Optimization
+     * @return Returns an optimized Netlist 
+     */
+    
     public static List<DGate> optimizeNetlist(List<DGate> inpNetlist,boolean doubleinv,boolean outputor,boolean twoNotsToNor)
     {
         List<DGate> outpNetlist = new ArrayList<DGate>();
