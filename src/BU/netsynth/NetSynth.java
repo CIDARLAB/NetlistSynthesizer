@@ -354,6 +354,7 @@ public class NetSynth {
                 int ttval = Convert.bintoDec(precompTT.get(0));
                 if((ttval!=0) && (ttval!= 255))
                 {
+                    //System.out.println("Reached here");
                     if(precompnetlist.get(ttval-1).size() < netlist.size())
                     {
                         netlist = new ArrayList<DGate>();
@@ -372,7 +373,8 @@ public class NetSynth {
         netlist = rewireNetlist(netlist);
         
         //System.out.println("\nFinal Netlist");
-        printNetlist(netlist);
+        //printNetlist(netlist);
+        
         //BooleanSimulator.printTruthTable(netlist, inputnames);
         finaldag = CreateMultDAGW(netlist);
         
@@ -382,6 +384,13 @@ public class NetSynth {
         }
         
         finaldag = DAGW.reorderinputs(finaldag,inputnames);
+        //List<String> netlistTT = new ArrayList<String>();
+        //System.out.println("Final Netlist");
+        //printNetlist(netlist);
+       
+        //BooleanSimulator.printTruthTable(netlist, inputnames);
+        //netlistTT = BooleanSimulator.getTruthTable(netlist, inputnames);
+        
         //for(Gate xgate:finaldag.Gates)
         //{
         //    System.out.println(xgate.Name +" : " + xgate.Type);

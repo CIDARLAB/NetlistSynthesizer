@@ -1,7 +1,7 @@
-module 256_3(outout out, input inp1,inp2,inp3);
+module 255_3(outout out, input inp1,inp2,inp3);
      reg out;
      always@(inp1,inp2,inp3) begin
-          case({inp3,inp2,inp1})
+          case({inp1,inp2,inp3})
                3'b000: out = 1'b1;
                3'b001: out = 1'b1;
                3'b010: out = 1'b1;

@@ -74,9 +74,9 @@ public class genVerilogFile {
         verout.add(line);
         line = "";
         line+= "          case({";
-        for(int i=(inputs-1);i>=0;i--)
+        for(int i=0;i<inputs;i++)
         {
-            if(i == 0)
+            if(i == (inputs-1))
             {
                 line += inputvars.get(i);
             }
@@ -169,9 +169,9 @@ public class genVerilogFile {
         verout.add(line);
         line = "";
         line+= "          case({";
-        for(int i=(inputs-1);i>=0;i--)
+        for(int i=0;i<inputs;i++)
         {
-            if(i == 0)
+            if(i == (inputs-1))
             {
                 line += inputvars.get(i);
             }
@@ -270,9 +270,9 @@ public class genVerilogFile {
         verout.add(line);
         line = "";
         line+= "          case({";
-        for(int i=(inputs-1);i>=0;i--)
+        for(int i=0;i<inputs;i++)
         {
-            if(i == 0)
+            if(i == (inputs-1))
             {
                 line += inputvars.get(i);
             }
@@ -382,9 +382,9 @@ public class genVerilogFile {
         verout.add(line);
         line = "";
         line+= "          case({";
-        for(int i=(inputs-1);i>=0;i--)
+        for(int i=0;i<inputs;i++)
         {
-            if(i == 0)
+            if(i == (inputs-1))
             {
                 line += inputvars.get(i);
             }

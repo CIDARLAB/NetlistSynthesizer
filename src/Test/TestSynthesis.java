@@ -22,6 +22,7 @@ import static BU.netsynth.NetSynth.runEspresso;
 import BU.netsynth.NetlistConversionFunctions;
 import BU.precomputation.PreCompute;
 import BU.precomputation.genVerilogFile;
+import MIT.dnacompiler.Gate;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -58,7 +59,16 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             newdag = NetSynth.runNetSynth(filepath);
-            System.out.println(i + " : "+(newdag.Gates.size()-4));
+            
+            /*if(newdag.Gates.size() == 4)
+            {
+                System.out.println(i);
+                
+                for(Gate xgate:newdag.Gates)
+                    System.out.println(xgate.Type + ":" + xgate.Name );
+            }
+            */
+            System.out.println(i + " : "+(newdag.Gates.size()));
         }
     }
     
