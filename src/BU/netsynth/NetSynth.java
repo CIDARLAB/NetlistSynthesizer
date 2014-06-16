@@ -173,6 +173,9 @@ public class NetSynth {
     public static DAGW runNetSynth(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck,NetSynthSwitches precomp, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
     {
         DAGW finaldag = new DAGW();
+        
+        
+        
         List<DGate> naivenetlist = new ArrayList<DGate>();
         List<DGate> structnetlist = new ArrayList<DGate>();
         
@@ -261,7 +264,7 @@ public class NetSynth {
             //<editor-fold desc="Behavioral- Has Case Statements">
             if(hasCaseStatements)
             {
-                System.out.println("Has Case Statements!");
+                //System.out.println("Has Case Statements!");
                 CircuitDetails direct = new CircuitDetails();
                 direct = parseVerilogFile.parseCaseStatements(alllines);
                 List<String> invttValues = new ArrayList<String>();
@@ -303,7 +306,9 @@ public class NetSynth {
                 //<editor-fold desc="Behavioral- Case Statements - NO Don't Cares">
                 else
                 {
-                    System.out.println("No Dont Cares");
+                    //System.out.println("No Dont Cares");
+                    
+                    
                     dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
                     invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
                     
@@ -364,10 +369,11 @@ public class NetSynth {
         
         
         
-        System.out.println("\nFinal Netlist");
         netlist = rewireNetlist(netlist);
+        
+        //System.out.println("\nFinal Netlist");
         printNetlist(netlist);
-        BooleanSimulator.printTruthTable(netlist, inputnames);
+        //BooleanSimulator.printTruthTable(netlist, inputnames);
         finaldag = CreateMultDAGW(netlist);
         
         if(hasCaseStatements)
@@ -376,10 +382,10 @@ public class NetSynth {
         }
         
         finaldag = DAGW.reorderinputs(finaldag,inputnames);
-        for(Gate xgate:finaldag.Gates)
-        {
-            System.out.println(xgate.Name +" : " + xgate.Type);
-        }
+        //for(Gate xgate:finaldag.Gates)
+        //{
+        //    System.out.println(xgate.Name +" : " + xgate.Type);
+        //}
         
         return finaldag;
     }
@@ -1077,6 +1083,11 @@ public class NetSynth {
     public static String create_VerilogFile(List<String> filelines, String filename)
     {
         String filestring = "";
+        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if(Filepath.contains("build/classes/"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+        else if(Filepath.contains("src"))
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         if (Filepath.contains("prashant")) 
         {
             filestring += Filepath + "src/BU/resources/";
@@ -1111,7 +1122,7 @@ public class NetSynth {
     public static void create_VerilogFile(int inputs,String hex, String filename)
     {
         List<String> filelines = new ArrayList<String>();
-        filelines = genVerilogFile.createVerilogFile(inputs, hex);
+        filelines = genVerilogFile.createSingleOutpVerilogFile(inputs, hex);
         String filestring = "";
         if (Filepath.contains("prashant")) 
         {

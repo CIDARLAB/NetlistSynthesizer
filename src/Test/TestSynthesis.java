@@ -4,6 +4,7 @@
  */
 package Test;
 
+import BU.CelloGraph.DAGW;
 import BU.ParseVerilog.CircuitDetails;
 import BU.ParseVerilog.Convert;
 import BU.ParseVerilog.Espresso;
@@ -20,6 +21,7 @@ import static BU.netsynth.NetSynth.parseEspressoToNORNAND;
 import static BU.netsynth.NetSynth.runEspresso;
 import BU.netsynth.NetlistConversionFunctions;
 import BU.precomputation.PreCompute;
+import BU.precomputation.genVerilogFile;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -45,9 +47,38 @@ public class TestSynthesis {
      */
     
     
-    public static void testrunNetSynth()
+    
+    public static void testAllnInputVerilog(int n)
     {
-        NetSynth.runNetSynth("");
+        int maxpow = (int) Math.pow(2,Math.pow(2,n));   
+        for(int i=0;i<maxpow;i++)
+        {
+            List<String> verilogFileLines = new ArrayList<String>();
+            verilogFileLines = genVerilogFile.createSingleOutpVerilogFile(n, i);
+            String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
+            DAGW newdag = new DAGW();
+            newdag = NetSynth.runNetSynth(filepath);
+            System.out.println(i + " : "+(newdag.Gates.size()-4));
+        }
+    }
+    
+    public static void testVerilogrunNetSynth()
+    {
+        
+        String path = Filepath;
+        Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
+         
+        if(Filepath.contains("prashant"))
+        {
+            if(Filepath.contains("build/classes/"))
+                Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
+            else if(Filepath.contains("src"))
+                Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
+            Filepath += "src/BU/ParseVerilog/Verilog.v";
+           //Filepath += "src/BU/resources/TestNinput.v";
+            path = Filepath;
+        }
+        System.out.println(NetSynth.runNetSynth(path).Gates.size());
     }
     
     

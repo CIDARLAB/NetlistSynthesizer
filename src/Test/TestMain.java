@@ -29,8 +29,8 @@ public class TestMain {
             //TestSynthesis.testGetTT();
             //TestSynthesis.testespressotoabc();
             //TestSynthesis.testParseVerilogFileFunctions();
-            TestSynthesis.testrunNetSynth();
-        
+            //TestSynthesis.testVerilogrunNetSynth();
+            TestSynthesis.testAllnInputVerilog(3);
         
         /*try {
             ClothoSocket.connect();

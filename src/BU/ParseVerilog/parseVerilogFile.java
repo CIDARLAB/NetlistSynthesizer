@@ -33,7 +33,7 @@ public class parseVerilogFile {
         String path = Filepath;
         Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
          
-        if(Filepath.contains("prashant"))
+        /*if(Filepath.contains("prashant"))
         {
             if(Filepath.contains("build/classes/"))
                 Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
@@ -41,7 +41,7 @@ public class parseVerilogFile {
                 Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
             Filepath += "src/BU/ParseVerilog/Verilog.v";
             path = Filepath;
-        }
+        }*/
         
         File file = new File(path);
         BufferedReader br;
