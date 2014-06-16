@@ -4,7 +4,7 @@
  */
 package BU.precomputation;
 
-import MIT.dnacompiler.reuHist;
+import MIT.heuristicsearch.reuHist;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;

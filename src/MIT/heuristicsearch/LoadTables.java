@@ -1,5 +1,6 @@
-package MIT.dnacompiler;
+package MIT.heuristicsearch;
 
+import MIT.dnacompiler.BGateCombo;
 import java.util.ArrayList;
 import java.util.List;
 

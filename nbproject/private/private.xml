@@ -9,6 +9,8 @@
             <file>file:/home/prashantvaidyanathan/cidar/NetlistSynthesizer/src/BU/netsynth/NetSynthSwitches.java</file>
             <file>file:/home/prashantvaidyanathan/cidar/NetlistSynthesizer/src/BU/ParseVerilog/VerilogKeywords.java</file>
             <file>file:/home/prashantvaidyanathan/cidar/NetlistSynthesizer/src/Test/TestMain.java</file>
+            <file>file:/home/prashantvaidyanathan/cidar/NetlistSynthesizer/src/MIT/dnacompiler/BGateNode.java</file>
+            <file>file:/home/prashantvaidyanathan/cidar/NetlistSynthesizer/src/MIT/heuristicsearch/HeuristicSearch.java</file>
             <file>file:/home/prashantvaidyanathan/cidar/NetlistSynthesizer/src/BU/netsynth/NetSynth.java</file>
             <file>file:/home/prashantvaidyanathan/cidar/NetlistSynthesizer/src/Test/TestSynthesis.java</file>
         </group>

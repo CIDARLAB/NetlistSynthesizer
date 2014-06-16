@@ -2,13 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package MIT.dnacompiler;
+package MIT.heuristicsearch;
 
 import BU.CelloGraph.DAGW;
 import BU.CelloGraph.DAGW_assignment;
 import BU.ParseVerilog.Convert;
+import MIT.dnacompiler.BGateCombo;
+import MIT.dnacompiler.BGateNode;
 import MIT.dnacompiler.BGateNode.nodecolor;
+import MIT.dnacompiler.Gate;
 import MIT.dnacompiler.Gate.GateType;
+import MIT.dnacompiler.Wire;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;

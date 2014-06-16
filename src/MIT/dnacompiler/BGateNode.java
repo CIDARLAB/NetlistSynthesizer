@@ -22,9 +22,9 @@ public class BGateNode {
         BLACK;
     }
     public  nodecolor ncolor;
-    BGateNode parent;
-    BGateNode child;
-    BGateNode Next;
+    public BGateNode parent;
+    public BGateNode child;
+    public BGateNode Next;
     //List<BGateNode> children = new ArrayList<BGateNode>();
     
     public BGateNode()
