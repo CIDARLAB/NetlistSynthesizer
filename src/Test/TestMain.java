@@ -11,7 +11,7 @@ import BU.netsynth.NetSynth;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.websocket.DeploymentException;
+
 
 /**
  *
@@ -28,8 +28,8 @@ public class TestMain {
             //TestSynthesis.testprintNetsynth();
             //TestSynthesis.testGetTT();
             //TestSynthesis.testespressotoabc();
-            TestSynthesis.testParseVerilogFileFunctions();
-        
+            //TestSynthesis.testParseVerilogFileFunctions();
+            TestSynthesis.testrunNetSynth();
         
         
         /*try {

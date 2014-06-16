@@ -45,6 +45,11 @@ public class TestSynthesis {
      */
     
     
+    public static void testrunNetSynth()
+    {
+        NetSynth.runNetSynth("");
+    }
+    
     
     public static void histogram()
     {

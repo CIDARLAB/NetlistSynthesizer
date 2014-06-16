@@ -15,13 +15,13 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.websocket.ClientEndpoint;
-import javax.websocket.DeploymentException;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
-import org.json.simple.JSONObject;
+//import javax.websocket.ClientEndpoint;
+//import javax.websocket.DeploymentException;
+//import javax.websocket.OnMessage;
+//import javax.websocket.OnOpen;
+//import javax.websocket.Session;
+//import javax.websocket.server.ServerEndpoint;
+//import org.json.simple.JSONObject;
         
 /*
 import java.text.DateFormat;
@@ -51,10 +51,10 @@ import org.jwebsocket.token.Token;
  * @author prashantvaidyanathan
  */
 
-@ClientEndpoint
+//@ClientEndpoint
 public class ClothoSocket
 {
-    
+  /*  
     
     
     public static void connect() throws DeploymentException, IOException
