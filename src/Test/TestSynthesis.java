@@ -55,7 +55,7 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.espresso, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.precompute,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
             System.out.println("\n");
             for(Gate xgate:newdag.Gates)
             {
@@ -83,7 +83,8 @@ public class TestSynthesis {
                     System.out.println(xgate.Type + ":" + xgate.Name );
             }
             */
-            System.out.println(i + " : "+(newdag.Gates.size()));
+            String hex = Convert.InttoHex(i);
+            System.out.println(hex + ","+(newdag.Gates.size()));
             
         }
     }

@@ -17,15 +17,12 @@ public enum NetSynthSwitches {
    abc,
    espresso,
    precompute,
-    
-   noinv,
-   
    noprecompute,
+   
+   noinv,
    
    nooutputOR,
    
    no2notstonor
-   
-   
     
 }

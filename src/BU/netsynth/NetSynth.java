@@ -131,14 +131,13 @@ public class NetSynth {
     ***********************************************************************/
     public static DAGW runNetSynth(String vfilepath)
     {
-        return runNetSynth(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode  );
+        return runNetSynth(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode  );
     }
     
-    public static DAGW runNetSynth(String vfilepath, String synthesis, String invcheck,String precompute, String outputor, String twonotstonor)
+    public static DAGW runNetSynth(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor)
     {
         NetSynthSwitches synth = null;
         NetSynthSwitches inv = null;
-        NetSynthSwitches precomp = null;
         NetSynthSwitches outpor = null;
         NetSynthSwitches twonots2nor = null;
         
@@ -146,7 +145,6 @@ public class NetSynth {
         {
             synth = NetSynthSwitches.valueOf(synthesis);
             inv = NetSynthSwitches.valueOf(invcheck);
-            precomp = NetSynthSwitches.valueOf(precompute);
             outpor = NetSynthSwitches.valueOf(outputor);
             twonots2nor = NetSynthSwitches.valueOf(twonotstonor);
         }
@@ -155,7 +153,7 @@ public class NetSynth {
             System.out.println("Error : "+ e.toString());
         }
         
-        return runNetSynth(vfilepath,synth, inv,precomp,outpor,twonots2nor);
+        return runNetSynth(vfilepath,synth, inv,outpor,twonots2nor);
     }
     /**Function*************************************************************
     Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
@@ -165,12 +163,11 @@ public class NetSynth {
      * @param vfilepath    []
      * @param synthesis
      * @param invcheck
-     * @param precomp
      * @param outputor
      * @param twonotstonor
      * @return 
     ***********************************************************************/
-    public static DAGW runNetSynth(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck,NetSynthSwitches precomp, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
+    public static DAGW runNetSynth(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
     {
         DAGW finaldag = new DAGW();
         
@@ -215,7 +212,7 @@ public class NetSynth {
             dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
             invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
             
-            if(synthesis.equals(NetSynthSwitches.noinv))
+            if(invcheck.equals(NetSynthSwitches.noinv))
             {
                 if(structnetlist.size() < dirnetlist.size())
                 {
@@ -277,7 +274,7 @@ public class NetSynth {
                 {
                     dirnetlist = runDCEspressoAndABC(direct,synthesis,outputor,twonotstonor);
                     invnetlist = runInvertedDCEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
-                    if(synthesis.equals(NetSynthSwitches.noinv))
+                    if(invcheck.equals(NetSynthSwitches.noinv))
                     {
                         for (DGate xgate : dirnetlist) 
                         {
@@ -312,7 +309,7 @@ public class NetSynth {
                     dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
                     invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
                     
-                    if(synthesis.equals(NetSynthSwitches.noinv))
+                    if(invcheck.equals(NetSynthSwitches.noinv))
                     {
                         for (DGate xgate : dirnetlist) 
                         {
@@ -346,51 +343,107 @@ public class NetSynth {
                 System.out.println("No case statements.\nWill be supported soon");
             }
         }
-        boolean precomputetriggered = false;
-        if((!precomp.equals(NetSynthSwitches.noprecompute)) && (outputnames.size()==1) && (inputnames.size() == 3))
+        
+        //boolean precomputetriggered = false;
+        if((synthesis.equals(NetSynthSwitches.precompute) || synthesis.equals(NetSynthSwitches.defaultmode)) && (inputnames.size()==3) && (outputnames.size()==1))
         {
-                precompTT = BooleanSimulator.getTruthTable(netlist, inputnames);
+            precompTT = BooleanSimulator.getTruthTable(netlist, inputnames);
+            int ttval = Convert.bintoDec(precompTT.get(0));
+            int invttval = Convert.bintoDec(Convert.invBin(precompTT.get(0)));
+            
+            if((ttval!=0) && (ttval!= 255))
+            {
+                
                 List<List<DGate>> precompnetlist;
                 precompnetlist = PreCompute.parseNetlistFile();
-                int ttval = Convert.bintoDec(precompTT.get(0));
-                if((ttval!=0) && (ttval!= 255))
+                
+                List<DGate> dirprecompnet = new ArrayList<DGate>();
+                List<DGate> invprecompnet = new ArrayList<DGate>();
+            
+                dirprecompnet = precompnetlist.get(ttval-1);
+                invprecompnet = precompnetlist.get(invttval-1);
+                dirprecompnet = runPrecomp(dirprecompnet,inputnames, outputnames,outputor,twonotstonor);
+                invprecompnet = runinvPrecomp(invprecompnet,inputnames, outputnames,outputor,twonotstonor);
+                if(synthesis.equals(NetSynthSwitches.precompute))
                 {
-                    //System.out.println("Reached here");
-                    if(precompnetlist.get(ttval-1).size() < netlist.size())
+                    netlist = new ArrayList<DGate>();
+                    //Over write netlist with precompute values
+                    if(invcheck.equals(NetSynthSwitches.noinv))
                     {
-                        netlist = new ArrayList<DGate>();
-                        for (DGate xgate : precompnetlist.get(ttval-1)) 
+                        for (DGate xgate : dirprecompnet) 
                         {
                             netlist.add(xgate);
                         }
-                        netlist.get(netlist.size()-1).output.name = outputnames.get(0);
-                        netlist.get(netlist.size()-1).output.wtype = DWireType.output;
-                        precomputetriggered = true;
+                    }
+                    else
+                    {
+                        if (dirprecompnet.size() < invprecompnet.size()) 
+                        {
+                            for (DGate xgate : dirprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        } 
+                        else 
+                        {
+                            for (DGate xgate : invprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        }
                     }
                 }
-                
+                else
+                {
+                    if(invcheck.equals(NetSynthSwitches.noinv))
+                    {
+                        if(dirprecompnet.size() <  netlist.size())
+                        {
+                            netlist = new ArrayList<DGate>();
+                            for (DGate xgate : dirprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        }
+                    }   
+                    else
+                    {
+                        if((dirprecompnet.size() <  netlist.size())&&  (dirprecompnet.size()< invprecompnet.size()) )
+                        {
+                            netlist = new ArrayList<DGate>();
+                            for (DGate xgate : dirprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        }
+                        else if((invprecompnet.size() <  netlist.size())&&  (invprecompnet.size()< dirprecompnet.size()) )
+                        {
+                            netlist = new ArrayList<DGate>();
+                            for (DGate xgate : invprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        } 
+                    }
+                }
+            }
         }
-        
-        
-        
         
         netlist = rewireNetlist(netlist);
         
-        System.out.println("\nFinal Netlist");
-        printNetlist(netlist);
+        
+        //System.out.println("\nFinal Netlist");
+        //printNetlist(netlist);
         
         //BooleanSimulator.printTruthTable(netlist, inputnames);
         finaldag = CreateMultDAGW(netlist);
         
-        if(hasCaseStatements && (!precomputetriggered))
+        if(hasCaseStatements)
         {
             finaldag = DAGW.addDanglingInputs(finaldag,inputnames);
         }
-        if(!precomputetriggered)
-        {
-            finaldag = DAGW.reorderinputs(finaldag,inputnames);
+        finaldag = DAGW.reorderinputs(finaldag,inputnames);
         
-        }
         //List<String> netlistTT = new ArrayList<String>();
         //System.out.println("Final Netlist");
         //printNetlist(netlist);
@@ -405,9 +458,62 @@ public class NetSynth {
         
         return finaldag;
     }
+    public static List<DGate> runinvPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
+    {
+        DGate finalnot = new DGate();
+        finalnot.gtype = DGateType.NOT;
+        finalnot.input.add(inpnetlist.get(inpnetlist.size()-1).output);
+        DWire notout = new DWire();
+        notout.name = outpnames.get(0);
+        notout.wtype = DWireType.output;
+        finalnot.output = notout;
+        inpnetlist.add(finalnot);
+        return runPrecomp(inpnetlist,inpnames,outpnames,outpor,twonots2nor);
+    }
     
-    
-    
+    public static List<DGate> runPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
+    {
+        List<DGate> finalnetlist = new ArrayList<DGate>();
+        inpnetlist.get(inpnetlist.size()-1).output.name = outpnames.get(0);
+        inpnetlist.get(inpnetlist.size()-1).output.wtype = DWireType.output;
+        
+        for(DGate xgate:inpnetlist)
+        {
+            for(DWire xwire:xgate.input)
+            {
+                if(xwire.wtype == DWireType.input)
+                {
+                    if(xwire.name.trim().equals("a"))
+                    {
+                        xwire.name = inpnames.get(0);
+                    }
+                    if(xwire.name.trim().equals("b"))
+                    {
+                        xwire.name = inpnames.get(1);
+                    }
+                    if(xwire.name.trim().equals("c"))
+                    {
+                        xwire.name = inpnames.get(2);
+                    }
+                }
+            }
+        }
+        boolean outor;
+        boolean not2nor;
+        
+        if(outpor.equals(NetSynthSwitches.defaultmode))
+            outor = true;
+        else
+            outor = false;
+        
+        if(twonots2nor.equals(NetSynthSwitches.defaultmode))
+            not2nor = true;
+        else
+            not2nor = false;
+        finalnetlist = optimizeNetlist(inpnetlist,outor,not2nor);
+        
+        return finalnetlist;
+    }
     
     public static List<DGate> runDCEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor) 
     {
