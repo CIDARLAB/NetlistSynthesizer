@@ -38,7 +38,7 @@ public class genVerilogFile {
         
         String modulename = "";
         modulename += hex + "_" + inputs;
-        String modulestring = "module " +  modulename +"(outout out, input ";
+        String modulestring = "module " +  modulename +"(output out, input ";
         for(int i=0;i<inputs;i++)
         {
             if(i == (inputs-1))
@@ -133,7 +133,7 @@ public class genVerilogFile {
         
         String modulename = "";
         modulename += intval + "_" + inputs;
-        String modulestring = "module " +  modulename +"(outout out, input ";
+        String modulestring = "module " +  modulename +"(output out, input ";
         for(int i=0;i<inputs;i++)
         {
             if(i == (inputs-1))
@@ -230,7 +230,7 @@ public class genVerilogFile {
         
         String modulename = "";
         modulename +=  "CellVerilog_" + inputs;
-        String modulestring = "module " +  modulename +"(outout out, input ";
+        String modulestring = "module " +  modulename +"(output out, input ";
         for(int i=0;i<inputs;i++)
         {
             if(i == (inputs-1))
@@ -342,7 +342,7 @@ public class genVerilogFile {
         
         String modulename = "";
         modulename +=  "CellVerilog_" + inputs;
-        String modulestring = "module " +  modulename +"(outout out, input ";
+        String modulestring = "module " +  modulename +"(output out, input ";
         for(int i=0;i<inputs;i++)
         {
             if(i == (inputs-1))

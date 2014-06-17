@@ -16,6 +16,7 @@ public enum NetSynthSwitches {
    
    abc,
    espresso,
+   precompute,
     
    noinv,
    

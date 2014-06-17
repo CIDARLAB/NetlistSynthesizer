@@ -346,6 +346,7 @@ public class NetSynth {
                 System.out.println("No case statements.\nWill be supported soon");
             }
         }
+        boolean precomputetriggered = false;
         if((!precomp.equals(NetSynthSwitches.noprecompute)) && (outputnames.size()==1) && (inputnames.size() == 3))
         {
                 precompTT = BooleanSimulator.getTruthTable(netlist, inputnames);
@@ -362,6 +363,9 @@ public class NetSynth {
                         {
                             netlist.add(xgate);
                         }
+                        netlist.get(netlist.size()-1).output.name = outputnames.get(0);
+                        netlist.get(netlist.size()-1).output.wtype = DWireType.output;
+                        precomputetriggered = true;
                     }
                 }
                 
@@ -372,18 +376,21 @@ public class NetSynth {
         
         netlist = rewireNetlist(netlist);
         
-        //System.out.println("\nFinal Netlist");
-        //printNetlist(netlist);
+        System.out.println("\nFinal Netlist");
+        printNetlist(netlist);
         
         //BooleanSimulator.printTruthTable(netlist, inputnames);
         finaldag = CreateMultDAGW(netlist);
         
-        if(hasCaseStatements)
+        if(hasCaseStatements && (!precomputetriggered))
         {
             finaldag = DAGW.addDanglingInputs(finaldag,inputnames);
         }
+        if(!precomputetriggered)
+        {
+            finaldag = DAGW.reorderinputs(finaldag,inputnames);
         
-        finaldag = DAGW.reorderinputs(finaldag,inputnames);
+        }
         //List<String> netlistTT = new ArrayList<String>();
         //System.out.println("Final Netlist");
         //printNetlist(netlist);

@@ -1,10 +1,18 @@
-module and3(output out,out1,out2,out3,out4, input in1,in2,in3,in4);
-
-wire w1,w2,w3,w4;
-nor (out,in3,in1,in2);
-or (out1,in1,in2,in3);
-and a1(out2,in3,in2);
-xnor (out3,in1,in2,in3);
-not (out4,in3);
-  
+module 0x16(output out, input in1, in2, in3);
+  reg r_out;
+  assign out = r_out;
+  always@(in1, in2, in3)
+    begin
+      case({in1,in2,in3})
+        3'b000: out = 1'b0;
+        3'b001: out = 1'b0;
+        3'b010: out = 1'b0;
+        3'b011: out = 1'b1;
+        3'b100: out = 1'b0;
+        3'b101: out = 1'b1;
+        3'b110: out = 1'b1;
+        3'b111: out = 1'b0;
+        default: out = 1'b0;
+      endcase
+    end
 endmodule

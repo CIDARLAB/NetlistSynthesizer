@@ -19,6 +19,7 @@ import BU.netsynth.NetSynth;
 import static BU.netsynth.NetSynth.Filepath;
 import static BU.netsynth.NetSynth.parseEspressoToNORNAND;
 import static BU.netsynth.NetSynth.runEspresso;
+import BU.netsynth.NetSynthSwitches;
 import BU.netsynth.NetlistConversionFunctions;
 import BU.precomputation.PreCompute;
 import BU.precomputation.genVerilogFile;
@@ -46,7 +47,21 @@ public class TestSynthesis {
      * 
      * 
      */
-    
+    public static void testSpecInputVerilog(int n,int tt)
+    {
+       
+            List<String> verilogFileLines = new ArrayList<String>();
+            verilogFileLines = genVerilogFile.createSingleOutpVerilogFile(n, tt);
+            String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
+            DAGW newdag = new DAGW();
+            //newdag = NetSynth.runNetSynth(filepath);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.espresso, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
+            System.out.println("\n");
+            for(Gate xgate:newdag.Gates)
+            {
+                System.out.println("Gate Type: " + xgate.Type + " : Gate Name: " + xgate.Name);
+            }
+    }
     
     
     public static void testAllnInputVerilog(int n)
@@ -69,6 +84,7 @@ public class TestSynthesis {
             }
             */
             System.out.println(i + " : "+(newdag.Gates.size()));
+            
         }
     }
     
