@@ -123,6 +123,13 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
     }
     
+    
+    
+    
+    
+    
+    
+    
     /**Function*************************************************************
     Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
     Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
@@ -168,6 +175,383 @@ public class NetSynth {
      * @return 
     ***********************************************************************/
     public static DAGW runNetSynth(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
+    {
+        DAGW finaldag = new DAGW();
+        
+        
+        
+        List<DGate> naivenetlist = new ArrayList<DGate>();
+        List<DGate> structnetlist = new ArrayList<DGate>();
+        
+        List<DGate> dirnetlist = new ArrayList<DGate>();
+        List<DGate> invnetlist = new ArrayList<DGate>();
+        List<String> inputnames = new ArrayList<String>();
+        List<String> outputnames = new ArrayList<String>();
+        List<DGate> netlist = new ArrayList<DGate>();
+        
+        
+        boolean isStructural = false;
+        boolean hasCaseStatements = false;
+        boolean hasDontCares = false;
+        
+        String alllines = parseVerilogFile.verilogFileLines(vfilepath);
+        isStructural = parseVerilogFile.isStructural(alllines);
+        inputnames = parseVerilogFile.getInputNames(alllines);
+        outputnames = parseVerilogFile.getOutputNames(alllines);
+        
+        List<String> precompTT = new ArrayList<String>();
+        int dirsize = 0;
+        int invsize = 0;
+        int structsize =0;
+        int precompsize =0;
+        int invprecompsize =0;
+        int netsize =0;
+        //<editor-fold desc="Structural Verilog">
+        if(isStructural)
+        {
+            naivenetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
+            structnetlist = parseStructuralVtoNORNOT(naivenetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+            
+            List<String> ttValues = new ArrayList<String>(); 
+            List<String> invttValues = new ArrayList<String>();
+            
+            ttValues = BooleanSimulator.getTruthTable(structnetlist, inputnames);  // Compute Truth Table of Each Output
+            invttValues = BooleanSimulator.invertTruthTable(ttValues); // Compute Inverse Truth Table of Each Output
+            
+            CircuitDetails direct = new CircuitDetails(inputnames,outputnames,ttValues); 
+            CircuitDetails inverted = new CircuitDetails(inputnames, outputnames,invttValues);
+            
+            dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
+            invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
+            
+            dirsize = getRepressorsCount(dirnetlist);
+            invsize = getRepressorsCount(invnetlist);
+            structsize = getRepressorsCount(structnetlist);
+            
+            
+            if(invcheck.equals(NetSynthSwitches.noinv))
+            {
+                if(structsize < dirsize)
+                {
+                    for(DGate xgate:structnetlist)
+                        netlist.add(xgate);
+                }
+                else
+                {
+                    for(DGate xgate:dirnetlist)
+                        netlist.add(xgate);
+                }
+            }
+            else 
+            {
+                if ((structsize < dirsize) && (structsize < invsize)) 
+                {
+                    for (DGate xgate : structnetlist) 
+                    {
+                        netlist.add(xgate);
+                    }
+                } 
+                else 
+                {
+                    if (dirsize < invsize) 
+                    {
+                        for (DGate xgate : dirnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    } 
+                    else 
+                    {
+                        for (DGate xgate : invnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    }
+                }
+            }
+            
+        }
+        //</editor-fold >
+        else
+        {
+            hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
+            //<editor-fold desc="Behavioral- Has Case Statements">
+            if(hasCaseStatements)
+            {
+                //System.out.println("Has Case Statements!");
+                CircuitDetails direct = new CircuitDetails();
+                direct = parseVerilogFile.parseCaseStatements(alllines);
+                List<String> invttValues = new ArrayList<String>();
+                invttValues = BooleanSimulator.invertTruthTable(direct.truthTable);
+                CircuitDetails inverted = new CircuitDetails(direct.inputNames, direct.outputNames, invttValues);
+                
+                hasDontCares = parseVerilogFile.hasDontCares(direct.truthTable);
+                //<editor-fold desc="Behavioral- Case Statements - Has Don't Cares">
+                if(hasDontCares)
+                {
+                    dirnetlist = runDCEspressoAndABC(direct,synthesis,outputor,twonotstonor);
+                    invnetlist = runInvertedDCEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
+                    
+                    dirsize = getRepressorsCount(dirnetlist);
+                    invsize = getRepressorsCount(invnetlist);
+                    
+                    if(invcheck.equals(NetSynthSwitches.noinv))
+                    {
+                        for (DGate xgate : dirnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    }
+                    else
+                    {
+                        if (dirsize < invsize) 
+                        {
+                            for (DGate xgate : dirnetlist) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        } 
+                        else 
+                        {
+                            for (DGate xgate : invnetlist) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        }
+                    }
+                }
+                //</editor-fold>
+                //<editor-fold desc="Behavioral- Case Statements - NO Don't Cares">
+                else
+                {
+                    //System.out.println("No Dont Cares");
+                    
+                    
+                    dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
+                    invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
+                    
+                    dirsize = getRepressorsCount(dirnetlist);
+                    invsize = getRepressorsCount(invnetlist);
+                    
+                    if(invcheck.equals(NetSynthSwitches.noinv))
+                    {
+                        for (DGate xgate : dirnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    }
+                    else
+                    {
+                        if (dirsize < invsize) 
+                        {
+                            for (DGate xgate : dirnetlist) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        } 
+                        else 
+                        {
+                            for (DGate xgate : invnetlist) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        }
+                    }
+                }
+                //</editor-fold>
+            }
+            //</editor-fold>
+            else
+            {
+                //System.out.println(alllines);
+                System.out.println("No case statements.\nWill be supported soon");
+            }
+        }
+        
+        
+        netsize = getRepressorsCount(netlist);
+        
+        //boolean precomputetriggered = false;
+        if((synthesis.equals(NetSynthSwitches.precompute) || synthesis.equals(NetSynthSwitches.defaultmode)) && (inputnames.size()==3) && (outputnames.size()==1))
+        {
+            precompTT = BooleanSimulator.getTruthTable(netlist, inputnames);
+            int ttval = Convert.bintoDec(precompTT.get(0));
+            int invttval = Convert.bintoDec(Convert.invBin(precompTT.get(0)));
+            
+            if((ttval!=0) && (ttval!= 255))
+            {
+                
+                List<List<DGate>> precompnetlist;
+                precompnetlist = PreCompute.parseNetlistFile();
+                
+                List<DGate> dirprecompnet = new ArrayList<DGate>();
+                List<DGate> invprecompnet = new ArrayList<DGate>();
+            
+                dirprecompnet = precompnetlist.get(ttval-1);
+                invprecompnet = precompnetlist.get(invttval-1);
+                dirprecompnet = runPrecomp(dirprecompnet,inputnames, outputnames,outputor,twonotstonor);
+                invprecompnet = runinvPrecomp(invprecompnet,inputnames, outputnames,outputor,twonotstonor);
+                
+                precompsize = getRepressorsCount(dirprecompnet);
+                invprecompsize = getRepressorsCount(invprecompnet);
+                
+                
+                
+                if(synthesis.equals(NetSynthSwitches.precompute))
+                {
+                    netlist = new ArrayList<DGate>();
+                    //Over write netlist with precompute values
+                    if(invcheck.equals(NetSynthSwitches.noinv))
+                    {
+                        for (DGate xgate : dirprecompnet) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    }
+                    else
+                    {
+                        if (precompsize < invprecompsize) 
+                        {
+                            for (DGate xgate : dirprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        } 
+                        else 
+                        {
+                            for (DGate xgate : invprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                   
+                    if(invcheck.equals(NetSynthSwitches.noinv))
+                    {
+                        if(precompsize <  netsize)
+                        {
+                            netlist = new ArrayList<DGate>();
+                            for (DGate xgate : dirprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        }
+                    }   
+                    else
+                    {
+                        if((precompsize <  netsize) &&  (precompsize<= invprecompsize))
+                        {
+                            netlist = new ArrayList<DGate>();
+                            for (DGate xgate : dirprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        }
+                        else if((invprecompsize <  netsize) &&  (invprecompsize<= precompsize))
+                        {
+                            netlist = new ArrayList<DGate>();
+                            for (DGate xgate : invprecompnet) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        } 
+                    }
+                }
+            }
+        }
+        
+        netlist = rewireNetlist(netlist);
+        
+        
+        //System.out.println("\nFinal Netlist");
+        //printNetlist(netlist);
+        
+        //BooleanSimulator.printTruthTable(netlist, inputnames);
+        finaldag = CreateMultDAGW(netlist);
+        
+        if(hasCaseStatements)
+        {
+            finaldag = DAGW.addDanglingInputs(finaldag,inputnames);
+        }
+        finaldag = DAGW.reorderinputs(finaldag,inputnames);
+        
+        //List<String> netlistTT = new ArrayList<String>();
+        //System.out.println("Final Netlist");
+        //printNetlist(netlist);
+       
+        //BooleanSimulator.printTruthTable(netlist, inputnames);
+        //netlistTT = BooleanSimulator.getTruthTable(netlist, inputnames);
+        
+        //for(Gate xgate:finaldag.Gates)
+        //{
+        //    System.out.println(xgate.Name +" : " + xgate.Type);
+        //}
+        
+        return finaldag;
+    }
+    
+    public static int getRepressorsCount(List<DGate> inpnetlist)
+    {
+        int count = 0;
+        for(DGate xgate:inpnetlist)
+        {
+            if(!xgate.gtype.equals(DGateType.OR))
+                count++;
+        }
+        
+        return count;
+    }
+    
+    /**Function*************************************************************
+    Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    SideEffects []
+    SeeAlso     []
+    ***********************************************************************/
+    public static List<DGate> getNetlist(String vfilepath)
+    {
+        return getNetlist(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode  );
+    }
+    
+    public static List<DGate> getNetlist(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor)
+    {
+        NetSynthSwitches synth = null;
+        NetSynthSwitches inv = null;
+        NetSynthSwitches outpor = null;
+        NetSynthSwitches twonots2nor = null;
+        
+        try
+        {
+            synth = NetSynthSwitches.valueOf(synthesis);
+            inv = NetSynthSwitches.valueOf(invcheck);
+            outpor = NetSynthSwitches.valueOf(outputor);
+            twonots2nor = NetSynthSwitches.valueOf(twonotstonor);
+        }
+        catch(Exception e)
+        {
+            System.out.println("Error : "+ e.toString());
+        }
+        
+        return getNetlist(vfilepath,synth, inv,outpor,twonots2nor);
+    }
+    
+    /**Function*************************************************************
+    Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    SideEffects []
+    SeeAlso
+     * @param vfilepath    []
+     * @param synthesis
+     * @param invcheck
+     * @param outputor
+     * @param twonotstonor
+     * @return 
+    ***********************************************************************/
+    
+    public static List<DGate> getNetlist(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
     {
         DAGW finaldag = new DAGW();
         
@@ -430,34 +814,14 @@ public class NetSynth {
         }
         
         netlist = rewireNetlist(netlist);
+        return netlist;
         
         
-        //System.out.println("\nFinal Netlist");
-        //printNetlist(netlist);
-        
-        //BooleanSimulator.printTruthTable(netlist, inputnames);
-        finaldag = CreateMultDAGW(netlist);
-        
-        if(hasCaseStatements)
-        {
-            finaldag = DAGW.addDanglingInputs(finaldag,inputnames);
-        }
-        finaldag = DAGW.reorderinputs(finaldag,inputnames);
-        
-        //List<String> netlistTT = new ArrayList<String>();
-        //System.out.println("Final Netlist");
-        //printNetlist(netlist);
-       
-        //BooleanSimulator.printTruthTable(netlist, inputnames);
-        //netlistTT = BooleanSimulator.getTruthTable(netlist, inputnames);
-        
-        //for(Gate xgate:finaldag.Gates)
-        //{
-        //    System.out.println(xgate.Name +" : " + xgate.Type);
-        //}
-        
-        return finaldag;
     }
+    
+    
+    
+    
     public static List<DGate> runinvPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
     {
         DGate finalnot = new DGate();

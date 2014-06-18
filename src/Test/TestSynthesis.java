@@ -55,8 +55,8 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.precompute,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
-            System.out.println("\n");
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
+            System.out.println("\nDAGW Gates");
             for(Gate xgate:newdag.Gates)
             {
                 System.out.println("Gate Type: " + xgate.Type + " : Gate Name: " + xgate.Name);
@@ -66,14 +66,16 @@ public class TestSynthesis {
     
     public static void testAllnInputVerilog(int n)
     {
-        int maxpow = (int) Math.pow(2,Math.pow(2,n));   
+        int maxpow = (int) Math.pow(2,Math.pow(2,n));  
+        int count =0;
         for(int i=0;i<maxpow;i++)
         {
             List<String> verilogFileLines = new ArrayList<String>();
             verilogFileLines = genVerilogFile.createSingleOutpVerilogFile(n, i);
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
-            newdag = NetSynth.runNetSynth(filepath);
+            //newdag = NetSynth.runNetSynth(filepath);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
             
             /*if(newdag.Gates.size() == 4)
             {
@@ -85,8 +87,9 @@ public class TestSynthesis {
             */
             String hex = Convert.InttoHex(i);
             System.out.println(hex + ","+(newdag.Gates.size()));
-            
+            count += newdag.Gates.size();
         }
+        System.out.println("Total : "+ count);
     }
     
     public static void testVerilogrunNetSynth()

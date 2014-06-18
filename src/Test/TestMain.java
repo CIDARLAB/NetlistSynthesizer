@@ -31,7 +31,7 @@ public class TestMain {
             //TestSynthesis.testParseVerilogFileFunctions();
             //TestSynthesis.testVerilogrunNetSynth();
             
-            //TestSynthesis.testSpecInputVerilog(3,22);
+            //TestSynthesis.testSpecInputVerilog(3,25);
             TestSynthesis.testAllnInputVerilog(3);
         
         /*try {
