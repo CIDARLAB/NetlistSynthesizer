@@ -577,7 +577,12 @@ public class NetSynth {
         outputnames = parseVerilogFile.getOutputNames(alllines);
         
         List<String> precompTT = new ArrayList<String>();
-        
+        int dirsize = 0;
+        int invsize = 0;
+        int structsize =0;
+        int precompsize =0;
+        int invprecompsize =0;
+        int netsize =0;
         //<editor-fold desc="Structural Verilog">
         if(isStructural)
         {
@@ -596,9 +601,14 @@ public class NetSynth {
             dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
             invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
             
+            dirsize = getRepressorsCount(dirnetlist);
+            invsize = getRepressorsCount(invnetlist);
+            structsize = getRepressorsCount(structnetlist);
+            
+            
             if(invcheck.equals(NetSynthSwitches.noinv))
             {
-                if(structnetlist.size() < dirnetlist.size())
+                if(structsize < dirsize)
                 {
                     for(DGate xgate:structnetlist)
                         netlist.add(xgate);
@@ -611,7 +621,7 @@ public class NetSynth {
             }
             else 
             {
-                if ((structnetlist.size() < dirnetlist.size()) && (structnetlist.size() < invnetlist.size())) 
+                if ((structsize < dirsize) && (structsize < invsize)) 
                 {
                     for (DGate xgate : structnetlist) 
                     {
@@ -620,7 +630,7 @@ public class NetSynth {
                 } 
                 else 
                 {
-                    if (dirnetlist.size() < invnetlist.size()) 
+                    if (dirsize < invsize) 
                     {
                         for (DGate xgate : dirnetlist) 
                         {
@@ -658,6 +668,10 @@ public class NetSynth {
                 {
                     dirnetlist = runDCEspressoAndABC(direct,synthesis,outputor,twonotstonor);
                     invnetlist = runInvertedDCEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
+                    
+                    dirsize = getRepressorsCount(dirnetlist);
+                    invsize = getRepressorsCount(invnetlist);
+                    
                     if(invcheck.equals(NetSynthSwitches.noinv))
                     {
                         for (DGate xgate : dirnetlist) 
@@ -667,7 +681,7 @@ public class NetSynth {
                     }
                     else
                     {
-                        if (dirnetlist.size() < invnetlist.size()) 
+                        if (dirsize < invsize) 
                         {
                             for (DGate xgate : dirnetlist) 
                             {
@@ -687,11 +701,14 @@ public class NetSynth {
                 //<editor-fold desc="Behavioral- Case Statements - NO Don't Cares">
                 else
                 {
-                    //System.out.println("No Dont Cares");
+                    System.out.println("No Dont Cares.... REACHED HERE!!");
                     
                     
                     dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
                     invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
+                    
+                    dirsize = getRepressorsCount(dirnetlist);
+                    invsize = getRepressorsCount(invnetlist);
                     
                     if(invcheck.equals(NetSynthSwitches.noinv))
                     {
@@ -702,7 +719,7 @@ public class NetSynth {
                     }
                     else
                     {
-                        if (dirnetlist.size() < invnetlist.size()) 
+                        if (dirsize < invsize) 
                         {
                             for (DGate xgate : dirnetlist) 
                             {
@@ -728,6 +745,9 @@ public class NetSynth {
             }
         }
         
+        
+        netsize = getRepressorsCount(netlist);
+        
         //boolean precomputetriggered = false;
         if((synthesis.equals(NetSynthSwitches.precompute) || synthesis.equals(NetSynthSwitches.defaultmode)) && (inputnames.size()==3) && (outputnames.size()==1))
         {
@@ -748,6 +768,12 @@ public class NetSynth {
                 invprecompnet = precompnetlist.get(invttval-1);
                 dirprecompnet = runPrecomp(dirprecompnet,inputnames, outputnames,outputor,twonotstonor);
                 invprecompnet = runinvPrecomp(invprecompnet,inputnames, outputnames,outputor,twonotstonor);
+                
+                precompsize = getRepressorsCount(dirprecompnet);
+                invprecompsize = getRepressorsCount(invprecompnet);
+                
+                
+                
                 if(synthesis.equals(NetSynthSwitches.precompute))
                 {
                     netlist = new ArrayList<DGate>();
@@ -761,7 +787,7 @@ public class NetSynth {
                     }
                     else
                     {
-                        if (dirprecompnet.size() < invprecompnet.size()) 
+                        if (precompsize < invprecompsize) 
                         {
                             for (DGate xgate : dirprecompnet) 
                             {
@@ -779,9 +805,10 @@ public class NetSynth {
                 }
                 else
                 {
+                   
                     if(invcheck.equals(NetSynthSwitches.noinv))
                     {
-                        if(dirprecompnet.size() <  netlist.size())
+                        if(precompsize <  netsize)
                         {
                             netlist = new ArrayList<DGate>();
                             for (DGate xgate : dirprecompnet) 
@@ -792,7 +819,7 @@ public class NetSynth {
                     }   
                     else
                     {
-                        if((dirprecompnet.size() <  netlist.size())&&  (dirprecompnet.size()< invprecompnet.size()) )
+                        if((precompsize <  netsize) &&  (precompsize<= invprecompsize))
                         {
                             netlist = new ArrayList<DGate>();
                             for (DGate xgate : dirprecompnet) 
@@ -800,7 +827,7 @@ public class NetSynth {
                                 netlist.add(xgate);
                             }
                         }
-                        else if((invprecompnet.size() <  netlist.size())&&  (invprecompnet.size()< dirprecompnet.size()) )
+                        else if((invprecompsize <  netsize) &&  (invprecompsize<= precompsize))
                         {
                             netlist = new ArrayList<DGate>();
                             for (DGate xgate : invprecompnet) 
@@ -1238,6 +1265,8 @@ public class NetSynth {
     public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
     {
         
+        
+        
         boolean outor;
         boolean not2nor;
         
@@ -1389,10 +1418,13 @@ public class NetSynth {
             }
         }
         
+        
+        
+        
         finalEspCircuit = optimizeNetlist(finalEspCircuit,outor,not2nor);
         
-        
         finalABCCircuit = separateOutputGates(finalABCCircuit);
+        
         finalABCCircuit = optimizeNetlist(finalABCCircuit,outor,not2nor);
         
         
@@ -1449,7 +1481,7 @@ public class NetSynth {
                             if(netlist.get(j).input.get(m).wtype.equals(DWireType.output) && netlist.get(j).input.get(m).name.trim().equals(netlist.get(i).output.name.trim()))
                             {
                                 outToOutflag = 1;
-                                //System.out.println("Found that case!!");
+                                System.out.println("Found that case!!");
                             }
                         }
                     }
@@ -1492,6 +1524,62 @@ public class NetSynth {
         netlist = new ArrayList<DGate>();
         netlist.addAll(finalnetlist);
         }while(!addgate.isEmpty());
+        
+        
+        
+        addgate = new HashMap<Integer,DGate>();
+        for(int i=0;i<(netlist.size()-1);i++)
+        {
+            
+            outToOutflag = 0;
+            if(netlist.get(i).output.wtype.equals(DWireType.output))
+            {
+                for(int j=(i+1);j<netlist.size();j++)
+                {
+                    
+                    for(int m=0;m<netlist.get(j).input.size();m++)
+                    {
+                        if(netlist.get(j).input.get(m).wtype.equals(DWireType.output) && netlist.get(j).input.get(m).name.trim().equals(netlist.get(i).output.name.trim()))
+                        {
+                            outToOutflag = 1;
+                            //System.out.println("Found that case!! "+ printGate(netlist.get(i)));
+                        }
+                    }
+                }
+                if(outToOutflag == 1)
+                {
+                    DGate newg = new DGate();
+                    newg.gtype = netlist.get(i).gtype;
+                    newg.input.addAll(netlist.get(i).input);
+                    String Wname = "0Wire" + Global.wirecount++;
+                    DWire outW = new DWire(Wname, DWireType.connector);
+                    newg.output = outW;
+                    addgate.put(i, newg);
+                    for(int j=(i+1);j<netlist.size();j++)
+                    {
+                            for(int m=0;m<netlist.get(j).input.size();m++)
+                            {
+                                if(netlist.get(j).input.get(m).wtype.equals(DWireType.output) && netlist.get(j).input.get(m).name.trim().equals(netlist.get(i).output.name.trim()))
+                                {
+                                    netlist.get(j).input.set(m, outW);
+                                    //System.out.println("Found that case!!");
+                                }
+                            }   
+                    }
+                }
+            }
+        }
+        finalnetlist = new ArrayList<DGate>();
+        for(int i=0;i<netlist.size();i++)
+        {
+            if(addgate.containsKey(i))
+            {
+                finalnetlist.add(addgate.get(i));
+            }
+            finalnetlist.add(netlist.get(i));
+        }
+        netlist = new ArrayList<DGate>();
+        netlist.addAll(finalnetlist);
         
         
         
@@ -4466,18 +4554,71 @@ public class NetSynth {
      * @return Returns an optimized Netlist 
      */
     
+    public static List<DGate> removeDuplicateNots(List<DGate> inpNetlist)
+    {
+        List<DGate> outpNetlist = new ArrayList<DGate>();
+        List<Integer> removelist = new ArrayList<Integer>();
+        for(int i=0;i<inpNetlist.size();i++)
+        {
+            if(inpNetlist.get(i).gtype.equals(DGateType.NOT) && (!inpNetlist.get(i).output.wtype.equals(DWireType.output)))
+            {
+                String inpname = inpNetlist.get(i).input.get(0).name.trim();
+                String setoutname = inpNetlist.get(i).output.name.trim();
+                for(int j=i+1;j<inpNetlist.size();j++)
+                {
+                    if(inpNetlist.get(j).gtype.equals(DGateType.NOT) && (!inpNetlist.get(j).output.wtype.equals(DWireType.output)) && inpNetlist.get(j).input.get(0).name.trim().equals(inpname))
+                    {
+                        removelist.add(j);
+                        String outpname = inpNetlist.get(j).output.name.trim();
+                        for(int k=j+1;k<inpNetlist.size();k++)
+                        {
+                            for(int m=0;m<inpNetlist.get(k).input.size();m++)
+                            {
+                                if(inpNetlist.get(k).input.get(m).name.trim().equals(outpname))
+                                {
+                                    inpNetlist.get(k).input.get(m).name = setoutname;
+                                }
+                            }
+                        }
+                        inpNetlist.get(j).output.name = setoutname;
+                    }
+                }
+            }
+        }
+        //System.out.println(removelist.size());
+        for(int i=0;i<inpNetlist.size();i++)
+        {
+            if(!removelist.contains(i))
+            {
+                outpNetlist.add(inpNetlist.get(i));
+            }
+        }
+        
+        return outpNetlist;
+    }
+    
     public static List<DGate> optimizeNetlist(List<DGate> inpNetlist,boolean outputor,boolean twoNotsToNor)
     {
+        
+       
+        
         List<DGate> outpNetlist = new ArrayList<DGate>();
         
         outpNetlist = removeDanglingGates(inpNetlist);
+        outpNetlist = separateOutputGates(outpNetlist);
+        outpNetlist = removeDuplicateNots(outpNetlist);
         outpNetlist = removeDoubleInverters(outpNetlist);
+        outpNetlist = removeDuplicateNots(outpNetlist);
+        
+        
+        
         if(outputor)
             outpNetlist = outputORopt(outpNetlist);
         if(twoNotsToNor)
             outpNetlist = convert2NOTsToNOR(outpNetlist);
         
         outpNetlist = rewireNetlist(outpNetlist);
+        
         
         return outpNetlist;
     }

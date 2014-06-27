@@ -61,6 +61,8 @@ public class TestSynthesis {
             {
                 System.out.println("Gate Type: " + xgate.Type + " : Gate Name: " + xgate.Name);
             }
+            
+            System.out.println(newdag.printGraph());
     }
     
     
@@ -108,7 +110,17 @@ public class TestSynthesis {
            //Filepath += "src/BU/resources/TestNinput.v";
             path = Filepath;
         }
-        System.out.println(NetSynth.runNetSynth(path).Gates.size());
+        //System.out.println("Netlist:");
+        //NetSynth.printNetlist(NetSynth.getNetlist(path));
+        DAGW resdag = new DAGW();
+        resdag = NetSynth.runNetSynth(path);
+        for(Gate xgate:resdag.Gates)
+        {
+            System.out.println("Type: " + xgate.Type + " ::: Name: "+ xgate.Name);
+        }
+        System.out.println("Number of Gates in the DAGW : " + resdag.Gates.size());
+        
+        System.out.println(resdag.printGraph());
     }
     
     
