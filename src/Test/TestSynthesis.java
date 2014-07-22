@@ -62,11 +62,11 @@ public class TestSynthesis {
                 System.out.println("Gate Type: " + xgate.Type + " : Gate Name: " + xgate.Name);
             }
             
-            System.out.println(newdag.printGraph());
+            System.out.println("\n\nPrint Graph: \n"+newdag.printGraph());
     }
     
     
-    public static void testAllnInputVerilog(int n)
+    public static void testAllnInputVerilog(int n) // Also perform check to make sure the truthtable produced is correct
     {
         int maxpow = (int) Math.pow(2,Math.pow(2,n));  
         int count =0;

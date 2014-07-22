@@ -327,8 +327,12 @@ public class NetSynth {
                     //System.out.println("No Dont Cares");
                     
                     
+                    
                     dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
                     invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
+                    
+                    
+                    
                     
                     dirsize = getRepressorsCount(dirnetlist);
                     invsize = getRepressorsCount(invnetlist);
@@ -374,6 +378,7 @@ public class NetSynth {
         //boolean precomputetriggered = false;
         if((synthesis.equals(NetSynthSwitches.precompute) || synthesis.equals(NetSynthSwitches.defaultmode)) && (inputnames.size()==3) && (outputnames.size()==1))
         {
+            //System.out.println("Reached precompute");
             precompTT = BooleanSimulator.getTruthTable(netlist, inputnames);
             int ttval = Convert.bintoDec(precompTT.get(0));
             int invttval = Convert.bintoDec(Convert.invBin(precompTT.get(0)));
@@ -395,8 +400,13 @@ public class NetSynth {
                 precompsize = getRepressorsCount(dirprecompnet);
                 invprecompsize = getRepressorsCount(invprecompnet);
                 
-                
-                
+                /*System.out.println("\n\nDirect Netlist\n");
+                printNetlist(dirprecompnet);
+                System.out.println("----------------------------");
+                System.out.println("\n\nInverted Netlist\n");
+                printNetlist(invprecompnet);
+                System.out.println("----------------------------");
+                */
                 if(synthesis.equals(NetSynthSwitches.precompute))
                 {
                     netlist = new ArrayList<DGate>();
@@ -853,6 +863,7 @@ public class NetSynth {
     {
         DGate finalnot = new DGate();
         finalnot.gtype = DGateType.NOT;
+        inpnetlist.get(inpnetlist.size()-1).output.wtype = DWireType.connector;
         finalnot.input.add(inpnetlist.get(inpnetlist.size()-1).output);
         DWire notout = new DWire();
         notout.name = outpnames.get(0);
@@ -901,6 +912,8 @@ public class NetSynth {
             not2nor = true;
         else
             not2nor = false;
+        
+        
         finalnetlist = optimizeNetlist(inpnetlist,outor,not2nor);
         
         return finalnetlist;
@@ -4368,8 +4381,10 @@ public class NetSynth {
     {
         
         List removegates = new ArrayList<Integer>();
-        
-        
+        /*System.out.println("\nBefore Output_OR optimization");
+        printNetlist(finalnetlist);
+        System.out.println("--------------------------");
+        */
         //System.out.println("\nBegin Output_OR optimization");
         for(int i=0;i<finalnetlist.size()-1;i++)
         {
@@ -4418,7 +4433,7 @@ public class NetSynth {
         printNetlist(outputornetlist);
         System.out.println("--------------------------");
         */
-         return outputornetlist;
+        return outputornetlist;
     }
     
     
@@ -4442,7 +4457,7 @@ public class NetSynth {
         do{
         
         removegates = new ArrayList<Integer>();
-        for(int i=0;i<tempnetlist.size()-1;i++)
+        for(int i=0;i<tempnetlist.size();i++)
         {
             if(!tempnetlist.get(i).output.wtype.equals(DWireType.output))
             {
@@ -4612,13 +4627,14 @@ public class NetSynth {
         
         
         
+        outpNetlist = removeDanglingGates(outpNetlist);
         if(outputor)
             outpNetlist = outputORopt(outpNetlist);
         if(twoNotsToNor)
             outpNetlist = convert2NOTsToNOR(outpNetlist);
+        outpNetlist = removeDanglingGates(outpNetlist);
         
         outpNetlist = rewireNetlist(outpNetlist);
-        
         
         return outpNetlist;
     }
