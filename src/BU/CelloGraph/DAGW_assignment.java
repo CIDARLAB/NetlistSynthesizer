@@ -4,7 +4,6 @@
  */
 package BU.CelloGraph;
 
-import MIT.dnacompiler.BGateNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
