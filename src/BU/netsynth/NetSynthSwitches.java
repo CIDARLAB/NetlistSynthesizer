@@ -18,6 +18,7 @@ public enum NetSynthSwitches {
    espresso,
    precompute,
    noprecompute,
+   originalstructural,
    
    noinv,
    

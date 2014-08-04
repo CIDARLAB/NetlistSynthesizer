@@ -209,8 +209,12 @@ public class NetSynth {
         //<editor-fold desc="Structural Verilog">
         if(isStructural)
         {
+            
+            
             naivenetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
             structnetlist = parseStructuralVtoNORNOT(naivenetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+            
+            
             
             List<String> ttValues = new ArrayList<String>(); 
             List<String> invttValues = new ArrayList<String>();
@@ -228,48 +232,55 @@ public class NetSynth {
             invsize = getRepressorsCount(invnetlist);
             structsize = getRepressorsCount(structnetlist);
             
-            
-            if(invcheck.equals(NetSynthSwitches.noinv))
+            if(synthesis.equals(NetSynthSwitches.originalstructural))
             {
-                if(structsize < dirsize)
-                {
-                    for(DGate xgate:structnetlist)
+                for(DGate xgate:structnetlist)
                         netlist.add(xgate);
-                }
-                else
-                {
-                    for(DGate xgate:dirnetlist)
-                        netlist.add(xgate);
-                }
             }
-            else 
+            else
             {
-                if ((structsize < dirsize) && (structsize < invsize)) 
+            
+                if(invcheck.equals(NetSynthSwitches.noinv))
                 {
-                    for (DGate xgate : structnetlist) 
+                    if(structsize < dirsize)
                     {
-                        netlist.add(xgate);
+                        for(DGate xgate:structnetlist)
+                            netlist.add(xgate);
                     }
-                } 
+                    else
+                    {
+                        for(DGate xgate:dirnetlist)
+                            netlist.add(xgate);
+                    }
+                }
                 else 
                 {
-                    if (dirsize < invsize) 
+                    if ((structsize < dirsize) && (structsize < invsize)) 
                     {
-                        for (DGate xgate : dirnetlist) 
+                        for (DGate xgate : structnetlist) 
                         {
                             netlist.add(xgate);
                         }
                     } 
                     else 
                     {
-                        for (DGate xgate : invnetlist) 
+                        if (dirsize < invsize) 
                         {
-                            netlist.add(xgate);
+                            for (DGate xgate : dirnetlist) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        } 
+                        else 
+                        {
+                            for (DGate xgate : invnetlist) 
+                            {
+                                netlist.add(xgate);
+                            }
                         }
                     }
                 }
             }
-            
         }
         //</editor-fold >
         else
