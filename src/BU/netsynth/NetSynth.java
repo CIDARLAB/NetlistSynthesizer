@@ -211,8 +211,17 @@ public class NetSynth {
         {
             
             naivenetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
-            structnetlist = parseStructuralVtoNORNOT(naivenetlist,synthesis); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
-            
+            if(synthesis.equals(NetSynthSwitches.originalstructural))
+            {
+                for(DGate xgate:naivenetlist)
+                {
+                    structnetlist.add(xgate);
+                }
+            }
+            else
+            {
+                structnetlist = parseStructuralVtoNORNOT(naivenetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+            }
             
             
             List<String> ttValues = new ArrayList<String>(); 
@@ -607,8 +616,17 @@ public class NetSynth {
         if(isStructural)
         {
             naivenetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
-            structnetlist = parseStructuralVtoNORNOT(naivenetlist,synthesis); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
-            
+            if(synthesis.equals(NetSynthSwitches.originalstructural))
+            {
+                for(DGate xgate:naivenetlist)
+                {
+                    structnetlist.add(xgate);
+                }
+            }
+            else
+            {
+                structnetlist = parseStructuralVtoNORNOT(naivenetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+            }
             List<String> ttValues = new ArrayList<String>(); 
             List<String> invttValues = new ArrayList<String>();
             
@@ -4508,7 +4526,7 @@ public class NetSynth {
     
     
     
-    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist, NetSynthSwitches synthesis)
+    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist)
     {
         List<DGate> structnetlist = new ArrayList<DGate>();
         //List<DGate> naivenetlist = new ArrayList<DGate>();
@@ -4518,7 +4536,12 @@ public class NetSynth {
         //printNetlist(naivenetlist);
         //System.out.println("------------------------------------");
         List<DGate> reducedfanin = new ArrayList<DGate>();
-        for(int i=0;i<naivenetlist.size();i++)
+        
+        //System.out.println("Before Optimizing");
+        //printNetlist(structnetlist);
+        //if(!synthesis.equals(NetSynthSwitches.originalstructural))
+        //{
+            for(int i=0;i<naivenetlist.size();i++)
         {
             for(DGate redgate: NetlistConversionFunctions.ConvertToFanin2(naivenetlist.get(i)))
             {
@@ -4531,15 +4554,9 @@ public class NetSynth {
             {
                 structnetlist.add(structgate);
             }
-        }
-        
-        //System.out.println("Before Optimizing");
-        //printNetlist(structnetlist);
-        if(!synthesis.equals(NetSynthSwitches.originalstructural))
-        {
-            
+        }    
             structnetlist = optimizeNetlist(structnetlist,true,true);
-        }
+        //}
         //structnetlist = removeDanglingGates(structnetlist);
         //printNetlist(structnetlist);
         //System.out.println("------------------------------------");
