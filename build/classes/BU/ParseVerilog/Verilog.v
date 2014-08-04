@@ -1,13 +1,15 @@
-module A(output out1, out2, out3,  input in1, in2);
-  reg r_out;
-  assign out = r_out;
-  always@(in1,in2)
-    begin
-      case({in1,in2})
-        2'b00: {out1,out2,out3} = 3'b000;
-        2'b01: {out1,out2,out3} = 3'b001;
-        2'b10: {out1,out2,out3} = 3'b010;
-        2'b11: {out1,out2,out3} = 3'b100;
-      endcase
-    end
+module bestdouble(output o0, o1, o2, input ina, inb, inc);
+
+   wire w0, w1, w2, w3, w4, w5, w6;
+   not (w0, ina);
+   not (w1, inb);
+   not (w2, inc);
+   nor (w3, w0, inb);
+   nor (w4, w1, inc);
+   nor (w5, w2, ina);
+   not (w6, w3);
+   not (o0, w4);
+   not (o1, w5);
+   nor (o2, w6, inc);
+
 endmodule

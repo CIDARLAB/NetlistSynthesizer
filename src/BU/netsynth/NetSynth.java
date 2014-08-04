@@ -210,9 +210,8 @@ public class NetSynth {
         if(isStructural)
         {
             
-            
             naivenetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
-            structnetlist = parseStructuralVtoNORNOT(naivenetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+            structnetlist = parseStructuralVtoNORNOT(naivenetlist,synthesis); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
             
             
             
@@ -608,7 +607,7 @@ public class NetSynth {
         if(isStructural)
         {
             naivenetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
-            structnetlist = parseStructuralVtoNORNOT(naivenetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+            structnetlist = parseStructuralVtoNORNOT(naivenetlist,synthesis); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
             
             List<String> ttValues = new ArrayList<String>(); 
             List<String> invttValues = new ArrayList<String>();
@@ -4509,7 +4508,7 @@ public class NetSynth {
     
     
     
-    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist)
+    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist, NetSynthSwitches synthesis)
     {
         List<DGate> structnetlist = new ArrayList<DGate>();
         //List<DGate> naivenetlist = new ArrayList<DGate>();
@@ -4536,8 +4535,11 @@ public class NetSynth {
         
         //System.out.println("Before Optimizing");
         //printNetlist(structnetlist);
-        
-        structnetlist = optimizeNetlist(structnetlist,true,true);
+        if(!synthesis.equals(NetSynthSwitches.originalstructural))
+        {
+            
+            structnetlist = optimizeNetlist(structnetlist,true,true);
+        }
         //structnetlist = removeDanglingGates(structnetlist);
         //printNetlist(structnetlist);
         //System.out.println("------------------------------------");
