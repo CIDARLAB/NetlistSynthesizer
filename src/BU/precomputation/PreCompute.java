@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import BU.netsynth.DGate;
-import BU.netsynth.DGate.DGateType;
+import BU.netsynth.DGateType;
 import BU.netsynth.NetSynth;
 import BU.netsynth.DWire;
-import BU.netsynth.DWire.DWireType;
+import BU.netsynth.DWireType;
 
 /**
  *

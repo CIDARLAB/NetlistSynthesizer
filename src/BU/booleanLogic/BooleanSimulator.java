@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import BU.netsynth.DGate;
 import BU.netsynth.DWire;
-import BU.netsynth.DWire.DWireType;
+import BU.netsynth.DWireType;
 import BU.netsynth.DWire.DWireValue;
 import BU.netsynth.NetSynth;
 

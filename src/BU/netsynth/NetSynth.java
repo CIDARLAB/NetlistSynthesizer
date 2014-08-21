@@ -14,11 +14,8 @@ import BU.ParseVerilog.Blif;
 import BU.ParseVerilog.CircuitDetails;
 import BU.ParseVerilog.Convert;
 import BU.ParseVerilog.Espresso;
-import BU.ParseVerilog.Parser;
 import BU.ParseVerilog.parseVerilogFile;
 import BU.booleanLogic.BooleanSimulator;
-import BU.netsynth.DGate.DGateType;
-import BU.netsynth.DWire.DWireType;
 import BU.precomputation.PreCompute;
 import BU.precomputation.genVerilogFile;
 import MIT.dnacompiler.Gate;
@@ -35,7 +32,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -126,10 +122,6 @@ public class NetSynth {
     
     
     
-    
-    
-    
-    
     /**Function*************************************************************
     Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
     Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
@@ -176,10 +168,128 @@ public class NetSynth {
     ***********************************************************************/
     public static DAGW runNetSynth(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
     {
+        
         DAGW finaldag = new DAGW();
         
+        List<String> inputnames = new ArrayList<String>();
+        List<String> outputnames = new ArrayList<String>();
+        List<DGate> netlist = new ArrayList<DGate>();
+        
+        boolean isStructural = false;
+        boolean hasCaseStatements = false;
+        
+        String alllines = parseVerilogFile.verilogFileLines(vfilepath);
+        isStructural = parseVerilogFile.isStructural(alllines);
+        hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
+        
+        inputnames = parseVerilogFile.getInputNames(alllines);
+        outputnames = parseVerilogFile.getOutputNames(alllines);
         
         
+        netlist = getNetlist(vfilepath, synthesis,  invcheck,  outputor,  twonotstonor );
+        
+        netlist = rewireNetlist(netlist);
+        //System.out.println("\nFinal Netlist");
+        //printNetlist(netlist);
+        
+        //BooleanSimulator.printTruthTable(netlist, inputnames);
+        finaldag = CreateMultDAGW(netlist);
+        
+        if(hasCaseStatements)
+        {
+            finaldag = DAGW.addDanglingInputs(finaldag,inputnames);
+        }
+        finaldag = DAGW.reorderinputs(finaldag,inputnames);
+        
+        //List<String> netlistTT = new ArrayList<String>();
+        //System.out.println("Final Netlist");
+        //printNetlist(netlist);
+       
+        //BooleanSimulator.printTruthTable(netlist, inputnames);
+        //netlistTT = BooleanSimulator.getTruthTable(netlist, inputnames);
+        
+        //for(Gate xgate:finaldag.Gates)
+        //{
+        //    System.out.println(xgate.Name +" : " + xgate.Type);
+        //}
+        
+        return finaldag;
+    }
+    
+    public static int getRepressorsCount(List<DGate> inpnetlist)
+    {
+        int count = 0;
+        for(DGate xgate:inpnetlist)
+        {
+            if(!xgate.gtype.equals(DGateType.OR))
+                count++;
+        }
+        
+        return count;
+    }
+    
+    /**Function*************************************************************
+    Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    SideEffects []
+    SeeAlso     []
+     * @param vfilepath
+     * @return 
+    ***********************************************************************/
+    public static List<DGate> getNetlist(String vfilepath)
+    {
+        return getNetlist(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode  );
+    }
+    
+    /**Function*************************************************************
+    Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    SideEffects []
+    SeeAlso     []
+     * @param vfilepath
+     * @param synthesis
+     * @param invcheck
+     * @param outputor
+     * @param twonotstonor
+     * @return
+    ***********************************************************************/
+    public static List<DGate> getNetlist(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor)
+    {
+        NetSynthSwitches synth = null;
+        NetSynthSwitches inv = null;
+        NetSynthSwitches outpor = null;
+        NetSynthSwitches twonots2nor = null;
+        
+        try
+        {
+            synth = NetSynthSwitches.valueOf(synthesis);
+            inv = NetSynthSwitches.valueOf(invcheck);
+            outpor = NetSynthSwitches.valueOf(outputor);
+            twonots2nor = NetSynthSwitches.valueOf(twonotstonor);
+        }
+        catch(Exception e)
+        {
+            System.out.println("Error : "+ e.toString());
+        }
+        
+        return getNetlist(vfilepath,synth, inv,outpor,twonots2nor);
+    }
+    
+    /**Function*************************************************************
+    Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    SideEffects []
+    SeeAlso
+     * @param vfilepath    []
+     * @param synthesis
+     * @param invcheck
+     * @param outputor
+     * @param twonotstonor
+     * @return 
+    ***********************************************************************/
+    
+    public static List<DGate> getNetlist(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
+    {
         List<DGate> naivenetlist = new ArrayList<DGate>();
         List<DGate> structnetlist = new ArrayList<DGate>();
         
@@ -493,398 +603,9 @@ public class NetSynth {
         }
         
         netlist = rewireNetlist(netlist);
-        
-        
-        //System.out.println("\nFinal Netlist");
-        //printNetlist(netlist);
-        
-        //BooleanSimulator.printTruthTable(netlist, inputnames);
-        finaldag = CreateMultDAGW(netlist);
-        
-        if(hasCaseStatements)
-        {
-            finaldag = DAGW.addDanglingInputs(finaldag,inputnames);
-        }
-        finaldag = DAGW.reorderinputs(finaldag,inputnames);
-        
-        //List<String> netlistTT = new ArrayList<String>();
-        //System.out.println("Final Netlist");
-        //printNetlist(netlist);
-       
-        //BooleanSimulator.printTruthTable(netlist, inputnames);
-        //netlistTT = BooleanSimulator.getTruthTable(netlist, inputnames);
-        
-        //for(Gate xgate:finaldag.Gates)
-        //{
-        //    System.out.println(xgate.Name +" : " + xgate.Type);
-        //}
-        
-        return finaldag;
-    }
-    
-    public static int getRepressorsCount(List<DGate> inpnetlist)
-    {
-        int count = 0;
-        for(DGate xgate:inpnetlist)
-        {
-            if(!xgate.gtype.equals(DGateType.OR))
-                count++;
-        }
-        
-        return count;
-    }
-    
-    /**Function*************************************************************
-    Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
-    Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
-    SideEffects []
-    SeeAlso     []
-    ***********************************************************************/
-    public static List<DGate> getNetlist(String vfilepath)
-    {
-        return getNetlist(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode  );
-    }
-    
-    public static List<DGate> getNetlist(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor)
-    {
-        NetSynthSwitches synth = null;
-        NetSynthSwitches inv = null;
-        NetSynthSwitches outpor = null;
-        NetSynthSwitches twonots2nor = null;
-        
-        try
-        {
-            synth = NetSynthSwitches.valueOf(synthesis);
-            inv = NetSynthSwitches.valueOf(invcheck);
-            outpor = NetSynthSwitches.valueOf(outputor);
-            twonots2nor = NetSynthSwitches.valueOf(twonotstonor);
-        }
-        catch(Exception e)
-        {
-            System.out.println("Error : "+ e.toString());
-        }
-        
-        return getNetlist(vfilepath,synth, inv,outpor,twonots2nor);
-    }
-    
-    /**Function*************************************************************
-    Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
-    Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
-    SideEffects []
-    SeeAlso
-     * @param vfilepath    []
-     * @param synthesis
-     * @param invcheck
-     * @param outputor
-     * @param twonotstonor
-     * @return 
-    ***********************************************************************/
-    
-    public static List<DGate> getNetlist(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
-    {
-        DAGW finaldag = new DAGW();
-        
-        
-        
-        List<DGate> naivenetlist = new ArrayList<DGate>();
-        List<DGate> structnetlist = new ArrayList<DGate>();
-        
-        List<DGate> dirnetlist = new ArrayList<DGate>();
-        List<DGate> invnetlist = new ArrayList<DGate>();
-        List<String> inputnames = new ArrayList<String>();
-        List<String> outputnames = new ArrayList<String>();
-        List<DGate> netlist = new ArrayList<DGate>();
-        
-        
-        boolean isStructural = false;
-        boolean hasCaseStatements = false;
-        boolean hasDontCares = false;
-        
-        String alllines = parseVerilogFile.verilogFileLines(vfilepath);
-        isStructural = parseVerilogFile.isStructural(alllines);
-        inputnames = parseVerilogFile.getInputNames(alllines);
-        outputnames = parseVerilogFile.getOutputNames(alllines);
-        
-        List<String> precompTT = new ArrayList<String>();
-        int dirsize = 0;
-        int invsize = 0;
-        int structsize =0;
-        int precompsize =0;
-        int invprecompsize =0;
-        int netsize =0;
-        //<editor-fold desc="Structural Verilog">
-        if(isStructural)
-        {
-            naivenetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
-            if(synthesis.equals(NetSynthSwitches.originalstructural))
-            {
-                for(DGate xgate:naivenetlist)
-                {
-                    structnetlist.add(xgate);
-                }
-            }
-            else
-            {
-                structnetlist = parseStructuralVtoNORNOT(naivenetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
-            }
-            List<String> ttValues = new ArrayList<String>(); 
-            List<String> invttValues = new ArrayList<String>();
-            
-            ttValues = BooleanSimulator.getTruthTable(structnetlist, inputnames);  // Compute Truth Table of Each Output
-            invttValues = BooleanSimulator.invertTruthTable(ttValues); // Compute Inverse Truth Table of Each Output
-            
-            CircuitDetails direct = new CircuitDetails(inputnames,outputnames,ttValues); 
-            CircuitDetails inverted = new CircuitDetails(inputnames, outputnames,invttValues);
-            
-            dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
-            invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
-            
-            dirsize = getRepressorsCount(dirnetlist);
-            invsize = getRepressorsCount(invnetlist);
-            structsize = getRepressorsCount(structnetlist);
-            
-            
-            if(invcheck.equals(NetSynthSwitches.noinv))
-            {
-                if(structsize < dirsize)
-                {
-                    for(DGate xgate:structnetlist)
-                        netlist.add(xgate);
-                }
-                else
-                {
-                    for(DGate xgate:dirnetlist)
-                        netlist.add(xgate);
-                }
-            }
-            else 
-            {
-                if ((structsize < dirsize) && (structsize < invsize)) 
-                {
-                    for (DGate xgate : structnetlist) 
-                    {
-                        netlist.add(xgate);
-                    }
-                } 
-                else 
-                {
-                    if (dirsize < invsize) 
-                    {
-                        for (DGate xgate : dirnetlist) 
-                        {
-                            netlist.add(xgate);
-                        }
-                    } 
-                    else 
-                    {
-                        for (DGate xgate : invnetlist) 
-                        {
-                            netlist.add(xgate);
-                        }
-                    }
-                }
-            }
-            
-        }
-        //</editor-fold >
-        else
-        {
-            hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
-            //<editor-fold desc="Behavioral- Has Case Statements">
-            if(hasCaseStatements)
-            {
-                //System.out.println("Has Case Statements!");
-                CircuitDetails direct = new CircuitDetails();
-                direct = parseVerilogFile.parseCaseStatements(alllines);
-                List<String> invttValues = new ArrayList<String>();
-                invttValues = BooleanSimulator.invertTruthTable(direct.truthTable);
-                CircuitDetails inverted = new CircuitDetails(direct.inputNames, direct.outputNames, invttValues);
-                
-                hasDontCares = parseVerilogFile.hasDontCares(direct.truthTable);
-                //<editor-fold desc="Behavioral- Case Statements - Has Don't Cares">
-                if(hasDontCares)
-                {
-                    dirnetlist = runDCEspressoAndABC(direct,synthesis,outputor,twonotstonor);
-                    invnetlist = runInvertedDCEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
-                    
-                    dirsize = getRepressorsCount(dirnetlist);
-                    invsize = getRepressorsCount(invnetlist);
-                    
-                    if(invcheck.equals(NetSynthSwitches.noinv))
-                    {
-                        for (DGate xgate : dirnetlist) 
-                        {
-                            netlist.add(xgate);
-                        }
-                    }
-                    else
-                    {
-                        if (dirsize < invsize) 
-                        {
-                            for (DGate xgate : dirnetlist) 
-                            {
-                                netlist.add(xgate);
-                            }
-                        } 
-                        else 
-                        {
-                            for (DGate xgate : invnetlist) 
-                            {
-                                netlist.add(xgate);
-                            }
-                        }
-                    }
-                }
-                //</editor-fold>
-                //<editor-fold desc="Behavioral- Case Statements - NO Don't Cares">
-                else
-                {
-                    System.out.println("No Dont Cares.... REACHED HERE!!");
-                    
-                    
-                    dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
-                    invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
-                    
-                    dirsize = getRepressorsCount(dirnetlist);
-                    invsize = getRepressorsCount(invnetlist);
-                    
-                    if(invcheck.equals(NetSynthSwitches.noinv))
-                    {
-                        for (DGate xgate : dirnetlist) 
-                        {
-                            netlist.add(xgate);
-                        }
-                    }
-                    else
-                    {
-                        if (dirsize < invsize) 
-                        {
-                            for (DGate xgate : dirnetlist) 
-                            {
-                                netlist.add(xgate);
-                            }
-                        } 
-                        else 
-                        {
-                            for (DGate xgate : invnetlist) 
-                            {
-                                netlist.add(xgate);
-                            }
-                        }
-                    }
-                }
-                //</editor-fold>
-            }
-            //</editor-fold>
-            else
-            {
-                //System.out.println(alllines);
-                System.out.println("No case statements.\nWill be supported soon");
-            }
-        }
-        
-        
-        netsize = getRepressorsCount(netlist);
-        
-        //boolean precomputetriggered = false;
-        if((synthesis.equals(NetSynthSwitches.precompute) || synthesis.equals(NetSynthSwitches.defaultmode)) && (inputnames.size()==3) && (outputnames.size()==1))
-        {
-            precompTT = BooleanSimulator.getTruthTable(netlist, inputnames);
-            int ttval = Convert.bintoDec(precompTT.get(0));
-            int invttval = Convert.bintoDec(Convert.invBin(precompTT.get(0)));
-            
-            if((ttval!=0) && (ttval!= 255))
-            {
-                
-                List<List<DGate>> precompnetlist;
-                precompnetlist = PreCompute.parseNetlistFile();
-                
-                List<DGate> dirprecompnet = new ArrayList<DGate>();
-                List<DGate> invprecompnet = new ArrayList<DGate>();
-            
-                dirprecompnet = precompnetlist.get(ttval-1);
-                invprecompnet = precompnetlist.get(invttval-1);
-                dirprecompnet = runPrecomp(dirprecompnet,inputnames, outputnames,outputor,twonotstonor);
-                invprecompnet = runinvPrecomp(invprecompnet,inputnames, outputnames,outputor,twonotstonor);
-                
-                precompsize = getRepressorsCount(dirprecompnet);
-                invprecompsize = getRepressorsCount(invprecompnet);
-                
-                
-                
-                if(synthesis.equals(NetSynthSwitches.precompute))
-                {
-                    netlist = new ArrayList<DGate>();
-                    //Over write netlist with precompute values
-                    if(invcheck.equals(NetSynthSwitches.noinv))
-                    {
-                        for (DGate xgate : dirprecompnet) 
-                        {
-                            netlist.add(xgate);
-                        }
-                    }
-                    else
-                    {
-                        if (precompsize < invprecompsize) 
-                        {
-                            for (DGate xgate : dirprecompnet) 
-                            {
-                                netlist.add(xgate);
-                            }
-                        } 
-                        else 
-                        {
-                            for (DGate xgate : invprecompnet) 
-                            {
-                                netlist.add(xgate);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                   
-                    if(invcheck.equals(NetSynthSwitches.noinv))
-                    {
-                        if(precompsize <  netsize)
-                        {
-                            netlist = new ArrayList<DGate>();
-                            for (DGate xgate : dirprecompnet) 
-                            {
-                                netlist.add(xgate);
-                            }
-                        }
-                    }   
-                    else
-                    {
-                        if((precompsize <  netsize) &&  (precompsize<= invprecompsize))
-                        {
-                            netlist = new ArrayList<DGate>();
-                            for (DGate xgate : dirprecompnet) 
-                            {
-                                netlist.add(xgate);
-                            }
-                        }
-                        else if((invprecompsize <  netsize) &&  (invprecompsize<= precompsize))
-                        {
-                            netlist = new ArrayList<DGate>();
-                            for (DGate xgate : invprecompnet) 
-                            {
-                                netlist.add(xgate);
-                            }
-                        } 
-                    }
-                }
-            }
-        }
-        
-        netlist = rewireNetlist(netlist);
         return netlist;
         
-        
     }
-    
-    
     
     
     public static List<DGate> runinvPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
@@ -1486,16 +1207,7 @@ public class NetSynth {
             }
         }
         
-        
-        
-        
-        
-        
-        
     }
-    
-    
-    
     
     
     public static List<DGate> separateOutputGates(List<DGate> netlist)
@@ -1770,148 +1482,6 @@ public class NetSynth {
     
     
     
-    public static void testespressogen()
-    {
-        List<String> eslines = new ArrayList<String>();
-        CircuitDetails circ = new CircuitDetails();
-        circ.inputNames.add("inp1");
-        circ.inputNames.add("inp2");
-        circ.inputNames.add("inp3");
-        circ.outputNames.add("out1");
-        circ.outputNames.add("out2");
-        circ.truthTable.add(Convert.dectoBin(69, 3));
-        circ.truthTable.add(Convert.dectoBin(96, 3));
-        List<String> espoutcirc = new ArrayList<String>();
-        espoutcirc = Espresso.createFile(circ);
-        List<String> blifoutcirc = new ArrayList<String>();
-        blifoutcirc = Blif.createFile(circ);
-        for(String xesp:espoutcirc)
-        {
-            System.out.println(xesp);
-        }
-        String filestring = "";
-        if (Filepath.contains("prashant")) 
-        {
-            filestring += Filepath + "src/BU/resources/espresso";
-        } 
-        else 
-        {
-            filestring += Filepath + "BU/resources/espresso";
-        }
-        filestring += Global.espout++;
-        filestring += ".txt";
-          File fespinp = new File(filestring);
-        //Writer output;
-        try 
-        {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-            //output = new BufferedWriter(new FileWriter(fespinp));
-             for (String xline : espoutcirc) 
-             {
-                String newl = (xline + "\n");
-                output.write(newl);
-             }
-             output.close();
-        } 
-        catch (IOException ex) 
-        {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-       
-        List<String> espout = new ArrayList<String>();
-        espout = runEspresso(filestring);
-        List<DGate> espoutput = new ArrayList<DGate>();
-        espoutput = parseEspressoToNORNAND(espout);
-    }
-    
-    
-    public static void vtestfunc()
-    {
-        String line = "module and3(output out, input wire in2,in6, bryan, output wire on1, input in1, in3, in4);";
-        Parser.testfunction(line);
-    }
-    
-    public static void verifyinverse()
-    {
-        String filestring ="";
-        if(Filepath.contains("prashant"))
-        {
-            filestring += Filepath+ "src/BU/resources/Inverse";
-        }
-        else
-        {
-            filestring += Filepath+ "BU/resources/Inverse";
-        }
-          
-            filestring += ".csv";
-            File fespinp = new File(filestring);
-        try {
-            List<List<DGate>> precomp;
-            precomp = PreCompute.parseNetlistFile();
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-            String Line;
-            Line = "SrNo,Actual,Inverse\n";
-            output.write(Line);
-            for(int i=0;i<256;i++)
-            {
-                 Line ="";
-                if(i==0||i==255)
-                   Line += i + "\n";
-                else
-                {
-                    int x = precomp.get(i-1).size();
-                    int y = precomp.get(253- i + 1).size();
-                    //int y=0;
-                    Line = i+ ","+ x + "," + (y+1) + "\n";
-                }
-                output.write(Line);
-            }
-            output.close();
-            
-            
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-        
-    }
-    
-    public static void verifyprecomute()
-    {
-         List<List<DGate>> precomp;
-         precomp = PreCompute.parseNetlistFile();
-         int flag =0;
-         for(int i=0;i<256;i++)
-         {
-             if(i==0 || i==255)
-             {
-                 flag =0;
-             } 
-             else
-             {
-                 String truthfunc ="";
-                 truthfunc = BooleanSimulator.bpermutePreComp(precomp.get(i-1));
-                 //System.out.println(truthfunc);
-                 int k = Convert.bintoDec(truthfunc);
-                 if(k!=i)
-                 {
-                     System.out.println(truthfunc);
-                     System.out.println(i-1);
-                     //flag =1;
-                     //break;
-                 }
-             }
-         }
-         if(flag == 1)
-         {
-             System.out.println("ERROR!!!");
-         }
-    }
-    
-    
-    
-    
     
     public static List<DGate> parseEspressoOutToABC(List<String> espout,NetSynthSwitches outpor, NetSynthSwitches twonots2nor) 
     {
@@ -1953,6 +1523,8 @@ public class NetSynth {
         
         return netlistout;
     }
+    
+    
     public static List<DGate> parseINVEspressoOutToABC(List<String> espout) 
     {
         List<DGate> netlistout = new ArrayList<DGate>();
@@ -2007,418 +1579,7 @@ public class NetSynth {
         return netlistout;
     }
     
-    /*private static Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>()
-    {
-            public int compare(String str1, String str2)
-            {
-                int res = String.CASE_INSENSITIVE_ORDER.compare(str1, str2);
-                if(res ==0)
-                {
-                    res = str1.compareTo(str2);                
-                }
-                return res;
-            }
-    };*/
-    
-    public static DAGW testParser(String pathFile, int inv, int presynth)
-    {
-        
-        String path = pathFile;
-        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if(Filepath.contains("build/classes/"))
-            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
-        else if(Filepath.contains("src"))
-            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        
-        
-        caseCirc = new CircuitDetails();
-        caseCirc = parseVerilogFile.parseCaseStatements(path);
-        //System.out.println(caseCirc.inputgatetable);
-        DAGW circuitDAG = new DAGW();
-        DAGW circuitDAGinv = new DAGW();
-        int invindx ;
-        
-        
-        
-        if(Convert.bintoDec(caseCirc.truthTable.get(0)) ==0 || Convert.bintoDec(caseCirc.truthTable.get(0)) ==255)
-            return null;
-        
-         // <editor-fold desc="If 3 input circuit and presynth option is true">
-        if((caseCirc.inputNames.size() == 3) && (presynth ==1))
-        {
-            DAGW circ = computeDAGW(Convert.bintoDec(caseCirc.truthTable.get(0))-1);
-            circuitDAG = new DAGW(circ.Gates,circ.Wires);
-            DAGW circinv = computeDAGW(255 - Convert.bintoDec(caseCirc.truthTable.get(0)) - 1);
-            circuitDAGinv = new DAGW(circinv.Gates,circinv.Wires);
-            //System.out.println("Ratatatatatata Circus Afro"+circuitDAG.Gates.get(0).Type.toString());
-            
-            //System.out.println("Ratatatatatata Circus"+circuitDAG.Wires.get(0).From.Type.toString());
-            if (circuitDAGinv.Gates.size() > 1 && (inv == 1)) 
-            {
-                int gatessize = circuitDAGinv.Gates.size();
-                if (("NOR".equals(circuitDAGinv.Gates.get(1).Type) || "NOT".equals(circuitDAGinv.Gates.get(1).Type)) && (!circuitDAGinv.Gates.get(0).Type.equals(GateType.OUTPUT_OR.toString()))) 
-                {
-                    
-                    if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) 
-                    {
-                        circuitDAG = circuitDAGinv;
-                        gatessize = circuitDAGinv.Gates.size();
-                        if("NOR".equals(circuitDAG.Gates.get(1).Type))
-                        {
-                            circuitDAG.Gates.get(1).Type = GateType.OUTPUT_OR.toString();
-                            circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
-                            
-                            circuitDAG.Gates.remove(0);
-                        }
-                        else if("NOT".equals(circuitDAG.Gates.get(1).Type))
-                        {
-                            circuitDAG.Gates.get(1).Type = GateType.OUTPUT.toString();
-                            circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
-                            circuitDAG.Gates.remove(0);
-                        }
-                    }
-                }
-            }
-            int i=0;
-            int j=0;
-            int caseinpcount =0;
-            HashMap<Integer,String> activeinp = new HashMap<Integer,String>();
-            
-            for(Gate gdag:circuitDAG.Gates)
-            {
-                if("INPUT".equals(gdag.Type))
-                {
-                    if("c".equals(gdag.Name.trim()))
-                    {
-                        i=0;
-                    }
-                    else if("b".equals(gdag.Name.trim()))
-                    {
-                        i=1;
-                    }
-                    else 
-                    {
-                        i=2;
-                    }
-                    activeinp.put(i,gdag.Name);
-                    gdag.Name = caseCirc.inputNames.get(i);
-                    caseinpcount++;
-                }
-                if("OUTPUT".equals(gdag.Type) || "OUTPUT_OR".equals(gdag.Type))
-                {
-                    gdag.Name = caseCirc.outputNames.get(j);
-                    j++; 
-                }
-            }
-            
-            if(caseinpcount != 3)
-            {
-                for(int jj=0;jj<3;jj++)
-                {
-                    if(!activeinp.containsKey(jj))
-                    {
-                        Gate uainp = new Gate();
-                        uainp.Outgoing = null;
-                        uainp.Index = -1;
-                        uainp.Type = Gate.GateType.INPUT.toString();
-                        uainp.Name = caseCirc.inputNames.get(jj);
-                        circuitDAG.Gates.add(uainp);
-                    }
-                }
-            }
-            List<String> inputGates = new ArrayList<String>();
-            HashMap<String,Gate> inpord = new HashMap<String,Gate>();
-            
-            for(Gate gdag:circuitDAG.Gates)
-            {
-                if(gdag.Type.equals("INPUT"))
-                {
-                    inputGates.add(gdag.Name.trim());
-                    inpord.put(gdag.Name.trim(), gdag);
-                    //System.out.println(gdag.Name);
-                }
-            }
-            
-            
-            Collections.sort(inputGates);
-            int kk=0;
-           
-            for(int ii=0;ii<circuitDAG.Gates.size();ii++)
-            {
-                Gate gdag = circuitDAG.Gates.get(ii);
-                if(gdag.Type.equals("INPUT"))
-                {
-                   Gate val = inpord.get(inputGates.get(kk));
-                   circuitDAG.Gates.set(ii, val);
-                   kk++;
-                }
-            }
-            for(Gate gdag:circuitDAG.Gates)
-            {
-                System.out.println(gdag.Name);
-            }
-            
-            
-        }
-        // </editor-fold>
-        
-        else
-        {
-            
-            List<String> eslines = new ArrayList<String>();
-            List<String> eslinesinv = new ArrayList<String>();
-            int powr = (int) Math.pow(2, caseCirc.inputNames.size());
-            
-            List<String> caseCirctt = new ArrayList<String>();
-            for(int i=0;i<caseCirc.truthTable.size();i++)
-            {
-                //System.out.println("Truth Table value!!" + caseCirc.inputgatetable.get(i));
-                caseCirctt.add(caseCirc.truthTable.get(i));
-            }
-            List<String> caseCircttinv = new ArrayList<String>();
-            for(int i=0;i<caseCirc.truthTable.size();i++)
-            {
-                caseCircttinv.add(Convert.invBin(caseCirctt.get(i)));
-            }
-            List<String> invval = new ArrayList<String>();
-            for(int i=0;i<caseCirc.truthTable.size();i++)
-            {
-                invval.add(caseCircttinv.get(i));
-            }
-            
-            
-            //int invval = ;
-            
-            CircuitDetails invcaseCirc = new CircuitDetails(caseCirc.inputNames,caseCirc.outputNames,invval);
-            
-            //System.out.println("Main Circuit: " + caseCirctt);
-            //System.out.println("Main Circuit: " + caseCircttinv);
-            
-            eslines = Espresso.createFile(caseCirc);
-            eslinesinv = Espresso.createFile(invcaseCirc);
-            String filestring = "";
-            String filestringinv = "";
-           
-            if(Filepath.contains("prashant"))
-            {
-                filestring += Filepath+ "src/BU/resources/espresso";
-            }
-            else
-            {
-                filestring += Filepath+ "BU/resources/espresso";
-            }
-            filestring += Global.espout++ ;
-            filestringinv += filestring;
-            filestring += ".txt";
-            filestringinv += "inv.txt";
-            
-            File fespinp = new File(filestring);
-            File fespinpinv = new File(filestringinv);
-            try 
-            {
-                Writer output = new BufferedWriter(new FileWriter(fespinp));
-                for(String xline:eslines)
-                {
-                    String newl = (xline + "\n");
-                    output.write(newl);
-                }
-                output.close();
-                List<String> espout = new ArrayList<String>();
-                espout = runEspresso(filestring);
-                List<DGate> espoutput = new ArrayList<DGate>();
-                espoutput = convertPOStoNORNOT(espout);
-                
-                espoutput = optimizeNetlist(espoutput,true,true);
-                //espoutput = removeDoubleInverters(espoutput);
-                //espoutput = outputORopt(espoutput);
-                //espoutput = parseEspressoToNORNAND(espout);
-                
-                System.out.println("\nPOST-OPTIMIZATION : NETLIST\n");
-                for(int i=0;i<espoutput.size();i++)
-                {
-                    System.out.println(printGate(espoutput.get(i)));
-                }
-                
-                Writer outputinv = new BufferedWriter(new FileWriter(fespinpinv));
-                for(String xline:eslinesinv)
-                {
-                    String newl = (xline + "\n");
-                    outputinv.write(newl);
-                }
-                outputinv.close();
-                
-                List<String> espoutinv = new ArrayList<String>();
-                espoutinv = runEspresso(filestringinv);
-                List<DGate> espoutputinv = new ArrayList<DGate>();
-                
-                //espoutputinv = parseEspressoToNORNAND(espoutinv);
-                espoutputinv = convertPOStoNORNOT(espoutinv);
-                
-                espoutputinv = optimizeNetlist(espoutputinv,true,true);
-                //espoutputinv = removeDoubleInverters(espoutputinv);
-                //espoutputinv = outputORopt(espoutputinv);
-                
-                System.out.println("\nPOST-OPTIMIZATION : INV NETLIST\n");
-                for(int i=0;i<espoutputinv.size();i++)
-                {
-                    System.out.println(printGate(espoutputinv.get(i)));
-                }
-                
-                //System.out.println("\n\n==== CHECKING!!! ====");
-                
-                //System.out.println("\n==== Primary Circuit ====");
-                //System.out.println(BooleanSimulator.bpermuteEsynth(espoutput));
-                //for(DGate dg:espoutput)
-                //    System.out.println(netlist(dg));
-                
-                //System.out.println("\n==== Inverse Circuit ====");
-                //System.out.println(BooleanSimulator.bpermuteEsynth(espoutputinv));
-                //for(DGate dg:espoutputinv)
-                //    System.out.println(netlist(dg));
-                
-                //DAGW circ = computeDAGW(caseCirc.inputgatetable-1);
-                //circuitDAG = CreateDAGW(espoutput);
-                circuitDAG = CreateMultDAGW(espoutput);
-                
-                //DAGW circinv = computeDAGW(255 - caseCirc.inputgatetable - 1);
-                //circuitDAGinv = CreateDAGW(espoutputinv);
-                circuitDAGinv = CreateMultDAGW(espoutputinv);
-                
-                if (circuitDAGinv.Gates.size() > 1 && (inv == 1)) {
-
-                    int gatessize = circuitDAGinv.Gates.size();
-                    if (("NOR".equals(circuitDAGinv.Gates.get(1).Type) || "NOT".equals(circuitDAGinv.Gates.get(1).Type)) && (!circuitDAGinv.Gates.get(0).Type.equals(GateType.OUTPUT_OR.toString()))) 
-                    {
-                        if (circuitDAG.Gates.size() > (circuitDAGinv.Gates.size() - 1)) {
-                            //System.out.println("Special Case");
-                            circuitDAG = circuitDAGinv;
-                            gatessize = circuitDAGinv.Gates.size();
-                            if (circuitDAG.Gates.get(1).Type == "NOR") {
-                                circuitDAG.Gates.get(1).Type = GateType.OUTPUT_OR.toString();
-                                circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
-                                circuitDAG.Gates.remove(0);
-                                circuitDAG.Wires.remove(0);
-                            } else if (circuitDAG.Gates.get(1).Type == "NOT") {
-                                circuitDAG.Gates.get(1).Type = GateType.OUTPUT.toString();
-                                circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
-                                circuitDAG.Gates.remove(0);
-                                circuitDAG.Wires.remove(0);
-                            }
-                        }
-                    }
-                }
-                
-                int activeinp=0;
-                List<String> activeinplist = new ArrayList<String>();
-                
-                for(Gate xgate : circuitDAG.Gates)
-                {
-                    if(xgate.Type.equals(GateType.INPUT.toString()))
-                    {
-                        activeinp++;
-                        activeinplist.add(xgate.Name);
-                        //System.out.println(xgate.Name.trim());
-                    }
-                }
-                if(activeinp < caseCirc.inputNames.size())
-                {
-                    for(String xinp:caseCirc.inputNames)
-                    {
-                        if(!activeinplist.contains(xinp.trim()))
-                        {
-                            Gate uainp = new Gate();
-                            uainp.Outgoing = null;
-                            uainp.Index = -1;
-                            uainp.Type = Gate.GateType.INPUT.toString();
-                            uainp.Name = xinp.trim();
-                            circuitDAG.Gates.add(uainp);
-                        }
-                    }
-                }
-                
-                HashMap<String, Gate> inpord = new HashMap<String, Gate>();
-                List<String> inputGates = new ArrayList<String>();
-                for(String xinp:caseCirc.inputNames)
-                {
-                    for (Gate gdag : circuitDAG.Gates) 
-                    {
-                        if (gdag.Type.equals("INPUT") && gdag.Name.equals(xinp)) 
-                        {
-                            inputGates.add(gdag.Name.trim());
-                            inpord.put(gdag.Name.trim(), gdag);
-                            //System.out.println(gdag.Name);
-                        }
-                    }   
-                }
-                //int kk = caseCirc.inputNames.size()-1;
-                int kk=0;
-                for (int ii = 0; ii < circuitDAG.Gates.size(); ii++) 
-                {
-                    Gate gdag = circuitDAG.Gates.get(ii);
-                    if (gdag.Type.equals("INPUT")) 
-                    {
-                        Gate val = inpord.get(inputGates.get(kk));
-                        circuitDAG.Gates.set(ii, val);
-                        //kk--;
-                        kk++;
-                    }
-                }
-                
-                /*for (Gate gdag : circuitDAG.Gates) 
-                {
-                    System.out.println(gdag.Name);
-                }*/
-                
-                /*if(espoutput.size() > (espoutputinv.size() + 1))
-                {
-                    System.out.println("Special Condition");
-                    espoutput = espoutputinv;
-                    String Wirename = "0Wire" + Global.wirecount++;
-                    espoutput.get(espoutput.size()-1).output.wtype = DWireType.connector;
-                    List<DWire> inpwesp = new ArrayList<DWire>();
-                    DWire outwesp = new DWire();
-                    outwesp.name =  espoutput.get(espoutput.size()-1).output.name;
-                    outwesp.wtype = DWireType.output;
-                    espoutput.get(espoutput.size()-1).output.name = Wirename;
-                    inpwesp.add(espoutput.get(espoutput.size()-1).output);
-                    espoutput.add(new DGate(DGateType.NOT,inpwesp,outwesp));
-                }*/
-                
-                //String espperm = BooleanSimulator.bpermute(espoutput);
-                
-                /*for(DGate netgate:espoutput)
-                {
-                    System.out.println(netlist(netgate));
-                }*/
-                //circuitDAG = CreateDAGW(espoutput);
-                
-                fespinp.deleteOnExit();
-                
-                //System.out.println(espperm);
-            } 
-            catch (IOException ex) 
-            {
-                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            
-        }
-        int ttpow = (int)Math.pow(2, caseCirc.inputNames.size());
-        for(int i=0;i<caseCirc.truthTable.size();i++)
-        {
-            String bintt = caseCirc.truthTable.get(i);
-            circuitDAG.truthtable.add(bintt);
-        }
-        System.out.println("\n\n\n\nDAGW!!!");
-        for(int i=0;i<circuitDAG.Gates.size();i++)
-            System.out.println(circuitDAG.Gates.get(i).Name + ":" + circuitDAG.Gates.get(i).Type);
-        System.out.println("\n\n\n\n\n");
-        
-        String graphs = circuitDAG.printGraph();
-        System.out.println(graphs);
-        return circuitDAG;
-        
-    }
+  
     
     
     
@@ -2444,121 +1605,7 @@ public class NetSynth {
         return outputdag;
     }
  
-    //<editor-fold desc="precompute function">
-    
-    /*
-    public static DAGraph precompute(int x)
-    {
-       DAGraph outdag = new DAGraph();
-        List<List<DGate>> precomp;
-        precomp = PreCompute.parseNetlistFile();
-        outdag = CreateDAGraph(precomp.get(x));
-        
-        return outdag;
-        
-    }
-    */
-    //</editor-fold>
-    
-    public static void testEspresso()
-    {
-        
-        List<String> espressoOut = new ArrayList<String>();
-        espressoOut = runEspresso("");
-        
-        List<DGate> SOPgates = new ArrayList<DGate>();
-        List<DGate> NORgates = new ArrayList<DGate>();
-        
-        SOPgates = parseEspressoOutput(espressoOut);
-        
-        System.out.println("POS format : ");
-        
-        if(functionOutp)
-        {
-                String gateString = printGate(SOPgates.get(0));
-                System.out.println(gateString);
-            
-        }
-        else
-        {
-            for(DGate g:SOPgates)
-            {
-               
-                String gateString = printGate(g);
-                System.out.println(gateString);
-            }
-        }
-        
-        NORgates = parseEspressoToNORNAND(espressoOut);
-     
-        System.out.println("\nUniversal Gates : ");
-        if(functionOutp)
-        {
-                String gateString = printGate(NORgates.get(0));
-                System.out.println(gateString);
-            
-        }
-        else
-        {
-            for(DGate g:NORgates)
-            {  
-                String gateString = printGate(g);
-                System.out.println(gateString);
-            }
-           
-        }
-        
-    }
-    public static void testABC()
-    {
-        String filename = "seg7";
-        List<DGate> dseg7 = new ArrayList<DGate>();
-        
-        try {
-            dseg7 = runABCverilog(filename);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        //dseg7 = removeDoubleInverters(dseg7);
-        //dseg7 = outputORopt(dseg7);
-        //dseg7 = convert2NOTsToNOR(dseg7);
-        //dseg7 = rewireNetlist(dseg7);
-        dseg7 = optimizeNetlist(dseg7,true,true);
-        
-        for(int i=0;i<dseg7.size();i++)
-            System.out.println(printGate(dseg7.get(i)));
-    }
-    
-    public static DAGW seg7dagw(String filename)
-    {
-        DAGW sevenseg = new DAGW();
-        //String filename = "seg7";
-        List<DGate> dseg7 = new ArrayList<DGate>();
-        
-        try {
-            dseg7 = runABCverilog(filename);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-        
-        //dseg7 = removeDoubleInverters(dseg7);
-        //dseg7 = outputORopt(dseg7);
-        //dseg7 = convert2NOTsToNOR(dseg7);
-        //dseg7 = rewireNetlist(dseg7);
-        
-        dseg7 = optimizeNetlist(dseg7,true,true);
-        
-        for(int i=0;i<dseg7.size();i++)
-            System.out.println(printGate(dseg7.get(i)));
-        sevenseg = CreateMultDAGW(dseg7);
-        
-        return sevenseg;
-    }
-    
-    
+  
     
     public static List<DGate> runABC(String filename) throws InterruptedException 
     {
@@ -4099,6 +3146,8 @@ public class NetSynth {
     Description []
     SideEffects []
     SeeAlso     []
+     * @param netlistinp
+     * @return 
     ***********************************************************************/
     public static List<DGate> removeDoubleInverters(List<DGate> netlistinp)
     {
@@ -4524,8 +3573,6 @@ public class NetSynth {
     
     
     
-    
-    
     public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist)
     {
         List<DGate> structnetlist = new ArrayList<DGate>();
@@ -4578,27 +3625,7 @@ public class NetSynth {
         return structnetlist;
     }
     
-    /*public static List<DGate> optimizeNetlist(List<DGate> inpNetlist)
-    {
-        List<DGate> outpNetlist = new ArrayList<DGate>();
-        
-        outpNetlist = removeDanglingGates(inpNetlist);
-        outpNetlist = outputORopt(outpNetlist);
-        outpNetlist = convert2NOTsToNOR(outpNetlist);
-        outpNetlist = rewireNetlist(outpNetlist);
-        
-        return outpNetlist;
-    }*/
 
-    /**
-     *
-     * @param inpNetlist This is the input Netlist you want to optimize
-     * @param doubleinv Remove Double Inverters
-     * @param outputor OutputOR Optimization
-     * @param twoNotsToNor 2NOTStoNOR Optimization
-     * @return Returns an optimized Netlist 
-     */
-    
     public static List<DGate> removeDuplicateNots(List<DGate> inpNetlist)
     {
         List<DGate> outpNetlist = new ArrayList<DGate>();
@@ -4954,8 +3981,6 @@ public class NetSynth {
     }
     
     
-    
-    
     public static List<DGate> notGates(List<DWire> inpWires)
     {
         List<DGate> notInp = new ArrayList<DGate>();
@@ -5092,212 +4117,7 @@ public class NetSynth {
         }
         return minterm;
     }
-    //<editor-fold desc="CreateDAGraph Function">
     
-    /*
-    public static DAGraph CreateDAGraph(List<DGate> netlist)
-    {
-        DAGraph outDAG = new DAGraph();
-        List<DWire> inplist = new ArrayList<DWire>(); 
-        List<DAGVertex> Vertices = new ArrayList<DAGVertex>();
-        List<DAGEdge> Edges = new ArrayList<DAGEdge>();
-        HashMap<DGate,DAGVertex> vertexhash = new HashMap<DGate,DAGVertex>();
-        int IndX =0; 
-        int outpIndx=0;
-        
-        
-        for(int i=netlist.size()-1;i>=0;i--)
-        {
-            DGate netg = netlist.get(i);
-             if(netg.input.contains(zero))
-             {
-                DGate tempNot = new DGate();
-                for(DWire xi:netg.input)
-                {
-                    if(!(xi.equals(zero)))
-                        tempNot.input.add(xi);
-                    tempNot.output = netg.output;
-                    tempNot.gtype = DGateType.NOT;
-                }
-                netlist.get(i).gtype = tempNot.gtype;
-                netlist.get(i).input = tempNot.input;
-                netlist.get(i).output = tempNot.output;
-                
-               
-            }
-        }
-        
-        
-        for(int i=netlist.size()-1;i>=0;i--)
-        {
-            DGate netg = netlist.get(i);
-           
-           
-            for(DWire xi:netg.input)
-            {
-                if((xi.wtype == DWireType.input) && (!(inplist.contains(xi))))
-                {
-                    inplist.add(xi);
-                }
-            }
-            
-            if(netg.output.wtype == DWireType.output)
-            {
-                //System.out.println(IndX);
-                DAGVertex out =null;
-                DAGVertex lvert = null;
-                if(netg.gtype == DGateType.NOT)
-                {
-                    outpIndx = IndX;
-                    out = new DAGVertex(IndX++, VertexType.OUTPUT_OR.toString());                 
-                    lvert = new DAGVertex(IndX++,VertexType.NOT.toString());
-                    vertexhash.put(netg, lvert);
-                }
-                else if(netg.gtype == DGateType.NOR2)
-                {
-                    outpIndx = IndX;
-                    out = new DAGVertex(IndX++, VertexType.OUTPUT.toString()); 
-                    lvert = new DAGVertex(IndX++,VertexType.NOR.toString());
-                    vertexhash.put(netg, lvert);
-                }
-                out.Name = netg.output.name;
-                lvert.outW = netg.output;
-                
-                //System.out.println(netg.output.wtype.toString());
-                //System.out.println(netg.gtype.toString());                
-                
-                Vertices.add(out);
-                Vertices.add(lvert);
-            }
-            else
-            {
-                DAGVertex vert=null;
-                if(netg.gtype == DGateType.NOT)
-                {
-                    vert = new DAGVertex(IndX++,VertexType.NOT.toString());
-                }
-                else if(netg.gtype == DGateType.NOR2)
-                {
-                    vert = new DAGVertex(IndX++,VertexType.NOR.toString());
-                }
-                vert.outW = netg.output;
-                
-                
-                
-                //System.out.println(netg.output.wtype.toString());
-                //System.out.println(netg.gtype.toString());
-                vertexhash.put(netg, vert);
-                Vertices.add(vert);
-            }
-        }
-        for(DWire inpx:inplist)
-        {
-            DAGVertex vert = new DAGVertex(IndX++,VertexType.INPUT.toString());
-            vert.outW = inpx;
-            vert.Name = inpx.name;
-            vert.Outgoing = null;
-            
-            Vertices.add(vert);
-        }
-        int eind=0;
-        
-        for(int i=netlist.size()-1;i>=0;i--)
-        {
-            DGate netg = netlist.get(i);
-           
-            if(netg.output.wtype == DWireType.output)
-            {
-                DAGEdge out = new DAGEdge();
-                out.From = Vertices.get(outpIndx);
-                out.To = vertexhash.get(netg);
-                out.Index = eind++;
-                out.Next = null;
-                Edges.add(out);
-            }
-            DAGEdge temp = null;
-            
-            
-            
-            for(DWire inps:netg.input)
-            {
-                
-               DAGVertex gTo=null;
-               //System.out.println(inps.name);
-               for(DAGVertex xvert:Vertices)
-               {
-                  
-                   if(xvert.outW.name.trim().equals(inps.name.trim()))
-                   {
-                       gTo = xvert;
-                       break;
-                   }
-               }
-               DAGVertex gFrom = null;
-               gFrom = vertexhash.get(netg);
-               DAGEdge newEdge = new DAGEdge(eind++,gFrom,gTo,temp);
-               
-               temp = newEdge;
-               Edges.add(newEdge);
-               
-            }
-        }
-        
-        for(DAGEdge edg:Edges)
-        {
-            if(edg.From.Type == "NOR")
-            {
-                if(!(edg.Next == null))
-                {
-                int count=0;
-                
-                for(DAGVertex dvert:Vertices)
-                {
-                    if(edg.From.equals(dvert))
-                    {
-                        break;
-                    }
-                    count++;
-                }
-                
-                Vertices.get(count).Outgoing = edg;
-                
-                }
-            }
-            else
-            {
-                if(edg.Next == null)
-                {
-                int count=0;
-                
-                for(DAGVertex dvert:Vertices)
-                {
-                    if(edg.From.equals(dvert))
-                    {
-                        break;
-                    }
-                    count++;
-                }
-                Vertices.get(count).Outgoing = edg;
-                
-                }
-            }
-        }
-        
-        for(DAGEdge xdedge:Edges)
-        {
-            outDAG.Edges.add(xdedge);
-        }
-        for(DAGVertex xdvert:Vertices)
-        {
-            outDAG.Vertices.add(xdvert);
-        }
-        
-        return outDAG;
-    }
-    
-    */
-    //</editor-fold>
-   
     
      public static DAGW CreateMultDAGW(List<DGate> netlist)
     {
@@ -5671,10 +4491,6 @@ public class NetSynth {
         return outDAG;
     }
    
-   
-    
-    
-    
     
      public static DAGW CreateDAGW(List<DGate> netlist)
     {

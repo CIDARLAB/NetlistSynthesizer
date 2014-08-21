@@ -6,8 +6,8 @@ package BU.netsynth;
 
 import java.util.ArrayList;
 import java.util.List;
-import BU.netsynth.DGate.DGateType;
-import BU.netsynth.DWire.DWireType;
+import BU.netsynth.DGateType;
+import BU.netsynth.DWireType;
 
 /**
  *

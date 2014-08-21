@@ -5,9 +5,9 @@
 package BU.ParseVerilog;
 
 import BU.netsynth.DGate;
-import BU.netsynth.DGate.DGateType;
+import BU.netsynth.DGateType;
 import BU.netsynth.DWire;
-import BU.netsynth.DWire.DWireType;
+import BU.netsynth.DWireType;
 import BU.netsynth.NetSynth;
 import java.io.BufferedReader;
 import java.io.File;

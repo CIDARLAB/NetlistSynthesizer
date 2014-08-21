@@ -14,16 +14,7 @@ import java.util.List;
 
 public class DGate implements Serializable{
     String gname;
-    public enum DGateType{
-           NOT,
-           BUF,
-           NOR, 
-           NAND, 
-           AND, 
-           OR, 
-           XOR,
-           XNOR;
-    }
+    
     public DGateType gtype;
     public List<DWire> input;
     public DWire output;

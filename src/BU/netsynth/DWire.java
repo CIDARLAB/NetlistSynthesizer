@@ -14,13 +14,7 @@ public class DWire implements Serializable {
    
     
      public String name; 
-     public enum DWireType{
-         input,
-         output,
-         GND,
-         Source,
-         connector;
-     }
+     
      public enum DWireValue{
          _1,
          _0,

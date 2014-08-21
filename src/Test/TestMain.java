@@ -6,7 +6,7 @@ package Test;
 
 import BU.ParseVerilog.parseVerilogFile;
 import BU.WebSockets.ClothoSocket;
-import BU.netsynth.DGate.DGateType;
+import BU.netsynth.DGateType;
 import BU.netsynth.NetSynth;
 import java.io.IOException;
 import java.util.logging.Level;
