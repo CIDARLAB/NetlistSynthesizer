@@ -44,9 +44,7 @@ import java.util.logging.Logger;
  */
 public class NetSynth {
 
-    /**
-     * @param args the command line arguments
-     */
+    
     public static DWire one;
     public static boolean POSmode;
     public static DWire zero;
@@ -55,6 +53,9 @@ public class NetSynth {
     
     public static CircuitDetails caseCirc;
     
+    /**
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         // TODO code application logic here
         
@@ -111,6 +112,16 @@ public class NetSynth {
         
     }
 
+    
+    
+    
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+    ***********************************************************************/
     public static void initializeFilepath() {
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         if(Filepath.contains("build/classes/"))
@@ -127,12 +138,26 @@ public class NetSynth {
     Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
     SideEffects []
     SeeAlso     []
+     * @param vfilepath
+     * @return 
     ***********************************************************************/
     public static DAGW runNetSynth(String vfilepath)
     {
         return runNetSynth(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode  );
     }
     
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param vfilepath
+     * @param synthesis
+     * @param invcheck
+     * @param outputor
+     * @param twonotstonor
+     * @return 
+    ***********************************************************************/
     public static DAGW runNetSynth(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor)
     {
         NetSynthSwitches synth = null;
@@ -154,12 +179,15 @@ public class NetSynth {
         
         return runNetSynth(vfilepath,synth, inv,outpor,twonots2nor);
     }
+    
+    
+    
     /**Function*************************************************************
     Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
     Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
     SideEffects []
-    SeeAlso
-     * @param vfilepath    []
+    SeeAlso     []
+     * @param vfilepath    
      * @param synthesis
      * @param invcheck
      * @param outputor
@@ -216,6 +244,15 @@ public class NetSynth {
         return finaldag;
     }
     
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param inpnetlist
+     * @return 
+    ***********************************************************************/
     public static int getRepressorsCount(List<DGate> inpnetlist)
     {
         int count = 0;
@@ -287,7 +324,6 @@ public class NetSynth {
      * @param twonotstonor
      * @return 
     ***********************************************************************/
-    
     public static List<DGate> getNetlist(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
     {
         List<DGate> naivenetlist = new ArrayList<DGate>();
@@ -607,7 +643,18 @@ public class NetSynth {
         
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param inpnetlist
+     * @param inpnames
+     * @param outpnames
+     * @param outpor
+     * @param twonots2nor
+     * @return 
+    ***********************************************************************/
     public static List<DGate> runinvPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
     {
         DGate finalnot = new DGate();
@@ -622,6 +669,19 @@ public class NetSynth {
         return runPrecomp(inpnetlist,inpnames,outpnames,outpor,twonots2nor);
     }
     
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param inpnetlist
+     * @param inpnames
+     * @param outpnames
+     * @param outpor
+     * @param twonots2nor
+     * @return 
+    ***********************************************************************/
     public static List<DGate> runPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
     {
         List<DGate> finalnetlist = new ArrayList<DGate>();
@@ -668,6 +728,18 @@ public class NetSynth {
         return finalnetlist;
     }
     
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param circ
+     * @param synthmode
+     * @param outpor
+     * @param twonots2nor
+     * @return 
+    ***********************************************************************/
     public static List<DGate> runDCEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor) 
     {
         List<DGate> EspCircuit = new ArrayList<DGate>();
@@ -758,7 +830,17 @@ public class NetSynth {
         }
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param circ
+     * @param synthmode
+     * @param outpor
+     * @param twonots2nor
+     * @return 
+    ***********************************************************************/
     public static List<DGate> runInvertedDCEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
     {
         
@@ -898,7 +980,17 @@ public class NetSynth {
         }
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param circ
+     * @param synthmode
+     * @param outpor
+     * @param twonots2nor
+     * @return 
+    ***********************************************************************/
     public static List<DGate> runEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
     {
         
@@ -1023,7 +1115,17 @@ public class NetSynth {
         }
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param circ
+     * @param synthmode
+     * @param outpor
+     * @param twonots2nor
+     * @return 
+    ***********************************************************************/
     public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
     {
         
@@ -1209,7 +1311,14 @@ public class NetSynth {
         
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param netlist
+     * @return 
+    ***********************************************************************/
     public static List<DGate> separateOutputGates(List<DGate> netlist)
     {
         List<DGate> finalnetlist = new ArrayList<DGate>();
@@ -1339,7 +1448,14 @@ public class NetSynth {
         return finalnetlist;
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param filename
+     * @return 
+    ***********************************************************************/
     public static List<DGate> parseVerilogABC(String filename)
     {
         List<DGate> netlistResult = new ArrayList<DGate>();
@@ -1406,7 +1522,15 @@ public class NetSynth {
         return netlistResult;
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param filelines
+     * @param filename
+     * @return 
+    ***********************************************************************/
     public static String create_VerilogFile(List<String> filelines, String filename)
     {
         String filestring = "";
@@ -1445,7 +1569,15 @@ public class NetSynth {
     }
     
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param inputs
+     * @param hex
+     * @param filename
+    ***********************************************************************/
     public static void create_VerilogFile(int inputs,String hex, String filename)
     {
         List<String> filelines = new ArrayList<String>();
@@ -1482,7 +1614,16 @@ public class NetSynth {
     
     
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param espout
+     * @param outpor
+     * @param twonots2nor
+     * @return 
+    ***********************************************************************/
     public static List<DGate> parseEspressoOutToABC(List<String> espout,NetSynthSwitches outpor, NetSynthSwitches twonots2nor) 
     {
         List<DGate> netlistout = new ArrayList<DGate>();
@@ -1524,7 +1665,14 @@ public class NetSynth {
         return netlistout;
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param espout
+     * @return 
+    ***********************************************************************/
     public static List<DGate> parseINVEspressoOutToABC(List<String> espout) 
     {
         List<DGate> netlistout = new ArrayList<DGate>();
@@ -1549,7 +1697,14 @@ public class NetSynth {
         return netlistout;
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param filename
+     * @return 
+    ***********************************************************************/
     public static List<DGate> parseEspressoFileToABC(String filename) 
     {
         List<DGate> netlistout = new ArrayList<DGate>();
@@ -1581,8 +1736,14 @@ public class NetSynth {
     
   
     
-    
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param x
+     * @return 
+    ***********************************************************************/
     public static DAGW computeDAGW(int x) 
     {
         one = new DWire("_one",DWireType.Source);
@@ -1606,7 +1767,15 @@ public class NetSynth {
     }
  
   
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param filename
+     * @return 
+     * @throws java.lang.InterruptedException
+    ***********************************************************************/
     public static List<DGate> runABC(String filename) throws InterruptedException 
     {
         initializeFilepath();
@@ -1679,7 +1848,15 @@ public class NetSynth {
     }
     
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param filename
+     * @return 
+     * @throws java.lang.InterruptedException
+    ***********************************************************************/
     public static List<DGate> runABCverilog(String filename) throws InterruptedException 
     {
     
@@ -1756,6 +1933,14 @@ public class NetSynth {
         //convertBenchToAIG();
     }
     
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @return 
+    ***********************************************************************/
     public static List<DGate> convertBenchToAIG()
     {
         
@@ -1940,7 +2125,14 @@ public class NetSynth {
     
           
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param netlist
+     * @return 
+    ***********************************************************************/
     public static List<DGate> convertAIGtoNORNOT(List<DGate> netlist)
     {
         List<DGate> netout = new ArrayList<DGate>();
@@ -2016,6 +2208,15 @@ public class NetSynth {
         return netout;
     }
     
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param pathFile
+     * @return 
+    ***********************************************************************/
     public static List<String> runEspresso(String pathFile) {
     
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
@@ -2092,33 +2293,14 @@ public class NetSynth {
     }
     
     
-    public static void testnetlistmodule()
-    {
-        DGate and = new DGate();
-        DWire w1 = new DWire("A",DWireType.input);
-        DWire w2 = new DWire("B",DWireType.input);
-        DWire outp = new DWire("outP",DWireType.output);
-        List<DWire> inputWires = new ArrayList<DWire>();
-        inputWires.add(w1);
-        inputWires.add(w2);
-        
-        DGateType testgateType;
-        testgateType = DGateType.NOR;
-        DGate gtest = new DGate(testgateType,inputWires,outp);
-        
-        List<DGate> test = new ArrayList<DGate>();
-        test = NetlistConversionFunctions.GatetoNORNOT(gtest);
-
-        for(DGate gout:test)
-        {
-            
-            String netbuilder = "";
-            netbuilder = printGate(gout);
-            System.out.println(netbuilder);
-        
-        }   
-    }
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param espinp
+     * @return 
+    ***********************************************************************/
     public static List<String> convertEspressoOutputToVerilog(List<String> espinp)
     {
         List<String> verilogfile = new ArrayList<String>();
@@ -2378,7 +2560,14 @@ public class NetSynth {
       
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param espinp
+     * @return 
+    ***********************************************************************/
     public static List<DGate> parseEspressoOutput(List<String> espinp)
     {
         one = new DWire("_one",DWireType.Source);
@@ -2587,6 +2776,15 @@ public class NetSynth {
         return sopexp;
     }
     
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param espinp
+     * @return 
+    ***********************************************************************/
     public static List<DGate> convertPOStoNORNOT(List<String> espinp)
     {
         
@@ -2790,7 +2988,14 @@ public class NetSynth {
     }
     
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param netlist
+     * @return 
+    ***********************************************************************/
     public static List<DGate> rewireNetlist(List<DGate> netlist)
     {
         for(int i=0;i<netlist.size();i++)
@@ -2818,6 +3023,8 @@ public class NetSynth {
     Description []
     SideEffects []
     SeeAlso     []
+     * @param netlistinp
+     * @return 
     ***********************************************************************/
     public static List<DGate> convert2NOTsToNOR(List<DGate> netlistinp)
     {
@@ -3453,6 +3660,8 @@ public class NetSynth {
     Description []
     SideEffects []
     SeeAlso     []
+     * @param finalnetlist
+     * @return 
     ***********************************************************************/
     public static List<DGate> outputORopt(List<DGate> finalnetlist)
     {
@@ -3521,6 +3730,8 @@ public class NetSynth {
     Description []
     SideEffects []
     SeeAlso     []
+     * @param netlist
+     * @return 
     ***********************************************************************/
     public static List<DGate> removeDanglingGates(List<DGate> netlist)
     {
@@ -3572,7 +3783,14 @@ public class NetSynth {
     }
     
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param naivenetlist
+     * @return 
+    ***********************************************************************/
     public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist)
     {
         List<DGate> structnetlist = new ArrayList<DGate>();
@@ -3625,7 +3843,14 @@ public class NetSynth {
         return structnetlist;
     }
     
-
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param inpNetlist
+     * @return 
+    ***********************************************************************/
     public static List<DGate> removeDuplicateNots(List<DGate> inpNetlist)
     {
         List<DGate> outpNetlist = new ArrayList<DGate>();
@@ -3669,6 +3894,18 @@ public class NetSynth {
         return outpNetlist;
     }
     
+    
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param inpNetlist
+     * @param outputor
+     * @param twoNotsToNor
+     * @return 
+    ***********************************************************************/
     public static List<DGate> optimizeNetlist(List<DGate> inpNetlist,boolean outputor,boolean twoNotsToNor)
     {
         
@@ -3696,6 +3933,15 @@ public class NetSynth {
         return outpNetlist;
     }
     
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param espinp
+     * @return 
+    ***********************************************************************/
     public static List<DGate> parseEspressoToNORNAND(List<String> espinp)
     {
         
@@ -3980,7 +4226,14 @@ public class NetSynth {
         return sopexp;
     }
     
-    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param inpWires
+     * @return 
+    ***********************************************************************/
     public static List<DGate> notGates(List<DWire> inpWires)
     {
         List<DGate> notInp = new ArrayList<DGate>();
@@ -3995,6 +4248,17 @@ public class NetSynth {
         return notInp;
     }
     
+    
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param inpWires
+     * @param gtype
+     * @return 
+    ***********************************************************************/
     public static List<DGate> NORNANDGates(List<DWire> inpWires, DGateType gtype)
     {
           if (inpWires.isEmpty())
@@ -4063,6 +4327,16 @@ public class NetSynth {
         return minterm;
     }
     
+    
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param inpWires
+     * @param gOrAnd
+     * @return 
+    ***********************************************************************/
     public static List<DGate> AndORGates(List<DWire> inpWires,DGateType gOrAnd)
     {
         if (inpWires.isEmpty())
@@ -4118,8 +4392,15 @@ public class NetSynth {
         return minterm;
     }
     
-    
-     public static DAGW CreateMultDAGW(List<DGate> netlist)
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+     * @param netlist
+     * @return 
+    ***********************************************************************/
+    public static DAGW CreateMultDAGW(List<DGate> netlist)
     {
          DAGW outDAG = new DAGW();
          List<DWire> inplist = new ArrayList<DWire>(); 
@@ -4492,7 +4773,20 @@ public class NetSynth {
     }
    
     
-     public static DAGW CreateDAGW(List<DGate> netlist)
+    /***************************************************************Function
+     * 
+    Synopsis    []
+    * 
+    Description []
+    * 
+    SideEffects []
+    * 
+    SeeAlso     []
+    * 
+     * @param netlist
+     * @return 
+    ***********************************************************************/
+    public static DAGW CreateDAGW(List<DGate> netlist)
     {
          DAGW outDAG = new DAGW();
          List<DWire> inplist = new ArrayList<DWire>(); 
@@ -4575,10 +4869,6 @@ public class NetSynth {
             }
         }*/
         //</editor-fold>
-        
-        
-        
-        
         
         for(int i=netlist.size()-1;i>=0;i--)
         {
@@ -4769,14 +5059,38 @@ public class NetSynth {
         return outDAG;
     }
    
-   
+    /***************************************************************Function
+     * 
+    Synopsis    [prints a Netlist]
+    * 
+    Description [Takes a List of DGates as input, and prints each DGate sequentially]
+    * 
+    SideEffects []
+    * 
+    SeeAlso     []
+    * 
+     * @param netlist The netlist to be printed.
+    ***********************************************************************/
     public static void printNetlist(List<DGate> netlist)
     {
         for(int i=0;i<netlist.size();i++)
             System.out.println(printGate(netlist.get(i)));
     }
     
-    
+    /***************************************************************
+    Function
+    <br> 
+    Synopsis    [prints a DGate]
+    <br>
+    Description [Takes a DGate as an input, and prints in the following format: DGateType(Output, Input1, Input2,....Inputn)]
+    <br> 
+    SideEffects []
+    <br> 
+    SeeAlso     []
+    <br> 
+     * @param g The DGate to be printed
+     * @return A string representation of the DGate
+    ***********************************************************************/
     public static String printGate(DGate g)
     {
         String netbuilder="";

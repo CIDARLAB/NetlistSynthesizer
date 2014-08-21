@@ -20,6 +20,7 @@ import BU.netsynth.Global;
 import BU.netsynth.NetSynth;
 import static BU.netsynth.NetSynth.Filepath;
 import static BU.netsynth.NetSynth.parseEspressoToNORNAND;
+import static BU.netsynth.NetSynth.printGate;
 import static BU.netsynth.NetSynth.runEspresso;
 import BU.netsynth.NetSynthSwitches;
 import BU.netsynth.NetlistConversionFunctions;
@@ -553,6 +554,38 @@ public class TestSynthesis {
     }
     
     
+    /**Function*************************************************************
+    Synopsis    []
+    Description []
+    SideEffects []
+    SeeAlso     []
+    ***********************************************************************/
+    public static void testnetlistmodule()
+    {
+        DGate and = new DGate();
+        DWire w1 = new DWire("A",DWireType.input);
+        DWire w2 = new DWire("B",DWireType.input);
+        DWire outp = new DWire("outP",DWireType.output);
+        List<DWire> inputWires = new ArrayList<DWire>();
+        inputWires.add(w1);
+        inputWires.add(w2);
+        
+        DGateType testgateType;
+        testgateType = DGateType.NOR;
+        DGate gtest = new DGate(testgateType,inputWires,outp);
+        
+        List<DGate> test = new ArrayList<DGate>();
+        test = NetlistConversionFunctions.GatetoNORNOT(gtest);
+
+        for(DGate gout:test)
+        {
+            
+            String netbuilder = "";
+            netbuilder = printGate(gout);
+            System.out.println(netbuilder);
+        
+        }   
+    }
     
     
 }
