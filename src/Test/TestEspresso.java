@@ -305,7 +305,7 @@ public class TestEspresso {
                 List<DGate> espoutput = new ArrayList<DGate>();
                 espoutput = convertPOStoNORNOT(espout);
                 
-                espoutput = optimizeNetlist(espoutput,true,true);
+                espoutput = optimizeNetlist(espoutput,true,true,false);
                 //espoutput = removeDoubleInverters(espoutput);
                 //espoutput = outputORopt(espoutput);
                 //espoutput = parseEspressoToNORNAND(espout);
@@ -331,7 +331,7 @@ public class TestEspresso {
                 //espoutputinv = parseEspressoToNORNAND(espoutinv);
                 espoutputinv = convertPOStoNORNOT(espoutinv);
                 
-                espoutputinv = optimizeNetlist(espoutputinv,true,true);
+                espoutputinv = optimizeNetlist(espoutputinv,true,true,false);
                 //espoutputinv = removeDoubleInverters(espoutputinv);
                 //espoutputinv = outputORopt(espoutputinv);
                 

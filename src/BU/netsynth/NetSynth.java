@@ -151,7 +151,7 @@ public class NetSynth {
     ***********************************************************************/
     public static DAGW runNetSynth(String vfilepath)
     {
-        return runNetSynth(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode  );
+        return runNetSynth(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode ,  NetSynthSwitches.defaultmode );
     }
     
     /**Function*************************************************************
@@ -168,14 +168,16 @@ public class NetSynth {
      * @param invcheck
      * @param outputor
      * @param twonotstonor
+     * @param nor3
      * @return 
     ***********************************************************************/
-    public static DAGW runNetSynth(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor)
+    public static DAGW runNetSynth(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor, String nor3)
     {
         NetSynthSwitches synth = null;
         NetSynthSwitches inv = null;
         NetSynthSwitches outpor = null;
         NetSynthSwitches twonots2nor = null;
+        NetSynthSwitches nor3inp = null;
         
         try
         {
@@ -183,13 +185,14 @@ public class NetSynth {
             inv = NetSynthSwitches.valueOf(invcheck);
             outpor = NetSynthSwitches.valueOf(outputor);
             twonots2nor = NetSynthSwitches.valueOf(twonotstonor);
+            nor3inp = NetSynthSwitches.valueOf(nor3);
         }
         catch(Exception e)
         {
             System.out.println("Error : "+ e.toString());
         }
         
-        return runNetSynth(vfilepath,synth, inv,outpor,twonots2nor);
+        return runNetSynth(vfilepath,synth, inv,outpor,twonots2nor, nor3inp);
     }
     
     
@@ -208,9 +211,10 @@ public class NetSynth {
      * @param invcheck
      * @param outputor
      * @param twonotstonor
+     * @param nor3
      * @return 
     ***********************************************************************/
-    public static DAGW runNetSynth(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
+    public static DAGW runNetSynth(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor ,NetSynthSwitches nor3)
     {
         
         DAGW finaldag = new DAGW();
@@ -230,7 +234,7 @@ public class NetSynth {
         outputnames = parseVerilogFile.getOutputNames(alllines);
         
         
-        netlist = getNetlist(vfilepath, synthesis,  invcheck,  outputor,  twonotstonor );
+        netlist = getNetlist(vfilepath, synthesis,  invcheck,  outputor,  twonotstonor, nor3 );
         
         netlist = rewireNetlist(netlist);
         //System.out.println("\nFinal Netlist");
@@ -299,7 +303,7 @@ public class NetSynth {
     ***********************************************************************/
     public static List<DGate> getNetlist(String vfilepath)
     {
-        return getNetlist(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode  );
+        return getNetlist(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode , NetSynthSwitches.defaultmode );
     }
     
     /**Function*************************************************************
@@ -318,12 +322,13 @@ public class NetSynth {
      * @param twonotstonor
      * @return
     ***********************************************************************/
-    public static List<DGate> getNetlist(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor)
+    public static List<DGate> getNetlist(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor, String nor3)
     {
         NetSynthSwitches synth = null;
         NetSynthSwitches inv = null;
         NetSynthSwitches outpor = null;
         NetSynthSwitches twonots2nor = null;
+        NetSynthSwitches nor3inp = null;
         
         try
         {
@@ -331,13 +336,15 @@ public class NetSynth {
             inv = NetSynthSwitches.valueOf(invcheck);
             outpor = NetSynthSwitches.valueOf(outputor);
             twonots2nor = NetSynthSwitches.valueOf(twonotstonor);
+            nor3inp = NetSynthSwitches.valueOf(nor3);
+            
         }
         catch(Exception e)
         {
             System.out.println("Error : "+ e.toString());
         }
         
-        return getNetlist(vfilepath,synth, inv,outpor,twonots2nor);
+        return getNetlist(vfilepath,synth, inv,outpor,twonots2nor, nor3inp);
     }
     
     /**Function*************************************************************
@@ -356,7 +363,7 @@ public class NetSynth {
      * @param twonotstonor
      * @return 
     ***********************************************************************/
-    public static List<DGate> getNetlist(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor )
+    public static List<DGate> getNetlist(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor, NetSynthSwitches nor3 )
     {
         List<DGate> naivenetlist = new ArrayList<DGate>();
         List<DGate> structnetlist = new ArrayList<DGate>();
@@ -398,7 +405,7 @@ public class NetSynth {
             }
             else
             {
-                structnetlist = parseStructuralVtoNORNOT(naivenetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+                structnetlist = parseStructuralVtoNORNOT(naivenetlist,nor3); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
             }
             
             
@@ -411,8 +418,8 @@ public class NetSynth {
             CircuitDetails direct = new CircuitDetails(inputnames,outputnames,ttValues); 
             CircuitDetails inverted = new CircuitDetails(inputnames, outputnames,invttValues);
             
-            dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
-            invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
+            dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor,nor3);
+            invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor,nor3);
             
             dirsize = getRepressorsCount(dirnetlist);
             invsize = getRepressorsCount(invnetlist);
@@ -486,8 +493,8 @@ public class NetSynth {
                 //<editor-fold desc="Behavioral- Case Statements - Has Don't Cares">
                 if(hasDontCares)
                 {
-                    dirnetlist = runDCEspressoAndABC(direct,synthesis,outputor,twonotstonor);
-                    invnetlist = runInvertedDCEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
+                    dirnetlist = runDCEspressoAndABC(direct,synthesis,outputor,twonotstonor, nor3);
+                    invnetlist = runInvertedDCEspressoAndABC(inverted,synthesis,outputor,twonotstonor, nor3);
                     
                     dirsize = getRepressorsCount(dirnetlist);
                     invsize = getRepressorsCount(invnetlist);
@@ -525,8 +532,8 @@ public class NetSynth {
                     
                     
                     
-                    dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor);
-                    invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor);
+                    dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor,nor3);
+                    invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor,nor3);
                     
                     
                     
@@ -591,8 +598,8 @@ public class NetSynth {
             
                 dirprecompnet = precompnetlist.get(ttval-1);
                 invprecompnet = precompnetlist.get(invttval-1);
-                dirprecompnet = runPrecomp(dirprecompnet,inputnames, outputnames,outputor,twonotstonor);
-                invprecompnet = runinvPrecomp(invprecompnet,inputnames, outputnames,outputor,twonotstonor);
+                dirprecompnet = runPrecomp(dirprecompnet,inputnames, outputnames,outputor,twonotstonor,nor3);
+                invprecompnet = runinvPrecomp(invprecompnet,inputnames, outputnames,outputor,twonotstonor,nor3);
                 
                 precompsize = getRepressorsCount(dirprecompnet);
                 invprecompsize = getRepressorsCount(invprecompnet);
@@ -691,7 +698,7 @@ public class NetSynth {
      * @param twonots2nor
      * @return 
     ***********************************************************************/
-    public static List<DGate> runinvPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
+    public static List<DGate> runinvPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor, NetSynthSwitches nor3)
     {
         DGate finalnot = new DGate();
         finalnot.gtype = DGateType.NOT;
@@ -702,7 +709,7 @@ public class NetSynth {
         notout.wtype = DWireType.output;
         finalnot.output = notout;
         inpnetlist.add(finalnot);
-        return runPrecomp(inpnetlist,inpnames,outpnames,outpor,twonots2nor);
+        return runPrecomp(inpnetlist,inpnames,outpnames,outpor,twonots2nor, nor3);
     }
     
     
@@ -722,7 +729,7 @@ public class NetSynth {
      * @param twonots2nor
      * @return 
     ***********************************************************************/
-    public static List<DGate> runPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
+    public static List<DGate> runPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitches outpor, NetSynthSwitches twonots2nor, NetSynthSwitches nor3)
     {
         List<DGate> finalnetlist = new ArrayList<DGate>();
         inpnetlist.get(inpnetlist.size()-1).output.name = outpnames.get(0);
@@ -751,7 +758,9 @@ public class NetSynth {
         }
         boolean outor;
         boolean not2nor;
-        
+        boolean nor3in = true;
+         if(nor3.equals(NetSynthSwitches.defaultmode))
+            nor3in = false;
         if(outpor.equals(NetSynthSwitches.defaultmode))
             outor = true;
         else
@@ -763,7 +772,7 @@ public class NetSynth {
             not2nor = false;
         
         
-        finalnetlist = optimizeNetlist(inpnetlist,outor,not2nor);
+        finalnetlist = optimizeNetlist(inpnetlist,outor,not2nor,nor3in);
         
         return finalnetlist;
     }
@@ -784,7 +793,7 @@ public class NetSynth {
      * @param twonots2nor
      * @return 
     ***********************************************************************/
-    public static List<DGate> runDCEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor) 
+    public static List<DGate> runDCEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor, NetSynthSwitches nor3) 
     {
         List<DGate> EspCircuit = new ArrayList<DGate>();
         List<DGate> ABCCircuit = new ArrayList<DGate>();
@@ -837,7 +846,9 @@ public class NetSynth {
         
         boolean outor;
         boolean not2nor;
-        
+        boolean nor3in = true;
+         if(nor3.equals(NetSynthSwitches.defaultmode))
+            nor3in = false;
         if(outpor.equals(NetSynthSwitches.defaultmode))
             outor = true;
         else
@@ -851,11 +862,11 @@ public class NetSynth {
         if(!synthmode.equals(NetSynthSwitches.abc))
         {
             EspCircuit = convertPOStoNORNOT(EspOutput);
-            EspCircuit = optimizeNetlist(EspCircuit,outor,not2nor);
+            EspCircuit = optimizeNetlist(EspCircuit,outor,not2nor,nor3in);
         }
             
         if(!synthmode.equals(NetSynthSwitches.espresso))
-            ABCCircuit = parseEspressoOutToABC(EspOutput, outpor,twonots2nor);
+            ABCCircuit = parseEspressoOutToABC(EspOutput, outpor,twonots2nor, nor3);
         
         if(synthmode.equals(NetSynthSwitches.abc))
             return ABCCircuit;
@@ -889,12 +900,14 @@ public class NetSynth {
      * @param twonots2nor
      * @return 
     ***********************************************************************/
-    public static List<DGate> runInvertedDCEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
+    public static List<DGate> runInvertedDCEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor,NetSynthSwitches nor3)
     {
         
         boolean outor;
         boolean not2nor;
-        
+        boolean nor3in = true;
+         if(nor3.equals(NetSynthSwitches.defaultmode))
+            nor3in = false;
         if(outpor.equals(NetSynthSwitches.defaultmode))
             outor = true;
         else
@@ -1003,13 +1016,13 @@ public class NetSynth {
             }
         }
         
-        finalEspCircuit = optimizeNetlist(finalEspCircuit,outor,not2nor);
+        finalEspCircuit = optimizeNetlist(finalEspCircuit,outor,not2nor,nor3in);
         
         finalABCCircuit = separateOutputGates(finalABCCircuit);
-        finalABCCircuit = optimizeNetlist(finalABCCircuit,outor,not2nor);
+        finalABCCircuit = optimizeNetlist(finalABCCircuit,outor,not2nor,nor3in);
         
         if(!synthmode.equals(NetSynthSwitches.espresso))
-            ABCCircuit = parseEspressoOutToABC(EspOutput, outpor,twonots2nor);
+            ABCCircuit = parseEspressoOutToABC(EspOutput, outpor,twonots2nor,nor3);
         
         if(synthmode.equals(NetSynthSwitches.abc))
             return finalABCCircuit;
@@ -1041,14 +1054,17 @@ public class NetSynth {
      * @param synthmode
      * @param outpor
      * @param twonots2nor
+     * @param nor3
      * @return 
     ***********************************************************************/
-    public static List<DGate> runEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
+    public static List<DGate> runEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor, NetSynthSwitches nor3)
     {
         
         boolean outor;
         boolean not2nor;
-        
+        boolean nor3in = true;
+         if(nor3.equals(NetSynthSwitches.defaultmode))
+            nor3in = false;
         if(outpor.equals(NetSynthSwitches.defaultmode))
             outor = true;
         else
@@ -1108,7 +1124,7 @@ public class NetSynth {
         fespinp.deleteOnExit();
         
         EspCircuit = convertPOStoNORNOT(EspOutput);
-        EspCircuit = optimizeNetlist(EspCircuit,outor,not2nor);
+        EspCircuit = optimizeNetlist(EspCircuit,outor,not2nor,nor3in);
         
         File fabcinp = new File(filestringblif);
         try 
@@ -1134,7 +1150,7 @@ public class NetSynth {
             
             abcoutput = separateOutputGates(abcoutput);
             
-            abcoutput = optimizeNetlist(abcoutput,outor,not2nor);
+            abcoutput = optimizeNetlist(abcoutput,outor,not2nor,nor3in);
             
             for (DGate xgate : abcoutput) 
             {
@@ -1182,14 +1198,16 @@ public class NetSynth {
      * @param twonots2nor
      * @return 
     ***********************************************************************/
-    public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor)
+    public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ,NetSynthSwitches synthmode, NetSynthSwitches outpor, NetSynthSwitches twonots2nor, NetSynthSwitches nor3)
     {
         
         
         
         boolean outor;
         boolean not2nor;
-        
+        boolean nor3in = true;
+         if(nor3.equals(NetSynthSwitches.defaultmode))
+            nor3in = false;
         if(outpor.equals(NetSynthSwitches.defaultmode))
             outor = true;
         else
@@ -1341,11 +1359,11 @@ public class NetSynth {
         
         
         
-        finalEspCircuit = optimizeNetlist(finalEspCircuit,outor,not2nor);
+        finalEspCircuit = optimizeNetlist(finalEspCircuit,outor,not2nor,nor3in);
         
         finalABCCircuit = separateOutputGates(finalABCCircuit);
         
-        finalABCCircuit = optimizeNetlist(finalABCCircuit,outor,not2nor);
+        finalABCCircuit = optimizeNetlist(finalABCCircuit,outor,not2nor,nor3in);
         
         
         
@@ -1564,7 +1582,7 @@ public class NetSynth {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            abcoutput = optimizeNetlist(abcoutput,true,true);
+            abcoutput = optimizeNetlist(abcoutput,true,true,false);
             //abcoutput = removeDoubleInverters(abcoutput);
             //abcoutput = outputORopt(abcoutput);
             //abcoutput = convert2NOTsToNOR(abcoutput);
@@ -1700,7 +1718,7 @@ public class NetSynth {
      * @param twonots2nor
      * @return 
     ***********************************************************************/
-    public static List<DGate> parseEspressoOutToABC(List<String> espout,NetSynthSwitches outpor, NetSynthSwitches twonots2nor) 
+    public static List<DGate> parseEspressoOutToABC(List<String> espout,NetSynthSwitches outpor, NetSynthSwitches twonots2nor,NetSynthSwitches nor3) 
     {
         List<DGate> netlistout = new ArrayList<DGate>();
         //List<String> espout = new ArrayList<String>();
@@ -1709,18 +1727,20 @@ public class NetSynth {
         {
             System.out.println(xline);
         }*/
-        boolean outor;
-        boolean not2nor;
+        boolean outor=false;
+        boolean not2nor=false;
+        boolean nor3in = true;
         
         if(outpor.equals(NetSynthSwitches.defaultmode))
             outor = true;
-        else
-            outor = false;
+        
+        if(nor3.equals(NetSynthSwitches.defaultmode))
+            nor3in = false;
+        
         
         if(twonots2nor.equals(NetSynthSwitches.defaultmode))
             not2nor = true;
-        else
-            not2nor = false;
+        
         
         
         List<String> vfilelines = new ArrayList<String>();
@@ -1732,7 +1752,7 @@ public class NetSynth {
             netlistout = runABCverilog("espressoVerilog");
             netlistout = separateOutputGates(netlistout);
             
-            netlistout = optimizeNetlist(netlistout,outor,not2nor);
+            netlistout = optimizeNetlist(netlistout,outor,not2nor,nor3in);
             
         } catch (InterruptedException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
@@ -1806,7 +1826,7 @@ public class NetSynth {
         try {
             
             netlistout = runABCverilog("espressoVerilog");
-            netlistout = optimizeNetlist(netlistout,true,true);            
+            netlistout = optimizeNetlist(netlistout,true,true,false);            
             //netlistout = removeDoubleInverters(netlistout);
             //netlistout = outputORopt(netlistout);
             //netlistout = convert2NOTsToNOR(netlistout);
@@ -3993,7 +4013,7 @@ public class NetSynth {
      * @param naivenetlist
      * @return 
     ***********************************************************************/
-    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist)
+    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist,NetSynthSwitches nor3)
     {
         List<DGate> structnetlist = new ArrayList<DGate>();
         //List<DGate> naivenetlist = new ArrayList<DGate>();
@@ -4022,7 +4042,10 @@ public class NetSynth {
                 structnetlist.add(structgate);
             }
         }    
-            structnetlist = optimizeNetlist(structnetlist,true,true);
+        boolean nor3in = true;
+         if(nor3.equals(NetSynthSwitches.defaultmode))
+            nor3in = false;
+        structnetlist = optimizeNetlist(structnetlist,true,true,nor3in);
         //}
         //structnetlist = removeDanglingGates(structnetlist);
         //printNetlist(structnetlist);
@@ -4116,7 +4139,7 @@ public class NetSynth {
      * @param twoNotsToNor
      * @return 
     ***********************************************************************/
-    public static List<DGate> optimizeNetlist(List<DGate> inpNetlist,boolean outputor,boolean twoNotsToNor)
+    public static List<DGate> optimizeNetlist(List<DGate> inpNetlist,boolean outputor,boolean twoNotsToNor, boolean nor3)
     {
         
        
@@ -4136,6 +4159,11 @@ public class NetSynth {
             outpNetlist = outputORopt(outpNetlist);
         if(twoNotsToNor)
             outpNetlist = convert2NOTsToNOR(outpNetlist);
+        
+        if(nor3)
+            outpNetlist = convertToNOR3(outpNetlist);
+            
+        
         outpNetlist = removeDanglingGates(outpNetlist);
         
         outpNetlist = rewireNetlist(outpNetlist);

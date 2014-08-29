@@ -124,7 +124,7 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
             System.out.println("\nDAGW Gates");
             for(Gate xgate:newdag.Gates)
             {
@@ -146,7 +146,7 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
             
             /*if(newdag.Gates.size() == 4)
             {
@@ -182,7 +182,7 @@ public class TestSynthesis {
         //System.out.println("Netlist:");
         //NetSynth.printNetlist(NetSynth.getNetlist(path));
         DAGW resdag = new DAGW();
-        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.originalstructural,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
+        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.originalstructural,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
         for(Gate xgate:resdag.Gates)
         {
             System.out.println("Type: " + xgate.Type + " ::: Name: "+ xgate.Name);
