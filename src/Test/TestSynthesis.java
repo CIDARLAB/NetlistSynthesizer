@@ -50,6 +50,72 @@ public class TestSynthesis {
      * 
      * 
      */
+    
+    
+    public static void test3norconversion()
+    {
+        List<DGate> inp = new ArrayList<DGate>();
+        
+        DGate g1 = new DGate();
+        DGate g2 = new DGate();
+        DGate g3 = new DGate();
+        DGate g4 = new DGate();
+        DGate g5 = new DGate();
+        
+        
+        
+        DWire w1 = new DWire("in1",DWireType.input);
+        DWire w2 = new DWire("in2",DWireType.input);
+        DWire w3 = new DWire("in3",DWireType.input);
+        DWire w4 = new DWire("w1",DWireType.connector);
+        DWire w5 = new DWire("w2",DWireType.connector);
+        DWire w6= new DWire("out1",DWireType.output);
+        DWire w7= new DWire("out2",DWireType.output);
+        DWire w8= new DWire("out3",DWireType.output);
+        
+        g1.gtype = DGateType.NOR;
+        g2.gtype = DGateType.NOT;
+        g3.gtype = DGateType.NOR;
+        g4.gtype = DGateType.NOT;
+        g5.gtype = DGateType.NOT;
+        
+        g1.input.add(w1);
+        g1.input.add(w2);
+        g1.output = w4;
+        
+        g2.input.add(w4);
+        g2.output = w5;
+        
+        g3.input.add(w3);
+        g3.input.add(w5);
+        g3.output = w6;
+        
+        g4.input.add(w4);
+        g4.output = w7;
+        
+        g5.input.add(w5);
+        g5.output = w8;
+        
+        inp.add(g1);
+        inp.add(g2);
+        inp.add(g3);
+        inp.add(g4);
+        inp.add(g5);
+        
+        System.out.println("Input Netlist");
+        NetSynth.printNetlist(inp);
+        
+        inp = NetSynth.convertToNOR3(inp);
+        
+        System.out.println("\nOutput Netlist");
+        NetSynth.printNetlist(inp);
+        
+        
+        
+        
+        
+    }
+    
     public static void testSpecInputVerilog(int n,int tt)
     {
        

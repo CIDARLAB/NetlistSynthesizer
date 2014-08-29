@@ -117,9 +117,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
     ***********************************************************************/
     public static void initializeFilepath() {
@@ -134,9 +138,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    <br>
     Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param vfilepath
      * @return 
@@ -147,9 +155,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param vfilepath
      * @param synthesis
@@ -183,9 +195,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    <br>
     Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param vfilepath    
      * @param synthesis
@@ -246,9 +262,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param inpnetlist
      * @return 
@@ -266,9 +286,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    <br>
     Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param vfilepath
      * @return 
@@ -279,9 +303,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    <br>
     Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param vfilepath
      * @param synthesis
@@ -313,11 +341,15 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    [Controller function in NetSynth. Parses Verilog to a Directed Acyclic Graph]
+    <br>
     Description [This is the default function. Takes the verilog file's filepath as the input parameter and gives an optimal result]
+    <br>
     SideEffects []
+    <br>
     SeeAlso
-     * @param vfilepath    []
+     * @param vfilepath   
      * @param synthesis
      * @param invcheck
      * @param outputor
@@ -644,9 +676,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param inpnetlist
      * @param inpnames
@@ -671,9 +707,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param inpnetlist
      * @param inpnames
@@ -730,9 +770,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param circ
      * @param synthmode
@@ -831,9 +875,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param circ
      * @param synthmode
@@ -981,9 +1029,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param circ
      * @param synthmode
@@ -1116,9 +1168,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param circ
      * @param synthmode
@@ -1312,9 +1368,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param netlist
      * @return 
@@ -1449,9 +1509,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param filename
      * @return 
@@ -1523,9 +1587,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param filelines
      * @param filename
@@ -1570,9 +1638,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param inputs
      * @param hex
@@ -1615,9 +1687,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param espout
      * @param outpor
@@ -1666,9 +1742,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param espout
      * @return 
@@ -1698,9 +1778,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param filename
      * @return 
@@ -1737,9 +1821,13 @@ public class NetSynth {
   
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>    
     SeeAlso     []
      * @param x
      * @return 
@@ -1768,9 +1856,13 @@ public class NetSynth {
  
   
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>    
     SeeAlso     []
      * @param filename
      * @return 
@@ -1849,9 +1941,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param filename
      * @return 
@@ -1935,9 +2031,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @return 
     ***********************************************************************/
@@ -2126,9 +2226,13 @@ public class NetSynth {
           
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param netlist
      * @return 
@@ -2210,9 +2314,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param pathFile
      * @return 
@@ -2294,9 +2402,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param espinp
      * @return 
@@ -2561,9 +2673,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param espinp
      * @return 
@@ -2778,9 +2894,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param espinp
      * @return 
@@ -2989,9 +3109,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param netlist
      * @return 
@@ -3018,10 +3142,72 @@ public class NetSynth {
     }
     
     
-    /**Function*************************************************************
-    Synopsis    [Search for the 2 NOTs to NOR motif and replace it with a NOR gate]
+    /***************************************************************
+    Function
+    <br>
+    Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
+    SeeAlso     []
+    <br>
+     * @param netlistinp
+     * @return 
+***********************************************************************/
+    public static List<DGate> convertToNOR3(List<DGate> netlistinp)
+    {
+        //List<DGate> netlistout = new ArrayList<DGate>();
+        //List<Integer> removegates = new ArrayList<Integer>();
+        for(int i=0;i<netlistinp.size();i++)
+        {
+            if(netlistinp.get(i).gtype.equals(DGateType.NOR) && (netlistinp.get(i).input.size()<3))
+            {
+                for(int j=i+1;j<netlistinp.size();j++)
+                {
+                    if(netlistinp.get(j).gtype.equals(DGateType.NOT) && (netlistinp.get(j).input.get(0).name.trim().equals(netlistinp.get(i).output.name.trim())))
+                    {
+                        for(int k=j+1;k<netlistinp.size();k++)
+                        {
+                            if(netlistinp.get(k).gtype.equals(DGateType.NOR) && (netlistinp.get(i).input.size()<3))
+                            {
+                                int indx=0;
+                                boolean found = false;
+                                for(int m =0;m<netlistinp.get(k).input.size();m++)
+                                {
+                                    if(netlistinp.get(k).input.get(m).name.trim().equals(netlistinp.get(j).output.name.trim()))
+                                    {
+                                        found = true;
+                                        indx = m;
+                                    }
+                                }
+                                if(found)
+                                {
+                                    netlistinp.get(k).input.remove(indx);
+                                    netlistinp.get(k).input.addAll(netlistinp.get(i).input);
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        netlistinp = removeDanglingGates(netlistinp);
+        return netlistinp;
+    }
+    
+    
+    
+    /**Function*************************************************************
+    <br>
+    Synopsis    [Search for the 2 NOTs to NOR motif and replace it with a NOR gate]
+    <br>
+    Description []
+    <br>
+    SideEffects []
+    <br>
     SeeAlso     []
      * @param netlistinp
      * @return 
@@ -3349,9 +3535,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    [Remove Double inverters motif]
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param netlistinp
      * @return 
@@ -3656,9 +3846,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    [Replace Output_OR]
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param finalnetlist
      * @return 
@@ -3726,11 +3920,15 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    [Removes Gates where the output is not of type DWireType.Output and the inputs are not outputs of any other Gate in the circuit]
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
-     * @param netlist
+     * @param netlist Input netlist
      * @return 
     ***********************************************************************/
     public static List<DGate> removeDanglingGates(List<DGate> netlist)
@@ -3784,9 +3982,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param naivenetlist
      * @return 
@@ -3844,9 +4046,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>    
     SideEffects []
+    <br>    
     SeeAlso     []
      * @param inpNetlist
      * @return 
@@ -3897,9 +4103,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param inpNetlist
      * @param outputor
@@ -3935,9 +4145,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param espinp
      * @return 
@@ -4227,9 +4441,13 @@ public class NetSynth {
     }
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param inpWires
      * @return 
@@ -4251,9 +4469,13 @@ public class NetSynth {
     
     
     /**Function*************************************************************
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param inpWires
      * @param gtype
@@ -4328,10 +4550,14 @@ public class NetSynth {
     }
     
     
-    /**Function*************************************************************
+    /***************************************************************Function
+    <br>
     Synopsis    []
+    <br>
     Description []
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
      * @param inpWires
      * @param gOrAnd
@@ -4392,13 +4618,17 @@ public class NetSynth {
         return minterm;
     }
     
-    /**Function*************************************************************
-    Synopsis    []
-    Description []
+    /***************************************************************Function
+    <br> 
+    Synopsis    [Netlist to Directed Acyclic Graph]
+    <br> 
+    Description [Converts a Netlist into a Directed Acyclic Graph with multiple outputs]
+    <br>
     SideEffects []
+    <br>
     SeeAlso     []
-     * @param netlist
-     * @return 
+     * @param netlist Input Netlist
+     * @return Directed Acyclic Graph with multiple outputs
     ***********************************************************************/
     public static DAGW CreateMultDAGW(List<DGate> netlist)
     {
@@ -4774,17 +5004,17 @@ public class NetSynth {
    
     
     /***************************************************************Function
-     * 
-    Synopsis    []
-    * 
-    Description []
-    * 
+    <br> 
+    Synopsis    [Netlist to Directed Acyclic Graph]
+    <br> 
+    Description [Converts a netlist into a Directed Acyclic Graph. DGates are Vertices and DWires are Arcs]
+    <br> 
     SideEffects []
-    * 
+    <br> 
     SeeAlso     []
-    * 
-     * @param netlist
-     * @return 
+    <br> 
+     * @param netlist Input netlist 
+     * @return A Directed Acyclic Graph
     ***********************************************************************/
     public static DAGW CreateDAGW(List<DGate> netlist)
     {
@@ -5060,15 +5290,15 @@ public class NetSynth {
     }
    
     /***************************************************************Function
-     * 
+     <br> 
     Synopsis    [prints a Netlist]
-    * 
+    <br> 
     Description [Takes a List of DGates as input, and prints each DGate sequentially]
-    * 
+    <br> 
     SideEffects []
-    * 
+    <br> 
     SeeAlso     []
-    * 
+    <br> 
      * @param netlist The netlist to be printed.
     ***********************************************************************/
     public static void printNetlist(List<DGate> netlist)
