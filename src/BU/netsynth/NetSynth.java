@@ -405,7 +405,7 @@ public class NetSynth {
             }
             else
             {
-                structnetlist = parseStructuralVtoNORNOT(naivenetlist,nor3); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+                structnetlist = parseStructuralVtoNORNOT(naivenetlist,nor3,synthesis); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
             }
             
             
@@ -678,6 +678,7 @@ public class NetSynth {
         }
         
         netlist = rewireNetlist(netlist);
+        //printNetlist(netlist);
         return netlist;
         
     }
@@ -4011,9 +4012,11 @@ public class NetSynth {
     <br>
     SeeAlso     []
      * @param naivenetlist
+     * @param nor3
+     * @param originalAND
      * @return 
     ***********************************************************************/
-    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist,NetSynthSwitches nor3)
+    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist,NetSynthSwitches nor3, NetSynthSwitches originalAND)
     {
         List<DGate> structnetlist = new ArrayList<DGate>();
         //List<DGate> naivenetlist = new ArrayList<DGate>();
@@ -4028,7 +4031,7 @@ public class NetSynth {
         //printNetlist(structnetlist);
         //if(!synthesis.equals(NetSynthSwitches.originalstructural))
         //{
-            for(int i=0;i<naivenetlist.size();i++)
+        for(int i=0;i<naivenetlist.size();i++)
         {
             for(DGate redgate: NetlistConversionFunctions.ConvertToFanin2(naivenetlist.get(i)))
             {
@@ -4037,7 +4040,7 @@ public class NetSynth {
         }
         for(int i=0;i<reducedfanin.size();i++)
         {
-            for(DGate structgate: NetlistConversionFunctions.GatetoNORNOT(reducedfanin.get(i)))
+            for(DGate structgate: NetlistConversionFunctions.GatetoNORNOT(reducedfanin.get(i),originalAND))
             {
                 structnetlist.add(structgate);
             }
@@ -4789,6 +4792,14 @@ public class NetSynth {
             if(netg.gtype.equals(DGateType.NOR))
             {
                 Gate norg = new Gate(indx,GateType.NOR.toString());
+                norg.outW = netg.output;
+                
+                indx++;
+                Gates.add(norg);
+            }
+            else if(netg.gtype.equals(DGateType.AND))
+            {
+                Gate norg = new Gate(indx,GateType.AND.toString());
                 norg.outW = netg.output;
                 
                 indx++;

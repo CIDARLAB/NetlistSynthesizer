@@ -9,6 +9,7 @@ import BU.netsynth.DGateType;
 import BU.netsynth.DWire;
 import BU.netsynth.DWireType;
 import BU.netsynth.NetSynth;
+import BU.netsynth.NetSynthSwitches;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -808,6 +809,9 @@ public class parseVerilogFile {
         //    System.out.println(NetSynth.netlist(structnetlist.get(i)));
         return structnetlist;
     }
+    
+    
+    
     
     public static boolean hasDontCares(List<String> TruthTableVals)
     {

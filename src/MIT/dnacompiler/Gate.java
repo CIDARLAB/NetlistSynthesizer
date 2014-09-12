@@ -22,6 +22,7 @@ public class Gate {
         INPUT,
         OUTPUT,
         OUTPUT_OR,
+        AND,
         NOR,
         NOT;
     }

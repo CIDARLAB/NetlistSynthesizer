@@ -5,7 +5,7 @@ module bestdepth(output o0, o1, o2, input ina, inb, inc);
    not (w1, inc);
    not (w2, w0);
    or (o0, w2, w1);
-   nor (w3, ina, inc);
+   and (w3, ina, inc);
    not (w4, inb);
    not (w5,w3);
    or (o1, w4, w5);

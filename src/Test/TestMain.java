@@ -32,7 +32,8 @@ public class TestMain {
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testSpecInputVerilog(3,158);
             //TestSynthesis.testVerilogrunNetSynth();
-            TestSynthesis.test3norconversion();
+            TestSynthesis.testVerilogrunNetSynth();
+            //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);
             //TestSynthesis.testAllnInputVerilog(3);
         
