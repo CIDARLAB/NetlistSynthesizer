@@ -408,6 +408,11 @@ public class NetSynth {
                 structnetlist = parseStructuralVtoNORNOT(naivenetlist,nor3,synthesis); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
             }
             
+            if(synthesis.equals(NetSynthSwitches.originalstructuralANDOR))
+            {
+                structnetlist = convertORbeforeAND(structnetlist);
+            }
+            
             
             List<String> ttValues = new ArrayList<String>(); 
             List<String> invttValues = new ArrayList<String>();
@@ -425,7 +430,7 @@ public class NetSynth {
             invsize = getRepressorsCount(invnetlist);
             structsize = getRepressorsCount(structnetlist);
             
-            if(synthesis.equals(NetSynthSwitches.originalstructural))
+            if(synthesis.equals(NetSynthSwitches.originalstructural) || synthesis.equals(NetSynthSwitches.originalstructuralAND) || synthesis.equals(NetSynthSwitches.originalstructuralANDOR))
             {
                 for(DGate xgate:structnetlist)
                         netlist.add(xgate);
@@ -3221,6 +3226,53 @@ public class NetSynth {
     
     
     
+    
+    public static List<DGate> convertORbeforeAND(List<DGate> netlistinp)
+    {
+        for(int i=0;i<netlistinp.size();i++)
+        {
+            if(netlistinp.get(i).gtype.equals(DGateType.NOR))
+            {
+                for(int j=i+1;j<netlistinp.size();j++)
+                {
+                    if(netlistinp.get(j).gtype.equals(DGateType.NOT) && netlistinp.get(j).input.get(0).name.trim().equals(netlistinp.get(i).output.name.trim()))
+                    {
+                        for(int k=j+1;k<netlistinp.size();k++)
+                        {
+                            if(netlistinp.get(k).gtype.equals(DGateType.AND))
+                            {
+                                int indx=0;
+                                boolean found = false;
+                                for(int m=0;m<netlistinp.get(k).input.size();m++)
+                                {
+                                    if(netlistinp.get(k).input.get(m).name.trim().equals(netlistinp.get(j).output.name.trim()))
+                                    {
+                                        indx = m;
+                                        found = true;
+                                    }
+                                }
+                                if(found)
+                                {
+                                    netlistinp.get(k).input.remove(indx);
+                                    DGate orgate = new DGate();
+                                    orgate.input.addAll(netlistinp.get(i).input);
+                                    orgate.gtype = DGateType.OR;
+                                    DWire orOutWire = new DWire("0Wire" +Global.wirecount++,netlistinp.get(j).output.wtype);
+                                    orgate.output = orOutWire;
+                                    netlistinp.add(k, orgate);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        netlistinp = removeDanglingGates(netlistinp);
+        return netlistinp;
+    }
+    
+    
+    
     /**Function*************************************************************
     <br>
     Synopsis    [Search for the 2 NOTs to NOR motif and replace it with a NOR gate]
@@ -4044,7 +4096,10 @@ public class NetSynth {
             {
                 structnetlist.add(structgate);
             }
-        }    
+        }
+        
+        
+        
         boolean nor3in = true;
          if(nor3.equals(NetSynthSwitches.defaultmode))
             nor3in = false;
@@ -4439,7 +4494,6 @@ public class NetSynth {
             {
                 no2ndstageGate = true;
             }
-                
         }
         else
         {

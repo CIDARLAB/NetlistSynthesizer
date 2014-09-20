@@ -20,6 +20,7 @@ public enum NetSynthSwitches {
    noprecompute,
    originalstructural,
    originalstructuralAND,
+   originalstructuralANDOR,
    
    noinv,
    

@@ -248,7 +248,7 @@ public class NetlistConversionFunctions {
         } 
         else if (g.gtype == DGateType.AND) 
         {
-            if (originalAND.equals(NetSynthSwitches.originalstructuralAND)) 
+            if (originalAND.equals(NetSynthSwitches.originalstructuralAND) || originalAND.equals(NetSynthSwitches.originalstructuralANDOR)) 
             {
                 g.calculateStage();
                 nor_eq.add(g);
