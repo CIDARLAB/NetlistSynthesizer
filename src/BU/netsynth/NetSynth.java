@@ -151,7 +151,7 @@ public class NetSynth {
     ***********************************************************************/
     public static DAGW runNetSynth(String vfilepath)
     {
-        return runNetSynth(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode ,  NetSynthSwitches.defaultmode );
+        return runNetSynth(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode ,  NetSynthSwitches.defaultmode );
     }
     
     /**Function*************************************************************
@@ -171,13 +171,15 @@ public class NetSynth {
      * @param nor3
      * @return 
     ***********************************************************************/
-    public static DAGW runNetSynth(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor, String nor3)
+    public static DAGW runNetSynth(String vfilepath, String synthesis, String invcheck, String outputor,String outputOR3, String twonotstonor, String nor3)
     {
         NetSynthSwitches synth = null;
         NetSynthSwitches inv = null;
         NetSynthSwitches outpor = null;
         NetSynthSwitches twonots2nor = null;
         NetSynthSwitches nor3inp = null;
+        NetSynthSwitches outor3 = null;
+        
         
         try
         {
@@ -186,13 +188,14 @@ public class NetSynth {
             outpor = NetSynthSwitches.valueOf(outputor);
             twonots2nor = NetSynthSwitches.valueOf(twonotstonor);
             nor3inp = NetSynthSwitches.valueOf(nor3);
+            outor3 = NetSynthSwitches.valueOf(outputOR3);
         }
         catch(Exception e)
         {
             System.out.println("Error : "+ e.toString());
         }
         
-        return runNetSynth(vfilepath,synth, inv,outpor,twonots2nor, nor3inp);
+        return runNetSynth(vfilepath,synth, inv,outpor,outor3,twonots2nor, nor3inp);
     }
     
     
@@ -210,11 +213,12 @@ public class NetSynth {
      * @param synthesis
      * @param invcheck
      * @param outputor
+     * @param outputOR3
      * @param twonotstonor
      * @param nor3
      * @return 
     ***********************************************************************/
-    public static DAGW runNetSynth(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor ,NetSynthSwitches nor3)
+    public static DAGW runNetSynth(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches outputOR3, NetSynthSwitches twonotstonor ,NetSynthSwitches nor3)
     {
         
         DAGW finaldag = new DAGW();
@@ -234,7 +238,7 @@ public class NetSynth {
         outputnames = parseVerilogFile.getOutputNames(alllines);
         
         
-        netlist = getNetlist(vfilepath, synthesis,  invcheck,  outputor,  twonotstonor, nor3 );
+        netlist = getNetlist(vfilepath, synthesis,  invcheck,  outputor,outputOR3,  twonotstonor, nor3 );
         
         netlist = rewireNetlist(netlist);
         //System.out.println("\nFinal Netlist");
@@ -303,7 +307,7 @@ public class NetSynth {
     ***********************************************************************/
     public static List<DGate> getNetlist(String vfilepath)
     {
-        return getNetlist(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode , NetSynthSwitches.defaultmode );
+        return getNetlist(vfilepath, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode , NetSynthSwitches.defaultmode );
     }
     
     /**Function*************************************************************
@@ -319,16 +323,20 @@ public class NetSynth {
      * @param synthesis
      * @param invcheck
      * @param outputor
+     * @param outputOR3
      * @param twonotstonor
+     * @param nor3
      * @return
     ***********************************************************************/
-    public static List<DGate> getNetlist(String vfilepath, String synthesis, String invcheck, String outputor, String twonotstonor, String nor3)
+    public static List<DGate> getNetlist(String vfilepath, String synthesis, String invcheck, String outputor,String outputOR3, String twonotstonor, String nor3)
     {
         NetSynthSwitches synth = null;
         NetSynthSwitches inv = null;
         NetSynthSwitches outpor = null;
         NetSynthSwitches twonots2nor = null;
         NetSynthSwitches nor3inp = null;
+        NetSynthSwitches outor3 = null;
+        
         
         try
         {
@@ -337,6 +345,7 @@ public class NetSynth {
             outpor = NetSynthSwitches.valueOf(outputor);
             twonots2nor = NetSynthSwitches.valueOf(twonotstonor);
             nor3inp = NetSynthSwitches.valueOf(nor3);
+            outor3 = NetSynthSwitches.valueOf(outputOR3);
             
         }
         catch(Exception e)
@@ -344,7 +353,7 @@ public class NetSynth {
             System.out.println("Error : "+ e.toString());
         }
         
-        return getNetlist(vfilepath,synth, inv,outpor,twonots2nor, nor3inp);
+        return getNetlist(vfilepath,synth, inv,outpor,outor3,twonots2nor, nor3inp);
     }
     
     /**Function*************************************************************
@@ -360,10 +369,12 @@ public class NetSynth {
      * @param synthesis
      * @param invcheck
      * @param outputor
+     * @param outputOR3
      * @param twonotstonor
+     * @param nor3
      * @return 
     ***********************************************************************/
-    public static List<DGate> getNetlist(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches twonotstonor, NetSynthSwitches nor3 )
+    public static List<DGate> getNetlist(String vfilepath,NetSynthSwitches synthesis, NetSynthSwitches invcheck, NetSynthSwitches outputor, NetSynthSwitches outputOR3, NetSynthSwitches twonotstonor, NetSynthSwitches nor3 )
     {
         List<DGate> naivenetlist = new ArrayList<DGate>();
         List<DGate> structnetlist = new ArrayList<DGate>();
@@ -681,7 +692,10 @@ public class NetSynth {
                 }
             }
         }
-        
+        if(outputOR3.equals(NetSynthSwitches.outputOR3))
+        {
+            netlist = convertToOutputOR3(netlist);
+        }
         netlist = rewireNetlist(netlist);
         //printNetlist(netlist);
         return netlist;
@@ -3225,8 +3239,90 @@ public class NetSynth {
     }
     
     
+    /***************************************************************
+    Function
+    <br>
+    Synopsis    []
+    <br>
+    Description []
+    <br>
+    SideEffects []
+    <br>
+    SeeAlso     []
+    <br>
+     * @param netlistinp
+     * @return 
+***********************************************************************/
+    public static List<DGate> convertToOutputOR3(List<DGate> netlistinp)
+    {
+        //List<DGate> netlistout = new ArrayList<DGate>();
+        //List<Integer> removegates = new ArrayList<Integer>();
+        for(int i=0;i<netlistinp.size();i++)
+        {
+            if(netlistinp.get(i).gtype.equals(DGateType.NOR) && (netlistinp.get(i).input.size()<3))
+            {
+                for(int j=i+1;j<netlistinp.size();j++)
+                {
+                    if(netlistinp.get(j).gtype.equals(DGateType.NOT) && (netlistinp.get(j).input.get(0).name.trim().equals(netlistinp.get(i).output.name.trim())))
+                    {
+                        for(int k=j+1;k<netlistinp.size();k++)
+                        {
+                            if(netlistinp.get(k).gtype.equals(DGateType.NOR) && (netlistinp.get(i).input.size()<3))
+                            {
+                                int indx=0;
+                                boolean found = false;
+                                for(int m =0;m<netlistinp.get(k).input.size();m++)
+                                {
+                                    if(netlistinp.get(k).input.get(m).name.trim().equals(netlistinp.get(j).output.name.trim()))
+                                    {
+                                        for(int l=k+1;l<netlistinp.size();l++)
+                                        {
+                                            if((netlistinp.get(l).gtype.equals(DGateType.NOT)) && (netlistinp.get(l).input.get(0).name.trim().equals(netlistinp.get(k).output.name.trim()))  && (netlistinp.get(l).output.wtype.equals(DWireType.output)) )
+                                            {
+                                                found = true;
+                                                System.out.println("Found output OR 3");
+                                                netlistinp.get(l).gtype = DGateType.OR;
+                                                netlistinp.get(l).input.remove(0);
+                                                netlistinp.get(l).input.addAll(netlistinp.get(i).input);
+                                                for(int x =0;x<netlistinp.get(k).input.size();x++)
+                                                {
+                                                    if(x!=m)
+                                                    {
+                                                        netlistinp.get(l).input.add(netlistinp.get(k).input.get(x));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        
+                                        //
+                                    }
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        netlistinp = removeDanglingGates(netlistinp);
+        return netlistinp;
+    }
     
     
+    /***************************************************************
+    Function
+    <br>
+    Synopsis    []
+    <br>
+    Description []
+    <br>
+    SideEffects []
+    <br>
+    SeeAlso     []
+    <br>
+     * @param netlistinp
+     * @return 
+***********************************************************************/
     public static List<DGate> convertORbeforeAND(List<DGate> netlistinp)
     {
         for(int i=0;i<netlistinp.size();i++)
@@ -3253,12 +3349,14 @@ public class NetSynth {
                                 }
                                 if(found)
                                 {
+                                    
                                     netlistinp.get(k).input.remove(indx);
                                     DGate orgate = new DGate();
                                     orgate.input.addAll(netlistinp.get(i).input);
                                     orgate.gtype = DGateType.OR;
                                     DWire orOutWire = new DWire("0Wire" +Global.wirecount++,netlistinp.get(j).output.wtype);
                                     orgate.output = orOutWire;
+                                    netlistinp.get(k).input.add(orOutWire);
                                     netlistinp.add(k, orgate);
                                 }
                             }
@@ -3267,6 +3365,7 @@ public class NetSynth {
                 }
             }
         }
+        
         netlistinp = removeDanglingGates(netlistinp);
         return netlistinp;
     }

@@ -18,6 +18,7 @@ import BU.netsynth.DWire;
 import BU.netsynth.DWireType;
 import BU.netsynth.Global;
 import BU.netsynth.NetSynth;
+import static BU.netsynth.NetSynth.CreateMultDAGW;
 import static BU.netsynth.NetSynth.Filepath;
 import static BU.netsynth.NetSynth.parseEspressoToNORNAND;
 import static BU.netsynth.NetSynth.printGate;
@@ -51,6 +52,130 @@ public class TestSynthesis {
      * 
      */
     
+    public static void testconvertORbeforeAND()
+    {
+        List<DGate> inpnetlist = new ArrayList<DGate>();
+        DGate nor1 = new DGate();
+        DGate nor2 = new DGate();
+        DGate not3 = new DGate();
+        DGate not4 = new DGate();
+        DGate and5 = new DGate();
+
+        DWire a = new DWire("a",DWireType.input);
+        DWire b = new DWire("b",DWireType.input);
+        DWire c = new DWire("c",DWireType.input);
+        DWire d = new DWire("d",DWireType.input);
+        
+        DWire out = new DWire("out",DWireType.output);
+        
+        DWire w1 = new DWire("w1",DWireType.input);
+        DWire w2 = new DWire("w2",DWireType.input);
+        DWire w3 = new DWire("w3",DWireType.input);
+        DWire w4 = new DWire("w4",DWireType.input);
+        
+        nor1.gtype = DGateType.NOR ;
+        nor2.gtype = DGateType.NOR ;
+        not3.gtype = DGateType.NOT ;
+        not4.gtype = DGateType.NOT ;
+        and5.gtype = DGateType.AND ;
+
+        
+        
+        nor1.input.add(a);
+        nor1.input.add(b);
+        nor2.input.add(c);
+        nor2.input.add(d);
+       
+        nor1.output = w1;
+        nor2.output = w2;
+        
+        not3.input.add(w1);
+        not4.input.add(w2);
+        
+        not3.output = w3;
+        not4.output = w4;
+        
+        and5.input.add(w3);
+        and5.input.add(w4);
+        
+        and5.output = out;
+        
+        inpnetlist.add(nor1);
+        inpnetlist.add(nor2);
+        inpnetlist.add(not3);
+        inpnetlist.add(not4);
+        inpnetlist.add(and5);
+        
+        System.out.println("Initial netlist");
+        NetSynth.printNetlist(inpnetlist);
+        
+        inpnetlist = NetSynth.convertORbeforeAND(inpnetlist);
+        
+        System.out.println("----------------------------\nAfter Conversion");
+        NetSynth.printNetlist(inpnetlist);
+        
+    }
+    
+    
+    
+    public static void testOR3out()
+    {
+        
+        DGate nor1 = new DGate();
+        DGate not2 = new DGate();
+        DGate nor3 = new DGate();
+        DGate not4 = new DGate();
+        
+        DWire a = new DWire("a",DWireType.input);
+        DWire b = new DWire("b",DWireType.input);
+        DWire c = new DWire("c",DWireType.input);
+        DWire w1 = new DWire("w1",DWireType.connector);
+        DWire w2 = new DWire("w2",DWireType.connector);
+        DWire w3 = new DWire("w3",DWireType.connector);
+        DWire out = new DWire("out",DWireType.output);
+        
+        nor1.gtype = DGateType.NOR;
+        not2.gtype = DGateType.NOT;
+        nor3.gtype = DGateType.NOR;
+        not4.gtype = DGateType.NOT;
+        
+        nor1.input.add(a);
+        nor1.input.add(b);
+        nor1.output = w1;
+        
+        not2.input.add(w1);
+        not2.output = w2;
+        
+        nor3.input.add(w2);
+        nor3.input.add(c);
+        nor3.output = w3;
+        
+        not4.input.add(w3);
+        not4.output = out;
+        
+        DGate not = new DGate();
+        not.gtype = DGateType.NOT;
+        
+        DWire out1 = new DWire("anotherOut",DWireType.output);
+        not.input.add(w3);
+        not.output = out1;
+        
+        List<DGate> netlist = new ArrayList<DGate>();
+        netlist.add(nor1);
+        netlist.add(not2);
+        netlist.add(nor3);
+        netlist.add(not4);
+        //netlist.add(not);
+        
+        System.out.println("Before Output 3");
+        NetSynth.printNetlist(netlist);
+        System.out.println("-------------------\nAfter Output OR synthesis");
+        netlist = NetSynth.convertToOutputOR3(netlist);
+        
+        NetSynth.printNetlist(netlist);
+        
+        
+    }
     
     public static void test3norconversion()
     {
@@ -124,7 +249,7 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
             System.out.println("\nDAGW Gates");
             for(Gate xgate:newdag.Gates)
             {
@@ -146,7 +271,7 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
             
             /*if(newdag.Gates.size() == 4)
             {
@@ -182,7 +307,7 @@ public class TestSynthesis {
         //System.out.println("Netlist:");
         //NetSynth.printNetlist(NetSynth.getNetlist(path));
         DAGW resdag = new DAGW();
-        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.originalstructural,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
+        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.originalstructural,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
         for(Gate xgate:resdag.Gates)
         {
             System.out.println("Type: " + xgate.Type + " ::: Name: "+ xgate.Name);
