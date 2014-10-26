@@ -3384,6 +3384,53 @@ public class NetSynth {
     }
     
     
+    /***************************************************************
+    Function
+    <br>
+    Synopsis    []
+    <br>
+    Description []
+    <br>
+    SideEffects []
+    <br>
+    SeeAlso     []
+    <br>
+     * @param netlistinp
+     * @return 
+***********************************************************************/
+    public static List<DGate> convertOR(List<DGate> netlistinp)
+    {
+        for(int i=0;i<netlistinp.size();i++)
+        {
+            if(netlistinp.get(i).gtype.equals(DGateType.NOT))
+            {
+                for(int j=i+1;j<netlistinp.size();j++)
+                {
+                    if(netlistinp.get(j).gtype.equals(DGateType.NOT))
+                    {
+                        for(int k=j+1;k<netlistinp.size();k++)
+                        {
+                            if(netlistinp.get(k).gtype.equals(DGateType.NOR) && (netlistinp.get(k).input.size() == 2))
+                            {
+                                if((netlistinp.get(k).input.get(0).name.trim().equals(netlistinp.get(i).output.name.trim()) && netlistinp.get(k).input.get(1).name.trim().equals(netlistinp.get(j).output.name.trim()))||(netlistinp.get(k).input.get(0).name.trim().equals(netlistinp.get(j).output.name.trim()) && netlistinp.get(k).input.get(1).name.trim().equals(netlistinp.get(i).output.name.trim())) )
+                                {
+                                    netlistinp.get(k).input.remove(0);
+                                    netlistinp.get(k).input.remove(1);
+                                    netlistinp.get(k).input.add(netlistinp.get(i).output);
+                                    netlistinp.get(k).input.add(netlistinp.get(j).output);
+                                    netlistinp.get(k).gtype = DGateType.AND;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        netlistinp = removeDanglingGates(netlistinp);
+        return netlistinp;
+    }
+    
     
     /**Function*************************************************************
     <br>

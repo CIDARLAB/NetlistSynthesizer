@@ -8,6 +8,8 @@ import BU.ParseVerilog.parseVerilogFile;
 import BU.WebSockets.ClothoSocket;
 import BU.netsynth.DGateType;
 import BU.netsynth.NetSynth;
+import BU.netsynth.NetSynthModes;
+import BU.netsynth.NetSynthSwitches;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +35,10 @@ public class TestMain {
             //TestSynthesis.testSpecInputVerilog(3,158);
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testconvertORbeforeAND();
-              TestSynthesis.testOR3out();
+            //TestSynthesis.testOR3out();
+            NetSynthSwitches[] switches = {NetSynthSwitches.abc,NetSynthSwitches.nooutputOR,NetSynthSwitches.precompute};
+            
+            TestSynthesis.testMain("filepath\\filefolder", NetSynthModes.cello, switches);
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);

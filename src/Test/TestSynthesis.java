@@ -23,6 +23,7 @@ import static BU.netsynth.NetSynth.Filepath;
 import static BU.netsynth.NetSynth.parseEspressoToNORNAND;
 import static BU.netsynth.NetSynth.printGate;
 import static BU.netsynth.NetSynth.runEspresso;
+import BU.netsynth.NetSynthModes;
 import BU.netsynth.NetSynthSwitches;
 import BU.netsynth.NetlistConversionFunctions;
 import BU.precomputation.PreCompute;
@@ -52,6 +53,22 @@ public class TestSynthesis {
      * 
      */
     
+    public static void testMain(String filename, NetSynthModes mode, NetSynthSwitches switches[])
+    {
+        System.out.println("File name "+filename);
+        System.out.println("---------------------");
+        System.out.println("---------------------");
+        
+        System.out.println("Mode : " + mode.toString());
+        System.out.println("---------------------");
+        System.out.println("---------------------");
+        
+        System.out.println("Switches : ");
+        for(int i=0;i<switches.length;i++)
+        {
+            System.out.println(switches[i]);
+        }
+    }
     public static void testconvertORbeforeAND()
     {
         List<DGate> inpnetlist = new ArrayList<DGate>();
