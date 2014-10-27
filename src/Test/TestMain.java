@@ -39,6 +39,7 @@ public class TestMain {
             NetSynthSwitches[] switches = {NetSynthSwitches.abc,NetSynthSwitches.nooutputOR,NetSynthSwitches.precompute};
             
             TestSynthesis.testMain("filepath\\filefolder", NetSynthModes.cello, switches);
+            TestSynthesis.testANDConversion();
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);

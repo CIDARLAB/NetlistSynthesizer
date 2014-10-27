@@ -69,6 +69,120 @@ public class TestSynthesis {
             System.out.println(switches[i]);
         }
     }
+    
+    public static void testANDConversion()
+    {
+        DGate not1 = new DGate();
+        DGate not2 = new DGate();
+        DGate nor3 = new DGate();
+        
+        DWire a = new DWire("a",DWireType.input);
+        DWire b = new DWire("b",DWireType.input);
+        DWire w1 = new DWire("w1",DWireType.connector);
+        DWire w2 = new DWire("w2",DWireType.connector);
+        DWire out = new DWire("out",DWireType.output);
+        
+        
+        
+        not1.gtype = DGateType.NOT;
+        not2.gtype = DGateType.NOT;
+        nor3.gtype = DGateType.NOR;
+        
+        not1.input.add(a);
+        not2.input.add(b);
+        
+        not1.output = w1;
+        not2.output = w2;
+        
+        nor3.input.add(w1);
+        nor3.input.add(w2);
+        
+        nor3.output = out;
+        
+        
+        DGate not4 = new DGate();
+        DGate not5 = new DGate();
+        DGate nor6 = new DGate();
+        
+        DWire c = new DWire("c",DWireType.input);
+        DWire d = new DWire("d",DWireType.input);
+        DWire w3 = new DWire("w3",DWireType.connector);
+        DWire w4 = new DWire("w4",DWireType.connector);
+        DWire out2 = new DWire("out2",DWireType.output);
+        
+        
+        
+        not4.gtype = DGateType.NOT;
+        not5.gtype = DGateType.NOT;
+        nor6.gtype = DGateType.NOR;
+        
+        not4.input.add(c);
+        not5.input.add(d);
+        
+        not4.output = w3;
+        not5.output = w4;
+        
+        nor6.input.add(w3);
+        nor6.input.add(w4);
+        
+        nor6.output = out2;
+        
+        
+        DGate not7 = new DGate();
+        DGate not8 = new DGate();
+        DGate nor9 = new DGate();
+        
+        DWire e = new DWire("e",DWireType.input);
+        DWire f = new DWire("f",DWireType.input);
+        DWire w5 = new DWire("w5",DWireType.connector);
+        DWire w6 = new DWire("w6",DWireType.connector);
+        DWire out3 = new DWire("out3",DWireType.output);
+        
+        
+        
+        not7.gtype = DGateType.NOT;
+        not8.gtype = DGateType.NOT;
+        nor9.gtype = DGateType.NOR;
+        
+        not7.input.add(e);
+        not8.input.add(f);
+        
+        not7.output = w5;
+        not8.output = w6;
+        
+        nor9.input.add(w5);
+        nor9.input.add(w6);
+        
+        nor9.output = out3;
+        
+        
+        
+        
+        List<DGate> netlist = new ArrayList<DGate>();
+        
+        netlist.add(not1);
+        netlist.add(not2);
+        netlist.add(nor3);
+        
+        netlist.add(not4);
+        netlist.add(not5);
+        netlist.add(nor6);
+        
+        netlist.add(not7);
+        netlist.add(not8);
+        netlist.add(nor9);
+        
+        System.out.println("Before AND conversion");
+        NetSynth.printNetlist(netlist);
+        System.out.println("==================================");
+        
+        netlist = NetSynth.convertAND(netlist);
+        System.out.println("After AND conversion");
+        NetSynth.printNetlist(netlist);
+        
+    }
+    
+    
     public static void testconvertORbeforeAND()
     {
         List<DGate> inpnetlist = new ArrayList<DGate>();
@@ -266,7 +380,7 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
             System.out.println("\nDAGW Gates");
             for(Gate xgate:newdag.Gates)
             {
@@ -288,7 +402,7 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
             
             /*if(newdag.Gates.size() == 4)
             {
@@ -324,7 +438,7 @@ public class TestSynthesis {
         //System.out.println("Netlist:");
         //NetSynth.printNetlist(NetSynth.getNetlist(path));
         DAGW resdag = new DAGW();
-        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.originalstructural,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode);
+        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.originalstructural,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
         for(Gate xgate:resdag.Gates)
         {
             System.out.println("Type: " + xgate.Type + " ::: Name: "+ xgate.Name);
