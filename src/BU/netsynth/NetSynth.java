@@ -3223,7 +3223,7 @@ public class NetSynth {
                     {
                         for(int k=j+1;k<netlistinp.size();k++)
                         {
-                            if(netlistinp.get(k).gtype.equals(DGateType.NOR) && (netlistinp.get(i).input.size()<3))
+                            if(netlistinp.get(k).gtype.equals(DGateType.NOR) && (netlistinp.get(k).input.size()<3) )
                             {
                                 int indx=0;
                                 boolean found = false;
