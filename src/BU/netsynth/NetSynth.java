@@ -3293,7 +3293,7 @@ public class NetSynth {
                                             if((netlistinp.get(l).gtype.equals(DGateType.NOT)) && (netlistinp.get(l).input.get(0).name.trim().equals(netlistinp.get(k).output.name.trim()))  && (netlistinp.get(l).output.wtype.equals(DWireType.output)) )
                                             {
                                                 found = true;
-                                                System.out.println("Found output OR 3");
+                                                //System.out.println("Found output OR 3");
                                                 netlistinp.get(l).gtype = DGateType.OR;
                                                 netlistinp.get(l).input.remove(0);
                                                 netlistinp.get(l).input.addAll(netlistinp.get(i).input);
@@ -3310,7 +3310,24 @@ public class NetSynth {
                                         //
                                     }
                                 }
-                                
+                            }
+                            boolean nornotor = false;
+                            int mindx =0;
+                            if(netlistinp.get(k).gtype.equals(DGateType.OR) && (netlistinp.get(i).input.size()<3) && netlistinp.get(k).output.wtype.equals(DWireType.output))
+                            {
+                                for(int m=0;m<netlistinp.get(k).input.size();m++)
+                                {
+                                    if(netlistinp.get(k).input.get(m).name.trim().equals(netlistinp.get(j).output.name.trim()))
+                                    {
+                                        nornotor = true;
+                                        mindx = m;
+                                    }
+                                }
+                            }
+                            if(nornotor)
+                            {
+                                netlistinp.get(k).input.remove(mindx);
+                                netlistinp.get(k).input.addAll(netlistinp.get(i).input);
                             }
                         }
                     }
