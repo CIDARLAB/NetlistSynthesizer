@@ -31,7 +31,7 @@ public class TestMain {
             //TestSynthesis.testGetTT();
             //TestSynthesis.testespressotoabc();
             //TestSynthesis.testParseVerilogFileFunctions();
-            //TestSynthesis.testVerilogrunNetSynth();
+            TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testSpecInputVerilog(3,158);
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testconvertORbeforeAND();
@@ -39,7 +39,7 @@ public class TestMain {
             NetSynthSwitches[] switches = {NetSynthSwitches.abc,NetSynthSwitches.nooutputOR,NetSynthSwitches.precompute};
             
             TestSynthesis.testMain("filepath\\filefolder", NetSynthModes.cello, switches);
-            TestSynthesis.testANDConversion();
+            //TestSynthesis.testANDConversion();
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);

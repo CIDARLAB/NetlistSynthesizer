@@ -1,18 +1,15 @@
-module bestdepth(output o0, o1, o2, input ina, inb, inc);
+module structuralXOR(output out, input inA, inB, inC, inD);
 
-   wire w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
-   nor (w0, ina, inb);
-   not (w1, inc);
-   not (w2, w0);
-   or (o0, w2, w1);
-   and (w3, ina, inc);
-   not (w4, inb);
-   not (w5,w3);
-   or (o1, w4, w5);
-   nor (w6, inb, inc);
-   not (w7, ina);
-   nor (w8, w0, w7);
-   not (w9, w6);
-   or (o2, w8, w9);
-
+wire w8,w7,w6,w5,w4,w3,w2,w1;
+   
+not (w1, inB);
+not (w3, inC);
+not (w4, inD);
+nor (w5, w1, w4);
+nor (w2, w1, inC);
+nor (w6, w3, w5);
+nor (w7, w2, w6);
+not (w8, w7);
+or (out, w8, inA);
+   
 endmodule
