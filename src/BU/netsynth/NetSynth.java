@@ -3340,7 +3340,7 @@ public class NetSynth {
                     if(netlistinp.get(j).gtype.equals(DGateType.NOT) && netlistinp.get(j).input.get(0).name.trim().equals(netlistinp.get(i).output.name.trim()) && netlistinp.get(j).output.wtype.equals(DWireType.output))
                     {
                         netlistinp.get(j).gtype = DGateType.OR;
-                        netlistinp.get(j).input.remove(i);
+                        netlistinp.get(j).input.remove(0);
                         netlistinp.get(j).input.addAll(netlistinp.get(i).input);
                         
                     }
