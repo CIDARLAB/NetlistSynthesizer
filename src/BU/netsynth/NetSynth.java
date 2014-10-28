@@ -701,14 +701,15 @@ public class NetSynth {
         {
             netlist = convertToOutputOR3(netlist);
         }
-        if(and2.equals(NetSynthSwitches.AND2) || and2.equals(NetSynthSwitches.AND2OR))
+        if(and2.equals(NetSynthSwitches.AND2))
         {
             netlist = convertAND(netlist);
-            if(and2.equals(NetSynthSwitches.AND2OR))
-            {
-                netlist = convertORbeforeAND(netlist);
-            }
         }
+        if(and2.equals(NetSynthSwitches.AND2OR))
+        {
+            netlist = convertFindORbeforeAND(netlist);
+        }
+        
         netlist = rewireNetlist(netlist);
         //printNetlist(netlist);
         return netlist;
@@ -3464,6 +3465,177 @@ public class NetSynth {
             if(countAND == 2)
                       break;
         }
+        
+        netlistinp = removeDanglingGates(netlistinp);
+        return netlistinp;
+    }
+    
+    
+    /***************************************************************
+    Function
+    <br>
+    Synopsis    []
+    <br>
+    Description []
+    <br>
+    SideEffects []
+    <br>
+    SeeAlso     []
+    <br>
+     * @param netlistinp
+     * @return 
+***********************************************************************/
+    public static List<DGate> convertFindORbeforeAND(List<DGate> netlistinp)
+    {
+        int countAND = 0;
+        
+        //2 NORS before a NOR
+        /*for(int i=0;i<netlistinp.size();i++)
+        {
+            if(netlistinp.get(i).gtype.equals(DGateType.NOR))
+            {
+                for(int j=i+1;j<netlistinp.size();j++)
+                {
+                    if(netlistinp.get(j).gtype.equals(DGateType.NOR))
+                    {
+                        for(int k=j+1;k<netlistinp.size();k++)
+                        {
+                            if(netlistinp.get(k).gtype.equals(DGateType.NOR) && (netlistinp.get(k).input.size() == 2))
+                            {
+                                if((netlistinp.get(k).input.get(0).name.trim().equals(netlistinp.get(i).output.name.trim()) && netlistinp.get(k).input.get(1).name.trim().equals(netlistinp.get(j).output.name.trim()))||(netlistinp.get(k).input.get(0).name.trim().equals(netlistinp.get(j).output.name.trim()) && netlistinp.get(k).input.get(1).name.trim().equals(netlistinp.get(i).output.name.trim())) )
+                                {
+                                    if(countAND == 2)
+                                        break;
+                                    System.out.println("Found it");
+                                    DGate or1 = new DGate();
+                                    DGate or2 = new DGate();
+                                    
+                                    or1.gtype = DGateType.OR;
+                                    or2.gtype = DGateType.OR;
+                                    
+                                    or1.input.addAll(netlistinp.get(i).input);
+                                    or2.input.addAll(netlistinp.get(j).input);
+                                    
+                                    DWire orOut1 = new DWire("0Wire" + Global.wirecount++,DWireType.connector);
+                                    DWire orOut2 = new DWire("0Wire" + Global.wirecount++,DWireType.connector);
+                                    
+                                    or1.output = orOut1;
+                                    or2.output = orOut2;
+                                    
+                                    
+                                    
+                                    netlistinp.get(k).input.remove(1);
+                                    netlistinp.get(k).input.remove(0);
+                                    netlistinp.get(k).input.add(orOut1);
+                                    netlistinp.get(k).input.add(orOut2);
+                                    netlistinp.get(k).gtype = DGateType.AND;
+                                    
+                                    netlistinp.add(k, or2);
+                                    netlistinp.add(k, or1);
+                                    countAND++;
+                                }
+                            }
+                        }
+                    }
+                    if(countAND == 2)
+                        break;
+                }
+            }
+            if(countAND == 2)
+                      break;
+        }*/
+        
+        //1 NOT 1 NOR before a NOR
+        //if (countAND < 2) 
+        //{
+            for (int i = 0; i < netlistinp.size(); i++) 
+            {
+                if (netlistinp.get(i).gtype.equals(DGateType.NOR) ||  netlistinp.get(i).gtype.equals(DGateType.NOT)) 
+                {
+                    for (int j = i + 1; j < netlistinp.size(); j++) 
+                    {
+                        if (netlistinp.get(j).gtype.equals(DGateType.NOR) || netlistinp.get(j).gtype.equals(DGateType.NOT)) 
+                        {
+                            for (int k = j + 1; k < netlistinp.size(); k++) 
+                            {
+                                if (netlistinp.get(k).gtype.equals(DGateType.NOR) && (netlistinp.get(k).input.size() == 2)) 
+                                {
+                                    if ((netlistinp.get(k).input.get(0).name.trim().equals(netlistinp.get(i).output.name.trim()) && netlistinp.get(k).input.get(1).name.trim().equals(netlistinp.get(j).output.name.trim())) || (netlistinp.get(k).input.get(0).name.trim().equals(netlistinp.get(j).output.name.trim()) && netlistinp.get(k).input.get(1).name.trim().equals(netlistinp.get(i).output.name.trim()))) 
+                                    {
+                                        if (countAND == 2) 
+                                        {
+                                            break;
+                                        }
+                                        System.out.println("Found it");
+                                        DGate or1 = new DGate();
+                                        DGate or2 = new DGate();
+
+                                        or1.gtype = DGateType.OR;
+                                        or2.gtype = DGateType.OR;
+
+                                        or1.input.addAll(netlistinp.get(i).input);
+                                        or2.input.addAll(netlistinp.get(j).input);
+
+                                        DWire orOut1 = new DWire("0Wire" + Global.wirecount++, DWireType.connector);
+                                        DWire orOut2 = new DWire("0Wire" + Global.wirecount++, DWireType.connector);
+
+                                        or1.output = orOut1;
+                                        or2.output = orOut2;
+
+                                        netlistinp.get(k).input.remove(1);
+                                        netlistinp.get(k).input.remove(0);
+                                        netlistinp.get(k).gtype = DGateType.AND;
+                                        
+                                        boolean or1add = false;
+                                        boolean or2add = false;
+                                        
+                                        if(netlistinp.get(i).gtype.equals(DGateType.NOT))
+                                        {
+                                            netlistinp.get(k).input.add(netlistinp.get(i).input.get(0));
+                                        }
+                                        else if(netlistinp.get(i).gtype.equals(DGateType.NOR))
+                                        {
+                                            netlistinp.get(k).input.add(orOut1);
+                                            or1add = true;
+                                            
+                                        }
+                                        
+                                        if(netlistinp.get(j).gtype.equals(DGateType.NOT))
+                                        {
+                                            netlistinp.get(k).input.add(netlistinp.get(j).input.get(0));
+                                        }
+                                        else if(netlistinp.get(j).gtype.equals(DGateType.NOR))
+                                        {
+                                            netlistinp.get(k).input.add(orOut2);
+                                            or2add = true;
+                                        }
+                                        
+                                        if(or1add)
+                                        {
+                                            netlistinp.add(k, or1);
+                                        }
+                                        if(or2add)
+                                        {
+                                            netlistinp.add(k, or2);
+                                        }
+                                        
+                                        countAND++;
+                                    }
+                                }
+                            }
+                        }
+                        if (countAND == 2) 
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (countAND == 2) 
+                {
+                    break;
+                }
+            }
+        //}
         
         netlistinp = removeDanglingGates(netlistinp);
         return netlistinp;

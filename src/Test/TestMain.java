@@ -31,14 +31,18 @@ public class TestMain {
             //TestSynthesis.testGetTT();
             //TestSynthesis.testespressotoabc();
             //TestSynthesis.testParseVerilogFileFunctions();
-            TestSynthesis.testVerilogrunNetSynth();
+            
+            TestSynthesis.testconvertFindORbeforeAND();
+            
+            //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testSpecInputVerilog(3,158);
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testconvertORbeforeAND();
             //TestSynthesis.testOR3out();
-            NetSynthSwitches[] switches = {NetSynthSwitches.abc,NetSynthSwitches.nooutputOR,NetSynthSwitches.precompute};
             
-            TestSynthesis.testMain("filepath\\filefolder", NetSynthModes.cello, switches);
+            //NetSynthSwitches[] switches = {NetSynthSwitches.abc,NetSynthSwitches.nooutputOR,NetSynthSwitches.precompute};
+            //TestSynthesis.testMain("filepath\\filefolder", NetSynthModes.cello, switches);
+            
             //TestSynthesis.testANDConversion();
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.test3norconversion();

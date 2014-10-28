@@ -70,6 +70,55 @@ public class TestSynthesis {
         }
     }
     
+    public static void testconvertFindORbeforeAND()
+    {
+        DWire a = new DWire("a",DWireType.input);
+        DWire b = new DWire("b",DWireType.input);
+        DWire c = new DWire("c",DWireType.input);
+        DWire d = new DWire("d",DWireType.input);
+        
+        DWire w1 = new DWire("w1",DWireType.connector);
+        DWire w2 = new DWire("w2",DWireType.connector);
+        
+        DWire out = new DWire("out",DWireType.output);
+        
+        DGate nor1 = new DGate();
+        DGate nor2 = new DGate();
+        DGate nor3 = new DGate();
+        
+        nor1.gtype = DGateType.NOR;
+        nor2.gtype = DGateType.NOR;
+        nor3.gtype = DGateType.NOR;
+        
+        nor1.input.add(a);
+        nor1.input.add(b);
+        nor2.input.add(c);
+        nor2.input.add(d);
+        
+        nor1.output = w1;
+        nor2.output = w2;
+        
+        nor3.input.add(w1);
+        nor3.input.add(w2);
+        nor3.output = out;
+        
+        List<DGate> netlist = new ArrayList<DGate>();
+        netlist.add(nor1);
+        netlist.add(nor2);
+        netlist.add(nor3);
+        
+        System.out.println("Before conversion");
+        NetSynth.printNetlist(netlist);
+        
+        System.out.println("--------------------\nAfter Conversion");
+        
+        netlist = NetSynth.convertFindORbeforeAND(netlist);
+        NetSynth.printNetlist(netlist);
+        
+        
+        
+    }
+    
     public static void testANDConversion()
     {
         DGate not1 = new DGate();
