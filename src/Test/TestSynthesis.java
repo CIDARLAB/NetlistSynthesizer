@@ -70,6 +70,65 @@ public class TestSynthesis {
         }
     }
     
+    
+    
+    public static void testconvertToNOR3()
+    {
+        DWire a = new DWire("a",DWireType.input);
+        DWire b = new DWire("b",DWireType.input);
+        DWire c = new DWire("c",DWireType.input);
+        
+        DWire w1 = new DWire("w1",DWireType.connector);
+        DWire w2 = new DWire("w2",DWireType.connector);
+        
+        DWire out1 = new DWire("out1",DWireType.output);
+        DWire out2 = new DWire("out2",DWireType.output);
+        
+        
+        DGate nor1 = new DGate();
+        DGate not2 = new DGate();
+        DGate nor3 = new DGate();
+        DGate not4 = new DGate();
+        
+        nor1.gtype = DGateType.NOR;
+        not2.gtype = DGateType.NOT;
+        nor3.gtype = DGateType.NOR;
+        not4.gtype = DGateType.NOT;
+        
+        nor1.input.add(a);
+        nor1.input.add(b);
+        
+        nor1.output = w1;
+        
+        not2.input.add(w1);
+        not2.output = w2;
+        
+        nor3.input.add(c);
+        nor3.input.add(w2);
+        
+        nor3.output = out1;
+        
+        not4.input.add(w2);
+        not4.output = out2;
+        
+        List<DGate> netlist = new ArrayList<DGate>();
+        netlist.add(nor1);
+        netlist.add(not2);
+        netlist.add(nor3);
+        netlist.add(not4);
+        
+        System.out.println("Before conversion");
+        NetSynth.printNetlist(netlist);
+        
+        netlist = NetSynth.convertToNOR3(netlist);
+        
+        System.out.println("\n-------------------------------\nAfter conversion");
+        NetSynth.printNetlist(netlist);
+        
+                
+        
+    }
+    
     public static void testconvertFindORbeforeAND()
     {
         DWire a = new DWire("a",DWireType.input);

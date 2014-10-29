@@ -3214,6 +3214,10 @@ public class NetSynth {
     {
         //List<DGate> netlistout = new ArrayList<DGate>();
         //List<Integer> removegates = new ArrayList<Integer>();
+        List<DGate> tempNetlist = new ArrayList<DGate>();
+        for(int i=0;i<netlistinp.size();i++)
+            tempNetlist.add(new DGate(netlistinp.get(i).gtype,netlistinp.get(i).input,netlistinp.get(i).output));
+        
         for(int i=0;i<netlistinp.size();i++)
         {
             if(netlistinp.get(i).gtype.equals(DGateType.NOR) && (netlistinp.get(i).input.size()<3))
@@ -3249,7 +3253,12 @@ public class NetSynth {
             }
         }
         netlistinp = removeDanglingGates(netlistinp);
+        
+        if(netlistinp.size() == tempNetlist.size())
+            return tempNetlist;
+        
         return netlistinp;
+        
     }
     
     

@@ -32,8 +32,8 @@ public class TestMain {
             //TestSynthesis.testespressotoabc();
             //TestSynthesis.testParseVerilogFileFunctions();
             
-            TestSynthesis.testconvertFindORbeforeAND();
-            
+            //TestSynthesis.testconvertFindORbeforeAND();
+            TestSynthesis.testconvertToNOR3();
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testSpecInputVerilog(3,158);
             //TestSynthesis.testVerilogrunNetSynth();
