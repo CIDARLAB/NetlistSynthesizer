@@ -18,7 +18,6 @@ import BU.netsynth.DWire;
 import BU.netsynth.DWireType;
 import BU.netsynth.Global;
 import BU.netsynth.NetSynth;
-import static BU.netsynth.NetSynth.CreateMultDAGW;
 import static BU.netsynth.NetSynth.Filepath;
 import static BU.netsynth.NetSynth.parseEspressoToNORNAND;
 import static BU.netsynth.NetSynth.printGate;
@@ -546,7 +545,7 @@ public class TestSynthesis {
         //System.out.println("Netlist:");
         //NetSynth.printNetlist(NetSynth.getNetlist(path));
         DAGW resdag = new DAGW();
-        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.nooutputOR,NetSynthSwitches.outputOR3,NetSynthSwitches.defaultmode, NetSynthSwitches.nor3,NetSynthSwitches.defaultmode);
+        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.nor3,NetSynthSwitches.defaultmode);
         for(Gate xgate:resdag.Gates)
         {
             System.out.println("Type: " + xgate.Type + " ::: Name: "+ xgate.Name);

@@ -33,10 +33,10 @@ public class TestMain {
             //TestSynthesis.testParseVerilogFileFunctions();
             
             //TestSynthesis.testconvertFindORbeforeAND();
-            TestSynthesis.testconvertToNOR3();
+            //TestSynthesis.testconvertToNOR3();
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testSpecInputVerilog(3,158);
-            //TestSynthesis.testVerilogrunNetSynth();
+            TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testconvertORbeforeAND();
             //TestSynthesis.testOR3out();
             

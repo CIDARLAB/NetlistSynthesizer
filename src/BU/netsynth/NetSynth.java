@@ -456,7 +456,7 @@ public class NetSynth {
             
                 if(invcheck.equals(NetSynthSwitches.noinv))
                 {
-                    if(structsize < dirsize)
+                    if(structsize <= dirsize)
                     {
                         for(DGate xgate:structnetlist)
                             netlist.add(xgate);
@@ -469,7 +469,7 @@ public class NetSynth {
                 }
                 else 
                 {
-                    if ((structsize < dirsize) && (structsize < invsize)) 
+                    if ((structsize <= dirsize) && (structsize <= invsize)) 
                     {
                         for (DGate xgate : structnetlist) 
                         {
@@ -3254,8 +3254,16 @@ public class NetSynth {
         }
         netlistinp = removeDanglingGates(netlistinp);
         
+        /*System.out.println("\n\nOriginal Netlist");
+        printNetlist(tempNetlist);
+        
+        System.out.println("\n-----------------------------\nNetlist after modification.");
+        printNetlist(netlistinp);*/
+        
         if(netlistinp.size() == tempNetlist.size())
             return tempNetlist;
+        
+        
         
         return netlistinp;
         
