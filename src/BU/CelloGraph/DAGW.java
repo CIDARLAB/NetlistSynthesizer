@@ -90,35 +90,34 @@ public class DAGW {
         }
     }
     
-    public String printGraph() 
-    {
+    public String printGraph(){
         String s = "";
-
-        for (int i = 0; i < Gates.size(); ++i) 
-        {
+        //String s = String.format("\n----- Logic Circuit #%d -----\n", index);
+        for (int i = 0; i < Gates.size(); ++i) {
             Gate gi = Gates.get(i);
-            //s += String.format("Vertex: Name = %-18s Type = %-9s  Index = %-3d", gi.Name, gi.Type, gi.Index);
-
 
             s += String.format("%-12s", gi.Type);
+            //s += String.format("%-18s", BooleanLogic.logicString(gi.get_logics()));
             s += String.format("%-18s", gi.Name);
             s += String.format("%-3d", gi.Index);
 
-
-            //System.out.println(s);
-
-            String child_indx = "";
-            if (gi.Type.equals("NOT") || gi.Type.equals("OUTPUT")) 
-            {
-                //System.out.println(gi.Type);
-                child_indx += "(" + gi.Outgoing.To.Index + ")";
+            String child_indx = "(";
+            for(Gate child: gi.getChildren()) {
+                child_indx += child.Index +",";
             }
-            if (gi.Type.equals("NOR") || gi.Type.equals("OUTPUT_OR")) 
-            {
-                child_indx += "(" + gi.Outgoing.To.Index + ",";
-                child_indx += gi.Outgoing.Next.To.Index + ")";
-            }
+            child_indx = child_indx.substring(0,child_indx.length()-1);
+            if(!gi.Type.equals("INPUT"))
+                child_indx += ")";
+
             s += String.format("%-12s", child_indx);
+
+            //if(gi.getScores().get_score() != -1.0000) {
+            //    s += String.format("%-5.4f", gi.getScores().get_score()); //onoff_ratio or noise_margin
+            //}
+
+            //if(gi.get_cellgrowth().size() > 0) {
+            //    s += "  tox:" + String.format("%-3.2f", CellGrowth.mostToxicRow(gi));
+            //}
 
             s += "\n";
         }
@@ -126,6 +125,8 @@ public class DAGW {
 
         return s;
     }
+    
+     
     
     
     public static DAGW addDanglingInputs(DAGW obj, List<String> inputnames)

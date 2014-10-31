@@ -711,7 +711,7 @@ public class NetSynth {
         }
         
         netlist = rewireNetlist(netlist);
-        //printNetlist(netlist);
+        printNetlist(netlist);
         return netlist;
         
     }
@@ -5240,6 +5240,14 @@ public class NetSynth {
             else if(netg.gtype.equals(DGateType.AND))
             {
                 Gate norg = new Gate(indx,GateType.AND.toString());
+                norg.outW = netg.output;
+                
+                indx++;
+                Gates.add(norg);
+            }
+            else if(netg.gtype.equals(DGateType.OR) && (!netg.output.wtype.equals(DWireType.output)))
+            {
+                Gate norg = new Gate(indx,GateType.OR.toString());
                 norg.outW = netg.output;
                 
                 indx++;

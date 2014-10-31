@@ -24,6 +24,7 @@ public class Gate {
         OUTPUT_OR,
         AND,
         NOR,
+        OR,
         NOT;
     }
     
@@ -237,7 +238,22 @@ public class Gate {
 	//this.Outgoing = new Wire(gate.Outgoing);
     }
 
+public ArrayList<Gate> getChildren(){
 
+        ArrayList<Gate> children = new ArrayList<Gate>();
+
+        if ( (this.Outgoing != null) && (this.Outgoing.To != null)){
+            children.add(this.Outgoing.To);
+
+            Wire w = this.Outgoing;
+            while(w.Next != null && w.Next.To != null) {
+                children.add(w.Next.To);
+                w = w.Next;
+            }
+        }
+
+        return children;
+    }
 
 
 
