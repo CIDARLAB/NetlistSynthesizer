@@ -478,7 +478,24 @@ public class NetSynth {
                     } 
                     else 
                     {
-                        if (dirsize < invsize) 
+                        if(dirsize == invsize)
+                        {
+                            if(NOR3count(dirnetlist) < NOR3count(invnetlist))
+                            {
+                                for (DGate xgate : dirnetlist) 
+                                {
+                                    netlist.add(xgate);
+                                }
+                            }
+                            else
+                            {
+                                for (DGate xgate : invnetlist) 
+                                {
+                                    netlist.add(xgate);
+                                }
+                            }
+                        }
+                        else if (dirsize < invsize) 
                         {
                             for (DGate xgate : dirnetlist) 
                             {
@@ -529,7 +546,24 @@ public class NetSynth {
                     }
                     else
                     {
-                        if (dirsize < invsize) 
+                        if(dirsize == invsize)
+                        {
+                            if(NOR3count(dirnetlist) < NOR3count(invnetlist))
+                            {
+                                for (DGate xgate : dirnetlist) 
+                                {
+                                    netlist.add(xgate);
+                                }
+                            }
+                            else
+                            {
+                                for (DGate xgate : invnetlist) 
+                                {
+                                    netlist.add(xgate);
+                                }
+                            }
+                        }
+                        else if(dirsize < invsize) 
                         {
                             for (DGate xgate : dirnetlist) 
                             {
@@ -571,7 +605,24 @@ public class NetSynth {
                     }
                     else
                     {
-                        if (dirsize < invsize) 
+                        if(dirsize == invsize)
+                        {
+                            if(NOR3count(dirnetlist) < NOR3count(invnetlist))
+                            {
+                                for (DGate xgate : dirnetlist) 
+                                {
+                                    netlist.add(xgate);
+                                }
+                            }
+                            else
+                            {
+                                for (DGate xgate : invnetlist) 
+                                {
+                                    netlist.add(xgate);
+                                }
+                            }
+                        }
+                        else if(dirsize < invsize) 
                         {
                             for (DGate xgate : dirnetlist) 
                             {
@@ -4566,6 +4617,33 @@ public class NetSynth {
         
         return outpNetlist;
     }
+    
+    
+    /**Function*************************************************************
+    <br>
+    Synopsis    []
+    <br>
+    Description []
+    <br>    
+    SideEffects []
+    <br>    
+    SeeAlso     []
+     * @param netlistinp
+     * @return 
+    ***********************************************************************/
+    public static int NOR3count(List<DGate> netlistinp)
+    {
+        int count =0;
+        for(int i=0;i<netlistinp.size();i++)
+        {
+            if(netlistinp.get(i).gtype.equals(DGateType.NOR) && (netlistinp.get(i).input.size()==3) )
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+    
     
     
     

@@ -545,7 +545,7 @@ public class TestSynthesis {
         //System.out.println("Netlist:");
         //NetSynth.printNetlist(NetSynth.getNetlist(path));
         DAGW resdag = new DAGW();
-        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.AND2OR);
+        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.nor3,NetSynthSwitches.defaultmode);
         for(Gate xgate:resdag.Gates)
         {
             System.out.println("Type: " + xgate.Type + " ::: Name: "+ xgate.Name);
