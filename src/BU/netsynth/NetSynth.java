@@ -9,13 +9,13 @@ package BU.netsynth;
 
 import BU.CelloGraph.DAGVertex.VertexType;
 import BU.CelloGraph.DAGW;
-
 import BU.ParseVerilog.Blif;
 import BU.ParseVerilog.CircuitDetails;
 import BU.ParseVerilog.Convert;
 import BU.ParseVerilog.Espresso;
 import BU.ParseVerilog.parseVerilogFile;
 import BU.booleanLogic.BooleanSimulator;
+import BU.netsynth.DWire.DWireValue;
 import BU.precomputation.PreCompute;
 import BU.precomputation.genVerilogFile;
 import MIT.dnacompiler.Gate;
@@ -32,8 +32,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -248,6 +250,7 @@ public class NetSynth {
         //printNetlist(netlist);
         
         //BooleanSimulator.printTruthTable(netlist, inputnames);
+        //finaldag = CreateMultDAGW(inputnames,outputnames,netlist);
         finaldag = CreateMultDAGW(netlist);
         
         if(hasCaseStatements)
@@ -284,13 +287,18 @@ public class NetSynth {
      * @param inpnetlist
      * @return 
     ***********************************************************************/
-    public static int getRepressorsCount(List<DGate> inpnetlist)
+    public static double getRepressorsCost(List<DGate> inpnetlist)
     {
-        int count = 0;
+        double count = 0;
         for(DGate xgate:inpnetlist)
         {
-            if(!xgate.gtype.equals(DGateType.OR))
-                count++;
+            if(xgate.gtype.equals(DGateType.NOR))
+                count+= 1.5;
+            if(xgate.gtype.equals(DGateType.NOT))
+                count+= 1;
+            if(xgate.gtype.equals(DGateType.AND))
+                count+= 2;
+            
         }
         
         return count;
@@ -401,12 +409,12 @@ public class NetSynth {
         outputnames = parseVerilogFile.getOutputNames(alllines);
         
         List<String> precompTT = new ArrayList<String>();
-        int dirsize = 0;
-        int invsize = 0;
-        int structsize =0;
-        int precompsize =0;
-        int invprecompsize =0;
-        int netsize =0;
+        double dirsize = 0;
+        double invsize = 0;
+        double structsize =0;
+        double precompsize =0;
+        double invprecompsize =0;
+        double netsize =0;
         //<editor-fold desc="Structural Verilog">
         if(isStructural)
         {
@@ -442,9 +450,9 @@ public class NetSynth {
             dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor,nor3);
             invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor,nor3);
             
-            dirsize = getRepressorsCount(dirnetlist);
-            invsize = getRepressorsCount(invnetlist);
-            structsize = getRepressorsCount(structnetlist);
+            dirsize = getRepressorsCost(dirnetlist);
+            invsize = getRepressorsCost(invnetlist);
+            structsize = getRepressorsCost(structnetlist);
             
             if(synthesis.equals(NetSynthSwitches.originalstructural) || synthesis.equals(NetSynthSwitches.originalstructuralAND) || synthesis.equals(NetSynthSwitches.originalstructuralANDOR))
             {
@@ -534,8 +542,8 @@ public class NetSynth {
                     dirnetlist = runDCEspressoAndABC(direct,synthesis,outputor,twonotstonor, nor3);
                     invnetlist = runInvertedDCEspressoAndABC(inverted,synthesis,outputor,twonotstonor, nor3);
                     
-                    dirsize = getRepressorsCount(dirnetlist);
-                    invsize = getRepressorsCount(invnetlist);
+                    dirsize = getRepressorsCost(dirnetlist);
+                    invsize = getRepressorsCost(invnetlist);
                     
                     if(invcheck.equals(NetSynthSwitches.noinv))
                     {
@@ -593,8 +601,8 @@ public class NetSynth {
                     
                     
                     
-                    dirsize = getRepressorsCount(dirnetlist);
-                    invsize = getRepressorsCount(invnetlist);
+                    dirsize = getRepressorsCost(dirnetlist);
+                    invsize = getRepressorsCost(invnetlist);
                     
                     if(invcheck.equals(NetSynthSwitches.noinv))
                     {
@@ -649,7 +657,7 @@ public class NetSynth {
         }
         
         
-        netsize = getRepressorsCount(netlist);
+        netsize = getRepressorsCost(netlist);
         
         //boolean precomputetriggered = false;
         if((synthesis.equals(NetSynthSwitches.precompute) || synthesis.equals(NetSynthSwitches.defaultmode)) && (inputnames.size()==3) && (outputnames.size()==1))
@@ -673,8 +681,8 @@ public class NetSynth {
                 dirprecompnet = runPrecomp(dirprecompnet,inputnames, outputnames,outputor,twonotstonor,nor3);
                 invprecompnet = runinvPrecomp(invprecompnet,inputnames, outputnames,outputor,twonotstonor,nor3);
                 
-                precompsize = getRepressorsCount(dirprecompnet);
-                invprecompsize = getRepressorsCount(invprecompnet);
+                precompsize = getRepressorsCost(dirprecompnet);
+                invprecompsize = getRepressorsCost(invprecompnet);
                 
                 /*System.out.println("\n\nDirect Netlist\n");
                 printNetlist(dirprecompnet);
@@ -756,6 +764,10 @@ public class NetSynth {
         {
             netlist = convertAND(netlist);
         }
+        
+        System.out.println("Before AND2 OR");
+        printNetlist(netlist);
+        System.out.println("---------------------------\n");
         if(and2.equals(NetSynthSwitches.AND2OR))
         {
             netlist = convertFindORbeforeAND(netlist);
@@ -5167,6 +5179,8 @@ public class NetSynth {
         return minterm;
     }
     
+    
+    
     /***************************************************************Function
     <br> 
     Synopsis    [Netlist to Directed Acyclic Graph]
@@ -5567,6 +5581,125 @@ public class NetSynth {
         return outDAG;
     }
    
+    
+    
+    
+    /***************************************************************Function
+    <br> 
+    Synopsis    [Netlist to Directed Acyclic Graph]
+    <br> 
+    Description [Converts a Netlist into a Directed Acyclic Graph with multiple outputs]
+    <br>
+    SideEffects []
+    <br>
+    SeeAlso     []
+     * @param netlist Input Netlist
+     * @return Directed Acyclic Graph with multiple outputs
+    ***********************************************************************/
+    public static DAGW CreateMultDAGW(List<String> inputnames, List<String> outputnames,List<DGate> netlist)
+    {
+        DAGW dag = new DAGW();
+        
+        for(String inp:inputnames)
+        {
+            Gate inpGate = new Gate();
+            inpGate.Name = inp;
+            inpGate.Type = GateType.INPUT.toString();
+        
+            
+            
+        }
+        
+        return dag;
+    }
+   
+    public static Map<String,List<DGate>> getWireToGateMap(List<DGate> netlist)
+    {
+        Map<String,List<DGate>> map = new HashMap<String,List<DGate>>();
+        
+        
+        
+        return map;
+    }
+    
+    public static boolean equalLogicInputs(List<List<String>> inplogic)
+    {
+        boolean equal = true;
+        
+        List<List<String>> inpcopy = new ArrayList<List<String>>();
+        for(int i=0;i<inplogic.size();i++)
+        {
+            inpcopy.add(new ArrayList<String>(inplogic.get(i)));
+        }
+        for(int i=0;i<inpcopy.size();i++)
+        {
+            Collections.sort(inpcopy.get(i));
+        } 
+        
+        for(int i=0;i<inpcopy.size()-1;i++)
+        {
+            if(!inpcopy.get(i).equals(inpcopy.get(i+1)))
+            {
+                equal = false;
+                return equal;
+            }
+        }
+        return equal;
+    }
+    
+    public static List<DGate> assignWireLogic(List<String> inputNames, List<DGate> netlist)
+    {
+        int pow = (int)Math.pow(2,inputNames.size());
+        
+        for(int i=0;i<pow;i++)
+        {
+            String inputBool = Convert.dectoBin(i, inputNames.size());
+            Map<String,Character> inputVals = new HashMap<String,Character>();
+            for(int j=0;j<inputNames.size();j++)
+            {
+                inputVals.put(inputNames.get(j), inputBool.charAt(j));
+            }
+            for(int j=0;j<netlist.size();j++)
+            {
+                for(int k=0;k<netlist.get(j).input.size();k++)
+                {
+                    if(netlist.get(j).input.get(k).wtype.equals(DWireType.input))
+                    {
+                        netlist.get(j).input.get(k).logicValue += inputVals.get(netlist.get(j).input.get(k).name);
+                        if(inputVals.get(netlist.get(j).input.get(k).name).equals('1'))
+                        {
+                           netlist.get(j).input.get(k).wValue = DWireValue._1;
+                        }
+                        else if(inputVals.get(netlist.get(j).input.get(k).name).equals('0'))
+                        {
+                            netlist.get(j).input.get(k).wValue = DWireValue._0;
+                        }
+                    }
+                }
+                
+                BooleanSimulator.bfunction(netlist.get(j));
+                if(netlist.get(j).output.wValue.equals(DWireValue._0))
+                {
+                    netlist.get(j).output.logicValue += '0';
+                }
+                else if(netlist.get(j).output.wValue.equals(DWireValue._1))
+                {
+                    netlist.get(j).output.logicValue += '1';
+                }
+                else 
+                {
+                    netlist.get(j).output.logicValue += 'X';
+                }
+            }
+        }
+        
+        for(int i=0;i<netlist.size();i++)
+        {
+            System.out.println(netlist.get(i).output.logicValue + " :"+printGate(netlist.get(i)));
+        }
+        
+        return netlist;
+    }
     
     /***************************************************************Function
     <br> 

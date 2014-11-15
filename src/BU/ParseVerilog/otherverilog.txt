@@ -34,6 +34,7 @@ module and3(output out, input in1,in2,in3);
         default: out = 0;
       endcase
     end
+    
 endmodule
 
 module and3(output out1,out2,out3 input in1,in2,in3);

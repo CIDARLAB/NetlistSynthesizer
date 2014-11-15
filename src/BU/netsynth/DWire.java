@@ -14,7 +14,7 @@ public class DWire implements Serializable {
    
     
      public String name; 
-     
+     public String logicValue;
      public enum DWireValue{
          _1,
          _0,
@@ -28,6 +28,7 @@ public class DWire implements Serializable {
      public DWire()
      {
          name = "";
+         logicValue = "";
          wValue = DWireValue._x;
          wtype = DWireType.connector;  
      }
@@ -35,6 +36,7 @@ public class DWire implements Serializable {
      {
         wtype = DWireType.connector;
         wValue = DWireValue._x;
+        logicValue = "";
         this.name = wirename;
      }
      public DWire(String wirename,DWireType wType)
@@ -46,6 +48,7 @@ public class DWire implements Serializable {
          }
          this.name = wirename;
          this.wtype = wType;
+         logicValue = "";
          wValue = DWireValue._x;
      }
      public DWire(DWire xwire)
@@ -53,5 +56,6 @@ public class DWire implements Serializable {
         this.wtype = xwire.wtype;
         this.wValue = xwire.wValue;
         this.name = xwire.name;
+        this.logicValue = xwire.logicValue;
      }
 }
