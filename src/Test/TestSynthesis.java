@@ -70,6 +70,30 @@ public class TestSynthesis {
     }
     
     
+    public static void testEqualLogic()
+    {
+        List<String> g1 = new ArrayList<String>();
+        List<String> g2 = new ArrayList<String>();
+        List<List<String>> listLogic = new ArrayList<List<String>>();
+        
+        g1.add("1011");
+        g1.add("1111");
+        g1.add("1111");
+        
+        g2.add("1111");
+        g2.add("1011");
+        g2.add("1111");
+        
+        listLogic.add(g1);
+        listLogic.add(g2);
+        
+        boolean equal = NetSynth.equalLogicInputs(listLogic);
+        if(equal)
+            System.out.println("Logic is equal");
+        else
+            System.out.println("Not equal");
+    }        
+    
     public static void testAssignLogic() 
     {
         DWire in1 = new DWire();

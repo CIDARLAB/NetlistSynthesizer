@@ -37,7 +37,9 @@ public class TestMain {
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testSpecInputVerilog(3,158);
             //TestSynthesis.testVerilogrunNetSynth();
-            TestSynthesis.testAssignLogic();
+            //TestSynthesis.testAssignLogic();
+        
+              TestSynthesis.testEqualLogic();
             //TestSynthesis.testconvertORbeforeAND();
             //TestSynthesis.testOR3out();
             
