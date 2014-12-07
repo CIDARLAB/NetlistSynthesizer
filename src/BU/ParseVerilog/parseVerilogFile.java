@@ -214,6 +214,145 @@ public class parseVerilogFile {
     }
     
     
+    public static List<String> getInputNamesABCVerilog(String alllines)
+    {
+        List<String> inputs = new ArrayList<String>();
+        List<String> outputs = new ArrayList<String>();
+        List<String> unknownIO = new ArrayList<String>();
+        String moduleString = alllines.substring(alllines.indexOf("module "),alllines.indexOf(";"));
+        alllines = alllines.substring((alllines.indexOf(moduleString) + moduleString.length()+1), alllines.indexOf(" endmodule"));
+        alllines = alllines.trim();
+        //moduleString = moduleString.trim();
+        //moduleString = moduleString.substring((moduleString.indexOf("(")+1),moduleString.indexOf(")"));
+        
+        String[] vlines = alllines.split(";");
+        for(int i=0;i<vlines.length;i++)
+        {
+            String line = vlines[i].trim();
+            if(line.startsWith("input "))
+            {
+                moduleString = line;
+                break;
+            }
+        }
+        //System.out.println(moduleString);
+        moduleString = moduleString.trim();
+        
+        String[] modulePieces = moduleString.split(",");
+        for(int i=0;i<modulePieces.length;i++)
+        {
+            String IO = modulePieces[i].trim();
+            if(IO.contains("input "))
+            {
+                IO = IO.substring(IO.indexOf("input ")+6);
+                IO = IO.trim();
+                if(!inputs.contains(IO))
+                    inputs.add(IO);
+                
+                for(int j=i+1;j<modulePieces.length;j++)
+                {
+                    String IOnext = modulePieces[j].trim();
+                    if(IOnext.contains("output "))
+                        break;
+                    if(!inputs.contains(IOnext))
+                        inputs.add(IOnext);
+                }
+                
+            }
+            else if(IO.contains("output "))
+            {
+                
+                IO = IO.substring(IO.indexOf("output ")+7);
+                IO = IO.trim();
+                if(!outputs.contains(IO))
+                    outputs.add(IO);
+                for(int j=i+1;j<modulePieces.length;j++)
+                {
+                    String IOnext = modulePieces[j].trim();
+                    if(IOnext.contains("input "))
+                        break;
+                    if(!outputs.contains(IOnext))
+                        outputs.add(IOnext);
+                }
+            }
+            else
+            {
+                unknownIO.add(IO);   
+                
+            }
+        }
+        return inputs;
+    }
+    
+    public static List<String> getOutputNamesABCVerilog(String alllines)
+    {
+        List<String> inputs = new ArrayList<String>();
+        List<String> outputs = new ArrayList<String>();
+        List<String> unknownIO = new ArrayList<String>();
+        String moduleString = alllines.substring(alllines.indexOf("module "),alllines.indexOf(";"));
+        alllines = alllines.substring((alllines.indexOf(moduleString) + moduleString.length()+1), alllines.indexOf(" endmodule"));
+        alllines = alllines.trim();
+        //moduleString = moduleString.trim();
+        //moduleString = moduleString.substring((moduleString.indexOf("(")+1),moduleString.indexOf(")"));
+        
+        String[] vlines = alllines.split(";");
+        for(int i=0;i<vlines.length;i++)
+        {
+            String line = vlines[i].trim();
+            if(line.startsWith("output "))
+            {
+                moduleString = line;
+                break;
+            }
+        }
+        moduleString = moduleString.trim();
+        String[] modulePieces = moduleString.split(",");
+        for(int i=0;i<modulePieces.length;i++)
+        {
+            String IO = modulePieces[i].trim();
+            if(IO.contains("input "))
+            {
+                IO = IO.substring(IO.indexOf("input ")+6);
+                IO = IO.trim();
+                if(!inputs.contains(IO))
+                    inputs.add(IO);
+                
+                for(int j=i+1;j<modulePieces.length;j++)
+                {
+                    String IOnext = modulePieces[j].trim();
+                    if(IOnext.contains("output "))
+                        break;
+                    if(!inputs.contains(IOnext))
+                        inputs.add(IOnext);
+                }
+                
+            }
+            else if(IO.contains("output "))
+            {
+                
+                IO = IO.substring(IO.indexOf("output ")+7);
+                IO = IO.trim();
+                if(!outputs.contains(IO))
+                    outputs.add(IO);
+                for(int j=i+1;j<modulePieces.length;j++)
+                {
+                    String IOnext = modulePieces[j].trim();
+                    if(IOnext.contains("input "))
+                        break;
+                    if(!outputs.contains(IOnext))
+                        outputs.add(IOnext);
+                }
+            }
+            else
+            {
+                unknownIO.add(IO);   
+                
+            }
+        }
+        return outputs;
+    }
+    
+    
     public static CircuitDetails parseCaseStatements(String alllines)
     {
         

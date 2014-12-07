@@ -75,42 +75,7 @@ public class NetSynth {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
-        //LoadTables.getAllCombos(0.9994);
-        //HeuristicSearch.beginSearch(null, 0.9);
         
-        //for(int i=0;i<257;i++)
-        //    System.out.println(Convert.InttoHex(i));
-        
-       //genVerilogFile.createVerilogFile(4, "0xBBBBB" );
-        //System.out.println(Convert.HextoInt("6"));
-       //vtestfunc();
-        
-        //verifyinverse();
-        //histogram();
-        //seg7dagw("seg7");
-        //testABC();
-        //test2notstonor();
-        //EspressoVsABC(3);
-        //EspressoVsABCinv(3);
-        //EspressoVsABCSingle(3,109);
-        
-        //testABC();
-        //testABCsingle(6);
-        
-        //testespressogen();
-        //HistogramREU.calcHist(-0.803574133407);
-        //DAGW xcasedag = testParser("",0,0);
-        //HeuristicSearch.beginSearch(xcasedag, 0.95,0.5,-1,500,20000);
-        
-        
-        //testespressogen();
-        
-        
-        //verifyprecomute();
-        //DAGraph x = precompute(2);2
-        //DAGW y = computeDAGW(14);
-        //testnetlistmodule();
-        //testEspresso();
         
     }
 
@@ -242,6 +207,12 @@ public class NetSynth {
         inputnames = parseVerilogFile.getInputNames(alllines);
         outputnames = parseVerilogFile.getOutputNames(alllines);
         
+        if(!isStructural && !hasCaseStatements)
+        {
+            inputnames = parseVerilogFile.getInputNamesABCVerilog(alllines);
+            outputnames = parseVerilogFile.getOutputNamesABCVerilog(alllines);
+        
+        }
         
         netlist = getNetlist(vfilepath, synthesis,  invcheck,  outputor,outputOR3,  twonotstonor, nor3,and2 );
         
@@ -594,12 +565,8 @@ public class NetSynth {
                     //System.out.println("No Dont Cares");
                     
                     
-                    
                     dirnetlist = runEspressoAndABC(direct,synthesis,outputor,twonotstonor,nor3);
                     invnetlist = runInvertedEspressoAndABC(inverted,synthesis,outputor,twonotstonor,nor3);
-                    
-                    
-                    
                     
                     dirsize = getRepressorsCost(dirnetlist);
                     invsize = getRepressorsCost(invnetlist);
@@ -651,8 +618,71 @@ public class NetSynth {
             //</editor-fold>
             else
             {
+                //System.out.println("No case statements.\nWill be supported soon");
                 //System.out.println(alllines);
-                System.out.println("No case statements.\nWill be supported soon");
+                
+                try 
+                {
+                    List<DGate> abcNetlist = runABCverilog_fullFilePath(vfilepath);
+                    
+                    List<String> ttValues = new ArrayList<String>();
+                    List<String> invttValues = new ArrayList<String>();
+                   
+                    inputnames = parseVerilogFile.getInputNamesABCVerilog(alllines);
+                    outputnames = parseVerilogFile.getOutputNamesABCVerilog(alllines);
+                    
+                    
+                    ttValues = BooleanSimulator.getTruthTable(abcNetlist, inputnames);  // Compute Truth Table of Each Output
+                    invttValues = BooleanSimulator.invertTruthTable(ttValues); // Compute Inverse Truth Table of Each Output
+
+                    CircuitDetails direct = new CircuitDetails(inputnames, outputnames, ttValues);
+                    CircuitDetails inverted = new CircuitDetails(inputnames, outputnames, invttValues);
+
+                    dirnetlist = runEspressoAndABC(direct, synthesis, outputor, twonotstonor, nor3);
+                    invnetlist = runInvertedEspressoAndABC(inverted, synthesis, outputor, twonotstonor, nor3);
+
+                    dirsize = getRepressorsCost(dirnetlist);
+                    invsize = getRepressorsCost(invnetlist);
+                    
+                    if (dirsize == invsize) 
+                    {
+                        if (NOR3count(dirnetlist) < NOR3count(invnetlist)) 
+                        {
+                            for (DGate xgate : dirnetlist) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        } 
+                        else 
+                        {
+                            for (DGate xgate : invnetlist) 
+                            {
+                                netlist.add(xgate);
+                            }
+                        }
+                    } 
+                    else if (dirsize < invsize) 
+                    {
+                        for (DGate xgate : dirnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    } 
+                    else 
+                    {
+                        for (DGate xgate : invnetlist) 
+                        {
+                            netlist.add(xgate);
+                        }
+                    }
+                    
+                    //printNetlist(abcNetlist);
+                } 
+                catch (InterruptedException ex) 
+                {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
             }
         }
         
@@ -765,8 +795,8 @@ public class NetSynth {
             netlist = convertAND(netlist);
         }
         
-        System.out.println("Before AND2 OR");
-        printNetlist(netlist);
+        //System.out.println("Before AND2 OR");
+        //printNetlist(netlist);
         System.out.println("---------------------------\n");
         if(and2.equals(NetSynthSwitches.AND2OR))
         {
@@ -2145,6 +2175,96 @@ public class NetSynth {
         return finalnetlist;
         //convertBenchToAIG();
     }
+    
+    
+    /**Function*************************************************************
+    <br>
+    Synopsis    []
+    <br>
+    Description []
+    <br>
+    SideEffects []
+    <br>
+    SeeAlso     []
+     * @param filename
+     * @return 
+     * @throws java.lang.InterruptedException
+    ***********************************************************************/
+    public static List<DGate> runABCverilog_fullFilePath(String filename) throws InterruptedException 
+    {
+        initializeFilepath();
+        String x = System.getProperty("os.name");
+        StringBuilder commandBuilder = null;
+        if(x.contains("Mac"))
+        {
+            commandBuilder = new StringBuilder(Filepath+"BU/resources/abc.mac -c \"read "+filename+"; strash;  rewrite; refactor; balance; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
+        }
+        else if("Linux".equals(x))
+        {
+            if(Filepath.contains("prashant"))
+            {
+                commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+filename+"; strash; rewrite; refactor;  balance; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
+            }
+            else
+            {
+                commandBuilder = new StringBuilder(Filepath+"BU/resources/abc -c \"read "+filename+"; strash;  rewrite; refactor; balance; write "+Filepath +"BU/resources/abcOutput.bench; quit\"");
+            }
+            
+        }
+        
+        String command = commandBuilder.toString();
+        String filestring = "";
+        if (Filepath.contains("prashant")) 
+        {
+            filestring += Filepath + "src/BU/resources/script";
+        } 
+        else 
+        {
+            filestring += Filepath + "BU/resources/script";
+        }
+        File fespinp = new File(filestring);
+        //Writer output;
+        try 
+        {
+             Writer output = new BufferedWriter(new FileWriter(fespinp));
+            //output = new BufferedWriter(new FileWriter(fespinp));
+             output.write(command);
+             output.close();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String clist ="";
+        if (Filepath.contains("prashant")) 
+        {
+            clist = Filepath+"src/BU/resources/script";
+        } 
+        else 
+        {
+            clist = Filepath+"BU/resources/script";
+        }
+        
+        
+        
+        Runtime runtime = Runtime.getRuntime();
+        Process proc = null;
+        List<DGate> finalnetlist = new ArrayList<DGate>();
+        try 
+        {
+            proc = runtime.exec(clist);
+            proc.waitFor();
+            finalnetlist = convertBenchToAIG();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return finalnetlist;
+        //convertBenchToAIG();
+    }
+    
+    
     
     
     /**Function*************************************************************
@@ -3646,7 +3766,7 @@ public class NetSynth {
                                         {
                                             break;
                                         }
-                                        System.out.println("Found it");
+                                        //System.out.println("Found it");
                                         DGate or1 = new DGate();
                                         DGate or2 = new DGate();
 

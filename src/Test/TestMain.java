@@ -39,7 +39,7 @@ public class TestMain {
             //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.testAssignLogic();
         
-              TestSynthesis.testEqualLogic();
+            //TestSynthesis.testEqualLogic();
             //TestSynthesis.testconvertORbeforeAND();
             //TestSynthesis.testOR3out();
             
@@ -47,7 +47,7 @@ public class TestMain {
             //TestSynthesis.testMain("filepath\\filefolder", NetSynthModes.cello, switches);
             
             //TestSynthesis.testANDConversion();
-            //TestSynthesis.testVerilogrunNetSynth();
+            TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);
             //TestSynthesis.testAllnInputVerilog(3);
