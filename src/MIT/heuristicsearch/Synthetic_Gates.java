@@ -43,7 +43,7 @@ public class Synthetic_Gates {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }
@@ -166,7 +166,7 @@ public class Synthetic_Gates {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }
@@ -214,7 +214,7 @@ public class Synthetic_Gates {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }
@@ -307,7 +307,7 @@ public class Synthetic_Gates {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }
@@ -366,7 +366,7 @@ public class Synthetic_Gates {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }
@@ -459,7 +459,7 @@ public class Synthetic_Gates {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }
@@ -558,7 +558,7 @@ public class Synthetic_Gates {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }
@@ -644,7 +644,7 @@ public class Synthetic_Gates {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }

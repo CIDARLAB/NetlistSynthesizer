@@ -276,7 +276,7 @@ public class TestEspresso {
             String filestring = "";
             String filestringinv = "";
            
-            if(Filepath.contains("prashant"))
+            if(Filepath.contains("prash"))
             {
                 filestring += Filepath+ "src/BU/resources/espresso";
             }

@@ -25,7 +25,7 @@ public class HistogramREU {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/BU/resources/";
         }

@@ -624,7 +624,7 @@ public class TestSynthesis {
         String path = Filepath;
         Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
          
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             if(Filepath.contains("build/classes/"))
                 Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
@@ -637,6 +637,7 @@ public class TestSynthesis {
         //System.out.println("Netlist:");
         //NetSynth.printNetlist(NetSynth.getNetlist(path));
         DAGW resdag = new DAGW();
+        
         resdag = NetSynth.runNetSynth(path,NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.AND2OR);
         for(Gate xgate:resdag.Gates)
         {
@@ -651,7 +652,7 @@ public class TestSynthesis {
     public static void histogram()
     {
         String filestring ="";
-          if(Filepath.contains("prashant"))
+          if(Filepath.contains("prash"))
           {
               filestring += Filepath+ "src/BU/resources/Histogram";
           }
@@ -690,7 +691,7 @@ public class TestSynthesis {
                 List<String> eslines = new ArrayList<String>();
                 eslines = Espresso.createFile(circ);
                 String filestring2 = "";
-                if(Filepath.contains("prashant"))
+                if(Filepath.contains("prash"))
                 {
                     filestring2 += Filepath+ "src/BU/resources/espresso";
                 }
@@ -752,7 +753,7 @@ public class TestSynthesis {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/ParseVerilog/Verilog.v";
         } 
@@ -785,7 +786,7 @@ public class TestSynthesis {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/testespfile.txt";
         } 
@@ -944,7 +945,7 @@ public class TestSynthesis {
     public static void verifyinverse()
     {
         String filestring ="";
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             filestring += Filepath+ "src/BU/resources/Inverse";
         }
@@ -1040,7 +1041,7 @@ public class TestSynthesis {
             System.out.println(xesp);
         }
         String filestring = "";
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/espresso";
         } 

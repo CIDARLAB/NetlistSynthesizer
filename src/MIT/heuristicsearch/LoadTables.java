@@ -44,7 +44,7 @@ public class LoadTables {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }

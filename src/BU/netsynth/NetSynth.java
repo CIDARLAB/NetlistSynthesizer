@@ -936,7 +936,7 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/";
         } 
@@ -1057,7 +1057,7 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/";
         } 
@@ -1215,7 +1215,7 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/";
         } 
@@ -1358,7 +1358,7 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/";
         } 
@@ -1674,7 +1674,7 @@ public class NetSynth {
         blifinput = Blif.createFile(circ);
         String filestring ="";
         String filestringblif = "";
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
             {
                 filestring += Filepath+ "src/BU/resources/";
             }
@@ -1752,7 +1752,7 @@ public class NetSynth {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/";
         } 
@@ -1800,7 +1800,7 @@ public class NetSynth {
         List<String> filelines = new ArrayList<String>();
         filelines = genVerilogFile.createSingleOutpVerilogFile(inputs, hex);
         String filestring = "";
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/";
         } 
@@ -2026,7 +2026,7 @@ public class NetSynth {
         }
         else if("Linux".equals(x))
         {
-            if(Filepath.contains("prashant"))
+            if(Filepath.contains("prash"))
             {
                 commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+Filepath+"src/BU/resources/"+filename+".blif; strash; rewrite; refactor;  balance; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
             }
@@ -2042,7 +2042,7 @@ public class NetSynth {
         
         String filestring = "";
         String clist = "";
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/script";
             clist = Filepath+"src/BU/resources/script";
@@ -2111,7 +2111,7 @@ public class NetSynth {
         }
         else if("Linux".equals(x))
         {
-            if(Filepath.contains("prashant"))
+            if(Filepath.contains("prash"))
             {
                 commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+Filepath+"src/BU/resources/"+filename+".v; strash; rewrite; refactor;  balance; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
             }
@@ -2126,7 +2126,7 @@ public class NetSynth {
         //System.out.println(command);
         
         String filestring = "";
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/script";
         } 
@@ -2148,7 +2148,7 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         String clist ="";
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             clist = Filepath+"src/BU/resources/script";
         } 
@@ -2201,7 +2201,7 @@ public class NetSynth {
         }
         else if("Linux".equals(x))
         {
-            if(Filepath.contains("prashant"))
+            if(Filepath.contains("prash"))
             {
                 commandBuilder = new StringBuilder(Filepath+"src/BU/resources/abc -c \"read "+filename+"; strash; rewrite; refactor;  balance; write "+Filepath +"src/BU/resources/abcOutput.bench; quit\"");
             }
@@ -2214,7 +2214,7 @@ public class NetSynth {
         
         String command = commandBuilder.toString();
         String filestring = "";
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/script";
         } 
@@ -2236,7 +2236,7 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         String clist ="";
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             clist = Filepath+"src/BU/resources/script";
         } 
@@ -2283,7 +2283,7 @@ public class NetSynth {
         
         List<String> benchlines = new ArrayList<String>();
         String filestring = "";
-        if (Filepath.contains("prashant")) 
+        if (Filepath.contains("prash")) 
         {
             filestring += Filepath + "src/BU/resources/abcOutput.bench";
         } 
@@ -2578,7 +2578,7 @@ public class NetSynth {
         }
         else if("Linux".equals(x))
         {
-            if(Filepath.contains("prashant"))
+            if(Filepath.contains("prash"))
             {
                 commandBuilder = new StringBuilder(Filepath+"src/BU/resources/espresso.linux -epos "+ pathFile);
             }
@@ -2602,7 +2602,7 @@ public class NetSynth {
             String filestring = "";
             
             
-             if(Filepath.contains("prashant"))
+             if(Filepath.contains("prash"))
              {
                 filestring += Filepath+ "src/BU/resources/write";
              }

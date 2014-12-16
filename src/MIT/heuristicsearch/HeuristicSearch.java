@@ -4214,7 +4214,7 @@ public class HeuristicSearch {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
         
           String filestring ="";
-          if(Filepath.contains("prashant"))
+          if(Filepath.contains("prash"))
           {
               filestring += Filepath+ "src/BU/resources/IndexGraph";
           }
@@ -4352,7 +4352,7 @@ public class HeuristicSearch {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }
@@ -4409,7 +4409,7 @@ public class HeuristicSearch {
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
        
-        if(Filepath.contains("prashant"))
+        if(Filepath.contains("prash"))
         {
             Filepath += "src/MIT/dnacompiler/";
         }
