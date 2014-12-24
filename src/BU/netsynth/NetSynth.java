@@ -224,10 +224,10 @@ public class NetSynth {
         //finaldag = CreateMultDAGW(inputnames,outputnames,netlist);
         finaldag = CreateMultDAGW(netlist);
         
-        if(hasCaseStatements)
-        {
+        //if(hasCaseStatements)
+        //{
             finaldag = DAGW.addDanglingInputs(finaldag,inputnames);
-        }
+        //}
         finaldag = DAGW.reorderinputs(finaldag,inputnames);
         
         //List<String> netlistTT = new ArrayList<String>();
@@ -407,7 +407,8 @@ public class NetSynth {
             {
                 structnetlist = convertORbeforeAND(structnetlist);
             }
-            
+           
+            //printNetlist(structnetlist);
             
             List<String> ttValues = new ArrayList<String>(); 
             List<String> invttValues = new ArrayList<String>();
@@ -797,7 +798,7 @@ public class NetSynth {
         
         //System.out.println("Before AND2 OR");
         //printNetlist(netlist);
-        System.out.println("---------------------------\n");
+        //System.out.println("---------------------------\n");
         if(and2.equals(NetSynthSwitches.AND2OR))
         {
             netlist = convertFindORbeforeAND(netlist);
@@ -805,6 +806,7 @@ public class NetSynth {
         
         netlist = rewireNetlist(netlist);
         printNetlist(netlist);
+        BooleanSimulator.printTruthTable(netlist, inputnames);
         return netlist;
         
     }
@@ -4622,6 +4624,12 @@ public class NetSynth {
         return reducednetlist;
     }
     
+    public static void printDebugStatement(String message)
+    {
+        System.out.println("=======================");
+        System.out.println("======= "+message);
+        System.out.println("=======================");
+    }
     
     /**Function*************************************************************
     <br>
@@ -4644,7 +4652,8 @@ public class NetSynth {
         //naivenetlist = parseVerilogFile.parseStructural(filepath);
         
         naivenetlist = removeDanglingGates(naivenetlist);
-        //printNetlist(naivenetlist);
+        
+        
         //System.out.println("------------------------------------");
         List<DGate> reducedfanin = new ArrayList<DGate>();
         
@@ -4670,9 +4679,11 @@ public class NetSynth {
         
         
         boolean nor3in = true;
-         if(nor3.equals(NetSynthSwitches.defaultmode))
+        if(nor3.equals(NetSynthSwitches.defaultmode))
             nor3in = false;
         structnetlist = optimizeNetlist(structnetlist,true,true,nor3in);
+        
+        
         //}
         //structnetlist = removeDanglingGates(structnetlist);
         //printNetlist(structnetlist);
@@ -4692,6 +4703,7 @@ public class NetSynth {
         
         //structnetlist = rewireNetlist(structnetlist);
         //printNetlist(structnetlist);
+        
         return structnetlist;
     }
     
@@ -4809,8 +4821,10 @@ public class NetSynth {
         
         
         outpNetlist = removeDanglingGates(outpNetlist);
+        
         if(outputor)
             outpNetlist = outputORopt(outpNetlist);
+        
         if(twoNotsToNor)
             outpNetlist = convert2NOTsToNOR(outpNetlist);
         

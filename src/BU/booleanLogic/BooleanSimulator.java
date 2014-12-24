@@ -252,8 +252,6 @@ public class BooleanSimulator {
              inputsW.put(dw.name.trim(),dw);
         }
         
-        
-        
         HashMap <String,Integer> inputWires = new HashMap<String,Integer>();
         int inpcnt =0;
         for(DWire dwl:inputL)
@@ -770,9 +768,8 @@ public class BooleanSimulator {
         int ttrows = (int)Math.pow(2, inputnames.size());
         for(int i=0;i<ttrows;i++)
         {
-            
-            
             String rrinputrowboolean = Convert.dectoBin(i,inputnames.size());
+            //System.out.println(rrinputrowboolean);
             for(int j=0;j<netlist.size();j++)
             {
                 for(int k=0;k<netlist.get(j).input.size();k++)
@@ -840,7 +837,7 @@ public class BooleanSimulator {
                 else if(ttVals.get(i).charAt(j) == '0')
                     invtt += "1";
                 else
-                    invtt += "x";
+                    invtt += "-";
             }
             invttVals.add(invtt);
         }
