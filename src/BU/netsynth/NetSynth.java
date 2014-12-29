@@ -407,7 +407,9 @@ public class NetSynth {
             {
                 structnetlist = convertORbeforeAND(structnetlist);
             }
-           
+            printDebugStatement("StructNetlist");
+                printNetlist(naivenetlist);
+                
             //printNetlist(structnetlist);
             
             List<String> ttValues = new ArrayList<String>(); 
@@ -4193,8 +4195,7 @@ public class NetSynth {
     public static List<DGate> removeDoubleInverters(List<DGate> netlistinp)
     {
         //Remove Redundant NOT Gates
-        
-        
+       
         
         List<Integer> removegates = new ArrayList<Integer>();
         for(int i=0;i<netlistinp.size()-1;i++)
@@ -4205,10 +4206,12 @@ public class NetSynth {
                 {
                     if(netlistinp.get(j).gtype.equals(DGateType.NOT))
                     {
-                   if(netlistinp.get(i).output.name.equals(netlistinp.get(j).input.get(0).name)) // If input of Gate j is the output of Gate i
-                   {
+                           
+                    if(netlistinp.get(i).output.name.equals(netlistinp.get(j).input.get(0).name)) // If input of Gate j is the output of Gate i
+                    {
                        if(netlistinp.get(j).output.wtype.equals(DWireType.output)) // if output of Gate j is an output for the circuit
                        {
+                           
                            if(netlistinp.get(i).input.get(0).wtype.equals(DWireType.input)) // input of Gate i is an input for the circuit
                            {
                                /*System.out.println("Before Step 1");
@@ -4651,9 +4654,10 @@ public class NetSynth {
         //List<DGate> naivenetlist = new ArrayList<DGate>();
         //naivenetlist = parseVerilogFile.parseStructural(filepath);
         
+       
+        
+        
         naivenetlist = removeDanglingGates(naivenetlist);
-        
-        
         //System.out.println("------------------------------------");
         List<DGate> reducedfanin = new ArrayList<DGate>();
         
@@ -4812,8 +4816,15 @@ public class NetSynth {
         
         List<DGate> outpNetlist = new ArrayList<DGate>();
         
+        
+        
+        
         outpNetlist = removeDanglingGates(inpNetlist);
-        outpNetlist = separateOutputGates(outpNetlist);
+        
+        
+        printDebugStatement("commenting out separate output gates comment");
+        //outpNetlist = separateOutputGates(outpNetlist);
+        
         outpNetlist = removeDuplicateNots(outpNetlist);
         outpNetlist = removeDoubleInverters(outpNetlist);
         outpNetlist = removeDuplicateNots(outpNetlist);

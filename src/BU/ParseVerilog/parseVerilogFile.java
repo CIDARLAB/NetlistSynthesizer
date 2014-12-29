@@ -1083,6 +1083,13 @@ public class parseVerilogFile {
                     pgate.input.add(xconnW);
                 }
             }
+            for(DWire xconnW:outputWires)
+            {
+                if(xconnW.name.equals(gin))
+                {
+                    pgate.input.add(xconnW);
+                }
+            }
         }
         if(gatetype.equals("xnor"))
             pgate.gtype = DGateType.XNOR;
