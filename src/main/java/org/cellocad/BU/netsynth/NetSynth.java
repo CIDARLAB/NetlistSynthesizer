@@ -63,12 +63,13 @@ public class NetSynth {
         functionOutp = false;
         one = new DWire("_one", DWireType.Source);
         zero = new DWire("_zero", DWireType.GND);
-        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (Filepath.contains("build/classes/")) {
+        Filepath = NetSynth.getFilepath();
+        
+        /*if (Filepath.contains("build/classes/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("build/classes/"));
         } else if (Filepath.contains("src")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
-        }
+        }*/
 
     }
 
@@ -87,11 +88,34 @@ public class NetSynth {
      */
     public static void initializeFilepath() {
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (Filepath.contains("build/classes/")) {
+        
+        if(Filepath.contains("/target/"))
+        {
+            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
+        }
+        
+        
+        /*if (Filepath.contains("build/classes/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("build/classes/"));
         } else if (Filepath.contains("src")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
+        }*/
+    }
+    public static String getFilepath() {
+        String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        
+        if(_filepath.contains("/target/"))
+        {
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
         }
+        
+        return _filepath;
+    }
+    public static String getResourcesFilepath() {
+        String _filepath = getFilepath();
+        _filepath += "/resources/";
+        //System.out.println(_filepath);
+        return _filepath;
     }
 
     /**
@@ -834,9 +858,9 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        String Filepath = getFilepath();
 
-        if (Filepath.contains("build/classes/")) {
+        /*if (Filepath.contains("build/classes/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("build/classes/"));
         } else if (Filepath.contains("src")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
@@ -845,7 +869,9 @@ public class NetSynth {
             filestring += Filepath + "src/org/cellocad/BU/resources/";
         } else {
             filestring += Filepath + "org/cellocad/BU/resources/";
-        }
+        }*/
+        
+        filestring = getResourcesFilepath();
         String filestringblif = "";
         filestringblif = filestring + "Blif_File";
         filestringblif += ".blif";
@@ -955,8 +981,9 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (Filepath.contains("build/classes/")) {
+        String Filepath = getFilepath();
+        
+        /*if (Filepath.contains("build/classes/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("build/classes/"));
         } else if (Filepath.contains("src")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
@@ -965,7 +992,9 @@ public class NetSynth {
             filestring += Filepath + "src/org/cellocad/BU/resources/";
         } else {
             filestring += Filepath + "org/cellocad/BU/resources/";
-        }
+        }*/
+        filestring = getResourcesFilepath();
+        
         String filestringblif = "";
         filestringblif = filestring + "Blif_File";
         filestringblif += ".blif";
@@ -1100,17 +1129,19 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (Filepath.contains("build/classes/")) {
+        String Filepath = getFilepath();
+        /*if (Filepath.contains("build/classes/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("build/classes/"));
         } else if (Filepath.contains("src")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
-        }
-        if (Filepath.contains("prash")) {
+        }*/
+        
+        /*if (Filepath.contains("prash")) {
             filestring += Filepath + "src/org/cellocad/BU/resources/";
         } else {
             filestring += Filepath + "org/cellocad/BU/resources/";
-        }
+        }*/
+        filestring = getResourcesFilepath();
         String filestringblif = "";
         filestringblif = filestring + "Blif_File";
         filestringblif += ".blif";
@@ -1229,8 +1260,9 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (Filepath.contains("build/classes/")) {
+        String Filepath = getFilepath();
+        
+        /*if (Filepath.contains("build/classes/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("build/classes/"));
         } else if (Filepath.contains("src")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
@@ -1239,7 +1271,8 @@ public class NetSynth {
             filestring += Filepath + "src/org/cellocad/BU/resources/";
         } else {
             filestring += Filepath + "org/cellocad/BU/resources/";
-        }
+        }*/
+        filestring = getResourcesFilepath();
         String filestringblif = "";
         filestringblif = filestring + "Blif_File";
         filestringblif += ".blif";
@@ -1829,13 +1862,13 @@ public class NetSynth {
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (x.contains("Mac")) {
-            commandBuilder = new StringBuilder(Filepath + "org/cellocad/BU/resources/abc.mac -c \"read " + Filepath + "org/cellocad/BU/resources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "org/cellocad/BU/resources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(Filepath + "/resources/abc.mac -c \"read " + Filepath + "/resources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
         } else if ("Linux".equals(x)) {
-            if (Filepath.contains("prash")) {
-                commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/abc -c \"read " + Filepath + "src/org/cellocad/BU/resources/" + filename + ".blif; strash; rewrite; refactor;  balance; write " + Filepath + "src/org/cellocad/BU/resources/abcOutput.bench; quit\"");
-            } else {
-                commandBuilder = new StringBuilder(Filepath + "org/cellocad/BU/resources/abc -c \"read " + Filepath + "org/cellocad/BU/resources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "org/cellocad/BU/resources/abcOutput.bench; quit\"");
-            }
+            //if (Filepath.contains("prash")) {
+            //    commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/abc -c \"read " + Filepath + "src/org/cellocad/BU/resources/" + filename + ".blif; strash; rewrite; refactor;  balance; write " + Filepath + "src/org/cellocad/BU/resources/abcOutput.bench; quit\"");
+            //} else {
+                commandBuilder = new StringBuilder(Filepath + "/resources/abc -c \"read " + Filepath + "/resources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+            //}
 
         }
 
@@ -1844,13 +1877,13 @@ public class NetSynth {
 
         String filestring = "";
         String clist = "";
-        if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/script";
-            clist = Filepath + "src/org/cellocad/BU/resources/script";
-        } else {
-            filestring += Filepath + "org/cellocad/BU/resources/script";
-            clist = Filepath + "org/cellocad/BU/resources/script";
-        }
+        //if (Filepath.contains("prash")) {
+        //    filestring += Filepath + "src/org/cellocad/BU/resources/script";
+        //    clist = Filepath + "src/org/cellocad/BU/resources/script";
+        ///} else {
+            filestring += Filepath + "/resources/script";
+            clist = Filepath + "/resources/script";
+        //}
         File fespinp = new File(filestring);
         //Writer output;
         try {
@@ -1895,16 +1928,18 @@ public class NetSynth {
      */
     public static List<DGate> runABCverilog(String filename) throws InterruptedException {
 
+        
+        initializeFilepath();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (x.contains("Mac")) {
-            commandBuilder = new StringBuilder(Filepath + "org/cellocad/BU/resources/abc.mac -c \"read " + Filepath + "org/cellocad/BU/resources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "org/cellocad/BU/resources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(Filepath + "/resources/abc.mac -c \"read " + Filepath + "/resources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
         } else if ("Linux".equals(x)) {
-            if (Filepath.contains("prash")) {
-                commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/abc -c \"read " + Filepath + "src/org/cellocad/BU/resources/" + filename + ".v; strash; rewrite; refactor;  balance; write " + Filepath + "src/org/cellocad/BU/resources/abcOutput.bench; quit\"");
-            } else {
-                commandBuilder = new StringBuilder(Filepath + "org/cellocad/BU/resources/abc -c \"read " + Filepath + "org/cellocad/BU/resources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "org/cellocad/BU/resources/abcOutput.bench; quit\"");
-            }
+            //if (Filepath.contains("prash")) {
+            //    commandBuilder = new StringBuilder(Filepath + "/resources/abc -c \"read " + Filepath + "/resources/" + filename + ".v; strash; rewrite; refactor;  balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+            //} else {
+                commandBuilder = new StringBuilder(Filepath + "/resources/abc -c \"read " + Filepath + "/resources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+            //}
 
         }
 
@@ -1912,11 +1947,11 @@ public class NetSynth {
         //System.out.println(command);
 
         String filestring = "";
-        if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/script";
-        } else {
-            filestring += Filepath + "org/cellocad/BU/resources/script";
-        }
+        //if (Filepath.contains("prash")) {
+        //    filestring += Filepath + "/resources/script";
+        //} else {
+            filestring += Filepath + "/resources/script";
+        //}
         File fespinp = new File(filestring);
         //Writer output;
         try {
@@ -1928,11 +1963,11 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         String clist = "";
-        if (Filepath.contains("prash")) {
-            clist = Filepath + "src/org/cellocad/BU/resources/script";
-        } else {
-            clist = Filepath + "org/cellocad/BU/resources/script";
-        }
+        //if (Filepath.contains("prash")) {
+        //    clist = Filepath + "/resources/script";
+        //} else {
+            clist = Filepath + "/resources/script";
+        //}
 
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
@@ -1970,23 +2005,23 @@ public class NetSynth {
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (x.contains("Mac")) {
-            commandBuilder = new StringBuilder(Filepath + "org/cellocad/BU/resources/abc.mac -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "org/cellocad/BU/resources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(Filepath + "/resources/abc.mac -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
         } else if ("Linux".equals(x)) {
-            if (Filepath.contains("prash")) {
-                commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/abc -c \"read " + filename + "; strash; rewrite; refactor;  balance; write " + Filepath + "src/org/cellocad/BU/resources/abcOutput.bench; quit\"");
-            } else {
-                commandBuilder = new StringBuilder(Filepath + "org/cellocad/BU/resources/abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "org/cellocad/BU/resources/abcOutput.bench; quit\"");
-            }
+            //if (Filepath.contains("prash")) {
+            //    commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/abc -c \"read " + filename + "; strash; rewrite; refactor;  balance; write " + Filepath + "src/org/cellocad/BU/resources/abcOutput.bench; quit\"");
+            //} else {
+                commandBuilder = new StringBuilder(Filepath + "/resources/abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+            //}
 
         }
 
         String command = commandBuilder.toString();
         String filestring = "";
-        if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/script";
-        } else {
-            filestring += Filepath + "org/cellocad/BU/resources/script";
-        }
+        //if (Filepath.contains("prash")) {
+        //    filestring += Filepath + "/resources/script";
+        //} else {
+            filestring += Filepath + "/resources/script";
+        //}
         File fespinp = new File(filestring);
         //Writer output;
         try {
@@ -1998,11 +2033,11 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         String clist = "";
-        if (Filepath.contains("prash")) {
-            clist = Filepath + "src/org/cellocad/BU/resources/script";
-        } else {
-            clist = Filepath + "org/cellocad/BU/resources/script";
-        }
+        //if (Filepath.contains("prash")) {
+        //    clist = Filepath + "src/org/cellocad/BU/resources/script";
+        //} else {
+            clist = Filepath + "/resources/script";
+        //}
 
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
@@ -2034,14 +2069,15 @@ public class NetSynth {
     **********************************************************************
      */
     public static List<DGate> convertBenchToAIG() {
-
+        
+        initializeFilepath();
         List<String> benchlines = new ArrayList<String>();
         String filestring = "";
-        if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/abcOutput.bench";
-        } else {
-            filestring += Filepath + "org/cellocad/BU/resources/abcOutput.bench";
-        }
+        //if (Filepath.contains("prash")) {
+        //   filestring += Filepath + "src/org/cellocad/BU/resources/abcOutput.bench";
+        //} else {
+            filestring += Filepath + "/resources/abcOutput.bench";
+        //}
 
         File gate_file = new File(filestring);
         BufferedReader brgate;
@@ -2280,23 +2316,23 @@ public class NetSynth {
      */
     public static List<String> runEspresso(String pathFile) {
 
-        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (Filepath.contains("build/classes/")) {
+        Filepath = getFilepath();
+        /*if (Filepath.contains("build/classes/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("build/classes/"));
         } else if (Filepath.contains("src")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
-        }
+        }*/
         List<String> espressoOutput = new ArrayList<String>();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (x.contains("Mac")) {
-            commandBuilder = new StringBuilder(Filepath + "org/cellocad/BU/resources/espresso.mac -epos " + pathFile);
+            commandBuilder = new StringBuilder(Filepath + "/resources/espresso.mac -epos " + pathFile);
         } else if ("Linux".equals(x)) {
-            if (Filepath.contains("prash")) {
-                commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/espresso.linux -epos " + pathFile);
-            } else {
-                commandBuilder = new StringBuilder(Filepath + "org/cellocad/BU/resources/espresso.linux -epos " + pathFile);
-            }
+            //if (Filepath.contains("prash")) {
+            //    commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/espresso.linux -epos " + pathFile);
+            //} else {
+                commandBuilder = new StringBuilder(Filepath + "/resources/espresso.linux -epos " + pathFile);
+            //}
 
         }
 
@@ -2311,12 +2347,13 @@ public class NetSynth {
         }
         try {
             String filestring = "";
-
-            if (Filepath.contains("prash")) {
+            filestring  = getResourcesFilepath();
+            filestring += "write";
+            /*if (Filepath.contains("prash")) {
                 filestring += Filepath + "src/org/cellocad/BU/resources/write";
             } else {
                 filestring += Filepath + "org/cellocad/BU/resources/write";
-            }
+            }*/
 
             filestring += Global.espout++;
             filestring += ".txt";

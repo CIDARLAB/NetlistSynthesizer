@@ -622,24 +622,29 @@ public class TestSynthesis {
     {
         
         String path = Filepath;
-        Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
-         
-        if(Filepath.contains("prash"))
+        
+        Filepath = NetSynth.getFilepath();
+        path = Filepath + "/resources/Verilog.v";
+        //Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
+        //System.out.println("File path : " + Filepath);
+        /*if(Filepath.contains("prash"))
         {
             if(Filepath.contains("build/classes/"))
                 Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
             else if(Filepath.contains("src"))
                 Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
             Filepath += "src/org/cellocad/BU/ParseVerilog/Verilog.v";
-           //Filepath += "src/org/cellocad/BU/resources/TestNinput.v";
+           //Filepath += "src/orIn TestSynthesis. Path is:g/cellocad/BU/resources/TestNinput.v";
             path = Filepath;
         }
         else
         {
             path = Filepath + "org/cellocad/BU/ParseVerilog/Verilog.v";
-        }
+        }*/
         //System.out.println("Netlist:");
         //NetSynth.printNetlist(NetSynth.getNetlist(path));
+       
+        
         DAGW resdag = new DAGW();
         
         resdag = NetSynth.runNetSynth(path,NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.AND2OR);
@@ -656,14 +661,14 @@ public class TestSynthesis {
     public static void histogram()
     {
         String filestring ="";
-          if(Filepath.contains("prash"))
-          {
-              filestring += Filepath+ "src/org/cellocad/BU/resources/Histogram";
-          }
-          else
-          {
-              filestring += Filepath+ "org/cellocad/BU/resources/Histogram";
-          }
+          //if(Filepath.contains("prash"))
+          //{
+          //    filestring += Filepath+ "/resources/Histogram";
+          //}
+          //else
+          //{
+              filestring += Filepath+ "/resources/Histogram";
+          //}
         
           
             //filestring += Global.espout++ ;
@@ -695,14 +700,14 @@ public class TestSynthesis {
                 List<String> eslines = new ArrayList<String>();
                 eslines = Espresso.createFile(circ);
                 String filestring2 = "";
-                if(Filepath.contains("prash"))
-                {
-                    filestring2 += Filepath+ "src/org/cellocad/BU/resources/espresso";
-                }
-                else
-                {
-                    filestring2 += Filepath+ "org/cellocad/BU/resources/espresso";
-                }
+                //if(Filepath.contains("prash"))
+                //{
+                //    filestring2 += Filepath+ "/resources/espresso";
+                //}
+                //else
+                //{
+                    filestring2 += Filepath+ "/resources/espresso";
+                //}
                 filestring2 += Global.espout++ ;
                 filestring2 += ".txt";
                 File fespinp2 = new File(filestring2);
@@ -757,14 +762,14 @@ public class TestSynthesis {
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if (Filepath.contains("prash")) 
-        {
-            filestring += Filepath + "src/org/cellocad/BU/ParseVerilog/Verilog.v";
-        } 
-        else 
-        {
-            filestring += Filepath + "org/cellocad/BU/ParseVerilog/Verilog.v";
-        }
+        //if (Filepath.contains("prash")) 
+        //{
+        //    filestring += Filepath + "src/org/cellocad/BU/ParseVerilog/Verilog.v";
+        //} 
+        //else 
+        //{
+            filestring += Filepath + "/resources/Verilog.v";
+        //}
         NetSynth.runNetSynth(filestring);
         /*String alllines = parseVerilogFile.verilogFileLines(filestring);
         boolean isStructural = parseVerilogFile.isStructural(alllines);
@@ -785,19 +790,20 @@ public class TestSynthesis {
     {
         String Filepath;
         String filestring ="";
-        Filepath = TestSynthesis.class.getClassLoader().getResource(".").getPath();
+        Filepath = NetSynth.getFilepath();
+        /*Filepath = TestSynthesis.class.getClassLoader().getResource(".").getPath();
         if(Filepath.contains("build/classes/"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
-            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        if (Filepath.contains("prash")) 
-        {
-            filestring += Filepath + "src/org/cellocad/BU/resources/testespfile.txt";
-        } 
-        else 
-        {
-            filestring += Filepath + "org/cellocad/BU/resources/testespfile.txt";
-        }
+            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));*/
+        //if (Filepath.contains("prash")) 
+        //{
+        //    filestring += Filepath + "/resources/testespfile.txt";
+        //} 
+        //else 
+        //{
+            filestring += Filepath + "/resources/testespfile.txt";
+        //}
         
         List<DGate> netlistoutp = new ArrayList<DGate>();
         netlistoutp = NetSynth.parseEspressoFileToABC(filestring);
@@ -949,14 +955,15 @@ public class TestSynthesis {
     public static void verifyinverse()
     {
         String filestring ="";
-        if(Filepath.contains("prash"))
-        {
-            filestring += Filepath+ "src/org/cellocad/BU/resources/Inverse";
-        }
-        else
-        {
-            filestring += Filepath+ "org/cellocad/BU/resources/Inverse";
-        }
+        
+        //if(Filepath.contains("prash"))
+        //{
+        //    filestring += Filepath+ "src/org/cellocad/BU/resources/Inverse";
+        //}
+        //else
+        //{
+            filestring += Filepath+ "/resources/Inverse";
+        //}
           
             filestring += ".csv";
             File fespinp = new File(filestring);
@@ -1027,6 +1034,7 @@ public class TestSynthesis {
     
     public static void testespressogen()
     {
+        Filepath = NetSynth.getFilepath();
         List<String> eslines = new ArrayList<String>();
         CircuitDetails circ = new CircuitDetails();
         circ.inputNames.add("inp1");
@@ -1045,14 +1053,14 @@ public class TestSynthesis {
             System.out.println(xesp);
         }
         String filestring = "";
-        if (Filepath.contains("prash")) 
-        {
-            filestring += Filepath + "src/org/cellocad/BU/resources/espresso";
-        } 
-        else 
-        {
-            filestring += Filepath + "org/cellocad/BU/resources/espresso";
-        }
+        //if (Filepath.contains("prash")) 
+        //{
+        //    filestring += Filepath + "src/org/cellocad/BU/resources/espresso";
+        //} 
+        //else 
+        //{
+            filestring += Filepath + "/resources/espresso";
+        //}
         filestring += Global.espout++;
         filestring += ".txt";
           File fespinp = new File(filestring);
