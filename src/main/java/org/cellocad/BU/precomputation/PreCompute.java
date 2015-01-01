@@ -36,21 +36,21 @@ public class PreCompute {
         // <editor-fold defaultstate="collapsed" desc="Read from Input File"> 
         
         String Filepath="";
-        Filepath = PreCompute.class.getClassLoader().getResource(".").getPath();
+        Filepath = NetSynth.getFilepath();
         
-        if(Filepath.contains("build/classes/"))
+        /*if(Filepath.contains("build/classes/"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
         else if(Filepath.contains("src"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-       
-        if(Filepath.contains("prash"))
-        {
-            Filepath += "src/org/cellocad/BU/precomputation/allnetlists.txt";
-        }
-        else
-        {
-            Filepath += "org/cellocad/BU/precomputation/allnetlists.txt";
-        }
+        */
+        //if(Filepath.contains("prash"))
+        //{
+        //    Filepath += "src/org/cellocad/BU/precomputation/allnetlists.txt";
+        //}
+        //else
+        //{
+            Filepath += "/resources/allnetlists.txt";
+        //}
         
         
         File file = new File(Filepath);
