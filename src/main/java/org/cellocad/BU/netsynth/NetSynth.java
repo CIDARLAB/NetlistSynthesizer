@@ -89,9 +89,9 @@ public class NetSynth {
     public static void initializeFilepath() {
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         
-        if(Filepath.contains("/target/classes/"))
+        if(Filepath.contains("/target/"))
         {
-            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/classes/"));
+            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
         }
         
         
@@ -104,9 +104,9 @@ public class NetSynth {
     public static String getFilepath() {
         String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         
-        if(_filepath.contains("/target/classes/"))
+        if(_filepath.contains("/target/"))
         {
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/classes/"));
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
         }
         
         return _filepath;
@@ -114,6 +114,7 @@ public class NetSynth {
     public static String getResourcesFilepath() {
         String _filepath = getFilepath();
         _filepath += "/resources/";
+        //System.out.println(_filepath);
         return _filepath;
     }
 

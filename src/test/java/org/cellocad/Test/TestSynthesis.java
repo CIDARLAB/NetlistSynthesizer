@@ -626,7 +626,7 @@ public class TestSynthesis {
         Filepath = NetSynth.getFilepath();
         path = Filepath + "/resources/Verilog.v";
         //Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
-        System.out.println("File path : " + Filepath);
+        //System.out.println("File path : " + Filepath);
         /*if(Filepath.contains("prash"))
         {
             if(Filepath.contains("build/classes/"))
