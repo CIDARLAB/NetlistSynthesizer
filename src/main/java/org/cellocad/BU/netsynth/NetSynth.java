@@ -4256,8 +4256,8 @@ public class NetSynth {
 
         outpNetlist = removeDanglingGates(inpNetlist);
 
-        //printDebugStatement("commenting out separate output gates comment");
-        outpNetlist = separateOutputGates(outpNetlist);
+        printDebugStatement("commenting out separate output gates comment");
+        //outpNetlist = separateOutputGates(outpNetlist);
 
         outpNetlist = removeDuplicateNots(outpNetlist);
         outpNetlist = removeDoubleInverters(outpNetlist);
@@ -4268,8 +4268,8 @@ public class NetSynth {
         if (outputor) {
             outpNetlist = outputORopt(outpNetlist);
         }
-        //printDebugStatement("Check Point.. Point after which it starts going wrong");
-        //printNetlist(outpNetlist);
+        printDebugStatement("Check Point.. Point after which it starts going wrong");
+        printNetlist(outpNetlist);
         if (twoNotsToNor) {
             outpNetlist = convert2NOTsToNOR(outpNetlist);
         }

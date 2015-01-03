@@ -7,6 +7,7 @@ package org.cellocad.BU.precomputation;
 import org.cellocad.BU.ParseVerilog.Convert;
 import java.util.ArrayList;
 import java.util.List;
+import org.cellocad.BU.precomputation.equationSolver.eqNode;
 
 /**
  *
@@ -420,8 +421,28 @@ public class genVerilogFile {
         return verout;
     }
     
+    public static List<String> createVerilogFromEq(List<String> eqs) 
+    {
+        List<String> veriloglines = new ArrayList<String>();
+        for(String eq:eqs)
+        {
+            eqNode node = createEqnAST(eq);
+            System.out.println();
+        }
+        return veriloglines;
+    }
     
+    public static eqNode createEqnAST(String equation)
+    {
+        eqNode root = new eqNode();
+        
+        return root;
+    }
     
+    public static String solveEq(eqNode root)
+    {
+        return "";
+    }
     public static void printverilogfile(List<String> verilogfile)
     {
         for(String verline:verilogfile)

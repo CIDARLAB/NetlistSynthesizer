@@ -45,9 +45,15 @@ public class TestMain {
             
             //NetSynthSwitches[] switches = {NetSynthSwitches.abc,NetSynthSwitches.nooutputOR,NetSynthSwitches.precompute};
             //TestSynthesis.testMain("filepath\\filefolder", NetSynthModes.cello, switches);
+            TestEqSolver eq = new TestEqSolver();
+            //eq.printASTtest();
+            
+            //eq.eqParserTest("f=(((d+(b'.c))+a));");
+            //eq.eqParserTest("f=a!'';");
+            eq.eqParserTest("f=a'+b'''.c';");
             
             //TestSynthesis.testANDConversion();
-            TestSynthesis.testVerilogrunNetSynth();
+            //TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);
             //TestSynthesis.testAllnInputVerilog(3);
