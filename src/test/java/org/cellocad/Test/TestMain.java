@@ -50,7 +50,10 @@ public class TestMain {
             
             //eq.eqParserTest("f=(((d+(b'.c))+a));");
             //eq.eqParserTest("f=a!'';");
-            eq.eqParserTest("f=a'+b'''.c';");
+            
+            //eq.eqParserTest("f=(a'+b)''';");
+            
+            eq.eqParserTest("f=(a'+b)'''+a.b+(c+d);");
             
             //TestSynthesis.testANDConversion();
             //TestSynthesis.testVerilogrunNetSynth();
