@@ -482,4 +482,31 @@ public class eqParser {
             
         }
     }
+    
+    
+    public static List<String> getAllTerms(eqNode node)
+    {
+        List<String> terms = new ArrayList<String>();
+        if(node.type.equals(eqNodeType.term))
+        {
+            List<String> term = new ArrayList<String>();
+            term.add(node.value);
+            return term;
+        }
+        else
+        {
+            for(eqNode child:node.children)
+            {
+                for(String term:getAllTerms(child))
+                {
+                    if(!terms.contains(term))
+                    {
+                        terms.add(term);
+                    }
+                            
+                }
+            }
+        }
+        return terms;
+    }
 }

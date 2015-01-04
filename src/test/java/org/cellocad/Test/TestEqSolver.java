@@ -80,6 +80,10 @@ public class TestEqSolver {
         eqParser.generateChildNodeList(root);
         System.out.println(root.printAST());
         
+        
+        System.out.println(eqParser.getAllTerms(root));
+        
+        
     }
     
 }
