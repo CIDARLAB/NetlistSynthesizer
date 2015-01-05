@@ -12,12 +12,11 @@ import java.util.List;
  *
  * @author prash
  */
-public class eqParser {
-    
+public class eqTree {
     public static void generateChildNodeList(eqNode node)
     {
         
-        if(node.type.equals(eqNodeType.root))
+        if(node.type.equals(eqNode.eqNodeType.root))
         {
             //<editor-fold desc="Node is of type root" defaultstate="collapsed">
             if (node.value.contains("'") || node.value.contains("!")) {
@@ -26,8 +25,8 @@ public class eqParser {
             }
             String eqn = node.value;
             String hs[] = eqn.split("=");
-            eqNode lhs = new eqNode(node,eqNodeType.output,hs[0].trim());
-            eqNode eqSign = new eqNode(node,eqNodeType.equals,"=");
+            eqNode lhs = new eqNode(node,eqNode.eqNodeType.output,hs[0].trim());
+            eqNode eqSign = new eqNode(node,eqNode.eqNodeType.equals,"=");
             hs[1] = hs[1].trim();
             hs[1] = hs[1].substring(0,hs[1].indexOf(";"));
             hs[1] = hs[1].trim();
@@ -57,12 +56,10 @@ public class eqParser {
                 else 
                     bracketCount++;
             }
-            eqNode rhs = new eqNode(node,eqNodeType.equation,hs[1].trim());
-            eqNode eol = new eqNode(node,eqNodeType.eol,";");
+            eqNode rhs = new eqNode(node,eqNode.eqNodeType.equation,hs[1].trim());
+            eqNode eol = new eqNode(node,eqNode.eqNodeType.eol,";");
             
-            lhs.sibling = eqSign;
-            eqSign.sibling = rhs;
-            rhs.sibling = eol;
+           
             
             node.children.add(lhs);
             node.children.add(eqSign);
@@ -72,7 +69,7 @@ public class eqParser {
             generateChildNodeList(rhs);
             //</editor-fold>
         }
-        else if(node.type.equals(eqNodeType.equation))
+        else if(node.type.equals(eqNode.eqNodeType.equation))
         {
             String eqn = node.value;
             eqn = eqn.trim();
@@ -164,9 +161,8 @@ public class eqParser {
                                 bracketCount++;
                             }
                         }
-                        eqNode eqnNode = new eqNode(node, eqNodeType.equation, notline);
-                        eqNode notNode = new eqNode(node, eqNodeType.not, "'");
-                        eqnNode.sibling = notNode;
+                        eqNode eqnNode = new eqNode(node, eqNode.eqNodeType.equation, notline);
+                        eqNode notNode = new eqNode(node, eqNode.eqNodeType.not, "'");
                         node.children.add(eqnNode);
                         node.children.add(notNode);
                         generateChildNodeList(eqnNode);
@@ -279,17 +275,17 @@ public class eqParser {
                         {
                             if(val.equals("+"))
                             {
-                                eqNode orNode = new eqNode(node,eqNodeType.or,"+");
+                                eqNode orNode = new eqNode(node,eqNode.eqNodeType.or,"+");
                                 siblingNodes.add(orNode);
                             }
                             else if(val.equals("."))
                             {
-                                eqNode andNode = new eqNode(node,eqNodeType.and,".");
+                                eqNode andNode = new eqNode(node,eqNode.eqNodeType.and,".");
                                 siblingNodes.add(andNode);
                             }
                             else
                             {
-                                eqNode termNode = new eqNode(node,eqNodeType.term,val);
+                                eqNode termNode = new eqNode(node,eqNode.eqNodeType.term,val);
                                 siblingNodes.add(termNode);
                             }
                         }
@@ -321,25 +317,26 @@ public class eqParser {
                                     }
                                 }
                                 
-                                eqNode eqnNode = new eqNode(node,eqNodeType.equation,val);
+                                eqNode eqnNode = new eqNode(node,eqNode.eqNodeType.equation,val);
                                 generateChildNodeList(eqnNode);
                                 siblingNodes.add(eqnNode);
                                 
                             }
                             else 
                             {
-                                eqNode termNode = new eqNode(node,eqNodeType.term,val);
+                                eqNode termNode = new eqNode(node,eqNode.eqNodeType.term,val);
                                 siblingNodes.add(termNode);
                             }
                         }
                         node.children.addAll(siblingNodes);
-                        if(siblingNodes.size() >1)
+                        
+                        /*if(siblingNodes.size() >1)
                         {
                             for (int i = 0; i < siblingNodes.size() - 1; i++) 
                             {
                                 siblingNodes.get(i).sibling = siblingNodes.get(i+1);
                             }
-                        }
+                        }*/
                         
                     }
                     
@@ -361,12 +358,12 @@ public class eqParser {
                         //Case 2.1.1: Possibly single or multiple NOT terms
                         eqn = eqn.substring(0, eqn.lastIndexOf("'"));
                         eqn = eqn.trim();
-                        eqNode not = new eqNode(node, eqNodeType.not, "'");
+                        eqNode not = new eqNode(node, eqNode.eqNodeType.not, "'");
                         if (eqn.contains("'")) 
                         {
                             //Case 2.1.1.1: Multiple Not terms
-                            eqNode childeqn = new eqNode(node, eqNodeType.equation, eqn);
-                            childeqn.sibling = not;
+                            eqNode childeqn = new eqNode(node, eqNode.eqNodeType.equation, eqn);
+                            //childeqn.sibling = not;
                             node.children.add(childeqn);
                             node.children.add(not);
                             generateChildNodeList(childeqn);
@@ -374,8 +371,8 @@ public class eqParser {
                         else 
                         {
                             //Case 2.1.1.2: Single Not term
-                            eqNode childeqn = new eqNode(node, eqNodeType.term, eqn);
-                            childeqn.sibling = not;
+                            eqNode childeqn = new eqNode(node, eqNode.eqNodeType.term, eqn);
+                            //childeqn.sibling = not;
                             node.children.add(childeqn);
                             node.children.add(not);
                         }
@@ -383,7 +380,7 @@ public class eqParser {
                     else
                     {
                         //Case 2.1.2: Eq is a term.
-                        eqNode childeqn = new eqNode(node, eqNodeType.term, eqn);
+                        eqNode childeqn = new eqNode(node, eqNode.eqNodeType.term, eqn);
                         node.children.add(childeqn);
                     }
                 }
@@ -404,15 +401,15 @@ public class eqParser {
                             eqNode prodNode;
                             if(prod.contains("'")||prod.contains("."))
                             {
-                                prodNode = new eqNode(node,eqNodeType.equation,prod);
+                                prodNode = new eqNode(node,eqNode.eqNodeType.equation,prod);
                                 generateChildNodeList(prodNode);
                             }
                             else
                             {
-                                prodNode = new eqNode(node,eqNodeType.term,prod);
+                                prodNode = new eqNode(node,eqNode.eqNodeType.term,prod);
                             }
                             prods.add(prodNode);
-                            eqNode orNode = new eqNode(node,eqNodeType.or,"+");
+                            eqNode orNode = new eqNode(node,eqNode.eqNodeType.or,"+");
                             prods.add(orNode);
                         }
                         // Last product term
@@ -420,12 +417,12 @@ public class eqParser {
                         if(eqn.contains("'")||eqn.contains("."))
                         {
                             //System.out.println(eqn);
-                            prodNode = new eqNode(node,eqNodeType.equation,eqn);
+                            prodNode = new eqNode(node,eqNode.eqNodeType.equation,eqn);
                             generateChildNodeList(prodNode);
                         }
                         else
                         {
-                            prodNode = new eqNode(node,eqNodeType.term,eqn);
+                            prodNode = new eqNode(node,eqNode.eqNodeType.term,eqn);
                         }
                         prods.add(prodNode);
                         for(eqNode xnode:prods)
@@ -447,15 +444,15 @@ public class eqParser {
                             eqNode termNode;
                             if(term.contains("'"))
                             {
-                                termNode = new eqNode(node,eqNodeType.equation,term);
+                                termNode = new eqNode(node,eqNode.eqNodeType.equation,term);
                                 generateChildNodeList(termNode);
                             }
                             else
                             {
-                                termNode = new eqNode(node,eqNodeType.term,term);
+                                termNode = new eqNode(node,eqNode.eqNodeType.term,term);
                             }
                             terms.add(termNode);
-                            eqNode andNode = new eqNode(node,eqNodeType.and,".");
+                            eqNode andNode = new eqNode(node,eqNode.eqNodeType.and,".");
                             terms.add(andNode);
                         }
                         //Last product term
@@ -463,12 +460,12 @@ public class eqParser {
                         if(eqn.contains("'"))
                         {
                             //System.out.println(eqn);
-                            termNode = new eqNode(node,eqNodeType.equation,eqn);
+                            termNode = new eqNode(node,eqNode.eqNodeType.equation,eqn);
                             generateChildNodeList(termNode);
                         }
                         else
                         {
-                            termNode = new eqNode(node,eqNodeType.term,eqn);
+                            termNode = new eqNode(node,eqNode.eqNodeType.term,eqn);
                         }
                         terms.add(termNode);
                         for(eqNode xnode:terms)
@@ -483,11 +480,31 @@ public class eqParser {
         }
     }
     
+    public static void assignSiblingNodes(eqNode node)
+    {
+        //Assign Right nodes
+        for(int i=0;i<node.children.size()-1;i++)
+        {
+            //System.out.println("Right sibling of " + node.children.get(i).value + " is :" +node.children.get(i+1).value);
+            node.children.get(i).rightSibling = node.children.get(i+1);
+        }
+        //Assign Left nodes
+        for(int i=node.children.size()-1;i>=1;i--)
+        {
+            node.children.get(i).leftSibling = node.children.get(i-1);
+        }
+        //Assign sibling nodes for all Child Nodes
+        for(eqNode child:node.children)
+        {
+            assignSiblingNodes(child);
+        }
+    }
+    
     
     public static List<String> getAllTerms(eqNode node)
     {
         List<String> terms = new ArrayList<String>();
-        if(node.type.equals(eqNodeType.term))
+        if(node.type.equals(eqNode.eqNodeType.term))
         {
             List<String> term = new ArrayList<String>();
             term.add(node.value);
@@ -509,4 +526,5 @@ public class eqParser {
         }
         return terms;
     }
+    
 }

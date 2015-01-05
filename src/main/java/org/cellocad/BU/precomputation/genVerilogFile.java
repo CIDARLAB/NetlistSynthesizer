@@ -439,10 +439,7 @@ public class genVerilogFile {
         return root;
     }
     
-    public static String solveEq(eqNode root)
-    {
-        return "";
-    }
+    
     public static void printverilogfile(List<String> verilogfile)
     {
         for(String verline:verilogfile)

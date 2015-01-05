@@ -4,16 +4,6 @@
  */
 package org.cellocad.Test;
 
-import org.cellocad.BU.ParseVerilog.parseVerilogFile;
-import org.cellocad.BU.WebSockets.ClothoSocket;
-import org.cellocad.BU.netsynth.DGateType;
-import org.cellocad.BU.netsynth.NetSynth;
-import org.cellocad.BU.netsynth.NetSynthModes;
-import org.cellocad.BU.netsynth.NetSynthSwitches;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 
 /**
  *
@@ -49,7 +39,7 @@ public class TestMain {
             //eq.printASTtest();
             
             //eq.eqParserTest("f=(((d+(b'.c))+a));");
-            //eq.eqParserTest("f=a!'';");
+            //eq.eqParserTest("f=a!+b;");
             
             //eq.eqParserTest("f=(a'+b)''';");
             

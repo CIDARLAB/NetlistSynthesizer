@@ -6,8 +6,9 @@
 package org.cellocad.Test;
 
 import org.cellocad.BU.precomputation.equationSolver.eqNode;
-import org.cellocad.BU.precomputation.equationSolver.eqNodeType;
-import org.cellocad.BU.precomputation.equationSolver.eqParser;
+import org.cellocad.BU.precomputation.equationSolver.eqNode.eqNodeType;
+import org.cellocad.BU.precomputation.equationSolver.eqSolver;
+import org.cellocad.BU.precomputation.equationSolver.eqTree;
 
 /**
  *
@@ -41,9 +42,6 @@ public class TestEqSolver {
         ch3.value = "a'";
         ch4.value = ";";
         
-        ch1.sibling = ch2;
-        ch2.sibling = ch3;
-        ch3.sibling = ch4;
         
         root.children.add(ch1);
         root.children.add(ch2);
@@ -64,7 +62,6 @@ public class TestEqSolver {
         l1.value = "a";
         l2.value = "'";
         
-        l1.sibling = l2;
         
         ch3.children.add(l1);
         ch3.children.add(l2);
@@ -77,13 +74,12 @@ public class TestEqSolver {
     public void eqParserTest(String eqn)
     {
         eqNode root = new eqNode(eqNodeType.root,eqn,0);
-        eqParser.generateChildNodeList(root);
+        eqTree.generateChildNodeList(root);
+        eqTree.assignSiblingNodes(root);
         System.out.println(root.printAST());
-        
-        
-        System.out.println(eqParser.getAllTerms(root));
-        
-        
-    }
+        System.out.println(eqTree.getAllTerms(root));
+        String val = eqSolver.solveEquation(root);
+        System.out.println(val);
+     }
     
 }

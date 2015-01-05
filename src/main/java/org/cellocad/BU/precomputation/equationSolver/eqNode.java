@@ -17,7 +17,34 @@ public class eqNode {
     public int stage;
     public eqNode parent;
     public List<eqNode> children;
-    public eqNode sibling;
+    public eqNode leftSibling;
+    public eqNode rightSibling;
+    
+    public enum eqNodeType {
+        eol,
+        output,
+        equals,
+        or,
+        and,
+        not,
+        bracket,
+        equation,
+        term,
+        root
+    }
+    
+    public enum eqNodeColor{
+        white,
+        gray,
+        black
+    }
+    public enum eqNodeBooleanVal{
+        _1,
+        _0,
+        _x
+    }
+    public eqNodeColor color;
+    public eqNodeBooleanVal boolVal;
     public eqNodeType type;
     public String value; 
     
@@ -76,4 +103,6 @@ public class eqNode {
         }
         return val;
     }
+    
+    
 }
