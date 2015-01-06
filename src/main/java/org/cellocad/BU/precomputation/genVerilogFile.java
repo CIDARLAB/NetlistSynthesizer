@@ -6,8 +6,12 @@ package org.cellocad.BU.precomputation;
 
 import org.cellocad.BU.ParseVerilog.Convert;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.cellocad.BU.precomputation.equationSolver.eqNode;
+import org.cellocad.BU.precomputation.equationSolver.eqSolver;
+import org.cellocad.BU.precomputation.equationSolver.eqTree;
 
 /**
  *
@@ -421,22 +425,98 @@ public class genVerilogFile {
         return verout;
     }
     
+    
     public static List<String> createVerilogFromEq(List<String> eqs) 
     {
-        List<String> veriloglines = new ArrayList<String>();
+        List<String> veriloglines = new ArrayList<>();
+        List<String> outputs = new ArrayList<>();
+        List<List<String>> inputSets = new ArrayList<>();
+        List<String> truthTables = new ArrayList<>();
+        List<String> allInputs = new ArrayList<>();
+        
         for(String eq:eqs)
         {
-            eqNode node = createEqnAST(eq);
-            System.out.println();
+            eqNode node = eqTree.createEqTree(eq);
+            outputs.add(node.children.get(0).value);
+            inputSets.add(eqTree.getAllTerms(node));
+            for(String xstring:eqTree.getAllTerms(node))
+            {
+                if(!allInputs.contains(xstring))
+                {
+                    allInputs.add(xstring);
+                }
+            }
+            truthTables.add(eqSolver.solveEquation(node));
+            //System.out.println(eqSolver.solveEquation(node));
         }
-        return veriloglines;
+        
+        return getVerilogFromEq(allInputs, inputSets, outputs,truthTables);
     }
     
-    public static eqNode createEqnAST(String equation)
+    
+    public static List<String> getVerilogFromEq(List<String> inputs, List<List<String>> inputSet, List<String> outputs, List<String> tt)
     {
-        eqNode root = new eqNode();
+        List<String> veriloglines = new ArrayList<>();
+        String moduleLine = "module verilogEqn(output ";
+        String inputsgrp = "";
+        String outputsgrp = "";
         
-        return root;
+        for(int i=0;i<(outputs.size()-1);i++)
+             outputsgrp += ((outputs.get(i)) + ",") ;
+        outputsgrp += outputs.get(outputs.size()-1);
+        
+        moduleLine += (outputsgrp +", input ");
+        
+        for(int i=0;i<(inputs.size()-1);i++)
+            inputsgrp += ((inputs.get(i)) + ",") ;
+        inputsgrp += inputs.get(inputs.size()-1);
+        
+        moduleLine += (inputsgrp+ ");");
+        
+        veriloglines.add(moduleLine); //Module Line
+        veriloglines.add("  always@("+inputsgrp+")"); // Always line
+        veriloglines.add("    begin"); // Begin line
+        veriloglines.add("      case({"+inputsgrp+"})");
+        
+        //Insert Logic to print TruthTable here!
+        int pow = (int)Math.pow(2, inputs.size());
+        for(int i=0;i<pow;i++)
+        {
+            String rowLine = "        ";
+            rowLine += i+":{"+outputsgrp+"}="+outputs.size()+"'b";
+            String rowbool = Convert.dectoBin(i, inputs.size());
+            Map<String,Character> inpMap = new HashMap<>();
+            for(int j=0;j<rowbool.length();j++)
+            {
+                inpMap.put(inputs.get(j), rowbool.charAt(j));
+            }
+            for(int j=0;j<outputs.size();j++)
+            {
+                String outTT = tt.get(j);
+                String specificRow = "";
+                for(int k=0;k<inputSet.get(j).size();k++)
+                {
+                    specificRow += inpMap.get(inputSet.get(j).get(k));
+                }
+                int indxVal = Convert.bintoDec(specificRow);
+                rowLine += outTT.charAt(indxVal);
+                
+            }
+            rowLine += ";";
+            veriloglines.add(rowLine);
+        }
+        String rowLine = "        ";
+        rowLine += "default"+":{"+outputsgrp+"}="+outputs.size()+"'b";
+        for(String x:outputs)
+            rowLine += "0";
+        rowLine += ";";
+        veriloglines.add(rowLine);
+        veriloglines.add("      endcase");
+        veriloglines.add("    end");
+        veriloglines.add("endmodule");
+        
+        
+        return veriloglines;
     }
     
     

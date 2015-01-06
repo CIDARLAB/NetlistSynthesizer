@@ -500,6 +500,13 @@ public class eqTree {
         }
     }
     
+    public static eqNode createEqTree(String equation)
+    {
+        eqNode root = new eqNode(eqNode.eqNodeType.root,equation,0);
+        generateChildNodeList(root);
+        assignSiblingNodes(root);
+        return root;
+    }
     
     public static List<String> getAllTerms(eqNode node)
     {

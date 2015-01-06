@@ -64,6 +64,8 @@ public class eqSolver {
     
     public static eqNodeBooleanVal getRowValue(eqNode node,Map<String,eqNodeBooleanVal> map)
     {
+        //System.out.println();
+        //System.out.println(map);
         eqNode curr = node;
         eqNodeBooleanVal rowVal = null;
         while(curr != null)
@@ -74,6 +76,7 @@ public class eqSolver {
                if(curr.type == eqNodeType.root)
                {
                    rowVal = curr.boolVal;
+                   //System.out.println(rowVal);
                }
                curr = curr.parent;
             }
@@ -98,7 +101,7 @@ public class eqSolver {
                 {
                     if(curr.rightSibling == null)
                     {
-                        System.out.println("Stage" + curr.stage +" : "+ curr.value + curr.type);
+                        //System.out.println("Stage" + curr.stage +" : "+ curr.value + curr.type);
                         curr.parent.boolVal = curr.boolVal;
                         curr = curr.parent;
                     }
@@ -173,7 +176,10 @@ public class eqSolver {
                 else if(curr.type == eqNodeType.and || curr.type == eqNodeType.or)
                 {
                     curr.color = eqNodeColor.black;
-                    curr.boolVal = curr.leftSibling.boolVal;
+                    if(curr.leftSibling.type== eqNodeType.term)
+                        curr.boolVal = map.get(curr.leftSibling.value);
+                    else
+                        curr.boolVal = curr.leftSibling.boolVal;
                     curr = curr.rightSibling;
                 }
                 else 
