@@ -44,9 +44,10 @@ public class TestMain {
             //eq.eqParserTest("f=(a'+b)''';");
             //eq.eqParserTest("f=(e.a'+b)'''+a+b+(c+d);");
             
-            TestVerilogGenerator.testVerilogFromEq();
+            //TestVerilogGenerator.testVerilogFromEq();
+            
             //TestSynthesis.testANDConversion();
-            //TestSynthesis.testVerilogrunNetSynth();
+            TestSynthesis.testVerilogrunNetSynth();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);
             //TestSynthesis.testAllnInputVerilog(3);

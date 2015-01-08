@@ -590,13 +590,14 @@ public class NetSynth {
                 //System.out.println(alllines);
 
                 try {
-                    List<DGate> abcNetlist = runABCverilog_fullFilePath(vfilepath);
-
+                    String modifiedVfilepath = genVerilogFile.modifyAssignVerilog(vfilepath);
+                    List<DGate> abcNetlist = runABCverilog_fullFilePath(modifiedVfilepath);
+                    
                     List<String> ttValues = new ArrayList<String>();
                     List<String> invttValues = new ArrayList<String>();
 
-                    inputnames = parseVerilogFile.getInputNamesABCVerilog(alllines);
-                    outputnames = parseVerilogFile.getOutputNamesABCVerilog(alllines);
+                    inputnames = parseVerilogFile.getInputNames(alllines);
+                    outputnames = parseVerilogFile.getOutputNames(alllines);
 
                     ttValues = BooleanSimulator.getTruthTable(abcNetlist, inputnames);  // Compute Truth Table of Each Output
                     invttValues = BooleanSimulator.invertTruthTable(ttValues); // Compute Inverse Truth Table of Each Output
@@ -4257,7 +4258,7 @@ public class NetSynth {
         outpNetlist = removeDanglingGates(inpNetlist);
 
         printDebugStatement("commenting out separate output gates comment");
-        //outpNetlist = separateOutputGates(outpNetlist);
+        outpNetlist = separateOutputGates(outpNetlist);
 
         outpNetlist = removeDuplicateNots(outpNetlist);
         outpNetlist = removeDoubleInverters(outpNetlist);
