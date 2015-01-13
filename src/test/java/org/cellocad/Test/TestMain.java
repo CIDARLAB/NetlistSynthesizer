@@ -48,6 +48,7 @@ public class TestMain {
             
             //TestSynthesis.testANDConversion();
             TestSynthesis.testVerilogrunNetSynth();
+            //TestSynthesis.testMultDaGW();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);
             //TestSynthesis.testAllnInputVerilog(3);

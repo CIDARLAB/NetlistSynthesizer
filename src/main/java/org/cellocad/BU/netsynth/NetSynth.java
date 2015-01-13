@@ -245,7 +245,7 @@ public class NetSynth {
         //finaldag = CreateMultDAGW(inputnames,outputnames,netlist);
         finaldag = CreateMultDAGW(netlist);
 
-        //if(hasCaseStatements)
+        //if(hasCaseStatements)getN
         //{
         finaldag = DAGW.addDanglingInputs(finaldag, inputnames);
         //}
@@ -727,10 +727,17 @@ public class NetSynth {
         if (and2.equals(NetSynthSwitches.AND2OR)) {
             netlist = convertFindORbeforeAND(netlist);
         }
-
+        
+        //Insert Final remove Dupicate logic function here!
+        netlist = assignWireLogic(inputnames,netlist);
+        netlist = removeDuplicateLogicGate(netlist);
+        
         netlist = rewireNetlist(netlist);
+        
         printNetlist(netlist);
         BooleanSimulator.printTruthTable(netlist, inputnames);
+        
+        
         return netlist;
 
     }
@@ -4024,7 +4031,105 @@ public class NetSynth {
          */
         return outputornetlist;
     }
-
+    
+    
+    
+    
+    public static List<DGate> removeDuplicateLogicGate(List<DGate> inpnetlist)
+    {
+        List<DGate> outnetlist = new ArrayList<>();
+        int outCount = 0;
+        int firstInstance = 0;
+        String outName = "";
+        //back here
+        for(int i=0;i<inpnetlist.size();i++)
+        {
+            outCount =0;
+            String logic1 = inpnetlist.get(i).output.logicValue;
+            /*if(inpnetlist.get(i).output.wtype.equals(DWireType.output))
+            {
+                outCount++;
+                outName = inpnetlist.get(i).output.name;
+            }*/
+            for(int j=i+1;j<inpnetlist.size();j++)
+            {
+                String logic2 = inpnetlist.get(j).output.logicValue;
+                if(logic1.equals(logic2))
+                {
+                    /*if(inpnetlist.get(j).output.wtype.equals(DWireType.output) && (outCount == 0))
+                    {
+                        outCount++;
+                        outName = inpnetlist.get(j).output.name;
+                    }*/
+                    if(inpnetlist.get(i).output.wtype.equals(DWireType.output))
+                    {
+                        for (DGate xgate : inpnetlist) {
+                            for (int k = 0; k < xgate.input.size(); k++) {
+                                if (xgate.input.get(k).name.equals(inpnetlist.get(j).output.name) && xgate.input.get(k).wtype.equals(DWireType.connector)) {
+                                    xgate.input.get(k).name = inpnetlist.get(i).output.name;
+                                    xgate.input.get(k).wtype = inpnetlist.get(i).output.wtype;
+                                }
+                            }
+                        }
+                    }
+                    else if(inpnetlist.get(i).output.wtype.equals(DWireType.connector))
+                    {
+                        inpnetlist.get(i).output.name = inpnetlist.get(j).output.name;
+                        inpnetlist.get(i).output.wtype = inpnetlist.get(j).output.wtype;
+                        for (DGate xgate : inpnetlist) {
+                            for (int k = 0; k < xgate.input.size(); k++) {
+                                if (xgate.input.get(k).name.equals(inpnetlist.get(j).output.name) && xgate.input.get(k).wtype.equals(DWireType.connector)) {
+                                    xgate.input.get(k).name = inpnetlist.get(i).output.name;
+                                    xgate.input.get(k).wtype = inpnetlist.get(i).output.wtype;
+                                }
+                            }
+                        }
+                    }
+                    
+                    //Case 1: i=out1, j=out2
+                    // Replace all Inputs with out1. Do not place if input or output.
+                    //Case 2: i=out1, j=w2
+                    // Replace all Inputs with out1. j will be removed in the remove dangling gates step. 
+                    //Case 3: i=w1,   j=out2
+                    // Replace i.out with out2. Replace all Inputs with out2.
+                    //Case 4: i=w1,   j=w2
+                    // Replace i.w1 with w2. Replace all inputs with w2. 
+                }
+            }
+        }
+        outnetlist = removeDuplicateGates(inpnetlist);
+        outnetlist = removeDanglingGates(outnetlist);
+        
+        return outnetlist;
+        
+    }
+    
+    
+    public static List<DGate> removeDuplicateGates(List<DGate> inpnetlist)
+    {
+        List<DGate> outnetlist = new ArrayList<>();
+        List<Integer> removeIndex = new ArrayList<>();
+        for(int i=0;i<inpnetlist.size();i++)
+        {
+            for(int j=i+1;j<inpnetlist.size();j++)
+            {
+                if(inpnetlist.get(i).output.name.equals(inpnetlist.get(j).output.name))
+                {
+                    if(!removeIndex.contains(j))
+                        removeIndex.add(j);
+                }
+            }
+        }
+        for(int i=0;i<inpnetlist.size();i++)
+        {
+            if(!removeIndex.contains(i))
+            {
+                outnetlist.add(inpnetlist.get(i));
+            }
+        }
+        return outnetlist;
+    }
+    
     /**
      * Function
      *************************************************************
@@ -4257,7 +4362,7 @@ public class NetSynth {
 
         outpNetlist = removeDanglingGates(inpNetlist);
 
-        printDebugStatement("commenting out separate output gates comment");
+        //printDebugStatement("commenting out separate output gates comment");
         outpNetlist = separateOutputGates(outpNetlist);
 
         outpNetlist = removeDuplicateNots(outpNetlist);
@@ -4267,10 +4372,10 @@ public class NetSynth {
         outpNetlist = removeDanglingGates(outpNetlist);
 
         if (outputor) {
-            outpNetlist = outputORopt(outpNetlist);
+            outpNetlist = outputORopt(outpNetlist); // Need to change this for multiple Outputs.
         }
-        printDebugStatement("Check Point.. Point after which it starts going wrong");
-        printNetlist(outpNetlist);
+        //printDebugStatement("Check Point.. Point after which it starts going wrong");
+        //printNetlist(outpNetlist);
         if (twoNotsToNor) {
             outpNetlist = convert2NOTsToNOR(outpNetlist);
         }
@@ -5046,9 +5151,7 @@ public class NetSynth {
         DAGW dag = new DAGW();
 
         for (String inp : inputnames) {
-            Gate inpGate = new Gate();
-            inpGate.Name = inp;
-            inpGate.Type = GateType.INPUT.toString();
+            
 
         }
 

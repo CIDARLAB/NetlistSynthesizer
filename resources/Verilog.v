@@ -1,1 +1,11 @@
-module EspToVerilog (input a, b, c, d, output o1 ); wire w0, w1, w2; assign w0 = c | d; assign w1 = ~a | ~b | d; assign w2 = ~b | c; assign o1 =  w0 & w1 & w2; endmodule
+module A(output out1, out2, out3, out4,  input in1, in2);
+  always@(in1,in2)
+    begin
+      case({in1,in2})
+        2'b00: {out1,out2,out3,out4} = 4'b1000;
+        2'b01: {out1,out2,out3,out4} = 4'b0100;
+        2'b10: {out1,out2,out3,out4} = 4'b0010;
+        2'b11: {out1,out2,out3,out4} = 4'b0001;
+      endcase
+    end
+endmodule

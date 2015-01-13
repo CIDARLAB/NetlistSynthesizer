@@ -52,6 +52,56 @@ public class TestSynthesis {
      * 
      */
     
+    public static void testMultDaGW()
+    {
+        List<DGate> netlist = new ArrayList<>();
+        
+        
+        DWire inp1 = new DWire("in1",DWireType.input);
+        DWire inp2 = new DWire("in2",DWireType.input);
+        DWire inp3 = new DWire("in3",DWireType.input);
+        
+        DWire out1 = new DWire("out1",DWireType.output);
+        DWire out2 = new DWire("out2",DWireType.output);
+        DWire out3 = new DWire("out3",DWireType.output);
+        DWire out4 = new DWire("out4",DWireType.output);
+        
+        
+        DGate nor1 = new DGate();
+        DGate nor2 = new DGate();
+        DGate not1 = new DGate();
+        DGate not2 = new DGate();
+        
+        nor1.input.add(inp1);
+        nor1.input.add(inp2);
+        nor1.output = out1;
+        nor1.gtype = DGateType.NOR;
+        
+        not1.input.add(out1);
+        not1.output = out2;
+        not1.gtype = DGateType.NOT;
+        
+        nor2.input.add(out1);
+        nor2.input.add(inp3);
+        nor2.output = out4;
+        nor2.gtype = DGateType.NOR;
+        
+        not2.input.add(out1);
+        not2.output = out3;
+        not2.gtype = DGateType.NOT;
+        
+        netlist.add(nor1);
+        netlist.add(not1);
+        netlist.add(not2);
+        netlist.add(nor2);
+        
+        
+        DAGW resdag = new DAGW();
+        resdag = NetSynth.CreateMultDAGW(netlist);
+        System.out.println(resdag.printGraph());
+        
+    }
+    
     public static void testMain(String filename, NetSynthModes mode, NetSynthSwitches switches[])
     {
         System.out.println("File name "+filename);
