@@ -229,11 +229,11 @@ public class NetSynth {
         inputnames = parseVerilogFile.getInputNames(alllines);
         outputnames = parseVerilogFile.getOutputNames(alllines);
 
-        if (!isStructural && !hasCaseStatements) {
+        /*if (!isStructural && !hasCaseStatements) {
             inputnames = parseVerilogFile.getInputNamesABCVerilog(alllines);
             outputnames = parseVerilogFile.getOutputNamesABCVerilog(alllines);
 
-        }
+        }*/
 
         netlist = getNetlist(vfilepath, synthesis, invcheck, outputor, outputOR3, twonotstonor, nor3, and2);
 
@@ -244,7 +244,7 @@ public class NetSynth {
         //BooleanSimulator.printTruthTable(netlist, inputnames);
         //finaldag = CreateMultDAGW(inputnames,outputnames,netlist);
         finaldag = CreateMultDAGW(netlist);
-
+        System.out.println(inputnames);
         //if(hasCaseStatements)getN
         //{
         finaldag = DAGW.addDanglingInputs(finaldag, inputnames);
