@@ -556,7 +556,8 @@ public class genVerilogFile {
         modifiedModule+= (inputSeq + "," + outputSeq);
         modifiedModule+= "); input " + inputSeq + "; output " + outputSeq + "; " ;
         
-        alllines = alllines.replace(moduleSubstring, modifiedModule);
+        alllines = alllines.replace(moduleSubstring, modifiedModule) + "\n";
+
         System.out.println(alllines);   
         
         newFilePath = NetSynth.getResourcesFilepath() + "modifiedForABC.v";
