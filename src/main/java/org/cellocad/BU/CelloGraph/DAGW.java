@@ -21,6 +21,7 @@ public class DAGW {
     public ArrayList<Wire> Wires;
     public ArrayList<Gate> Gates;
     public List<String> truthtable;
+    private Object BooleanLogic;
     public DAGW()
     {
         Wires = new ArrayList<Wire>();
@@ -110,7 +111,10 @@ public class DAGW {
                 child_indx += ")";
 
             s += String.format("%-12s", child_indx);
-
+            s += String.format("%-12s", gi.Type);
+            //s += String.format("%-18s", BooleanLogic.logicString(gi.get_logics()));
+            s += String.format("%-18s", gi.Name);
+            s += String.format("%-3d", gi.Index);
             //if(gi.getScores().get_score() != -1.0000) {
             //    s += String.format("%-5.4f", gi.getScores().get_score()); //onoff_ratio or noise_margin
             //}

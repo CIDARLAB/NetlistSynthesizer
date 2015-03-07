@@ -103,7 +103,6 @@ public class NetSynth {
     }
     public static String getFilepath() {
         String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        
         if(_filepath.contains("/target/"))
         {
             _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
@@ -113,7 +112,7 @@ public class NetSynth {
     }
     public static String getResourcesFilepath() {
         String _filepath = getFilepath();
-        _filepath += "/resources/";
+        _filepath += "/resources/netsynthResources/";
         //System.out.println(_filepath);
         return _filepath;
     }
@@ -874,9 +873,9 @@ public class NetSynth {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
         }
         if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/";
+            filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/";
         } else {
-            filestring += Filepath + "org/cellocad/BU/resources/";
+            filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/";
         }*/
         
         filestring = getResourcesFilepath();
@@ -997,9 +996,9 @@ public class NetSynth {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
         }
         if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/";
+            filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/";
         } else {
-            filestring += Filepath + "org/cellocad/BU/resources/";
+            filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/";
         }*/
         filestring = getResourcesFilepath();
         
@@ -1145,9 +1144,9 @@ public class NetSynth {
         }*/
         
         /*if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/";
+            filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/";
         } else {
-            filestring += Filepath + "org/cellocad/BU/resources/";
+            filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/";
         }*/
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1276,9 +1275,9 @@ public class NetSynth {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
         }
         if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/";
+            filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/";
         } else {
-            filestring += Filepath + "org/cellocad/BU/resources/";
+            filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/";
         }*/
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1533,9 +1532,9 @@ public class NetSynth {
         String filestring = "";
         String filestringblif = "";
         if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/";
+            filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/";
         } else {
-            filestring += Filepath + "org/cellocad/BU/resources/";
+            filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/";
         }
         filestringblif = filestring + "blifinp";
         filestringblif += ".blif";
@@ -1602,9 +1601,9 @@ public class NetSynth {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
         }
         if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/";
+            filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/";
         } else {
-            filestring += Filepath + "org/cellocad/BU/resources/";
+            filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/";
         }
         filestring += filename + ".v";
         File fespinp = new File(filestring);
@@ -1645,9 +1644,9 @@ public class NetSynth {
         filelines = genVerilogFile.createSingleOutpVerilogFile(inputs, hex);
         String filestring = "";
         if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/";
+            filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/";
         } else {
-            filestring += Filepath + "org/cellocad/BU/resources/";
+            filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/";
         }
         filestring += filename + ".v";
         File fespinp = new File(filestring);
@@ -1870,12 +1869,12 @@ public class NetSynth {
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (x.contains("Mac")) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/abc.mac -c \"read " + Filepath + "/resources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc.mac -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
         } else if ("Linux".equals(x)) {
             //if (Filepath.contains("prash")) {
-            //    commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/abc -c \"read " + Filepath + "src/org/cellocad/BU/resources/" + filename + ".blif; strash; rewrite; refactor;  balance; write " + Filepath + "src/org/cellocad/BU/resources/abcOutput.bench; quit\"");
+            //    commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/netsynthResources/abc -c \"read " + Filepath + "src/org/cellocad/BU/resources/netsynthResources/" + filename + ".blif; strash; rewrite; refactor;  balance; write " + Filepath + "src/org/cellocad/BU/resources/netsynthResources/abcOutput.bench; quit\"");
             //} else {
-                commandBuilder = new StringBuilder(Filepath + "/resources/abc -c \"read " + Filepath + "/resources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+                commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
             //}
 
         }
@@ -1886,11 +1885,11 @@ public class NetSynth {
         String filestring = "";
         String clist = "";
         //if (Filepath.contains("prash")) {
-        //    filestring += Filepath + "src/org/cellocad/BU/resources/script";
-        //    clist = Filepath + "src/org/cellocad/BU/resources/script";
+        //    filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/script";
+        //    clist = Filepath + "src/org/cellocad/BU/resources/netsynthResources/script";
         ///} else {
-            filestring += Filepath + "/resources/script";
-            clist = Filepath + "/resources/script";
+            filestring += Filepath + "/resources/netsynthResources/script";
+            clist = Filepath + "/resources/netsynthResources/script";
         //}
         File fespinp = new File(filestring);
         //Writer output;
@@ -1941,12 +1940,12 @@ public class NetSynth {
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (x.contains("Mac")) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/abc.mac -c \"read " + Filepath + "/resources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc.mac -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
         } else if ("Linux".equals(x)) {
             //if (Filepath.contains("prash")) {
-            //    commandBuilder = new StringBuilder(Filepath + "/resources/abc -c \"read " + Filepath + "/resources/" + filename + ".v; strash; rewrite; refactor;  balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+            //    commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".v; strash; rewrite; refactor;  balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
             //} else {
-                commandBuilder = new StringBuilder(Filepath + "/resources/abc -c \"read " + Filepath + "/resources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+                commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
             //}
 
         }
@@ -1956,9 +1955,9 @@ public class NetSynth {
 
         String filestring = "";
         //if (Filepath.contains("prash")) {
-        //    filestring += Filepath + "/resources/script";
+        //    filestring += Filepath + "/resources/netsynthResources/script";
         //} else {
-            filestring += Filepath + "/resources/script";
+            filestring += Filepath + "/resources/netsynthResources/script";
         //}
         File fespinp = new File(filestring);
         //Writer output;
@@ -1972,9 +1971,9 @@ public class NetSynth {
         }
         String clist = "";
         //if (Filepath.contains("prash")) {
-        //    clist = Filepath + "/resources/script";
+        //    clist = Filepath + "/resources/netsynthResources/script";
         //} else {
-            clist = Filepath + "/resources/script";
+            clist = Filepath + "/resources/netsynthResources/script";
         //}
 
         Runtime runtime = Runtime.getRuntime();
@@ -2013,12 +2012,12 @@ public class NetSynth {
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (x.contains("Mac")) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/abc.mac -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc.mac -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
         } else if ("Linux".equals(x)) {
             //if (Filepath.contains("prash")) {
-            //    commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/abc -c \"read " + filename + "; strash; rewrite; refactor;  balance; write " + Filepath + "src/org/cellocad/BU/resources/abcOutput.bench; quit\"");
+            //    commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/netsynthResources/abc -c \"read " + filename + "; strash; rewrite; refactor;  balance; write " + Filepath + "src/org/cellocad/BU/resources/netsynthResources/abcOutput.bench; quit\"");
             //} else {
-                commandBuilder = new StringBuilder(Filepath + "/resources/abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/abcOutput.bench; quit\"");
+                commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
             //}
 
         }
@@ -2026,9 +2025,9 @@ public class NetSynth {
         String command = commandBuilder.toString();
         String filestring = "";
         //if (Filepath.contains("prash")) {
-        //    filestring += Filepath + "/resources/script";
+        //    filestring += Filepath + "/resources/netsynthResources/script";
         //} else {
-            filestring += Filepath + "/resources/script";
+            filestring += Filepath + "/resources/netsynthResources/script";
         //}
         File fespinp = new File(filestring);
         //Writer output;
@@ -2042,9 +2041,9 @@ public class NetSynth {
         }
         String clist = "";
         //if (Filepath.contains("prash")) {
-        //    clist = Filepath + "src/org/cellocad/BU/resources/script";
+        //    clist = Filepath + "src/org/cellocad/BU/resources/netsynthResources/script";
         //} else {
-            clist = Filepath + "/resources/script";
+            clist = Filepath + "/resources/netsynthResources/script";
         //}
 
         Runtime runtime = Runtime.getRuntime();
@@ -2082,9 +2081,9 @@ public class NetSynth {
         List<String> benchlines = new ArrayList<String>();
         String filestring = "";
         //if (Filepath.contains("prash")) {
-        //   filestring += Filepath + "src/org/cellocad/BU/resources/abcOutput.bench";
+        //   filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/abcOutput.bench";
         //} else {
-            filestring += Filepath + "/resources/abcOutput.bench";
+            filestring += Filepath + "/resources/netsynthResources/abcOutput.bench";
         //}
 
         File gate_file = new File(filestring);
@@ -2334,12 +2333,12 @@ public class NetSynth {
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (x.contains("Mac")) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/espresso.mac -epos " + pathFile);
+            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/espresso.mac -epos " + pathFile);
         } else if ("Linux".equals(x)) {
             //if (Filepath.contains("prash")) {
-            //    commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/espresso.linux -epos " + pathFile);
+            //    commandBuilder = new StringBuilder(Filepath + "src/org/cellocad/BU/resources/netsynthResources/espresso.linux -epos " + pathFile);
             //} else {
-                commandBuilder = new StringBuilder(Filepath + "/resources/espresso.linux -epos " + pathFile);
+                commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/espresso.linux -epos " + pathFile);
             //}
 
         }
@@ -2358,9 +2357,9 @@ public class NetSynth {
             filestring  = getResourcesFilepath();
             filestring += "write";
             /*if (Filepath.contains("prash")) {
-                filestring += Filepath + "src/org/cellocad/BU/resources/write";
+                filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/write";
             } else {
-                filestring += Filepath + "org/cellocad/BU/resources/write";
+                filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/write";
             }*/
 
             filestring += Global.espout++;

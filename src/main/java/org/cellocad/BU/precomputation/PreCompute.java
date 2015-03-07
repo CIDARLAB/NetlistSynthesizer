@@ -49,7 +49,7 @@ public class PreCompute {
         //}
         //else
         //{
-            Filepath += "/resources/allnetlists.txt";
+            Filepath += "/resources/netsynthResources/allnetlists.txt";
         //}
         
         

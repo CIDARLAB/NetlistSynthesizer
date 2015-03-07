@@ -1,1 +1,0 @@
-module newAssignVerilog(a,b,o1); input a,b; output o1;  assign o1 = ~a | ~b; endmodule

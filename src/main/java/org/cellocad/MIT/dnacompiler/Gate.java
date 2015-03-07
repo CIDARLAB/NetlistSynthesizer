@@ -40,6 +40,10 @@ public class Gate {
     public ArrayList<Double> reus;
     //public static ArrayList<InputREU> CIRCUIT_INPUT_REUS;
 
+    
+    private ArrayList<Integer> _logics     = new ArrayList<Integer>();
+    
+    
     // in case of input gates have different on_off_reus;
     public ArrayList<Double> input_gate_reus;
 
@@ -255,7 +259,9 @@ public ArrayList<Gate> getChildren(){
         return children;
     }
 
-
+public ArrayList<Integer> get_logics() {
+        return _logics;
+    }
 
 
 
