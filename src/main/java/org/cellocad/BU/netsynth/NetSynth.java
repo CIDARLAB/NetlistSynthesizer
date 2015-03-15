@@ -4960,6 +4960,7 @@ public class NetSynth {
         for (DWire x : g.input) {
             netbuilder += ",";
             netbuilder += x.name;
+        
         }
         netbuilder += ")";
         return netbuilder;
