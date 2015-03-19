@@ -47,7 +47,10 @@ public class TestMain {
             //TestVerilogGenerator.testVerilogFromEq();
             
             //TestSynthesis.testANDConversion();
-            TestSynthesis.testVerilogrunNetSynth();
+               
+            //TestSynthesis.testVerilogrunNetSynth();
+            TestSubcircuit.testTTisomorphism();
+
             //TestSynthesis.testMultDaGW();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);
