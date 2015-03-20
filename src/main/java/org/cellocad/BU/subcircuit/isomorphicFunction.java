@@ -6,7 +6,9 @@
 package org.cellocad.BU.subcircuit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.cellocad.BU.ParseVerilog.Convert;
 
 /**
@@ -16,23 +18,140 @@ import org.cellocad.BU.ParseVerilog.Convert;
 public class isomorphicFunction {
     
     
-    public static void getPermutationMatrix(List<String> inputs,List<String> jumbledInputs)
-    {
-        System.out.println("Inputs : " + inputs);
-        System.out.println("Input Size : " + inputs.size());
-        int combinations = getFactorial(inputs.size());
-        System.out.println("Possible Combinations : " + combinations);
-        
-        int[] mat = new int[inputs.size()];
-        for(int i=0;i<inputs.size();i++)
-            mat[i] = i;
-        
-        for(int i=0;i<combinations;i++)
-        {
-            
-        }
-    }
     
+    
+    public static Map<Integer,permutationMap> getPermutationMapping(int size)
+    {
+        Map<Integer,permutationMap> map = new HashMap<Integer,permutationMap>();
+        
+        if(size == 1)
+            return map;//empty?
+        
+        if(size == 2)
+        {
+            permutationMap p0 = new permutationMap();
+            permutationMap p1 = new permutationMap();
+            
+            p0.inputOrder.add(0);
+            p0.inputOrder.add(1);
+            
+            p0.permutation.add(0);
+            p0.permutation.add(1);
+            p0.permutation.add(2);
+            p0.permutation.add(3);
+            
+            p1.inputOrder.add(1);
+            p1.inputOrder.add(0);
+            
+            p1.permutation.add(0);
+            p1.permutation.add(2);
+            p1.permutation.add(1);
+            p1.permutation.add(3);
+            
+            map.put(0, p1);
+            map.put(1, p1);
+        }
+        else if(size == 3){
+            
+            permutationMap p0 = new permutationMap();
+            permutationMap p1 = new permutationMap();
+            permutationMap p2 = new permutationMap();
+            permutationMap p3 = new permutationMap();
+            permutationMap p4 = new permutationMap();
+            permutationMap p5 = new permutationMap();
+            
+            p0.inputOrder.add(0);
+            p0.inputOrder.add(1);
+            p0.inputOrder.add(2);
+            
+            p0.permutation.add(0);
+            p0.permutation.add(1);
+            p0.permutation.add(2);
+            p0.permutation.add(3);
+            p0.permutation.add(4);
+            p0.permutation.add(5);
+            p0.permutation.add(6);
+            p0.permutation.add(7);
+            
+            p1.inputOrder.add(0);
+            p1.inputOrder.add(2);
+            p1.inputOrder.add(1);
+            
+            p1.permutation.add(0);
+            p1.permutation.add(2);
+            p1.permutation.add(1);
+            p1.permutation.add(3);
+            p1.permutation.add(4);
+            p1.permutation.add(6);
+            p1.permutation.add(5);
+            p1.permutation.add(7);
+            
+            
+            p2.inputOrder.add(2);
+            p2.inputOrder.add(0);
+            p2.inputOrder.add(1);
+            
+            p2.permutation.add(0);
+            p2.permutation.add(4);
+            p2.permutation.add(1);
+            p2.permutation.add(5);
+            p2.permutation.add(2);
+            p2.permutation.add(6);
+            p2.permutation.add(3);
+            p2.permutation.add(7);
+            
+            
+            p3.inputOrder.add(2);
+            p3.inputOrder.add(1);
+            p3.inputOrder.add(0);
+            
+            p3.permutation.add(0);
+            p3.permutation.add(4);
+            p3.permutation.add(2);
+            p3.permutation.add(6);
+            p3.permutation.add(1);
+            p3.permutation.add(5);
+            p3.permutation.add(3);
+            p3.permutation.add(7);
+            
+            p4.inputOrder.add(1);
+            p4.inputOrder.add(2);
+            p4.inputOrder.add(0);
+            
+            p4.permutation.add(0);
+            p4.permutation.add(2);
+            p4.permutation.add(4);
+            p4.permutation.add(6);
+            p4.permutation.add(1);
+            p4.permutation.add(3);
+            p4.permutation.add(5);
+            p4.permutation.add(7);
+            
+            
+            p5.inputOrder.add(1);
+            p5.inputOrder.add(0);
+            p5.inputOrder.add(2);
+            
+            p5.permutation.add(0);
+            p5.permutation.add(1);
+            p5.permutation.add(4);
+            p5.permutation.add(5);
+            p5.permutation.add(2);
+            p5.permutation.add(3);
+            p5.permutation.add(6);
+            p5.permutation.add(7);
+            
+            map.put(0, p0);
+            map.put(1, p1);
+            map.put(2, p2);
+            map.put(3, p3);
+            map.put(4, p4);
+            map.put(5, p5);
+        }
+        
+        
+        return map;
+    }
     
     public static boolean checkCircuitIsomorphism(List<String> tt1, List<String> tt2)
     {
@@ -42,14 +161,28 @@ public class isomorphicFunction {
         return result;
     }
     
-    public static boolean checkTTIsomorphism(String t1, String t2, List<String> i1, List<String> i2)
+    public static String getPermutedTT(String t,List<Integer> permutation){
+        String result = "";
+        
+        for(int i=0;i<permutation.size();i++){
+            result += t.charAt(permutation.get(i));
+        }
+        return result;
+    }
+    
+    public static List<Integer> getInputPermutation(String t1, String t2){
+        List<Integer> map = new ArrayList<Integer>();
+        
+        return map;
+    }
+    
+    public static boolean checkPequivalence(String t1, String t2)
     {
         boolean result = false;
         if(t1.length() != t2.length())
             return false;
         
         int len = t1.length();
-        int inputSize = i1.size();
         if((t1.charAt(0) != t2.charAt(0)) || (t1.charAt(len-1)!= t2.charAt(len-1)))
             return false;
         if(getOnes(t1)!=getOnes(t2))

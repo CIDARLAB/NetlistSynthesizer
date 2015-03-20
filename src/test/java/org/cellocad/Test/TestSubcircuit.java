@@ -27,7 +27,7 @@ public class TestSubcircuit {
         
         
         
-        isomorphicFunction.getPermutationMatrix(inputs,inputsJumbled);
+        //isomorphicFunction.getPermutationMatrix(inputs,inputsJumbled);
     }
     
     public static void testTTisomorphism()
@@ -47,7 +47,7 @@ public class TestSubcircuit {
         i2.add("x");
         i2.add("y");
         i2.add("z");
-        isomorphicFunction.checkTTIsomorphism("00101100", "01011000", i1, i2);
+        isomorphicFunction.checkPequivalence("00101100", "01011000");
         
     }
     
