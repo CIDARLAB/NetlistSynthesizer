@@ -17,81 +17,72 @@ import org.cellocad.BU.netsynth.NetSynth;
  * @author prash
  */
 public class subCircuitEnumerator {
-    
-    public static void getSubcircuits(List<DGate> netlist)
-    {
-        for(int i=0;i<netlist.size();i++)
-        {
+
+    public static void getSubcircuits(List<DGate> netlist) {
+        for (int i = 0; i < netlist.size(); i++) {
             int high = getHigh(i);
             int low = getLow(i);
-            for(int j=low;j<=high;j++)
-            {
-                String binEq = Convert.dectoBin(j, i+1);
+            for (int j = low; j <= high; j++) {
+                String binEq = Convert.dectoBin(j, i + 1);
                 String revBin = new StringBuilder(binEq).reverse().toString();
                 List<DGate> subNetlist = new ArrayList<DGate>();
-                for(int k=0;k<revBin.length();k++)
-                {
-                    if(revBin.charAt(k) == '1')
+                for (int k = 0; k < revBin.length(); k++) {
+                    if (revBin.charAt(k) == '1') {
                         subNetlist.add(netlist.get(k));
+                    }
                 }
                 List<DGate> modifiedsubNetlist = new ArrayList<DGate>();
                 modifiedsubNetlist = removeDanglingNodeInSubnetlist(subNetlist);
-                NetSynth.printNetlist(modifiedsubNetlist);
+                int inpCount = getSubnetlistInputCount(modifiedsubNetlist);
+                if(inpCount == 3){
+                    NetSynth.printNetlist(modifiedsubNetlist);
+                }    
+                
                 System.out.println("--");
             }
             System.out.println("--");
         }
-        
+
     }
-    public static int getHigh(int n)
-    {
-        int high = (int)((Math.pow(2, n+1) -1));
+
+    public static int getHigh(int n) {
+        int high = (int) ((Math.pow(2, n + 1) - 1));
         return high;
     }
-    public static int getLow(int n)
-    {
-        int low = (int)(Math.pow(2, n));
+
+    public static int getLow(int n) {
+        int low = (int) (Math.pow(2, n));
         return low;
     }
-    
-    public static List<DGate> removeDanglingNodeInSubnetlist(List<DGate> netlist){
-        
-        
-        
+
+    public static List<DGate> removeDanglingNodeInSubnetlist(List<DGate> netlist) {
+
         List<Integer> removegates = new ArrayList<Integer>();
         List<DGate> netlistCopy = new ArrayList<DGate>();
         List<DGate> tempnetlist = new ArrayList<DGate>();
-        
-        
-        for(DGate x:netlist)
-        {
+
+        for (DGate x : netlist) {
             netlistCopy.add(new DGate(x));
         }
         //Preprocessing
         //netlist.get(netlist.size()-1).output.wtype = DWireType.output;
-        for(int i=0;i<netlistCopy.size()-1;i++){
-            if(netlistCopy.get(i).output.wtype.equals(DWireType.output)){
+        for (int i = 0; i < netlistCopy.size() - 1; i++) {
+            if (netlistCopy.get(i).output.wtype.equals(DWireType.output)) {
                 removegates.add(i);
             }
         }
-        for(int i=0;i<netlistCopy.size();i++)
-        {
-            if(!removegates.contains(i)){
+        for (int i = 0; i < netlistCopy.size(); i++) {
+            if (!removegates.contains(i)) {
                 tempnetlist.add(netlistCopy.get(i));
             }
         }
-        tempnetlist.get(tempnetlist.size()-1).output.wtype = DWireType.output;
-        System.out.println("PREPROCESSING STEP");
-        NetSynth.printNetlist(tempnetlist);
-        System.out.println("END PREPROCESSING STEP");
-        
-        
+        tempnetlist.get(tempnetlist.size() - 1).output.wtype = DWireType.output;
+
         //------------
-        
         /*List<DGate> tempnetlist = new ArrayList<DGate>();
-        for (int i = 0; i < netlist.size(); i++) {
-            tempnetlist.add(netlist.get(i));
-        }*/
+         for (int i = 0; i < netlist.size(); i++) {
+         tempnetlist.add(netlist.get(i));
+         }*/
         List<DGate> reducednetlist = new ArrayList<DGate>();
         removegates = new ArrayList<Integer>();
         do {
@@ -122,10 +113,34 @@ public class subCircuitEnumerator {
             }
             tempnetlist = new ArrayList<DGate>();
             tempnetlist.addAll(reducednetlist);
-            
+
         } while (!removegates.isEmpty());
 
         return reducednetlist;
     }
-    
+
+    public static int getSubnetlistInputCount(List<DGate> netlist) {
+        int inputcount = 0;
+        List<String> outputnames = new ArrayList<String>();
+        List<String> inputnames = new ArrayList<String>();
+        List<String> connectors = new ArrayList<String>();
+
+        for (int i = 0; i < netlist.size(); i++) {
+            if (netlist.get(i).output.wtype.equals(DWireType.output)) {
+                outputnames.add(netlist.get(i).output.name);
+            } else {
+                connectors.add(netlist.get(i).output.name);
+            }
+
+            for (int j = 0; j < netlist.get(i).input.size(); j++) {
+                String inp = netlist.get(i).input.get(j).name;
+                if(!outputnames.contains(inp) && !connectors.contains(inp) && !inputnames.contains(inp)){
+                    inputnames.add(inp);
+                }
+            }
+        }
+        inputcount = inputnames.size();
+        return inputcount;
+    }
+
 }
