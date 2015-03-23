@@ -17,9 +17,7 @@ import org.cellocad.BU.ParseVerilog.Convert;
  */
 public class isomorphicFunction {
     
-    
-    
-    
+    //Mapping based on number of inputs.
     public static Map<Integer,permutationMap> getPermutationMapping(int size)
     {
         Map<Integer,permutationMap> map = new HashMap<Integer,permutationMap>();
@@ -153,6 +151,8 @@ public class isomorphicFunction {
         return map;
     }
     
+    
+    //This is for multiple outputs. Requires NPNP equivalence. Can be done later. 
     public static boolean checkCircuitIsomorphism(List<String> tt1, List<String> tt2)
     {
         boolean result = false;
@@ -161,24 +161,26 @@ public class isomorphicFunction {
         return result;
     }
     
+    
+    //Based the permuted TT based on the permutation matrix.
     public static String getPermutedTT(String t,List<Integer> permutation){
         String result = "";
-        
         for(int i=0;i<permutation.size();i++){
             result += t.charAt(permutation.get(i));
         }
         return result;
     }
     
+    //To be done with NPN equivalence. 
     public static List<Integer> getInputPermutation(String t1, String t2){
         List<Integer> map = new ArrayList<Integer>();
         
         return map;
     }
     
+    //Returns true if the two truth tables have a P equivalence. 
     public static boolean checkPequivalence(String t1, String t2)
     {
-        boolean result = false;
         if(t1.length() != t2.length())
             return false;
         
@@ -188,22 +190,52 @@ public class isomorphicFunction {
         if(getOnes(t1)!=getOnes(t2))
             return false;
         
+        
+        int n = (int)(Math.log10(len)/Math.log10(2));
+        if(n>4)
+        {
+            System.out.println("Sub-circuits with more than 4 inputs not supported. Feature will be added soon");
+            return false;
+        }
+        
+        Map<Integer,permutationMap> map = getPermutationMapping(n);
+        if(getPermutationIndex(t1,t2,map) == -1)
+            return false;
+        else 
+            return true;
+            
+        
+        /*
+        //Implement a difference matrix approach. Need to check advantages. 
         List<Integer> diff = new ArrayList<Integer>();
         for(int i=1;i<(len-1);i++)
         {
             if(t1.charAt(i)!= t2.charAt(i))
             {
-                diff.add(i);
+                //diff.add(i);
             }
-        //    String bin = Convert.dectoBin(i, inputSize);
-        //    System.out.println("Binary " + bin);
         }
+        */
+    }
+    
+    //Given 2 truth tables, get the index of the permutation map which indicates the order in which the permutation occurs. t2 is permutated based on the map permutation matrices and matched with t1.
+    public static int getPermutationIndex(String t1,String t2, Map<Integer,permutationMap> map){
+        int result = -1;
         
-        System.out.println("Difference Matrix : "+diff);
+        for(int i=0;i<map.size();i++)
+        {
+            String ptt = getPermutedTT(t2,map.get(i).inputOrder);
+            if(ptt.equals(t1))
+            {
+                result = i;
+                break;
+            }
+        }
         
         return result;
     }
     
+    //Gets the number of '1's in the truth table.
     public static int getOnes(String t)
     {
         int count = 0;
@@ -214,6 +246,7 @@ public class isomorphicFunction {
         }
         return count;
     }
+    
     
     public static int getFactorial(int n)
     {

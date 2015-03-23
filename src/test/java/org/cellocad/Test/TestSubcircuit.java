@@ -51,4 +51,10 @@ public class TestSubcircuit {
         
     }
     
+    public static void testStringPermutation(String tt, int permutationNumber){
+        
+        String result = isomorphicFunction.getPermutedTT(tt, isomorphicFunction.getPermutationMapping(3).get(permutationNumber).permutation); 
+        System.out.println(tt + "::" + result);
+    }
+    
 }

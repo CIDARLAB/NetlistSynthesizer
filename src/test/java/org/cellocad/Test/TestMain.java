@@ -50,6 +50,7 @@ public class TestMain {
                
             //TestSynthesis.testVerilogrunNetSynth();
             TestSubcircuit.testTTisomorphism();
+            TestSubcircuit.testStringPermutation("01234567",3);
 
             //TestSynthesis.testMultDaGW();
             //TestSynthesis.test3norconversion();
