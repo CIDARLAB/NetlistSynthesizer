@@ -69,6 +69,18 @@ public class DGate implements Serializable{
         
     }
     
+    public DGate(DGate gate)
+    {
+        gtype = gate.gtype;
+        gname = gate.gname;
+        input = new ArrayList<DWire>();
+        for(DWire x:gate.input)
+        {
+            input.add(new DWire(x));
+        }
+        output = new DWire(gate.output);
+    }
+    
     public void calculateStage()
     {
         if(!this.input.isEmpty())

@@ -49,6 +49,8 @@ public class TestMain {
             //TestSynthesis.testANDConversion();
                
             //TestSynthesis.testVerilogrunNetSynth();
+            
+            TestSubcircuit.testGetSubcircuit();
             TestSubcircuit.testTTisomorphism();
             TestSubcircuit.testStringPermutation("01234567",3);
 
