@@ -58,4 +58,12 @@ public class DWire implements Serializable {
         this.name = xwire.name;
         this.logicValue = xwire.logicValue;
      }
+     
+     public static String printDWire(DWire xwire)
+     {
+         String wstr = "";
+         wstr += ("Wire Name : " + xwire.name);
+         wstr += ("::Wire Type "+ xwire.wtype.toString());
+         return wstr;
+     }
 }

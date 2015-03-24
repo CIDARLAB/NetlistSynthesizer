@@ -8,7 +8,9 @@ package org.cellocad.BU.subcircuit;
 import java.util.ArrayList;
 import java.util.List;
 import org.cellocad.BU.ParseVerilog.Convert;
+import org.cellocad.BU.booleanLogic.BooleanSimulator;
 import org.cellocad.BU.netsynth.DGate;
+import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
 
@@ -19,10 +21,13 @@ import org.cellocad.BU.netsynth.NetSynth;
 public class subCircuitEnumerator {
 
     public static void getSubcircuits(List<DGate> netlist) {
-        for (int i = 0; i < netlist.size(); i++) {
+        for(int i=0;i<netlist.size();i++){
+            netlist.get(i).gindex = i;
+        }
+        for (int i = netlist.size()-1; i >=0; i--) {
             int high = getHigh(i);
             int low = getLow(i);
-            for (int j = low; j <= high; j++) {
+            for (int j = high; j >= low; j--) {
                 String binEq = Convert.dectoBin(j, i + 1);
                 String revBin = new StringBuilder(binEq).reverse().toString();
                 List<DGate> subNetlist = new ArrayList<DGate>();
@@ -33,11 +38,19 @@ public class subCircuitEnumerator {
                 }
                 List<DGate> modifiedsubNetlist = new ArrayList<DGate>();
                 modifiedsubNetlist = removeDanglingNodeInSubnetlist(subNetlist);
-                int inpCount = getSubnetlistInputCount(modifiedsubNetlist);
-                if(inpCount == 3){
+                List<String> inputs = getSubnetlistInputs(modifiedsubNetlist);
+                modifiedsubNetlist = NetSynth.rewireNetlist(modifiedsubNetlist);
+                if (inputs.size() <= 4) {
+                    List<String> tt = BooleanSimulator.getTruthTable(modifiedsubNetlist, inputs);
                     NetSynth.printNetlist(modifiedsubNetlist);
-                }    
-                
+                    List<Integer> indices = new ArrayList<Integer>();
+                    for(int k=0;k<modifiedsubNetlist.size();k++)
+                        indices.add(modifiedsubNetlist.get(k).gindex);
+                    System.out.println("Inputs : " + inputs);
+                    System.out.println(DWire.printDWire(modifiedsubNetlist.get(modifiedsubNetlist.size() - 1).output));
+                    System.out.println("Subnetlist Truthtable : " + tt.get(0));
+                    System.out.println("Gate Indices : " + indices);
+                }
                 System.out.println("--");
             }
             System.out.println("--");
@@ -119,8 +132,8 @@ public class subCircuitEnumerator {
         return reducednetlist;
     }
 
-    public static int getSubnetlistInputCount(List<DGate> netlist) {
-        int inputcount = 0;
+    public static List<String> getSubnetlistInputs(List<DGate> netlist) {
+
         List<String> outputnames = new ArrayList<String>();
         List<String> inputnames = new ArrayList<String>();
         List<String> connectors = new ArrayList<String>();
@@ -134,13 +147,14 @@ public class subCircuitEnumerator {
 
             for (int j = 0; j < netlist.get(i).input.size(); j++) {
                 String inp = netlist.get(i).input.get(j).name;
-                if(!outputnames.contains(inp) && !connectors.contains(inp) && !inputnames.contains(inp)){
+                if (!outputnames.contains(inp) && !connectors.contains(inp) && !inputnames.contains(inp)) {
+                    netlist.get(i).input.get(j).wtype = DWireType.input;
                     inputnames.add(inp);
                 }
             }
         }
-        inputcount = inputnames.size();
-        return inputcount;
+        //inputcount = inputnames.size();
+        return inputnames;
     }
 
 }

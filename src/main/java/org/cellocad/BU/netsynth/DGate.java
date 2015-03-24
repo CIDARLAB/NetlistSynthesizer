@@ -19,7 +19,7 @@ public class DGate implements Serializable{
     public List<DWire> input;
     public DWire output;
     public int gatestage;
-    
+    public int gindex;
     
     public DGate()
     {      
@@ -73,6 +73,7 @@ public class DGate implements Serializable{
     {
         gtype = gate.gtype;
         gname = gate.gname;
+        gindex = gate.gindex;
         input = new ArrayList<DWire>();
         for(DWire x:gate.input)
         {
