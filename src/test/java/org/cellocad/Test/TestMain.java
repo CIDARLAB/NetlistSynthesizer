@@ -50,10 +50,13 @@ public class TestMain {
                
             //TestSynthesis.testVerilogrunNetSynth();
             
-            TestSubcircuit.testGetSubcircuit();
-            TestSubcircuit.testTTisomorphism();
-            TestSubcircuit.testStringPermutation("01234567",3);
-
+            //TestSubcircuit.testGetSubcircuit();
+            //TestSubcircuit.testTTisomorphism();
+            //TestSubcircuit.testStringPermutation("01234567",3);
+            
+            //TestSubcircuit.testRenameWires();
+            
+            TestSubcircuit.testInsertSubCircuit();
             //TestSynthesis.testMultDaGW();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);

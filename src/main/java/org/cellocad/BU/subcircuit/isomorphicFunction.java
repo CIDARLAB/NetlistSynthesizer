@@ -17,14 +17,14 @@ import org.cellocad.BU.ParseVerilog.Convert;
  */
 public class isomorphicFunction {
     
-    //Mapping based on number of inputs.
+    //Mapping based on number of inputs. Has upto 4 inputs.
     public static Map<Integer,permutationMap> getPermutationMapping(int size)
     {
         Map<Integer,permutationMap> map = new HashMap<Integer,permutationMap>();
         
+        //<editor-fold desc="Permutation Maps">
         if(size == 1)
             return map;//empty?
-        
         if(size == 2)
         {
             permutationMap p0 = new permutationMap();
@@ -701,22 +701,19 @@ public class isomorphicFunction {
             p23.permutation.add(11);
             p23.permutation.add(7);
             p23.permutation.add(15);
-        }
             
-        
+            //</editor-fold>
+        }
         return map;
     }
-    
     
     //This is for multiple outputs. Requires NPNP equivalence. Can be done later. 
     public static boolean checkCircuitIsomorphism(List<String> tt1, List<String> tt2)
     {
         boolean result = false;
         
-        
         return result;
     }
-    
     
     //Based the permuted TT based on the permutation matrix.
     public static String getPermutedTT(String t,List<Integer> permutation){
@@ -745,7 +742,6 @@ public class isomorphicFunction {
             return false;
         if(getOnes(t1)!=getOnes(t2))
             return false;
-        
         
         int n = (int)(Math.log10(len)/Math.log10(2));
         if(n>4)
@@ -802,7 +798,6 @@ public class isomorphicFunction {
         }
         return count;
     }
-    
     
     public static int getFactorial(int n)
     {

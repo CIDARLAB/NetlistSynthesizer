@@ -4679,9 +4679,9 @@ public class NetSynth {
             }
         }
 
-        for (int i = 0; i < netlist.size(); i++) {
-            System.out.println(netlist.get(i).output.logicValue + " :" + printGate(netlist.get(i)));
-        }
+        //for (int i = 0; i < netlist.size(); i++) {
+        //    System.out.println(netlist.get(i).output.logicValue + " :" + printGate(netlist.get(i)));
+        //}
 
         return netlist;
     }
@@ -4910,7 +4910,14 @@ public class NetSynth {
         //DAGW outputDAG = new DAGW(outDAG.Gates,outDAG.Wires);
         return outDAG;
     }
-
+    
+    public static void assignGateIndex(List<DGate> netlist){
+        for(int i=0;i<netlist.size();i++){
+            netlist.get(i).gindex = i;
+        }
+    }
+    
+    
     /**
      * *************************************************************Function
      * <br>

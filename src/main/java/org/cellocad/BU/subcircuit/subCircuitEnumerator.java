@@ -20,10 +20,14 @@ import org.cellocad.BU.netsynth.NetSynth;
  */
 public class subCircuitEnumerator {
 
-    public static void getSubcircuits(List<DGate> netlist) {
-        for(int i=0;i<netlist.size();i++){
-            netlist.get(i).gindex = i;
-        }
+    
+    
+    
+    public static List<List<DGate>> getSubcircuits(List<DGate> netlist) {
+        NetSynth.assignGateIndex(netlist);
+        List<List<Integer>> allIndices = new ArrayList<List<Integer>>();
+        List<List<DGate>> allSubcircuits = new ArrayList<List<DGate>>();
+        
         for (int i = netlist.size()-1; i >=0; i--) {
             int high = getHigh(i);
             int low = getLow(i);
@@ -42,22 +46,60 @@ public class subCircuitEnumerator {
                 modifiedsubNetlist = NetSynth.rewireNetlist(modifiedsubNetlist);
                 if (inputs.size() <= 4) {
                     List<String> tt = BooleanSimulator.getTruthTable(modifiedsubNetlist, inputs);
-                    NetSynth.printNetlist(modifiedsubNetlist);
+                    //NetSynth.printNetlist(modifiedsubNetlist);
                     List<Integer> indices = new ArrayList<Integer>();
                     for(int k=0;k<modifiedsubNetlist.size();k++)
                         indices.add(modifiedsubNetlist.get(k).gindex);
-                    System.out.println("Inputs : " + inputs);
+                    
+                    if(!containsSubcircuit(indices,allIndices)){
+                        allIndices.add(indices);
+                        allSubcircuits.add(modifiedsubNetlist);
+                    }
+                    
+                    /*System.out.println("Inputs : " + inputs);
                     System.out.println(DWire.printDWire(modifiedsubNetlist.get(modifiedsubNetlist.size() - 1).output));
                     System.out.println("Subnetlist Truthtable : " + tt.get(0));
-                    System.out.println("Gate Indices : " + indices);
+                    System.out.println("Gate Indices : " + indices);*/
                 }
-                System.out.println("--");
+                //System.out.println("--");
             }
-            System.out.println("--");
+            //System.out.println("--");
         }
-
+        System.out.println("All Subcircuits:");
+        for(List<DGate> subcirc:allSubcircuits){
+            System.out.println("\nNetlist:\n------------");
+            NetSynth.printNetlist(subcirc);
+            System.out.println("------------\nSize:"+subcirc.size()+"\n------------");
+        }
+        return allSubcircuits;
     }
 
+    public static boolean containsSubcircuit(List<Integer> indices, List<List<Integer>> subcircuits){
+        boolean result = false;
+            for(List<Integer> list:subcircuits){
+                if(equalLists(indices,list)){
+                    result = true;
+                    break;
+                }
+            }
+        
+        return result;
+    }
+    
+    public static boolean equalLists(List<Integer> list1, List<Integer> list2){
+        boolean result = true;
+        if(list1.size()!= list2.size())
+            return false;
+        for(int i=0;i<list1.size();i++){
+            if(!list1.get(i).equals(list2.get(i))){
+                result = false;
+                break;
+            }
+        }
+        
+        return result;
+    }
+    
     public static int getHigh(int n) {
         int high = (int) ((Math.pow(2, n + 1) - 1));
         return high;
