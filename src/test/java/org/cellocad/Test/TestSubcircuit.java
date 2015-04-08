@@ -9,11 +9,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.cellocad.BU.booleanLogic.BooleanSimulator;
 import org.cellocad.BU.netsynth.DGate;
 import org.cellocad.BU.netsynth.DGateType;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
+import org.cellocad.BU.precomputation.PreCompute;
+import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.cellocad.BU.subcircuit.isomorphicFunction;
 import org.cellocad.BU.subcircuit.subCircuitEnumerator;
 import org.cellocad.BU.subcircuit.subCircuitSwap;
@@ -224,6 +227,19 @@ public class TestSubcircuit {
         subCircuitEnumerator.getSubcircuits(netlist);
     }
     
+    public static void testSubcircuitSwap(){
+        List<DGate> netlist = new ArrayList<DGate>();
+        List<DGate> subcircuit = new ArrayList<DGate>();
+        
+        netlist = getSampleNetlist2();
+        subcircuit = getSampleNetlist3();
+        
+        List<SubcircuitLibrary> library = new ArrayList<SubcircuitLibrary>();
+        library = PreCompute.getCircuitLibrary();
+        
+        subCircuitSwap.implementSwap(netlist, library);
+        
+    }
     
     public static void testInsertSubCircuit(){
         List<DGate> netlist = new ArrayList<DGate>();
@@ -240,15 +256,33 @@ public class TestSubcircuit {
         NetSynth.assignGateIndex(netlist);
         NetSynth.assignGateIndex(subcircuit);
         
+        NetSynth.printDebugStatement("Post Swap");
+        List<DGate> output = new ArrayList<DGate>();
+        output = subCircuitSwap.insertSubcircuit(netlist, subcircuit, inputMap, 8);
+        
         NetSynth.printDebugStatement("Initial Netlist");
         NetSynth.printNetlist(netlist);
         
         NetSynth.printDebugStatement("Subcircuit");
         NetSynth.printNetlist(subcircuit);
         
+        NetSynth.printDebugStatement("Final Netlist");
+        NetSynth.printNetlist(output);
         
-        NetSynth.printDebugStatement("Post Swap");
-        subCircuitSwap.insertSubcircuit(netlist, subcircuit, inputMap, 8);
+        List<String> inputnames = new ArrayList<String>();
+        inputnames.add("a");
+        inputnames.add("b");
+        inputnames.add("c");
+        inputnames.add("d");
+        
+        
+        NetSynth.printDebugStatement("Initial TT");
+        BooleanSimulator.printTruthTable(netlist,inputnames);
+        
+        NetSynth.printDebugStatement("Final TT");
+        BooleanSimulator.printTruthTable(output,inputnames);
+        
+        
     }
     
     public static void testPermutationMatrix()

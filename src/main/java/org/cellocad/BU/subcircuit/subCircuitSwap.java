@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.cellocad.BU.booleanLogic.BooleanSimulator;
 import org.cellocad.BU.netsynth.DGate;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
@@ -22,9 +23,13 @@ import org.cellocad.BU.netsynth.NetSynth;
 public class subCircuitSwap {
     
     //Need to make some framework. Can be done later. Implement 3 input 1 output motifs now. 
-    public static void implementSwap(List<DGate> netlist)
+    public static void implementSwap(List<DGate> netlist,List<SubcircuitLibrary> library)
     {
+        System.out.println("library : 69");
+        System.out.println("Inputs : "+ library.get(69).getInputCount());
+        System.out.println("Decimal Value " + library.get(69).getTTDecimalVal());
         
+        BooleanSimulator.printTruthTable(library.get(69).netlist, library.get(69).inputs);
     }
     
     
@@ -57,18 +62,11 @@ public class subCircuitSwap {
             output.add(index, subcircopy.get(i));
         }
         
-        //NetSynth.printDebugStatement("After adding new Subcircuit");
-        //NetSynth.printNetlist(output);
-        
         //Rewire Nodes
         output = NetSynth.rewireNetlist(output);
         
         //Remove Dangling Nodes
         output = NetSynth.removeDanglingGates(output);
-        
-        //NetSynth.printDebugStatement("Remove Dangling Nodes");
-        //NetSynth.printNetlist(output);
-        
         
         //Rewire Nodes
         output = NetSynth.rewireNetlist(output);
@@ -91,9 +89,6 @@ public class subCircuitSwap {
         //Rewire Nodes
         output = NetSynth.rewireNetlist(output);
         renameWires(output,false);
-        
-        NetSynth.printDebugStatement("Final Netlist");
-        NetSynth.printNetlist(output);
         
         return output;
     }

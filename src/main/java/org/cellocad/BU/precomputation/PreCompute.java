@@ -19,6 +19,8 @@ import org.cellocad.BU.netsynth.DGateType;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
+import org.cellocad.BU.subcircuit.CircuitLibrary;
+import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 
 /**
  *
@@ -26,6 +28,92 @@ import org.cellocad.BU.netsynth.DWireType;
  */
 public class PreCompute {
     
+    
+    public static List<SubcircuitLibrary> getCircuitLibrary(){
+        List<String> inputOrder = new ArrayList<String>();
+        inputOrder.add("a");
+        inputOrder.add("b");
+        inputOrder.add("c");
+        
+       
+        List<SubcircuitLibrary> library = new ArrayList<SubcircuitLibrary>();
+        List<List<String>> string_netlists = new ArrayList<List<String>>();
+        
+        // <editor-fold defaultstate="collapsed" desc="Read from Input File"> 
+        
+        String Filepath="";
+        Filepath = NetSynth.getFilepath();
+        Filepath += "/resources/netsynthResources/allnetlists.txt";
+        File file = new File(Filepath);
+        
+        BufferedReader br;
+        FileReader fr;
+        List<String> filelines = new ArrayList<String>();
+        try {
+
+            fr = new FileReader(file);
+            br = new BufferedReader(fr);
+
+            String line;
+            try {
+                while ((line = br.readLine()) != null) {
+                    filelines.add(line);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        // </editor-fold> 
+        List<String> snetlist;
+        int count = 0;
+        String nline = "";
+        for (int i = 0; i < filelines.size(); i++) {
+            int k;
+            if (filelines.get(i).contains("Expression for ")) {
+                String expression = filelines.get(i).substring(filelines.get(i).indexOf(":") + 2);
+
+                k = i + 2;
+
+                snetlist = new ArrayList<String>();
+                while (!filelines.get(k).equals("")) {
+                    nline = filelines.get(k).trim();
+                    snetlist.add(nline);
+                    k++;
+                }
+                if (snetlist.isEmpty()) {
+                    snetlist.add(expression);
+                }
+
+                string_netlists.add(snetlist);
+
+            }
+        }
+        int cnt = 1;
+        for (int i = 0; i < string_netlists.size(); i++) {
+            List<DGate> set = new ArrayList<DGate>();
+            List<DGate> stset = new ArrayList<DGate>();
+
+            for (String xs : string_netlists.get(i)) {
+                DGate xg1 = parseNorGate(xs);
+                set.add(xg1);
+            }
+            if (!set.isEmpty()) {
+                stset = stitchNetlist(set);
+                stset.get(stset.size() - 1).output.wtype = DWireType.output;
+                //System.out.println("Found" + cnt++);
+                stset = doubleinputnortonot(stset);
+                SubcircuitLibrary lib = new SubcircuitLibrary(stset,inputOrder);
+                library.add(lib);
+            } else {
+                SubcircuitLibrary lib = new SubcircuitLibrary(set,inputOrder);
+                library.add(lib);
+            }
+        }
+        return library;
+    }
     
     public static List<List<DGate>> parseNetlistFile()
     {
@@ -276,6 +364,8 @@ public class PreCompute {
     
     public static DGate parseNorGate(String xg)
     {
+        NetSynth.one = new DWire("_one", DWireType.Source);
+        NetSynth.zero = new DWire("_zero", DWireType.GND);
        if(!xg.contains("NOR"))
        {
            DGate bufgate = new DGate();
@@ -298,8 +388,7 @@ public class PreCompute {
        for(int i=0;i<parts.length;i++)
        {
            
-           parts[i].trim();
-           
+           parts[i] = parts[i].trim();
            if(parts[i].contains("Wire"))
                xwtype = DWireType.connector;
             else if(parts[i].contains("_0"))

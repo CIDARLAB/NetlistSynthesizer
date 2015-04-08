@@ -56,7 +56,9 @@ public class TestMain {
             
             //TestSubcircuit.testRenameWires();
             
-            TestSubcircuit.testInsertSubCircuit();
+            //TestSubcircuit.testInsertSubCircuit();
+            TestSubcircuit.testSubcircuitSwap();
+        
             //TestSynthesis.testMultDaGW();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);
