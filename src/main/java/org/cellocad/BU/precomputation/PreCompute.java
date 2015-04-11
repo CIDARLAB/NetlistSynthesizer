@@ -19,8 +19,10 @@ import org.cellocad.BU.netsynth.DGateType;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
-import org.cellocad.BU.subcircuit.CircuitLibrary;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -28,6 +30,143 @@ import org.cellocad.BU.subcircuit.SubcircuitLibrary;
  */
 public class PreCompute {
     
+    
+    
+    public static List<SubcircuitLibrary> getCircuitLibrary(String filename){
+        List<String> inputOrder = new ArrayList<String>();
+        inputOrder.add("a");
+        inputOrder.add("b");
+        inputOrder.add("c");
+        
+       
+        List<SubcircuitLibrary> library = new ArrayList<SubcircuitLibrary>();
+        List<List<String>> string_netlists = new ArrayList<List<String>>();
+        
+        // <editor-fold defaultstate="collapsed" desc="Read from Input File"> 
+        
+        String Filepath="";
+        Filepath = NetSynth.getResourcesFilepath();
+        Filepath += "/"+filename;
+        File file = new File(Filepath);
+        
+        BufferedReader br;
+        FileReader fr;
+        //List<String> filelines = new ArrayList<String>();
+        String filelines="";
+        try {
+
+            fr = new FileReader(file);
+            br = new BufferedReader(fr);
+
+            String line;
+            try {
+                while ((line = br.readLine()) != null) {
+                    filelines+=line;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        JSONArray jsonLib;
+        try {
+            jsonLib = new JSONArray(filelines);
+            for(int i=0;i<jsonLib.length();i++){
+                JSONObject obj;
+                obj = (JSONObject) jsonLib.get(i);
+                String output = "";
+                List<String> inputs = new ArrayList<String>();
+                if(obj.has("outputs")){
+                    output = (new JSONArray(obj.get("outputs").toString()).get(0)).toString().trim();
+                }
+                if(obj.has("inputs")){
+                    JSONArray inputList = new JSONArray(obj.get("inputs").toString());
+                    for(int j=0;j<inputList.length();j++){
+                        inputs.add(inputList.get(j).toString().trim());
+                    }
+                }
+                List<DGate> netlist = new ArrayList<DGate>();
+                if(obj.has("netlist")){
+                    JSONArray netlistJSON = new JSONArray(obj.get("netlist").toString());
+                    for(int j=0;j<netlistJSON.length();j++){
+                        netlist.add(stringToDGate(netlistJSON.get(j).toString(),inputs,output));
+                    }
+                }
+                NetSynth.rewireNetlist(netlist);
+                SubcircuitLibrary subcirc = new SubcircuitLibrary(netlist,inputs,output);
+                System.out.println("SubCirc:\n"+ subcirc.printSubcircuit());
+                library.add(subcirc);
+            }
+            //System.out.println("JSON Array " + jsonLib);
+        } catch (JSONException ex) {
+            Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
+            //return null;
+        }
+        
+        return library;
+    }
+    
+    public static DGate stringToDGate(String dgate,List<String> inputorder, String output){
+        DGate gate = new DGate();
+        String temp = dgate;
+        if(dgate.startsWith(DGateType.AND.toString())){
+            gate.gtype = DGateType.AND;
+        }
+        else if(dgate.startsWith(DGateType.BUF.toString())){
+            gate.gtype = DGateType.BUF;
+        }
+        else if(dgate.startsWith(DGateType.NAND.toString())){
+            gate.gtype = DGateType.NAND;    
+        }
+        else if(dgate.startsWith(DGateType.NOR.toString())){
+            gate.gtype = DGateType.NOR;
+        }
+        else if(dgate.startsWith(DGateType.NOT.toString())){
+            gate.gtype = DGateType.NOT;
+        }
+        else if(dgate.startsWith(DGateType.OR.toString())){
+            gate.gtype = DGateType.OR;
+        }
+        else if(dgate.startsWith(DGateType.XNOR.toString())){
+            gate.gtype = DGateType.XNOR;
+        }
+        else if(dgate.startsWith(DGateType.XOR.toString())){
+            gate.gtype = DGateType.XOR;
+        }
+        else{
+            return gate;
+        }
+        if(dgate.contains("(") && dgate.contains(")"))
+        {
+            String ioports = dgate.substring(dgate.indexOf("(")+1, dgate.lastIndexOf(")"));
+            String[] io = ioports.trim().split(",");
+            if(output.equals(io[0].trim())){
+                gate.output = new DWire(io[0].trim(),DWireType.output);
+            }
+            else{
+                gate.output = new DWire(io[0].trim(),DWireType.connector);
+            }
+            for(int j=1;j<io.length;j++){
+                if(inputorder.contains(io[j].trim())){
+                    gate.input.add(new DWire(io[j].trim(),DWireType.input));
+                }
+                else{
+                    gate.input.add(new DWire(io[j].trim(),DWireType.connector));
+                }
+            }
+                 
+        }
+        else
+        {
+            return gate;
+        }
+        
+        return gate;
+    }
     
     public static List<SubcircuitLibrary> getCircuitLibrary(){
         List<String> inputOrder = new ArrayList<String>();
@@ -125,48 +264,33 @@ public class PreCompute {
         
         String Filepath="";
         Filepath = NetSynth.getFilepath();
-        
-        /*if(Filepath.contains("build/classes/"))
-            Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
-        else if(Filepath.contains("src"))
-            Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-        */
-        //if(Filepath.contains("prash"))
-        //{
-        //    Filepath += "src/org/cellocad/BU/precomputation/allnetlists.txt";
-        //}
-        //else
-        //{
-            Filepath += "/resources/netsynthResources/allnetlists.txt";
-        //}
-        
+        Filepath += "/resources/netsynthResources/allnetlists.txt";
         
         File file = new File(Filepath);
-        
-         BufferedReader br;
-         FileReader fr;
-         List<String> filelines = new ArrayList<String>();
-         try {
-            
-            fr = new FileReader(file);           
+
+        BufferedReader br;
+        FileReader fr;
+        List<String> filelines = new ArrayList<String>();
+        try {
+
+            fr = new FileReader(file);
             br = new BufferedReader(fr);
-            
+
             String line;
             try {
-                while((line = br.readLine()) != null )
-                {
+                while ((line = br.readLine()) != null) {
                     filelines.add(line);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
-        }
-         
+        } 
         // </editor-fold> 
-         List<String> snetlist;
+        
+        List<String> snetlist;
         int count =0;
         String nline = "";
         for(int i=0;i<filelines.size();i++)
@@ -248,6 +372,7 @@ public class PreCompute {
         }
         return netlistinp;
     }
+    
     
     public static List<DGate> stitchNetlist(List<DGate> set)
     {
@@ -361,6 +486,7 @@ public class PreCompute {
      
         return stitchedset;
     }
+    
     
     public static DGate parseNorGate(String xg)
     {
