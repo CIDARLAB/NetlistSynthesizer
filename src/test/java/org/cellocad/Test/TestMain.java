@@ -4,6 +4,7 @@
  */
 package org.cellocad.Test;
 
+import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.precomputation.PreCompute;
 
 
@@ -62,7 +63,11 @@ public class TestMain {
             //TestSubcircuit.testSubcircuitSwap();
             
             //PreCompute.getCircuitLibrary("netlist_in3out1.json");
+            
             TestSubcircuit.testgetSubcircuitDetails();
+            //NetSynth.initializeSubLibrary();
+
+
             //TestSynthesis.testMultDaGW();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);

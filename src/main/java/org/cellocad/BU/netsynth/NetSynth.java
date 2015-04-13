@@ -35,7 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.cellocad.BU.subcircuit.CircuitLibrary;
 import org.cellocad.BU.subcircuit.SubNetlist;
+import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 
 /**
  *
@@ -48,9 +50,18 @@ public class NetSynth {
     public static DWire zero;
     public static boolean functionOutp;
     public static String Filepath;
-    public static List<List<List<SubNetlist>>> library; 
+    
+    /**
+     *
+     */
+    public static Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary;
+    //sublibrary.get(i) gives a Map of all Subcircuits with i inputs
+    //sublibrary.get(i).get(4) Gives a List of all subcircuits with i inputs, and truthtable == 4. 
+    
+    //public static List<List<Map<List<Integer>,List<CircuitLibrary>>>> library;//?? Works?? 
     //This would be something like. Rows = # of Inputs. Columns = # of Outputs
     //So library.get(i).get(o) would give the library of all subnetlists with i+1 inputs and o+1 outputs
+    //Integer = Decimal value of the truthtable. 
     public static CircuitDetails caseCirc;
 
     /**
@@ -68,7 +79,49 @@ public class NetSynth {
         Filepath = NetSynth.getFilepath();
 
     }
-
+    
+    public static void initializeSubLibrary(){
+        sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
+        Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<4;i++){
+            init1.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        NetSynth.sublibrary.put(1, init1);
+        Map<Integer,List<SubcircuitLibrary>> init2 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<16;i++){
+            init2.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        NetSynth.sublibrary.put(2, init2);
+        Map<Integer,List<SubcircuitLibrary>> init3 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<256;i++){
+            init3.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        NetSynth.sublibrary.put(3, init3);
+        List<SubcircuitLibrary> net3in1out = new ArrayList<SubcircuitLibrary>();
+        net3in1out = PreCompute.getCircuitLibrary("netlist_in3out1.json");
+        List<SubcircuitLibrary> net3in1outOr = new ArrayList<SubcircuitLibrary>();
+        net3in1outOr = PreCompute.getCircuitLibrary("netlist_in3out1_OR.json");
+        
+        for(int i=0;i<net3in1out.size();i++)
+        {
+            SubcircuitLibrary subcirc = new SubcircuitLibrary();
+            subcirc = net3in1out.get(i);
+            subcirc.setInputs();
+            subcirc.setTT();
+            subcirc.switches.add(NetSynthSwitches.nooutputOR);
+            sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
+        }
+        for(int i=0;i<net3in1outOr.size();i++)
+        {
+            SubcircuitLibrary subcirc = new SubcircuitLibrary();
+            subcirc = net3in1outOr.get(i);
+            subcirc.setInputs();
+            subcirc.setTT();
+            subcirc.switches.add(NetSynthSwitches.outputOR);           
+            sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
+        }
+        //System.out.println("sublibrary"+sublibrary);
+    }
     /**
      * Function ************************************************************
      * <br>

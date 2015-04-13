@@ -7,10 +7,13 @@ package org.cellocad.BU.subcircuit;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.cellocad.BU.ParseVerilog.Convert;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
 import org.cellocad.BU.netsynth.DGate;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
+import org.cellocad.BU.netsynth.NetSynth;
+import org.cellocad.BU.netsynth.NetSynthSwitches;
 
 /**
  *
@@ -21,25 +24,63 @@ public class CircuitLibrary {
     public List<String> inputs;
     public List<String> outputs;
     public List<String> truthtables;
+    public List<NetSynthSwitches> switches;
     
     public CircuitLibrary(){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
         outputs = new ArrayList<String>();
         truthtables = new ArrayList<String>();
+        switches = new ArrayList<NetSynthSwitches>();
     }
     public CircuitLibrary(List<DGate> _netlist){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
         outputs = new ArrayList<String>();
         truthtables = new ArrayList<String>();
-        
+        switches = new ArrayList<NetSynthSwitches>();
         for(DGate gate:_netlist){
             netlist.add(gate);
         }
         assignGIndex();
         inputs = getInputs();
         outputs = getOutputs();
+        truthtables = BooleanSimulator.getTruthTable(netlist, inputs);
+        
+    }
+    public CircuitLibrary(List<DGate> _netlist,List<String> inputOrder){
+        netlist = new ArrayList<DGate>();
+        inputs = new ArrayList<String>();
+        outputs = new ArrayList<String>();
+        truthtables = new ArrayList<String>();
+        switches = new ArrayList<NetSynthSwitches>();
+        for(DGate gate:_netlist){
+            netlist.add(gate);
+        }
+        assignGIndex();
+        for(String inp:inputOrder){
+            inputs.add(inp);
+        }
+        outputs = getOutputs();
+        truthtables = BooleanSimulator.getTruthTable(netlist, inputs);
+        
+    }
+    public CircuitLibrary(List<DGate> _netlist,List<String> inputOrder,List<String> outputOrder){
+        netlist = new ArrayList<DGate>();
+        inputs = new ArrayList<String>();
+        outputs = new ArrayList<String>();
+        truthtables = new ArrayList<String>();
+        switches = new ArrayList<NetSynthSwitches>();
+        for(DGate gate:_netlist){
+            netlist.add(gate);
+        }
+        assignGIndex();
+        for(String inp:inputOrder){
+            inputs.add(inp);
+        }
+        for(String outp:outputOrder){
+            outputs.add(outp);
+        }
         truthtables = BooleanSimulator.getTruthTable(netlist, inputs);
         
     }
@@ -50,7 +91,13 @@ public class CircuitLibrary {
     public int getOutputCount(){
         return outputs.size();
     }
-    
+    public List<Integer> getTTDecimalVal(){
+        List<Integer> tts = new ArrayList<Integer>();
+        for(String truthtable:truthtables){
+            tts.add(Convert.bintoDec(truthtable));
+        }
+        return tts;
+    }
     private void assignGIndex(){
         for(int i=0;i<netlist.size();i++){
             netlist.get(i).gindex = i;
@@ -78,5 +125,26 @@ public class CircuitLibrary {
             }
         }
         return outputnames;
+    }
+    public String printCircuit(){
+        String str = "";
+        str+= "Inputs:\n";
+        for(int i=0;i<inputs.size();i++) {
+            str+= (inputs.get(i)+" ");
+        }
+        str += "\nOutputs:\n";
+        for(int i=0;i<outputs.size();i++) {
+            str+= (outputs.get(i)+" ");
+        }
+        str += "\nNetlist:\n";
+        for(DGate gate: netlist){
+            str += NetSynth.printGate(gate);
+            str += "\n";
+        }
+        str += "TruthTable:";
+        for(int i=0;i<truthtables.size();i++) {
+            str+= (truthtables.get(i)+" ");
+        }
+        return str;
     }
 }

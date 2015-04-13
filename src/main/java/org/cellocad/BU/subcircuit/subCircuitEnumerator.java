@@ -52,8 +52,6 @@ public class subCircuitEnumerator {
                         SubNetlist newsubnlist = new SubNetlist();
                         newsubnlist.tt = tt.get(0);
                         newsubnlist.inputs.addAll(inputs);
-                        System.out.println("Inputs: "+inputs);
-                        System.out.println("TT: "+tt.get(0));
                         subNList.add(newsubnlist);
                         
                         //allSubcircuits.add(modifiedsubNetlist);

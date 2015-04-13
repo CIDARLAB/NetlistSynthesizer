@@ -10,8 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.cellocad.BU.ParseVerilog.Convert;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
 import org.cellocad.BU.netsynth.DGate;
+import org.cellocad.BU.netsynth.DGateType;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
@@ -23,19 +25,85 @@ import org.cellocad.BU.netsynth.NetSynth;
 public class subCircuitSwap {
     
     //Need to make some framework. Can be done later. Implement 3 input 1 output motifs now. 
-    public static void implementSwap(List<DGate> netlist,List<SubcircuitLibrary> library)
+    public static List<DGate> implementSwap(List<DGate> netlist,Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
     {
-        System.out.println("library : 69");
-        System.out.println("Inputs : "+ library.get(69).getInputCount());
-        System.out.println("Decimal Value " + library.get(69).getTTDecimalVal());
+        List<DGate> output = new ArrayList<DGate>();
+        System.out.println("Reached here");
+        output = nodeRewrite(netlist,netlist.size()-1, sublibrary);
+       
+        NetSynth.printNetlist(output);
+        System.out.println("=========================");
+        String wireName = output.get(output.size()-1).output.name;
+        int indx = output.size()-1;
         
-        BooleanSimulator.printTruthTable(library.get(69).netlist, library.get(69).inputs);
+        do{
+            for(int i=output.size()-1;i>=0;i--){
+                if(output.get(i).output.name.equals(wireName)){
+                    indx = i;
+                }
+            }
+            if(indx == 0){
+                break;
+            }
+            else{
+                indx --;
+            }
+            List<DGate> temp = new ArrayList<DGate>();
+            
+            output = nodeRewrite(output,indx, sublibrary);
+            //Just Make sure this works all the time. Potential problem?
+            wireName = output.get(indx).output.name;
+        }while(true);
+        
+        return output;
     }
     
-    public static List<DGate> nodeRewrite(List<DGate> netlist,int index){
+    public static int circCost(List<DGate> netlist){
+        int count =0;
+        for(DGate gate:netlist){
+            if(gate.output.wtype.equals(DWireType.output) && gate.gtype.equals(DGateType.OR)){
+                
+            }
+            else
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public static List<DGate> nodeRewrite(List<DGate> netlist,int index,Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
         List<DGate> output = new ArrayList<DGate>();
+        for(DGate gate:netlist){
+            output.add(new DGate(gate));
+        }
+        output = NetSynth.rewireNetlist(output);
         List<SubNetlist> subnet = new ArrayList<SubNetlist>();
         subnet = subCircuitEnumerator.getSubNetlistDetails(netlist, index);
+        
+        for(int i=0;i<subnet.size();i++){
+            int tt = Convert.bintoDec(subnet.get(i).tt);
+            int inpSize = subnet.get(i).inputs.size();
+            
+            Map<Integer,permutationMap> pmap = isomorphicFunction.getPermutationMapping(inpSize);
+            for(int j=0;j<pmap.size();j++){
+                int ttPerm = Convert.bintoDec(isomorphicFunction.getPermutedTT(subnet.get(i).tt, pmap.get(j).permutation));
+                Map<String,String> inpMap = new HashMap<String,String>();
+                for(int k=0;k<sublibrary.get(inpSize).get(ttPerm).size();k++){
+                    inpMap = isomorphicFunction.getInputMapping(subnet.get(i).inputs,sublibrary.get(inpSize).get(ttPerm).get(k).inputs,pmap.get(j).inputOrder);
+                    List<DGate> tempNetlist = new ArrayList<DGate>();
+                    tempNetlist = insertSubcircuit(netlist,sublibrary.get(inpSize).get(ttPerm).get(k).netlist,inpMap,index);
+                    if(circCost(tempNetlist) < circCost(output)){
+                        output = new ArrayList<DGate>();
+                        System.out.println("Switch");
+                        for (DGate gate : tempNetlist) {
+                            output.add(new DGate(gate));
+                        }
+                        output = NetSynth.rewireNetlist(output);
+                    }
+                }
+            }
+        }
         
         return output;
     }

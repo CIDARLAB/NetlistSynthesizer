@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cellocad.BU.netsynth.DGate;
@@ -30,7 +31,85 @@ import org.json.JSONObject;
  */
 public class PreCompute {
     
-    
+    public static Map<Integer,SubcircuitLibrary> getCircuitLibraryMap(String filename){
+        List<String> inputOrder = new ArrayList<String>();
+        inputOrder.add("a");
+        inputOrder.add("b");
+        inputOrder.add("c");
+        
+       
+        Map<Integer,SubcircuitLibrary> library = new HashMap<Integer,SubcircuitLibrary>();
+        List<List<String>> string_netlists = new ArrayList<List<String>>();
+        
+        // <editor-fold defaultstate="collapsed" desc="Read from Input File"> 
+        
+        String Filepath="";
+        Filepath = NetSynth.getResourcesFilepath();
+        Filepath += "/"+filename;
+        File file = new File(Filepath);
+        
+        BufferedReader br;
+        FileReader fr;
+        //List<String> filelines = new ArrayList<String>();
+        String filelines="";
+        try {
+
+            fr = new FileReader(file);
+            br = new BufferedReader(fr);
+
+            String line;
+            try {
+                while ((line = br.readLine()) != null) {
+                    filelines+=line;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        JSONArray jsonLib;
+        try {
+            jsonLib = new JSONArray(filelines);
+            for(int i=0;i<jsonLib.length();i++){
+                JSONObject obj;
+                obj = (JSONObject) jsonLib.get(i);
+                String output = "";
+                List<String> inputs = new ArrayList<String>();
+                if(obj.has("outputs")){
+                    output = (new JSONArray(obj.get("outputs").toString()).get(0)).toString().trim();
+                }
+                if(obj.has("inputs")){
+                    JSONArray inputList = new JSONArray(obj.get("inputs").toString());
+                    for(int j=0;j<inputList.length();j++){
+                        inputs.add(inputList.get(j).toString().trim());
+                    }
+                }
+                List<DGate> netlist = new ArrayList<DGate>();
+                if(obj.has("netlist")){
+                    JSONArray netlistJSON = new JSONArray(obj.get("netlist").toString());
+                    for(int j=0;j<netlistJSON.length();j++){
+                        netlist.add(stringToDGate(netlistJSON.get(j).toString(),inputs,output));
+                    }
+                }
+                NetSynth.rewireNetlist(netlist);
+                
+                SubcircuitLibrary subcirc = new SubcircuitLibrary(netlist,inputs,output);
+                
+                System.out.println("SubCirc:\n"+ subcirc.printSubcircuit());
+                library.put(subcirc.getTTDecimalVal(), subcirc);
+                //library.add(subcirc);
+            }
+            //System.out.println("JSON Array " + jsonLib);
+        } catch (JSONException ex) {
+            Logger.getLogger(PreCompute.class.getName()).log(Level.SEVERE, null, ex);
+            //return null;
+        }
+        return library;
+    }
     
     public static List<SubcircuitLibrary> getCircuitLibrary(String filename){
         List<String> inputOrder = new ArrayList<String>();
@@ -100,7 +179,7 @@ public class PreCompute {
                 
                 SubcircuitLibrary subcirc = new SubcircuitLibrary(netlist,inputs,output);
                 
-                System.out.println("SubCirc:\n"+ subcirc.printSubcircuit());
+                //System.out.println("SubCirc:\n"+ subcirc.printSubcircuit());
                 library.add(subcirc);
             }
             //System.out.println("JSON Array " + jsonLib);

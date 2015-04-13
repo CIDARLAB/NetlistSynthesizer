@@ -770,6 +770,15 @@ public class isomorphicFunction {
         */
     }
     
+    public static Map<String,String> getInputMapping(List<String> netlist,List<String> subnetlist,List<Integer>mapping){
+        Map<String,String> inpMap = new HashMap<String,String>();
+        for(int i=0;i<mapping.size();i++){
+            inpMap.put(netlist.get(i), subnetlist.get(mapping.get(i)));
+        }
+            
+        return inpMap;
+    }
+    
     //Given 2 truth tables, get the index of the permutation map which indicates the order in which the permutation occurs. t2 is permutated based on the map permutation matrices and matched with t1.
     public static int getPermutationIndex(String t1,String t2, Map<Integer,permutationMap> map){
         int result = -1;

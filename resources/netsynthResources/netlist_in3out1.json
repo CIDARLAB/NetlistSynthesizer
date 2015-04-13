@@ -1878,13 +1878,13 @@
     "y"
   ],
   "netlist": [
-    "NOR(w9,inB,inC)",
-    "NOR(w8,w9,inC)",
-    "NOR(w7,w9,inB)",
+    "NOR(w9,b,c)",
+    "NOR(w8,w9,c)",
+    "NOR(w7,w9,b)",
     "NOR(w6,w7,w8)",
-    "NOR(w4,inA,w6)",
+    "NOR(w4,a,w6)",
     "NOR(w3,w4,w6)",
-    "NOR(w2,w4,inA)",
+    "NOR(w2,w4,a)",
     "NOR(y,w2,w3)"
   ]
 },
@@ -2715,13 +2715,13 @@
     "y"
   ],
   "netlist": [
-    "NOR(w9,inB,inC)",
-    "NOR(w8,w9,inC)",
-    "NOR(w7,w9,inB)",
+    "NOR(w9,b,c)",
+    "NOR(w8,w9,c)",
+    "NOR(w7,w9,b)",
     "NOR(w6,w7,w8)",
-    "NOR(w4,inA,w6)",
+    "NOR(w4,a,w6)",
     "NOR(w3,w4,w6)",
-    "NOR(w2,w4,inA)",
+    "NOR(w2,w4,a)",
     "OR(y,w2,w3)"
   ]
 },

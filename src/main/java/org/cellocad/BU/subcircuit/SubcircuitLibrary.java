@@ -14,6 +14,7 @@ import org.cellocad.BU.netsynth.DGate;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
+import org.cellocad.BU.netsynth.NetSynthSwitches;
 
 /**
  *
@@ -24,16 +25,19 @@ public class SubcircuitLibrary {
     public List<String> inputs;
     public String output;
     public String truthtable;
+    public List<NetSynthSwitches> switches;
     
     public SubcircuitLibrary(){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
+        switches = new ArrayList<NetSynthSwitches>();
         output = "";
         truthtable = "";
     }
     public SubcircuitLibrary(List<DGate> _netlist){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
+        switches = new ArrayList<NetSynthSwitches>();
         output = "";
         truthtable = "";
         
@@ -50,6 +54,7 @@ public class SubcircuitLibrary {
     public SubcircuitLibrary(List<DGate> _netlist,List<String> inputOrder){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
+        switches = new ArrayList<NetSynthSwitches>();
         output = "";
         truthtable = "";
         
@@ -71,7 +76,7 @@ public class SubcircuitLibrary {
     public SubcircuitLibrary(List<DGate> _netlist,List<String> inputOrder,String _output){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
-        
+        switches = new ArrayList<NetSynthSwitches>();
         truthtable = "";
         
         for(DGate gate:_netlist){
@@ -107,6 +112,23 @@ public class SubcircuitLibrary {
         for(int i=0;i<netlist.size();i++){
             netlist.get(i).gindex = i;
         }
+    }
+    
+    public void setInputs(){
+        inputs = new ArrayList<String>();
+        for(DGate gate:netlist){
+            for(DWire input:gate.input){
+                if(input.wtype.equals(DWireType.input)){
+                    if(!inputs.contains(input.name))
+                        inputs.add(input.name);
+                }
+            }
+        }
+    }
+    
+    public void setTT(){
+        truthtable = "";
+        truthtable = BooleanSimulator.getTruthTable(netlist, inputs).get(0);
     }
     private List<String> getInputs(){
         List<String> inputnames = new ArrayList<String>();

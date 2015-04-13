@@ -1871,14 +1871,14 @@
     "y"
   ],
   "netlist": [
-    "NOT(n4,inA)",
-    "NOR(0Wire6411,inC,inB)",
-    "NOR(n7,inB,0Wire6411)",
-    "NOR(n9,inC,0Wire6411)",
+    "NOT(n4,a)",
+    "NOR(0Wire6411,c,b)",
+    "NOR(n7,b,0Wire6411)",
+    "NOR(n9,c,0Wire6411)",
     "NOR(n11,n7,n9)",
     "NOT(n12,n11)",
     "NOR(n13,n4,n12)",
-    "NOR(n15,inA,n11)",
+    "NOR(n15,a,n11)",
     "OR(y,n13,n15)"
   ]
 },
@@ -2698,13 +2698,13 @@
     "y"
   ],
   "netlist": [
-    "NOR(w9,inB,inC)",
-    "NOR(w8,w9,inC)",
-    "NOR(w7,w9,inB)",
+    "NOR(w9,b,c)",
+    "NOR(w8,w9,c)",
+    "NOR(w7,w9,b)",
     "NOR(w6,w7,w8)",
-    "NOR(w4,inA,w6)",
+    "NOR(w4,a,w6)",
     "NOR(w3,w4,w6)",
-    "NOR(w2,w4,inA)",
+    "NOR(w2,w4,a)",
     "OR(y,w2,w3)"
   ]
 },
