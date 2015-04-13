@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.cellocad.BU.subcircuit.SubNetlist;
 
 /**
  *
@@ -47,7 +48,9 @@ public class NetSynth {
     public static DWire zero;
     public static boolean functionOutp;
     public static String Filepath;
-
+    public static List<List<List<SubNetlist>>> library; 
+    //This would be something like. Rows = # of Inputs. Columns = # of Outputs
+    //So library.get(i).get(o) would give the library of all subnetlists with i+1 inputs and o+1 outputs
     public static CircuitDetails caseCirc;
 
     /**

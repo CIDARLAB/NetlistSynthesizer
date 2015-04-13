@@ -97,7 +97,9 @@ public class PreCompute {
                     }
                 }
                 NetSynth.rewireNetlist(netlist);
+                
                 SubcircuitLibrary subcirc = new SubcircuitLibrary(netlist,inputs,output);
+                
                 System.out.println("SubCirc:\n"+ subcirc.printSubcircuit());
                 library.add(subcirc);
             }

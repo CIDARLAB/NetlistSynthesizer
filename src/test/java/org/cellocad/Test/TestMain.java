@@ -61,8 +61,8 @@ public class TestMain {
             //TestSubcircuit.testInsertSubCircuit();
             //TestSubcircuit.testSubcircuitSwap();
             
-            PreCompute.getCircuitLibrary("netlist_in3out1.json");
-            
+            //PreCompute.getCircuitLibrary("netlist_in3out1.json");
+            TestSubcircuit.testgetSubcircuitDetails();
             //TestSynthesis.testMultDaGW();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);

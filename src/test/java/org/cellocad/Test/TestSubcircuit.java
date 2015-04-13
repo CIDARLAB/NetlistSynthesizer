@@ -240,6 +240,14 @@ public class TestSubcircuit {
         subCircuitSwap.implementSwap(netlist, library);
         
     }
+    public static void testgetSubcircuitDetails(){
+        
+        List<DGate> netlist = new ArrayList<DGate>();
+        netlist = getSampleNetlist2();
+        NetSynth.printNetlist(netlist);
+        subCircuitSwap.nodeRewrite(netlist, netlist.size()-1);
+    }
+    
     
     public static void testInsertSubCircuit(){
         List<DGate> netlist = new ArrayList<DGate>();

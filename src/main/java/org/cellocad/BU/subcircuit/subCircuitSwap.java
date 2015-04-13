@@ -32,6 +32,13 @@ public class subCircuitSwap {
         BooleanSimulator.printTruthTable(library.get(69).netlist, library.get(69).inputs);
     }
     
+    public static List<DGate> nodeRewrite(List<DGate> netlist,int index){
+        List<DGate> output = new ArrayList<DGate>();
+        List<SubNetlist> subnet = new ArrayList<SubNetlist>();
+        subnet = subCircuitEnumerator.getSubNetlistDetails(netlist, index);
+        
+        return output;
+    }
     
     public static List<DGate> insertSubcircuit(List<DGate> netlist,List<DGate> subcircuit, Map<String,String> inputMap,int index){
         List<DGate> output = new ArrayList<DGate>();
