@@ -66,7 +66,7 @@ public class TestMain {
             
             //TestSubcircuit.testgetSubcircuitDetails();
             
-            TestSynthesis.testNewgetNetlist(3, 69);
+            TestSynthesis.testNewgetNetlist(3, 33);
             
 
 

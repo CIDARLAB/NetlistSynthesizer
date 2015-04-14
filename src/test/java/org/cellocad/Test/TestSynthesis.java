@@ -632,6 +632,9 @@ public class TestSynthesis {
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
             List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
+            switches.add(NetSynthSwitches.espresso);
+            switches.add(NetSynthSwitches.outputOR);
+            
             newdag = NetSynth.runNetSynth(filepath, switches);
             System.out.println("\nDAGW Gates");
             for(Gate xgate:newdag.Gates)

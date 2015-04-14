@@ -28,13 +28,15 @@ public class subCircuitSwap {
     //Need to make some framework. Can be done later. Implement 3 input 1 output motifs now. 
     public static List<DGate> implementSwap(List<DGate> netlist,List<NetSynthSwitches> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
     {
+        
         netlist = NetSynth.rewireNetlist(netlist);
+        renameWires(netlist,false);
+        netlist = NetSynth.rewireNetlist(netlist);
+        
+        
         List<DGate> output = new ArrayList<DGate>();
         //System.out.println("Reached here");
         output = nodeRewrite(netlist,switches,netlist.size()-1, sublibrary);
-       
-        //NetSynth.printNetlist(output);
-        //System.out.println("=========================");
         String wireName = output.get(output.size()-1).output.name;
         int indx = output.size()-1;
         
@@ -51,10 +53,9 @@ public class subCircuitSwap {
                 indx --;
             }
             List<DGate> temp = new ArrayList<DGate>();
-            
+            wireName = output.get(indx).output.name;    
             output = nodeRewrite(output,switches,indx, sublibrary);
-            //Just Make sure this works all the time. Potential problem?
-            wireName = output.get(indx).output.name;
+            
         }while(true);
         
         return output;
@@ -86,7 +87,6 @@ public class subCircuitSwap {
         for(int i=0;i<subnet.size();i++){
             int tt = Convert.bintoDec(subnet.get(i).tt);
             int inpSize = subnet.get(i).inputs.size();
-            
             Map<Integer,permutationMap> pmap = isomorphicFunction.getPermutationMapping(inpSize);
             for(int j=0;j<pmap.size();j++){
                 int ttPerm = Convert.bintoDec(isomorphicFunction.getPermutedTT(subnet.get(i).tt, pmap.get(j).permutation));
@@ -99,17 +99,48 @@ public class subCircuitSwap {
                         canSwap = true;
                     } 
                     else {
+                        
                         canSwap = containsSwitches(switches,sublibrary.get(inpSize).get(ttPerm).get(k).switches);
+                        if(canSwap){
+                            if(switches.contains(NetSynthSwitches.outputOR)){
+                                if(!netlist.get(index).output.wtype.equals(DWireType.output)){
+                                    if(sublibrary.get(inpSize).get(ttPerm).get(k).switches.contains(NetSynthSwitches.outputOR)){
+                                        canSwap = false;
+                                    }
+                                }
+                            }
+                        }
                     }
                     if (canSwap) {
+                        //System.out.println("TT ORG"+subnet.get(i).tt);
+                        //System.out.println("TT"+Convert.dectoBin(ttPerm, inpSize));
                         tempNetlist = insertSubcircuit(netlist, sublibrary.get(inpSize).get(ttPerm).get(k).netlist, inpMap, index);
                         if (circCost(tempNetlist) < circCost(output)) {
-                            output = new ArrayList<DGate>();
-                            System.out.println("Switch");
-                            for (DGate gate : tempNetlist) {
-                                output.add(new DGate(gate));
+                            
+                            
+                            List<String> inputNames = new ArrayList<String>();
+                            for (DGate gate : output) {
+                                for (DWire wire : gate.input) {
+                                    if (wire.wtype.equals(DWireType.input)) {
+                                        if (!inputNames.contains(wire.name)) {
+                                            inputNames.add(wire.name);
+                                        }
+                                    }
+                                }
                             }
-                            output = NetSynth.rewireNetlist(output);
+                            
+                            
+                            //if()
+                            List<String> tt1 = BooleanSimulator.getTruthTable(tempNetlist, inputNames);
+                            List<String> tt2 = BooleanSimulator.getTruthTable(netlist,inputNames);
+                            if (equalFunctions(tt1, tt2)) {
+                                output = new ArrayList<DGate>();
+                                for (DGate gate : tempNetlist) {
+                                    output.add(new DGate(gate));
+                                }
+                                output = NetSynth.rewireNetlist(output);
+                            }
+                            
                         }
                     }
                     
@@ -118,6 +149,21 @@ public class subCircuitSwap {
         }
         
         return output;
+    }
+    
+    public static boolean equalFunctions(List<String> tt1,List<String> tt2){
+        boolean res = true;
+        if(tt1.size() != tt2.size())
+            return false;
+        for(int i=0;i<tt1.size();i++)
+        {
+            if(!tt1.get(i).equals(tt2.get(i))){
+                res = false;
+                break;
+            }
+        }
+            
+        return res;
     }
     
     public static boolean containsSwitches(List<NetSynthSwitches> switches, List<NetSynthSwitches> constraints){

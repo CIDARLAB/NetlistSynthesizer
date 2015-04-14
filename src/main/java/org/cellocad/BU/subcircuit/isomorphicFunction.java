@@ -46,7 +46,7 @@ public class isomorphicFunction {
             p1.permutation.add(1);
             p1.permutation.add(3);
             
-            map.put(0, p1);
+            map.put(0, p0);
             map.put(1, p1);
         }
         else if(size == 3){
@@ -701,6 +701,31 @@ public class isomorphicFunction {
             p23.permutation.add(11);
             p23.permutation.add(7);
             p23.permutation.add(15);
+            
+            map.put(0, p0);
+            map.put(1, p1);
+            map.put(2, p2);
+            map.put(3, p3);
+            map.put(4, p4);
+            map.put(5, p5);
+            map.put(6, p6);
+            map.put(7, p7);
+            map.put(8, p8);
+            map.put(9, p9);
+            map.put(10, p10);
+            map.put(11, p11);
+            map.put(12, p12);
+            map.put(13, p13);
+            map.put(14, p14);
+            map.put(15, p15);
+            map.put(16, p16);
+            map.put(17, p17);
+            map.put(18, p18);
+            map.put(19, p19);
+            map.put(20, p20);
+            map.put(21, p21);
+            map.put(22, p22);
+            map.put(23, p23);
             
             //</editor-fold>
         }

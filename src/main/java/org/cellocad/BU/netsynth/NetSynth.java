@@ -869,7 +869,7 @@ public class NetSynth {
                     dirnetlist = runEspressoAndABC(direct, switches);
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
                     
-                    dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                    //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                     invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     
                     dirsize = getRepressorsCost(dirnetlist);

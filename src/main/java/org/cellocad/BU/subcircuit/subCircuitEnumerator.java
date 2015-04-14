@@ -40,7 +40,7 @@ public class subCircuitEnumerator {
                 modifiedsubNetlist = removeDanglingNodeInSubnetlist(subNetlist);
                 List<String> inputs = getSubnetlistInputs(modifiedsubNetlist);
                 modifiedsubNetlist = NetSynth.rewireNetlist(modifiedsubNetlist);
-                if (inputs.size() <= 4) {
+                if (inputs.size() <= 3) {
                     List<String> tt = BooleanSimulator.getTruthTable(modifiedsubNetlist, inputs);
                     //NetSynth.printNetlist(modifiedsubNetlist);
                     List<Integer> indices = new ArrayList<Integer>();
