@@ -28,12 +28,13 @@ public class subCircuitSwap {
     //Need to make some framework. Can be done later. Implement 3 input 1 output motifs now. 
     public static List<DGate> implementSwap(List<DGate> netlist,List<NetSynthSwitches> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
     {
+        netlist = NetSynth.rewireNetlist(netlist);
         List<DGate> output = new ArrayList<DGate>();
-        System.out.println("Reached here");
+        //System.out.println("Reached here");
         output = nodeRewrite(netlist,switches,netlist.size()-1, sublibrary);
        
-        NetSynth.printNetlist(output);
-        System.out.println("=========================");
+        //NetSynth.printNetlist(output);
+        //System.out.println("=========================");
         String wireName = output.get(output.size()-1).output.name;
         int indx = output.size()-1;
         

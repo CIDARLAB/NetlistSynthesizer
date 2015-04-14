@@ -461,7 +461,6 @@ public class NetSynth {
             dirsize = getRepressorsCost(dirnetlist);
             invsize = getRepressorsCost(invnetlist);
             structsize = getRepressorsCost(structnetlist);
-            //backhere
             if (synthesis.equals(NetSynthSwitches.originalstructural) || synthesis.equals(NetSynthSwitches.originalstructuralAND) || synthesis.equals(NetSynthSwitches.originalstructuralANDOR)) {
                 for (DGate xgate : structnetlist) {
                     netlist.add(xgate);
@@ -508,6 +507,7 @@ public class NetSynth {
             }
         } //</editor-fold >
         else {
+            
             hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
             //<editor-fold desc="Behavioral- Has Case Statements">
             if (hasCaseStatements) {
@@ -591,7 +591,7 @@ public class NetSynth {
                 //</editor-fold>
             } //</editor-fold>
             else {
-                
+                //backhere
                 try {
                     String modifiedVfilepath = genVerilogFile.modifyAssignVerilog(vfilepath);
                     List<DGate> abcNetlist = runABCverilog_fullFilePath(modifiedVfilepath);
@@ -744,7 +744,6 @@ public class NetSynth {
         double structsize = 0;
         double netsize = 0;
         
-        
         List<DGate> netlist = new ArrayList<DGate>();
         List<DGate> dirnetlist = new ArrayList<DGate>();
         List<DGate> invnetlist = new ArrayList<DGate>();
@@ -781,6 +780,7 @@ public class NetSynth {
             dirnetlist = runEspressoAndABC(direct,switches);
             invnetlist = runInvertedEspressoAndABC(inverted,switches);
             
+            
             structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,sublibrary);
             dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
             invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
@@ -807,6 +807,88 @@ public class NetSynth {
             }
         }
         else{
+            hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
+            if(hasCaseStatements){
+                CircuitDetails direct = new CircuitDetails();
+                direct = parseVerilogFile.parseCaseStatements(alllines);
+                List<String> invttValues = new ArrayList<String>();
+                invttValues = BooleanSimulator.invertTruthTable(direct.truthTable);
+                CircuitDetails inverted = new CircuitDetails(direct.inputNames, direct.outputNames, invttValues);
+
+                hasDontCares = parseVerilogFile.hasDontCares(direct.truthTable);
+                //<editor-fold desc="Behavioral- Case Statements - Has Don't Cares">
+                if (hasDontCares) {
+                    dirnetlist = runDCEspressoAndABC(direct, switches);
+                    invnetlist = runInvertedDCEspressoAndABC(inverted, switches);
+                    dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                    invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
+                    
+                    dirsize = getRepressorsCost(dirnetlist);
+                    invsize = getRepressorsCost(invnetlist);
+
+                    if (dirsize <= invsize) {
+                        return dirnetlist;
+                    } else {
+                        return invnetlist;                        
+                    }
+                    
+                } //</editor-fold>
+                //<editor-fold desc="Behavioral- Case Statements - NO Don't Cares">
+                else {
+                    
+                    dirnetlist = runEspressoAndABC(direct, switches);
+                    invnetlist = runInvertedEspressoAndABC(inverted, switches);
+                    dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                    invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
+                    
+                    dirsize = getRepressorsCost(dirnetlist);
+                    invsize = getRepressorsCost(invnetlist);
+
+                    if (dirsize <= invsize) {
+                        return dirnetlist;
+                    } else {
+                        return invnetlist;
+                    }
+                }
+                //</editor-fold>
+            }
+            else
+            {
+                try {
+                    String modifiedVfilepath = genVerilogFile.modifyAssignVerilog(vfilepath);
+                    List<DGate> abcNetlist = runABCverilog_fullFilePath(modifiedVfilepath);
+
+                    List<String> ttValues = new ArrayList<String>();
+                    List<String> invttValues = new ArrayList<String>();
+
+                    inputnames = parseVerilogFile.getInputNames(alllines);
+                    outputnames = parseVerilogFile.getOutputNames(alllines);
+
+                    ttValues = BooleanSimulator.getTruthTable(abcNetlist, inputnames);  // Compute Truth Table of Each Output
+                    invttValues = BooleanSimulator.invertTruthTable(ttValues); // Compute Inverse Truth Table of Each Output
+
+                    CircuitDetails direct = new CircuitDetails(inputnames, outputnames, ttValues);
+                    CircuitDetails inverted = new CircuitDetails(inputnames, outputnames, invttValues);
+
+                    dirnetlist = runEspressoAndABC(direct,switches);
+                    invnetlist = runInvertedEspressoAndABC(inverted, switches);
+                    dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                    invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
+                    
+                    dirsize = getRepressorsCost(dirnetlist);
+                    invsize = getRepressorsCost(invnetlist);
+
+                    if (dirsize < invsize) {
+                        return dirnetlist;
+                    } else {
+                        return invnetlist;
+                    }
+
+                    //printNetlist(abcNetlist);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
             //seehere
         }
         
@@ -1002,6 +1084,66 @@ public class NetSynth {
         }
     }
 
+    
+    public static List<DGate> runDCEspressoAndABC(CircuitDetails circ, List<NetSynthSwitches> synthmode) {
+        List<DGate> EspCircuit = new ArrayList<DGate>();
+        List<DGate> ABCCircuit = new ArrayList<DGate>();
+        List<String> espressoFile = new ArrayList<String>();
+        List<String> blifFile = new ArrayList<String>();
+
+        espressoFile = Espresso.createFile(circ);
+        blifFile = Blif.createFile(circ);
+        String filestring = "";
+        String Filepath = getFilepath();
+
+        filestring = getResourcesFilepath();
+        String filestringblif = "";
+        filestringblif = filestring + "Blif_File";
+        filestringblif += ".blif";
+        String filestringesp = "";
+
+        filestringesp += filestring + "Espresso_File" + ".txt";
+        File fespinp = new File(filestringesp);
+        //Writer output;
+        try {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+
+            for (String xline : espressoFile) {
+                String newl = (xline + "\n");
+                output.write(newl);
+            }
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> EspOutput = new ArrayList<String>();
+        EspOutput = runEspresso(filestringesp);
+        fespinp.deleteOnExit();
+
+        
+        if (!synthmode.contains(NetSynthSwitches.abc)) {
+            EspCircuit = convertPOStoNORNOT(EspOutput);
+            EspCircuit = optimize(EspCircuit);
+        }
+
+        if (!synthmode.contains(NetSynthSwitches.espresso)) {
+            ABCCircuit = parseEspressoOutToABC(EspOutput);
+        }
+
+        if (synthmode.contains(NetSynthSwitches.abc)) {
+            return ABCCircuit;
+        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+            return EspCircuit;
+        } else {
+            if (EspCircuit.size() < ABCCircuit.size()) {
+                return EspCircuit;
+            } else {
+                return ABCCircuit;
+            }
+        }
+    }
+
+    
     /**
      * Function ************************************************************
      * <br>
@@ -1137,6 +1279,107 @@ public class NetSynth {
         }
     }
 
+    public static List<DGate> runInvertedDCEspressoAndABC(CircuitDetails circ, List<NetSynthSwitches> synthmode) {
+
+        List<DGate> EspCircuit = new ArrayList<DGate>();
+        List<DGate> ABCCircuit = new ArrayList<DGate>();
+        List<String> espressoFile = new ArrayList<String>();
+        List<String> blifFile = new ArrayList<String>();
+
+        espressoFile = Espresso.createFile(circ);
+        blifFile = Blif.createFile(circ);
+        String filestring = "";
+        String Filepath = getFilepath();
+
+        filestring = getResourcesFilepath();
+
+        String filestringblif = "";
+        filestringblif = filestring + "Blif_File";
+        filestringblif += ".blif";
+        String filestringesp = "";
+
+        filestringesp += filestring + "Espresso_File" + ".txt";
+        File fespinp = new File(filestringesp);
+        //Writer output;
+        try {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+
+            for (String xline : espressoFile) {
+                String newl = (xline + "\n");
+                output.write(newl);
+            }
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> EspOutput = new ArrayList<String>();
+        EspOutput = runEspresso(filestringesp);
+        fespinp.deleteOnExit();
+
+        EspCircuit = convertPOStoNORNOT(EspOutput);
+        ABCCircuit = parseINVEspressoOutToABC(EspOutput);
+
+        List<DGate> finalEspCircuit = new ArrayList<DGate>();
+        List<DGate> finalABCCircuit = new ArrayList<DGate>();
+
+        for (int i = 0; i < EspCircuit.size(); i++) {
+            if (EspCircuit.get(i).output.wtype.equals(DWireType.output)) {
+                String outname = "";
+                outname = EspCircuit.get(i).output.name.trim();
+                String notinpwirename = "0Wire" + Global.wirecount++;
+                DWire notinp = new DWire(notinpwirename, DWireType.connector);
+                EspCircuit.get(i).output = notinp;
+                finalEspCircuit.add(EspCircuit.get(i));
+                DGate outnot = new DGate();
+                outnot.gtype = DGateType.NOT;
+                outnot.input.add(notinp);
+                outnot.output = new DWire(outname, DWireType.output);
+                finalEspCircuit.add(outnot);
+            } else {
+                finalEspCircuit.add(EspCircuit.get(i));
+            }
+        }
+        for (int i = 0; i < ABCCircuit.size(); i++) {
+            if (ABCCircuit.get(i).output.wtype.equals(DWireType.output)) {
+                String outname = "";
+                outname = ABCCircuit.get(i).output.name.trim();
+                String notinpwirename = "0Wire" + Global.wirecount++;
+                DWire notinp = new DWire(notinpwirename, DWireType.connector);
+                ABCCircuit.get(i).output = notinp;
+                finalABCCircuit.add(ABCCircuit.get(i));
+                DGate outnot = new DGate();
+                outnot.gtype = DGateType.NOT;
+                outnot.input.add(notinp);
+                outnot.output = new DWire(outname, DWireType.output);
+                finalABCCircuit.add(outnot);
+            } else {
+                finalABCCircuit.add(ABCCircuit.get(i));
+            }
+        }
+
+        finalEspCircuit = optimize(finalEspCircuit);
+
+        finalABCCircuit = separateOutputGates(finalABCCircuit);
+        finalABCCircuit = optimize(finalABCCircuit);
+
+        if (!synthmode.contains(NetSynthSwitches.espresso)) {
+            ABCCircuit = parseEspressoOutToABC(EspOutput);
+        }
+
+        if (synthmode.contains(NetSynthSwitches.abc)) {
+            return finalABCCircuit;
+        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+            return finalEspCircuit;
+        } else {
+            if (finalEspCircuit.size() < finalABCCircuit.size()) {
+                return finalEspCircuit;
+            } else {
+                return finalABCCircuit;
+            }
+        }
+    }
+
+    
     /**
      * Function ************************************************************
      * <br>
@@ -1965,6 +2208,27 @@ public class NetSynth {
         return netlistout;
     }
 
+    public static List<DGate> parseEspressoOutToABC(List<String> espout) {
+        List<DGate> netlistout = new ArrayList<DGate>();
+        List<String> vfilelines = new ArrayList<String>();
+
+        vfilelines = convertEspressoOutputToVerilog(espout);
+        String vfilepath = "";
+        vfilepath = create_VerilogFile(vfilelines, "espressoVerilog");
+        try {
+            netlistout = runABCverilog("espressoVerilog");
+            netlistout = separateOutputGates(netlistout);
+
+            netlistout = optimize(netlistout);
+
+        } catch (InterruptedException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return netlistout;
+    }
+
+    
     /**
      * Function ************************************************************
      * <br>
