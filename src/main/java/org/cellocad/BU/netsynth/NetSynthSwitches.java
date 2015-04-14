@@ -25,7 +25,7 @@ public enum NetSynthSwitches {
    noinv,
    
    outputOR,
-   nooutputOR,
+   //nooutputOR,
    outputOR3,
    
    AND2,

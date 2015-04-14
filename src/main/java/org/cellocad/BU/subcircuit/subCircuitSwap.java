@@ -17,6 +17,7 @@ import org.cellocad.BU.netsynth.DGateType;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
+import org.cellocad.BU.netsynth.NetSynthSwitches;
 
 /**
  *
@@ -25,11 +26,11 @@ import org.cellocad.BU.netsynth.NetSynth;
 public class subCircuitSwap {
     
     //Need to make some framework. Can be done later. Implement 3 input 1 output motifs now. 
-    public static List<DGate> implementSwap(List<DGate> netlist,Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
+    public static List<DGate> implementSwap(List<DGate> netlist,List<NetSynthSwitches> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
     {
         List<DGate> output = new ArrayList<DGate>();
         System.out.println("Reached here");
-        output = nodeRewrite(netlist,netlist.size()-1, sublibrary);
+        output = nodeRewrite(netlist,switches,netlist.size()-1, sublibrary);
        
         NetSynth.printNetlist(output);
         System.out.println("=========================");
@@ -50,7 +51,7 @@ public class subCircuitSwap {
             }
             List<DGate> temp = new ArrayList<DGate>();
             
-            output = nodeRewrite(output,indx, sublibrary);
+            output = nodeRewrite(output,switches,indx, sublibrary);
             //Just Make sure this works all the time. Potential problem?
             wireName = output.get(indx).output.name;
         }while(true);
@@ -72,7 +73,7 @@ public class subCircuitSwap {
         return count;
     }
     
-    public static List<DGate> nodeRewrite(List<DGate> netlist,int index,Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
+    public static List<DGate> nodeRewrite(List<DGate> netlist,List<NetSynthSwitches> switches,int index,Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
         List<DGate> output = new ArrayList<DGate>();
         for(DGate gate:netlist){
             output.add(new DGate(gate));
@@ -92,20 +93,41 @@ public class subCircuitSwap {
                 for(int k=0;k<sublibrary.get(inpSize).get(ttPerm).size();k++){
                     inpMap = isomorphicFunction.getInputMapping(subnet.get(i).inputs,sublibrary.get(inpSize).get(ttPerm).get(k).inputs,pmap.get(j).inputOrder);
                     List<DGate> tempNetlist = new ArrayList<DGate>();
-                    tempNetlist = insertSubcircuit(netlist,sublibrary.get(inpSize).get(ttPerm).get(k).netlist,inpMap,index);
-                    if(circCost(tempNetlist) < circCost(output)){
-                        output = new ArrayList<DGate>();
-                        System.out.println("Switch");
-                        for (DGate gate : tempNetlist) {
-                            output.add(new DGate(gate));
-                        }
-                        output = NetSynth.rewireNetlist(output);
+                    boolean canSwap = false;
+                    if (sublibrary.get(inpSize).get(ttPerm).get(k).switches.size() == 0) {
+                        canSwap = true;
+                    } 
+                    else {
+                        canSwap = containsSwitches(switches,sublibrary.get(inpSize).get(ttPerm).get(k).switches);
                     }
+                    if (canSwap) {
+                        tempNetlist = insertSubcircuit(netlist, sublibrary.get(inpSize).get(ttPerm).get(k).netlist, inpMap, index);
+                        if (circCost(tempNetlist) < circCost(output)) {
+                            output = new ArrayList<DGate>();
+                            System.out.println("Switch");
+                            for (DGate gate : tempNetlist) {
+                                output.add(new DGate(gate));
+                            }
+                            output = NetSynth.rewireNetlist(output);
+                        }
+                    }
+                    
                 }
             }
         }
         
         return output;
+    }
+    
+    public static boolean containsSwitches(List<NetSynthSwitches> switches, List<NetSynthSwitches> constraints){
+        boolean contains = true;
+        for(NetSynthSwitches sw:constraints){
+            if(!switches.contains(sw)){
+                contains = false;
+                break;
+            }
+        }
+        return contains;
     }
     
     public static List<DGate> insertSubcircuit(List<DGate> netlist,List<DGate> subcircuit, Map<String,String> inputMap,int index){

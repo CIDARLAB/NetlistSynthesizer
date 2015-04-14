@@ -108,7 +108,6 @@ public class NetSynth {
             subcirc = net3in1out.get(i);
             subcirc.setInputs();
             subcirc.setTT();
-            subcirc.switches.add(NetSynthSwitches.nooutputOR);
             sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
         }
         for(int i=0;i<net3in1outOr.size();i++)
@@ -732,7 +731,44 @@ public class NetSynth {
         return netlist;
 
     }
-
+    
+    public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitches> switches){
+        
+        List<String> inputnames = new ArrayList<String>();
+        List<String> outputnames = new ArrayList<String>();
+        List<DGate> netlist = new ArrayList<DGate>();
+        List<DGate> naiveNetlist = new ArrayList<DGate>();
+        List<DGate> structNetlist = new ArrayList<DGate>();
+        
+        boolean isStructural = false;
+        boolean hasCaseStatements = false;
+        boolean hasDontCares = false;
+        
+        String alllines = parseVerilogFile.verilogFileLines(vfilepath);
+        isStructural = parseVerilogFile.isStructural(alllines);
+        inputnames = parseVerilogFile.getInputNames(alllines);
+        outputnames = parseVerilogFile.getOutputNames(alllines);
+        if(isStructural){
+            naiveNetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
+            naiveNetlist = rewireNetlist(naiveNetlist);
+            if (switches.contains(NetSynthSwitches.originalstructural)) {
+                return naiveNetlist;
+            } 
+            else {
+                //structNetlist = parseStructuralVtoNORNOT(naivenetlist, nor3, synthesis); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+            }
+            
+            //seehere
+        }
+        else{
+            
+        }
+        
+        
+        return netlist;
+    }
+    
+    
     /**
      * Function ************************************************************
      * <br>
@@ -3932,6 +3968,35 @@ public class NetSynth {
         return outpNetlist;
     }
 
+    
+    public static List<DGate> optimize(List<DGate> netlist){
+        List<DGate> output = new ArrayList<DGate>();
+        
+        output = removeDanglingGates(netlist);
+        output = separateOutputGates(output);
+        
+        //What is going on here???? Need to check this.
+        output = removeDuplicateNots(output);
+        output = removeDoubleInverters(output);
+        output = removeDuplicateNots(output);
+        output = rewireNetlist(output);
+        
+        
+        output = removeDanglingGates(output);
+        output = rewireNetlist(output);
+        
+        output = removeDanglingGates(output);
+        output = rewireNetlist(output);
+        
+        output = removeDuplicateLogicGate(output);
+        output = rewireNetlist(output);
+        
+        output = removeDanglingGates(output);
+        output = rewireNetlist(output);
+        
+        return output;
+    }
+    
     /**
      * Function ************************************************************
      * <br>

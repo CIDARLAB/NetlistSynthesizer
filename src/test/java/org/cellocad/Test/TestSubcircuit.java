@@ -15,6 +15,7 @@ import org.cellocad.BU.netsynth.DGateType;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
+import org.cellocad.BU.netsynth.NetSynthSwitches;
 import org.cellocad.BU.precomputation.PreCompute;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.cellocad.BU.subcircuit.isomorphicFunction;
@@ -253,7 +254,10 @@ public class TestSubcircuit {
         System.out.println("====================================\n");
         NetSynth.initializeSubLibrary();
         System.out.println("TT : "+ BooleanSimulator.getTruthTable(netlist,inputNames));
-        List<DGate> output = subCircuitSwap.implementSwap(netlist, NetSynth.sublibrary);
+        List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
+        switches.add(NetSynthSwitches.outputOR);
+        
+        List<DGate> output = subCircuitSwap.implementSwap(netlist,switches, NetSynth.sublibrary);
         
         NetSynth.printNetlist(output);
         System.out.println("====================================\n");
