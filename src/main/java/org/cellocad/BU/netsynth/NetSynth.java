@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import org.cellocad.BU.subcircuit.CircuitLibrary;
 import org.cellocad.BU.subcircuit.SubNetlist;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
+import org.cellocad.BU.subcircuit.subCircuitSwap;
 
 /**
  *
@@ -460,7 +461,7 @@ public class NetSynth {
             dirsize = getRepressorsCost(dirnetlist);
             invsize = getRepressorsCost(invnetlist);
             structsize = getRepressorsCost(structnetlist);
-
+            //backhere
             if (synthesis.equals(NetSynthSwitches.originalstructural) || synthesis.equals(NetSynthSwitches.originalstructuralAND) || synthesis.equals(NetSynthSwitches.originalstructuralANDOR)) {
                 for (DGate xgate : structnetlist) {
                     netlist.add(xgate);
@@ -734,9 +735,19 @@ public class NetSynth {
     
     public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitches> switches){
         
+        initializeSubLibrary();
         List<String> inputnames = new ArrayList<String>();
         List<String> outputnames = new ArrayList<String>();
+        
+        double dirsize = 0;
+        double invsize = 0;
+        double structsize = 0;
+        double netsize = 0;
+        
+        
         List<DGate> netlist = new ArrayList<DGate>();
+        List<DGate> dirnetlist = new ArrayList<DGate>();
+        List<DGate> invnetlist = new ArrayList<DGate>();
         List<DGate> naiveNetlist = new ArrayList<DGate>();
         List<DGate> structNetlist = new ArrayList<DGate>();
         
@@ -755,13 +766,48 @@ public class NetSynth {
                 return naiveNetlist;
             } 
             else {
-                //structNetlist = parseStructuralVtoNORNOT(naivenetlist, nor3, synthesis); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+                
+                structNetlist = convertNaiveToNORNOT(naiveNetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
             }
+            List<String> ttValues = new ArrayList<String>();
+            List<String> invttValues = new ArrayList<String>();
+
+            ttValues = BooleanSimulator.getTruthTable(structNetlist, inputnames);  // Compute Truth Table of Each Output
+            invttValues = BooleanSimulator.invertTruthTable(ttValues); // Compute Inverse Truth Table of Each Output
+
+            CircuitDetails direct = new CircuitDetails(inputnames, outputnames, ttValues);
+            CircuitDetails inverted = new CircuitDetails(inputnames, outputnames, invttValues);
             
-            //seehere
+            dirnetlist = runEspressoAndABC(direct,switches);
+            invnetlist = runInvertedEspressoAndABC(inverted,switches);
+            
+            structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,sublibrary);
+            dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+            invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
+            
+            dirsize = getRepressorsCost(dirnetlist);
+            invsize = getRepressorsCost(invnetlist);
+            structsize = getRepressorsCost(structNetlist);
+            
+            if ((structsize <= dirsize) && (structsize <= invsize)) {
+                return structNetlist;
+            } 
+            else {
+                if (dirsize == invsize) {
+                    if (NOR3count(dirnetlist) < NOR3count(invnetlist)) {
+                        return dirnetlist;
+                    } else {
+                        return invnetlist;
+                    }
+                } else if (dirsize < invsize) {
+                    return dirnetlist;
+                } else {
+                    return invnetlist;
+                }
+            }
         }
         else{
-            
+            //seehere
         }
         
         
@@ -1211,7 +1257,114 @@ public class NetSynth {
             }
         }
     }
+    
+    
+    /**
+     * Function ************************************************************
+     * <br>
+     * Synopsis []
+     * <br>
+     * Description []
+     * <br>
+     * SideEffects []
+     * <br>
+     * SeeAlso []
+     *
+     * @param circ
+     * @param synthmode
+     * @param outpor
+     * @param twonots2nor
+     * @param nor3
+     * @return
+     * *********************************************************************
+     */
+    public static List<DGate> runEspressoAndABC(CircuitDetails circ, List<NetSynthSwitches> synthmode) {
 
+        
+        List<DGate> EspCircuit = new ArrayList<DGate>();
+        List<DGate> ABCCircuit = new ArrayList<DGate>();
+        List<String> espressoFile = new ArrayList<String>();
+        List<String> blifFile = new ArrayList<String>();
+
+        espressoFile = Espresso.createFile(circ);
+        blifFile = Blif.createFile(circ);
+        String filestring = "";
+        String Filepath = getFilepath();
+        
+        filestring = getResourcesFilepath();
+        String filestringblif = "";
+        filestringblif = filestring + "Blif_File";
+        filestringblif += ".blif";
+        String filestringesp = "";
+
+        filestringesp += filestring + "Espresso_File" + ".txt";
+        File fespinp = new File(filestringesp);
+        //Writer output;
+        try {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+
+            for (String xline : espressoFile) {
+                String newl = (xline + "\n");
+                output.write(newl);
+            }
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> EspOutput = new ArrayList<String>();
+        EspOutput = runEspresso(filestringesp);
+        fespinp.deleteOnExit();
+
+        EspCircuit = convertPOStoNORNOT(EspOutput);
+        EspCircuit = optimize(EspCircuit);
+
+        File fabcinp = new File(filestringblif);
+        try {
+            Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+            for (String xline : blifFile) {
+                String newl = (xline + "\n");
+                outputblif.write(newl);
+            }
+            outputblif.close();
+            List<DGate> abcoutput = new ArrayList<DGate>();
+
+            try {
+                abcoutput = runABC("Blif_File");
+
+            } catch (InterruptedException ex) {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            abcoutput = separateOutputGates(abcoutput);
+            abcoutput = optimize(abcoutput);
+
+            for (DGate xgate : abcoutput) {
+                ABCCircuit.add(xgate);
+            }
+            ABCCircuit = removeDanglingGates(ABCCircuit);
+            fabcinp.deleteOnExit();
+
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        fabcinp.deleteOnExit();
+
+        if (synthmode.contains(NetSynthSwitches.abc)) {
+            return ABCCircuit;
+        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+            return EspCircuit;
+        } else {
+            if (EspCircuit.size() < ABCCircuit.size()) {
+                return EspCircuit;
+            } else {
+                return ABCCircuit;
+            }
+        }
+    }
+    
+    
+    
+    
     /**
      * Function ************************************************************
      * <br>
@@ -1371,6 +1524,131 @@ public class NetSynth {
 
     }
 
+    public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ, List<NetSynthSwitches> synthmode) {
+
+        
+        List<DGate> EspCircuit = new ArrayList<DGate>();
+        List<DGate> ABCCircuit = new ArrayList<DGate>();
+        List<String> espressoFile = new ArrayList<String>();
+        List<String> blifFile = new ArrayList<String>();
+
+        espressoFile = Espresso.createFile(circ);
+        blifFile = Blif.createFile(circ);
+        String filestring = "";
+        String Filepath = getFilepath();
+
+        filestring = getResourcesFilepath();
+        String filestringblif = "";
+        filestringblif = filestring + "Blif_File";
+        filestringblif += ".blif";
+        String filestringesp = "";
+
+        filestringesp += filestring + "Espresso_File" + ".txt";
+        File fespinp = new File(filestringesp);
+        //Writer output;
+        try {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+
+            for (String xline : espressoFile) {
+                String newl = (xline + "\n");
+                output.write(newl);
+            }
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> EspOutput = new ArrayList<String>();
+        EspOutput = runEspresso(filestringesp);
+        fespinp.deleteOnExit();
+
+        EspCircuit = convertPOStoNORNOT(EspOutput);
+
+        File fabcinp = new File(filestringblif);
+        try {
+            Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
+            for (String xline : blifFile) {
+                String newl = (xline + "\n");
+                outputblif.write(newl);
+            }
+            outputblif.close();
+            List<DGate> abcoutput = new ArrayList<DGate>();
+
+            try {
+                abcoutput = runABC("Blif_File");
+
+            } catch (InterruptedException ex) {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            for (DGate xgate : abcoutput) {
+                ABCCircuit.add(xgate);
+            }
+            ABCCircuit = removeDanglingGates(ABCCircuit);
+            fabcinp.deleteOnExit();
+
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        fabcinp.deleteOnExit();
+
+        List<DGate> finalEspCircuit = new ArrayList<DGate>();
+        List<DGate> finalABCCircuit = new ArrayList<DGate>();
+
+        for (int i = 0; i < EspCircuit.size(); i++) {
+            if (EspCircuit.get(i).output.wtype.equals(DWireType.output)) {
+                String outname = "";
+                outname = EspCircuit.get(i).output.name.trim();
+                String notinpwirename = "0Wire" + Global.wirecount++;
+                DWire notinp = new DWire(notinpwirename, DWireType.connector);
+                EspCircuit.get(i).output = notinp;
+                finalEspCircuit.add(EspCircuit.get(i));
+                DGate outnot = new DGate();
+                outnot.gtype = DGateType.NOT;
+                outnot.input.add(notinp);
+                outnot.output = new DWire(outname, DWireType.output);
+                finalEspCircuit.add(outnot);
+            } else {
+                finalEspCircuit.add(EspCircuit.get(i));
+            }
+        }
+        for (int i = 0; i < ABCCircuit.size(); i++) {
+            if (ABCCircuit.get(i).output.wtype.equals(DWireType.output)) {
+                String outname = "";
+                outname = ABCCircuit.get(i).output.name.trim();
+                String notinpwirename = "0Wire" + Global.wirecount++;
+                DWire notinp = new DWire(notinpwirename, DWireType.connector);
+                ABCCircuit.get(i).output = notinp;
+                finalABCCircuit.add(ABCCircuit.get(i));
+                DGate outnot = new DGate();
+                outnot.gtype = DGateType.NOT;
+                outnot.input.add(notinp);
+                outnot.output = new DWire(outname, DWireType.output);
+                finalABCCircuit.add(outnot);
+            } else {
+                finalABCCircuit.add(ABCCircuit.get(i));
+            }
+        }
+
+        finalEspCircuit = optimize(finalEspCircuit);
+        finalABCCircuit = separateOutputGates(finalABCCircuit);
+        finalABCCircuit = optimize(finalABCCircuit);
+
+        if (synthmode.contains(NetSynthSwitches.abc)) {
+            return finalABCCircuit;
+        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+            return finalEspCircuit;
+        } else {
+            if (finalEspCircuit.size() < finalABCCircuit.size()) {
+                return finalEspCircuit;
+            } else {
+                return finalABCCircuit;
+            }
+        }
+
+    }
+
+    
     /**
      * Function ************************************************************
      * <br>
@@ -3845,7 +4123,30 @@ public class NetSynth {
 
         return structnetlist;
     }
+    
+    public static List<DGate> convertNaiveToNORNOT(List<DGate> netlist){
+        List<DGate> output = new ArrayList<DGate>();
+        
+        netlist = removeDanglingGates(netlist);
+        //System.out.println("------------------------------------");
+        List<DGate> reducedfanin = new ArrayList<DGate>();
 
+        for (int i = 0; i < netlist.size(); i++) {
+            for (DGate redgate : NetlistConversionFunctions.ConvertToFanin2(netlist.get(i))) {
+                reducedfanin.add(redgate);
+            }
+        }
+        for (int i = 0; i < reducedfanin.size(); i++) {
+            for (DGate structgate : NetlistConversionFunctions.GatetoNORNOT(reducedfanin.get(i))) {
+                output.add(structgate);
+            }
+        }
+
+        output = optimize(output);
+
+        return output;
+    }
+    
     /**
      * Function ************************************************************
      * <br>
