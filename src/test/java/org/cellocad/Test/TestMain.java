@@ -64,7 +64,12 @@ public class TestMain {
             
             //PreCompute.getCircuitLibrary("netlist_in3out1.json");
             
-            TestSubcircuit.testgetSubcircuitDetails();
+            //TestSubcircuit.testgetSubcircuitDetails();
+            
+            TestSynthesis.testNewgetNetlist(3, 69);
+            
+
+
             //NetSynth.initializeSubLibrary();
 
 

@@ -621,6 +621,29 @@ public class TestSynthesis {
         
     }
     
+    
+    
+    public static void testNewgetNetlist(int n,int tt)
+    {
+       
+            List<String> verilogFileLines = new ArrayList<String>();
+            verilogFileLines = genVerilogFile.createSingleOutpVerilogFile(n, tt);
+            String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
+            DAGW newdag = new DAGW();
+            //newdag = NetSynth.runNetSynth(filepath);
+            List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
+            newdag = NetSynth.runNetSynth(filepath, switches);
+            System.out.println("\nDAGW Gates");
+            for(Gate xgate:newdag.Gates)
+            {
+                System.out.println("Gate Type: " + xgate.Type + " : Gate Name: " + xgate.Name);
+            }
+            
+            System.out.println("\n\nPrint Graph: \n"+newdag.printGraph());
+    }
+    
+    
+    
     public static void testSpecInputVerilog(int n,int tt)
     {
        

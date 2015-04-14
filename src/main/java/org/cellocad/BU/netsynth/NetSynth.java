@@ -868,6 +868,7 @@ public class NetSynth {
                     
                     dirnetlist = runEspressoAndABC(direct, switches);
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
+                    
                     dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                     invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     
@@ -2115,16 +2116,7 @@ public class NetSynth {
     public static String create_VerilogFile(List<String> filelines, String filename) {
         String filestring = "";
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (Filepath.contains("build/classes/")) {
-            Filepath = Filepath.substring(0, Filepath.lastIndexOf("build/classes/"));
-        } else if (Filepath.contains("src")) {
-            Filepath = Filepath.substring(0, Filepath.lastIndexOf("src/"));
-        }
-        if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/";
-        } else {
-            filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/";
-        }
+        filestring = NetSynth.getResourcesFilepath();
         filestring += filename + ".v";
         File fespinp = new File(filestring);
         //Writer output;
@@ -4565,10 +4557,14 @@ public class NetSynth {
 
     
     public static List<DGate> optimize(List<DGate> netlist){
+        
         List<DGate> output = new ArrayList<DGate>();
         
         output = removeDanglingGates(netlist);
+        output = rewireNetlist(output);
+        
         output = separateOutputGates(output);
+        output = rewireNetlist(output);
         
         //What is going on here???? Need to check this.
         output = removeDuplicateNots(output);
@@ -4580,11 +4576,22 @@ public class NetSynth {
         output = removeDanglingGates(output);
         output = rewireNetlist(output);
         
-        output = removeDanglingGates(output);
-        output = rewireNetlist(output);
         
+        List<String> inputNames = new ArrayList<String>();
+        for(DGate gate:output){
+            for(DWire wire:gate.input){
+                if(wire.wtype.equals(DWireType.input)){
+                    if(!inputNames.contains(wire.name)){
+                        inputNames.add(wire.name);
+                    }
+                }
+            }
+        }
+        
+        output = NetSynth.assignWireLogic(inputNames, output);
         output = removeDuplicateLogicGate(output);
         output = rewireNetlist(output);
+        
         
         output = removeDanglingGates(output);
         output = rewireNetlist(output);
