@@ -636,7 +636,7 @@ public class TestSynthesis {
             System.out.println("\nDAGW Gates");
             for(Gate xgate:newdag.Gates)
             {
-                System.out.println("Gate Type: " + xgate.Type + " : Gate Name: " + xgate.Name);
+                System.out.println("Gate Type: " + xgate.Type.toString() + " : Gate Name: " + xgate.Name);
             }
             
             System.out.println("\n\nPrint Graph: \n"+newdag.printGraph());

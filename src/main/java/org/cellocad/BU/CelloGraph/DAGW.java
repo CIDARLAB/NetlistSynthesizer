@@ -143,7 +143,7 @@ public class DAGW {
             int flag =0;
             for(int j=0;j<obj.Gates.size();j++)
             {
-                if(obj.Gates.get(j).Type.equals(GateType.INPUT.toString()))
+                if(obj.Gates.get(j).Type.equals(GateType.INPUT))
                 {
                     if(obj.Gates.get(j).Name.trim().equals(inputnames.get(i).trim()))
                     {
@@ -156,7 +156,7 @@ public class DAGW {
                 Gate dangGate = new Gate();
                 dangGate.Index = indx;
                 dangGate.Name = inputnames.get(i).trim();
-                dangGate.Type = GateType.INPUT.toString();
+                dangGate.Type = GateType.INPUT;
                 indx--;
                 inpGates.add(dangGate);
             }
@@ -187,7 +187,7 @@ public class DAGW {
         HashMap<Integer, Gate> inpGates = new HashMap<Integer, Gate>(); 
         for(int i=0;i<obj.Gates.size();i++)
         {
-            if(obj.Gates.get(i).Type.equals(GateType.INPUT.toString()))
+            if(obj.Gates.get(i).Type.equals(GateType.INPUT))
             {
                 firstindex = i;
                 break;

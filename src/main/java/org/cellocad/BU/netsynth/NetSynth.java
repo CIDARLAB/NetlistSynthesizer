@@ -5035,13 +5035,13 @@ public class NetSynth {
             Gate outb = new Gate();
             Gate inpb = new Gate();
 
-            outb.Type = "OUTPUT";
+            outb.Type = GateType.OUTPUT;
             outb.Name = netlist.get(0).output.name;
             outb.Index = 0;
 
             inpb.Index = 1;
             inpb.Name = netlist.get(0).input.get(0).name;
-            inpb.Type = "INPUT";
+            inpb.Type = GateType.INPUT;
 
             Wire edge = new Wire();
 
@@ -5106,10 +5106,10 @@ public class NetSynth {
             Gate outg = new Gate();
             outg.Name = outputwires.get(i);
             if (outputORwires.contains(outputwires.get(i))) {
-                outg.Type = GateType.OUTPUT_OR.toString();
+                outg.Type = GateType.OUTPUT_OR;
                 outg.outW = new DWire(outputwires.get(i), DWireType.output);
             } else {
-                outg.Type = GateType.OUTPUT.toString();
+                outg.Type = GateType.OUTPUT;
             }
 
             outg.Index = indx;
@@ -5119,25 +5119,25 @@ public class NetSynth {
         for (int i = netlist.size() - 1; i >= 0; i--) {
             DGate netg = netlist.get(i);
             if (netg.gtype.equals(DGateType.NOR)) {
-                Gate norg = new Gate(indx, GateType.NOR.toString());
+                Gate norg = new Gate(indx, GateType.NOR);
                 norg.outW = netg.output;
 
                 indx++;
                 Gates.add(norg);
             } else if (netg.gtype.equals(DGateType.AND)) {
-                Gate norg = new Gate(indx, GateType.AND.toString());
+                Gate norg = new Gate(indx, GateType.AND);
                 norg.outW = netg.output;
 
                 indx++;
                 Gates.add(norg);
             } else if (netg.gtype.equals(DGateType.OR) && (!netg.output.wtype.equals(DWireType.output))) {
-                Gate norg = new Gate(indx, GateType.OR.toString());
+                Gate norg = new Gate(indx, GateType.OR);
                 norg.outW = netg.output;
 
                 indx++;
                 Gates.add(norg);
             } else if (netg.gtype.equals(DGateType.NOT)) {
-                Gate notg = new Gate(indx, GateType.NOT.toString());
+                Gate notg = new Gate(indx, GateType.NOT);
                 notg.outW = netg.output;
                 indx++;
                 Gates.add(notg);
@@ -5146,7 +5146,7 @@ public class NetSynth {
         for (int i = 0; i < inputwires.size(); i++) {
             Gate ing = new Gate();
             ing.Name = inputwires.get(i);
-            ing.Type = GateType.INPUT.toString();
+            ing.Type = GateType.INPUT;
             ing.Index = indx;
             indx++;
             Gates.add(ing);
@@ -5441,13 +5441,13 @@ public class NetSynth {
             Gate outb = new Gate();
             Gate inpb = new Gate();
 
-            outb.Type = "OUTPUT";
+            outb.Type = GateType.OUTPUT;
             outb.Name = netlist.get(0).output.name;
             outb.Index = 0;
 
             inpb.Index = 1;
             inpb.Name = netlist.get(0).input.get(0).name;
-            inpb.Type = "INPUT";
+            inpb.Type = GateType.INPUT;
 
             Wire edge = new Wire();
 
@@ -5510,7 +5510,7 @@ public class NetSynth {
                 if (netg.gtype == DGateType.OR) {
                     Gate outor = null;
                     outpIndx = IndX;
-                    outor = new Gate(IndX++, VertexType.OUTPUT_OR.toString());
+                    outor = new Gate(IndX++, GateType.OUTPUT_OR);
                     outor.Name = netg.output.name;
                     vertexhash.put(netg, outor);
                     Gates.add(outor);
@@ -5519,13 +5519,13 @@ public class NetSynth {
                     Gate lvert = null;
                     if (netg.gtype == DGateType.NOT) {
                         outpIndx = IndX;
-                        out = new Gate(IndX++, VertexType.OUTPUT.toString());
-                        lvert = new Gate(IndX++, VertexType.NOT.toString());
+                        out = new Gate(IndX++, GateType.OUTPUT);
+                        lvert = new Gate(IndX++, GateType.NOT);
                         vertexhash.put(netg, lvert);
                     } else if (netg.gtype == DGateType.NOR) {
                         outpIndx = IndX;
-                        out = new Gate(IndX++, VertexType.OUTPUT.toString());
-                        lvert = new Gate(IndX++, VertexType.NOR.toString());
+                        out = new Gate(IndX++, GateType.OUTPUT);
+                        lvert = new Gate(IndX++, GateType.NOR);
                         vertexhash.put(netg, lvert);
                     }
                     out.Name = netg.output.name;
@@ -5539,9 +5539,9 @@ public class NetSynth {
             } else {
                 Gate vert = null;
                 if (netg.gtype == DGateType.NOT) {
-                    vert = new Gate(IndX++, VertexType.NOT.toString());
+                    vert = new Gate(IndX++, GateType.NOT);
                 } else if (netg.gtype == DGateType.NOR) {
-                    vert = new Gate(IndX++, VertexType.NOR.toString());
+                    vert = new Gate(IndX++, GateType.NOR);
                 }
                 vert.outW = netg.output;
 
@@ -5550,7 +5550,7 @@ public class NetSynth {
             }
         }
         for (DWire inpx : inplist) {
-            Gate vert = new Gate(IndX++, VertexType.INPUT.toString());
+            Gate vert = new Gate(IndX++, GateType.INPUT);
             vert.outW = inpx;
             vert.Name = inpx.name;
             vert.Outgoing = null;
@@ -5594,7 +5594,7 @@ public class NetSynth {
         }
 
         for (Wire edg : Wires) {
-            if (edg.From.Type == "NOR" || edg.From.Type == "OUTPUT_OR") {
+            if (edg.From.Type.equals(GateType.NOR) || edg.From.Type.equals(GateType.OUTPUT_OR)) {
                 if (!(edg.Next == null)) {
                     int count = 0;
 

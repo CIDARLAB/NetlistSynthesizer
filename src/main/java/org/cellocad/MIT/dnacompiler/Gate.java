@@ -31,7 +31,7 @@ public class Gate {
     public DWire outW = new DWire();
     public int Index;
     public String Name;
-    public String Type;
+    public GateType Type;
     public Wire Outgoing; //toward INPUTS. note that a gate is not aware of its wire(s) going toward OUTPUT
 
     public ArrayList<Integer> logics;
@@ -83,7 +83,7 @@ public class Gate {
 	this.Index = 0;
         this.stage =0;
 	this.Name = "";
-	this.Type = "";
+	this.Type = null;
         this.Outgoing = null;
 	this.tir_ratio =  -1.0;
 	this.score = -1.0;
@@ -95,7 +95,7 @@ public class Gate {
     }
 
     ///////////prashant's///////////
-    public Gate(int ind,String dType)
+    public Gate(int ind,GateType dType)
     {
         this.Index = ind;
         this.stage = 0;
@@ -124,7 +124,7 @@ public class Gate {
 	this.direction = "+";
     }
 
-    public Gate(int ind,String dType,Wire de)
+    public Gate(int ind,GateType dType,Wire de)
     {
         this.stage =0;
         this.Index = ind;
@@ -180,7 +180,7 @@ public class Gate {
         this.stage =0;
 	this.Index = 0;
 	//this.Name = "";
-	this.Type = "";
+	this.Type = null;
         this.Outgoing = null;
 	this.outW = null;
 

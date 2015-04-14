@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.cellocad.MIT.dnacompiler.Gate.GateType;
 
 /**
  *
@@ -142,14 +143,14 @@ public class TestEspresso {
                         gatessize = circuitDAGinv.Gates.size();
                         if("NOR".equals(circuitDAG.Gates.get(1).Type))
                         {
-                            circuitDAG.Gates.get(1).Type = Gate.GateType.OUTPUT_OR.toString();
+                            circuitDAG.Gates.get(1).Type = Gate.GateType.OUTPUT_OR;
                             circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
                             
                             circuitDAG.Gates.remove(0);
                         }
                         else if("NOT".equals(circuitDAG.Gates.get(1).Type))
                         {
-                            circuitDAG.Gates.get(1).Type = Gate.GateType.OUTPUT.toString();
+                            circuitDAG.Gates.get(1).Type = Gate.GateType.OUTPUT;
                             circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
                             circuitDAG.Gates.remove(0);
                         }
@@ -197,7 +198,7 @@ public class TestEspresso {
                         Gate uainp = new Gate();
                         uainp.Outgoing = null;
                         uainp.Index = -1;
-                        uainp.Type = Gate.GateType.INPUT.toString();
+                        uainp.Type = Gate.GateType.INPUT;
                         uainp.Name = caseCirc.inputNames.get(jj);
                         circuitDAG.Gates.add(uainp);
                     }
@@ -370,13 +371,13 @@ public class TestEspresso {
                             //System.out.println("Special Case");
                             circuitDAG = circuitDAGinv;
                             gatessize = circuitDAGinv.Gates.size();
-                            if (circuitDAG.Gates.get(1).Type == "NOR") {
-                                circuitDAG.Gates.get(1).Type = Gate.GateType.OUTPUT_OR.toString();
+                            if (circuitDAG.Gates.get(1).Type.equals(GateType.NOR)) {
+                                circuitDAG.Gates.get(1).Type = Gate.GateType.OUTPUT_OR;
                                 circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
                                 circuitDAG.Gates.remove(0);
                                 circuitDAG.Wires.remove(0);
-                            } else if (circuitDAG.Gates.get(1).Type == "NOT") {
-                                circuitDAG.Gates.get(1).Type = Gate.GateType.OUTPUT.toString();
+                            } else if (circuitDAG.Gates.get(1).Type.equals(GateType.NOT) ) {
+                                circuitDAG.Gates.get(1).Type = Gate.GateType.OUTPUT;
                                 circuitDAG.Gates.get(1).Name = circuitDAG.Gates.get(0).Name;
                                 circuitDAG.Gates.remove(0);
                                 circuitDAG.Wires.remove(0);
@@ -406,7 +407,7 @@ public class TestEspresso {
                             Gate uainp = new Gate();
                             uainp.Outgoing = null;
                             uainp.Index = -1;
-                            uainp.Type = Gate.GateType.INPUT.toString();
+                            uainp.Type = Gate.GateType.INPUT;
                             uainp.Name = xinp.trim();
                             circuitDAG.Gates.add(uainp);
                         }
