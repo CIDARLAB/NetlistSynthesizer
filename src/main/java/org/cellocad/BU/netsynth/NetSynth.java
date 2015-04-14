@@ -277,6 +277,36 @@ public class NetSynth {
         return finaldag;
     }
 
+    public static DAGW runNetSynth(String vfilepath, List<NetSynthSwitches> switches) {
+
+        DAGW finaldag = new DAGW();
+
+        List<String> inputnames = new ArrayList<String>();
+        List<String> outputnames = new ArrayList<String>();
+        List<DGate> netlist = new ArrayList<DGate>();
+
+        boolean isStructural = false;
+        boolean hasCaseStatements = false;
+
+        String alllines = parseVerilogFile.verilogFileLines(vfilepath);
+        isStructural = parseVerilogFile.isStructural(alllines);
+        hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
+
+        inputnames = parseVerilogFile.getInputNames(alllines);
+        outputnames = parseVerilogFile.getOutputNames(alllines);
+
+        netlist = getNetlist(vfilepath, switches);
+        netlist = rewireNetlist(netlist);
+        
+        finaldag = CreateMultDAGW(netlist);
+        System.out.println(inputnames);
+        
+        finaldag = DAGW.addDanglingInputs(finaldag, inputnames);
+        finaldag = DAGW.reorderinputs(finaldag, inputnames);
+
+        return finaldag;
+    }
+
     /**
      * Function ************************************************************
      * <br>
