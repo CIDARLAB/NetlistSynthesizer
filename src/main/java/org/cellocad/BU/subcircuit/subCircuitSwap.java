@@ -119,7 +119,8 @@ public class subCircuitSwap {
                             
                             
                             List<String> inputNames = new ArrayList<String>();
-                            for (DGate gate : output) {
+                            //for (DGate gate : netlist) {
+                            for (DGate gate : output) { //Previous. Input names incorrect
                                 for (DWire wire : gate.input) {
                                     if (wire.wtype.equals(DWireType.input)) {
                                         if (!inputNames.contains(wire.name)) {
@@ -131,6 +132,16 @@ public class subCircuitSwap {
                             
                             
                             //if()
+                            System.out.println("DEBUG!!!!");
+                            System.out.println("Input Names:" + inputNames);
+                            
+                            //System.out.println("Temp Netlist");
+                            //NetSynth.printNetlist(tempNetlist);
+                            
+                            //System.out.println("===Netlist===");
+                            //NetSynth.printNetlist(netlist);
+                            
+                            
                             List<String> tt1 = BooleanSimulator.getTruthTable(tempNetlist, inputNames);
                             List<String> tt2 = BooleanSimulator.getTruthTable(netlist,inputNames);
                             if (equalFunctions(tt1, tt2)) {

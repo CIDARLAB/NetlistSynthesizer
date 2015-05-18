@@ -276,7 +276,28 @@ public class NetSynth {
 
         return finaldag;
     }
+    
+    
+    public static DAGW runNetSynthCode(String codeLines, List<NetSynthSwitches> switches) {
 
+        DAGW finaldag = new DAGW();
+        
+        String filepath = "";
+        filepath = getResourcesFilepath();
+        filepath += "tempVerilog.v";
+        File fespinp = new File(filepath);
+        try {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            output.write(codeLines);
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finaldag = runNetSynth(filepath,switches);
+
+        return finaldag;
+    }
+    
     public static DAGW runNetSynth(String vfilepath, List<NetSynthSwitches> switches) {
 
         DAGW finaldag = new DAGW();
@@ -306,7 +327,7 @@ public class NetSynth {
 
         return finaldag;
     }
-
+    
     /**
      * Function ************************************************************
      * <br>

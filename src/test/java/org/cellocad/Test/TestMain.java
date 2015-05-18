@@ -66,8 +66,8 @@ public class TestMain {
             
             //TestSubcircuit.testgetSubcircuitDetails();
             
-            TestSynthesis.testNewgetNetlist(3, 33);
-            
+            //TestSynthesis.testNewgetNetlist(4, 56);
+                NetSynth.runNetSynthCode(null, null);
 
 
             //NetSynth.initializeSubLibrary();
