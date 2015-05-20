@@ -4272,6 +4272,7 @@ public class NetSynth {
             for (int j = i + 1; j < inpnetlist.size(); j++) {
                 String logic2 = inpnetlist.get(j).output.logicValue;
                 if (logic1.equals(logic2)) {
+                    
                     if (inpnetlist.get(i).output.wtype.equals(DWireType.output)) {
                         for (DGate xgate : inpnetlist) {
                             for (int k = 0; k < xgate.input.size(); k++) {
@@ -5393,7 +5394,9 @@ public class NetSynth {
 
     public static List<DGate> assignWireLogic(List<String> inputNames, List<DGate> netlist) {
         int pow = (int) Math.pow(2, inputNames.size());
-
+        for(DGate gate:netlist){
+            gate.output.logicValue = "";
+        }
         for (int i = 0; i < pow; i++) {
             String inputBool = Convert.dectoBin(i, inputNames.size());
             Map<String, Character> inputVals = new HashMap<String, Character>();

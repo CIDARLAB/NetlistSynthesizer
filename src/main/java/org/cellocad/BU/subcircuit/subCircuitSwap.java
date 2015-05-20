@@ -26,7 +26,7 @@ import org.cellocad.BU.netsynth.NetSynthSwitches;
 public class subCircuitSwap {
     
     //Need to make some framework. Can be done later. Implement 3 input 1 output motifs now. 
-    public static List<DGate> implementSwap(List<DGate> netlist,List<NetSynthSwitches> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
+    public static List<DGate> implementSwap(List<DGate> netlist, List<NetSynthSwitches> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
     {
         
         netlist = NetSynth.rewireNetlist(netlist);
@@ -76,6 +76,7 @@ public class subCircuitSwap {
     }
     
     public static List<DGate> nodeRewrite(List<DGate> netlist,List<NetSynthSwitches> switches,int index,Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
+        
         List<DGate> output = new ArrayList<DGate>();
         for(DGate gate:netlist){
             output.add(new DGate(gate));
@@ -130,17 +131,21 @@ public class subCircuitSwap {
                                 }
                             }
                             
-                            
-                            //if()
-                            System.out.println("DEBUG!!!!");
-                            System.out.println("Input Names:" + inputNames);
-                            
-                            //System.out.println("Temp Netlist");
-                            //NetSynth.printNetlist(tempNetlist);
-                            
-                            //System.out.println("===Netlist===");
-                            //NetSynth.printNetlist(netlist);
-                            
+                            //if(inputNames.get(0).equals("inp1")){
+                                
+                                //System.out.println("Breaks here");
+                                
+                                /*System.out.println("Input Names:" + inputNames);
+                                NetSynth.printDebugStatement("TempNetlist");
+                                NetSynth.printNetlist(tempNetlist);
+                                
+                                NetSynth.printDebugStatement("Netlist");
+                                NetSynth.printNetlist(netlist);
+                                
+                                NetSynth.printDebugStatement("Output");
+                                NetSynth.printNetlist(output);
+                                */
+                            //}
                             
                             List<String> tt1 = BooleanSimulator.getTruthTable(tempNetlist, inputNames);
                             List<String> tt2 = BooleanSimulator.getTruthTable(netlist,inputNames);
@@ -158,6 +163,9 @@ public class subCircuitSwap {
                 }
             }
         }
+        
+        //NetSynth.printDebugStatement("Final Output");
+        //NetSynth.printNetlist(output);
         
         return output;
     }
@@ -204,7 +212,7 @@ public class subCircuitSwap {
         Map<String,DWireType> wireTypeMap = getInputWtypes(output,updatedMap);
         
         renameSubcircuitWires(subcircopy,updatedMap,wireTypeMap);
-        
+          
         //Rename output Wire and reassign wire type.
         subcircopy.get(subcircopy.size()-1).output.name = output.get(index).output.name;
         subcircopy.get(subcircopy.size()-1).output.wtype = output.get(index).output.wtype;
@@ -223,8 +231,12 @@ public class subCircuitSwap {
         //Remove Dangling Nodes
         output = NetSynth.removeDanglingGates(output);
         
+        
+        
         //Rewire Nodes
         output = NetSynth.rewireNetlist(output);
+        
+        
         
         //Remove Gates with Duplicate Logic
         List<String> inputNames = new ArrayList<String>();
@@ -239,11 +251,12 @@ public class subCircuitSwap {
         }
         
         output = NetSynth.assignWireLogic(inputNames, output);
-        output = NetSynth.removeDuplicateLogicGate(output);
         
-        //Rewire Nodes
+        output = NetSynth.removeDuplicateLogicGate(output);
         output = NetSynth.rewireNetlist(output);
+        
         renameWires(output,false);
+        
         
         return output;
     }
@@ -303,7 +316,11 @@ public class subCircuitSwap {
     
     public static Map<String,String> renameWires(List<DGate> netlist, boolean subcircuit){
         
-        //NetSynth.printNetlist(netlist);
+        String tempPrefix = "0z";
+        Map<String,String> tempMap = new HashMap<String,String>();
+        
+        Map<String,String> swapMap = new HashMap<String,String>();
+        
         String wirePrefix = "0w";
         if(subcircuit)
             wirePrefix = "0sw";
@@ -312,8 +329,8 @@ public class subCircuitSwap {
         for(DGate gate:netlist){
             for(DWire inp:gate.input){
                 if(inp.wtype.equals(DWireType.connector)){
-                    if(nameMap.containsKey(inp.name)){
-                        inp.name = nameMap.get(inp.name);
+                    if(swapMap.containsKey(inp.name)){
+                        inp.name = swapMap.get(inp.name);
                     }
                     //Should never reach this else block. Remove and see what happens.
                     /*else{
@@ -328,14 +345,28 @@ public class subCircuitSwap {
                 
                 if (!nameMap.containsKey(gate.output.name)) {
                     String wirename = wirePrefix + indx;
+                    String tempname = tempPrefix + indx;
+                    tempMap.put(tempname, wirename);
+                    swapMap.put(gate.output.name, tempname);
                     indx++;
                     nameMap.put(gate.output.name, wirename);
-                    gate.output.name = wirename;
+                    gate.output.name = tempname;
                 } 
                 //Should never reach this else block. Remove and see what happens.
                 /*else {
                     gate.output.name = nameMap.get(gate.output.name);
                 }*/
+            }
+        }
+        
+        for(DGate gate:netlist){
+            if(tempMap.containsKey(gate.output.name)){
+                gate.output.name = tempMap.get(gate.output.name);
+            }
+            for(DWire wire:gate.input){
+                if(tempMap.containsKey(wire.name)){
+                    wire.name = tempMap.get(wire.name);
+                }
             }
         }
         //System.out.println("Renamed Circuit");
