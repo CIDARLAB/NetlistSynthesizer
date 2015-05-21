@@ -890,6 +890,7 @@ public class NetSynth {
                     dirnetlist = runEspressoAndABC(direct, switches);
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
                     
+                    
                     dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                     invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     
@@ -1418,9 +1419,9 @@ public class NetSynth {
             ABCCircuit = parseEspressoOutToABC(EspOutput);
         }
 
-        if (synthmode.contains(NetSynthSwitches.abc)) {
+        if (synthmode.contains(NetSynthSwitches.abc) && !synthmode.contains(NetSynthSwitches.espresso)) {
             return finalABCCircuit;
-        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+        } else if (synthmode.contains(NetSynthSwitches.espresso) && !synthmode.contains(NetSynthSwitches.abc)) {
             return finalEspCircuit;
         } else {
             if (finalEspCircuit.size() < finalABCCircuit.size()) {
@@ -1612,7 +1613,8 @@ public class NetSynth {
 
         EspCircuit = convertPOStoNORNOT(EspOutput);
         EspCircuit = optimize(EspCircuit);
-
+        
+        
         File fabcinp = new File(filestringblif);
         try {
             Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
@@ -1644,9 +1646,9 @@ public class NetSynth {
         }
         fabcinp.deleteOnExit();
 
-        if (synthmode.contains(NetSynthSwitches.abc)) {
+        if (synthmode.contains(NetSynthSwitches.abc) && !synthmode.contains(NetSynthSwitches.espresso)) {
             return ABCCircuit;
-        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+        } else if (synthmode.contains(NetSynthSwitches.espresso) && !synthmode.contains(NetSynthSwitches.abc)) {
             return EspCircuit;
         } else {
             if (EspCircuit.size() < ABCCircuit.size()) {
@@ -1929,9 +1931,9 @@ public class NetSynth {
         finalABCCircuit = separateOutputGates(finalABCCircuit);
         finalABCCircuit = optimize(finalABCCircuit);
 
-        if (synthmode.contains(NetSynthSwitches.abc)) {
+        if (synthmode.contains(NetSynthSwitches.abc) && !synthmode.contains(NetSynthSwitches.espresso)) {
             return finalABCCircuit;
-        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+        } else if (synthmode.contains(NetSynthSwitches.espresso) && !synthmode.contains(NetSynthSwitches.abc)) {
             return finalEspCircuit;
         } else {
             if (finalEspCircuit.size() < finalABCCircuit.size()) {
@@ -2839,7 +2841,7 @@ public class NetSynth {
                 output.write(line);
             }
             output.close();
-            fbool.deleteOnExit();
+            fbool.delete();
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -3218,6 +3220,7 @@ public class NetSynth {
 
         //for(String xespinp:espinp)
         //    System.out.println(xespinp);
+        
         List<DGate> netlist = new ArrayList<DGate>();
         one = new DWire("_one", DWireType.Source);
         zero = new DWire("_zero", DWireType.GND);
