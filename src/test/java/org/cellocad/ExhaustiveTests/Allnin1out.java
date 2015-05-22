@@ -57,10 +57,9 @@ public class Allnin1out {
                     String inpName = "inp" + j;
                     inputnames.add(inpName);
                 }
-                
                 List<DGate> netlist = new ArrayList<DGate>();
                 netlist = NetSynth.getNetlist(filepath, switches);
-                String tt = BooleanSimulator.getTruthTable(netlist, inputnames).get(0);
+                String tt = BooleanSimulator.getTruthTable(netlist, inputnames).get(0); 
                 
                 int ttIntVal = Convert.bintoDec(tt);
                 if(ttIntVal != i){
@@ -85,8 +84,8 @@ public class Allnin1out {
        boolean result;
        List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
        switches.add(NetSynthSwitches.espresso);
-       //switches.add(NetSynthSwitches.outputOR);
-       int size = 4;
+       switches.add(NetSynthSwitches.outputOR);
+       int size = 3;
        result = verify3in1out(switches,size);
        String assertMessage = size + " Input 1 Output Test Failed.";
        assertTrue(assertMessage,result);

@@ -33,16 +33,28 @@ public class subCircuitSwap {
         renameWires(netlist,false);
         netlist = NetSynth.rewireNetlist(netlist);
         
+        List<String> inputNames = new ArrayList<String>();
+        
+        for(DGate gate:netlist){
+            for(DWire wire:gate.input){
+                if(wire.wtype.equals(DWireType.input)){
+                    if(!inputNames.contains(wire.name)){
+                        inputNames.add(wire.name);
+                    }
+                }
+            }
+        }
         
         List<DGate> output = new ArrayList<DGate>();
         //System.out.println("Reached here");
         output = nodeRewrite(netlist,switches,netlist.size()-1, sublibrary);
-        String wireName = output.get(output.size()-1).output.name;
+        output = NetSynth.assignWireLogic(inputNames, output);
+        String wireLogic = output.get(output.size()-1).output.logicValue;
         int indx = output.size()-1;
         
         do{
             for(int i=output.size()-1;i>=0;i--){
-                if(output.get(i).output.name.equals(wireName)){
+                if(output.get(i).output.logicValue.equals(wireLogic)){
                     indx = i;
                 }
             }
@@ -52,9 +64,12 @@ public class subCircuitSwap {
             else{
                 indx --;
             }
-            List<DGate> temp = new ArrayList<DGate>();
-            wireName = output.get(indx).output.name;    
+            //List<DGate> temp = new ArrayList<DGate>();
+            
+            //System.out.println("Index : "+indx);
+            wireLogic = output.get(indx).output.logicValue;    
             output = nodeRewrite(output,switches,indx, sublibrary);
+            output = NetSynth.assignWireLogic(inputNames, output);
             
         }while(true);
         
