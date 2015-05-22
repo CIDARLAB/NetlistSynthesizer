@@ -269,7 +269,7 @@ public class NetSynth {
         netlist = rewireNetlist(netlist);
         
         finaldag = CreateMultDAGW(netlist);
-        System.out.println(inputnames);
+        //System.out.println(inputnames);
         
         finaldag = DAGW.addDanglingInputs(finaldag, inputnames);
         finaldag = DAGW.reorderinputs(finaldag, inputnames);
@@ -320,7 +320,7 @@ public class NetSynth {
         netlist = rewireNetlist(netlist);
         
         finaldag = CreateMultDAGW(netlist);
-        System.out.println(inputnames);
+        //System.out.println(inputnames);
         
         finaldag = DAGW.addDanglingInputs(finaldag, inputnames);
         finaldag = DAGW.reorderinputs(finaldag, inputnames);
