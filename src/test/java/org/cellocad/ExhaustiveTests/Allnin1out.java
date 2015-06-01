@@ -39,7 +39,7 @@ public class Allnin1out {
         int noOfTT = (int)Math.pow(2, ttSize);
         for(int i=0;i<noOfTT;i++){
             try {
-                System.out.println("TT Val ::"+i);
+                
                 
                 
                 List<String> verilogFileLines = new ArrayList<String>();
@@ -58,8 +58,17 @@ public class Allnin1out {
                     inputnames.add(inpName);
                 }
                 List<DGate> netlist = new ArrayList<DGate>();
+                
+                long startTime = System.nanoTime();
                 netlist = NetSynth.getNetlist(filepath, switches);
+                long endTime = System.nanoTime();
+                
+                long duration = (endTime - startTime)/1000000;
+                System.out.println("That took ::"+duration+" milliseconds");
                 String tt = BooleanSimulator.getTruthTable(netlist, inputnames).get(0); 
+                
+                System.out.println("TT Val ::"+i+":: Circuit Size = " + netlist.size());
+                
                 
                 int ttIntVal = Convert.bintoDec(tt);
                 if(ttIntVal != i){
@@ -83,9 +92,9 @@ public class Allnin1out {
     public void testAllCombinations(){
        boolean result;
        List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
-       switches.add(NetSynthSwitches.espresso);
+       //switches.add(NetSynthSwitches.espresso);
        switches.add(NetSynthSwitches.outputOR);
-       int size = 3;
+       int size = 4;
        result = verify3in1out(switches,size);
        String assertMessage = size + " Input 1 Output Test Failed.";
        assertTrue(assertMessage,result);

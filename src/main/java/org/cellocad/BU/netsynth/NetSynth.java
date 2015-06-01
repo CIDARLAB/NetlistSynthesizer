@@ -4,8 +4,8 @@
  */
 package org.cellocad.BU.netsynth;
 
-import org.cellocad.BU.CelloGraph.DAGVertex.VertexType;
-import org.cellocad.BU.CelloGraph.DAGW;
+import org.cellocad.BU.DAG.DAGVertex.VertexType;
+import org.cellocad.BU.DAG.DAGW;
 import org.cellocad.BU.ParseVerilog.Blif;
 import org.cellocad.BU.ParseVerilog.CircuitDetails;
 import org.cellocad.BU.ParseVerilog.Convert;
@@ -890,10 +890,18 @@ public class NetSynth {
                     dirnetlist = runEspressoAndABC(direct, switches);
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
                     
+                    //printDebugStatement("Start Sub circ swap");
+                    
                     
                     dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
-                    invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     
+                    //printDebugStatement("Direct Netlist Result");
+                    //printNetlist(dirnetlist);
+                    
+                    invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
+
+                    //printDebugStatement("Inverted Netlist Result");
+                    //printNetlist(invnetlist);                    
                     dirsize = getRepressorsCost(dirnetlist);
                     invsize = getRepressorsCost(invnetlist);
 

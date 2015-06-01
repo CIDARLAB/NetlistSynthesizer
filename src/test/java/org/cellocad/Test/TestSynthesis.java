@@ -4,7 +4,7 @@
  */
 package org.cellocad.Test;
 
-import org.cellocad.BU.CelloGraph.DAGW;
+import org.cellocad.BU.DAG.DAGW;
 import org.cellocad.BU.ParseVerilog.Blif;
 import org.cellocad.BU.ParseVerilog.CircuitDetails;
 import org.cellocad.BU.ParseVerilog.Convert;
