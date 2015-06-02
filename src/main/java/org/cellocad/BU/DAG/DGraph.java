@@ -31,7 +31,7 @@ public class DGraph {
                 if(wire.wtype.equals(DWireType.input)){
                     if(!inputs.contains(wire.name)){
                         inputs.add(wire.name);
-                    o}
+                    }
                 }
             }
         }

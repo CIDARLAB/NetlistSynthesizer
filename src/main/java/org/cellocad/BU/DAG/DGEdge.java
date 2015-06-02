@@ -5,10 +5,16 @@
  */
 package org.cellocad.BU.DAG;
 
+import java.util.List;
+
 /**
  *
  * @author prash
  */
 public class DGEdge {
     
+    public DGNode from;
+    public List<DGNode> to;
+    public String wireName;
+
 }
