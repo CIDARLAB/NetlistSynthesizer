@@ -140,6 +140,9 @@ public class NetSynth {
         if (Filepath.contains("/target/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
         }
+        else if (Filepath.contains("/src/")) {
+            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/src/"));
+        }
 
     }
 
@@ -148,6 +151,10 @@ public class NetSynth {
         if (_filepath.contains("/target/")) {
             _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
         }
+        else if (_filepath.contains("/src/")) {
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
+        }
+        Filepath = _filepath;
         return _filepath;
     }
 
@@ -1071,7 +1078,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1147,7 +1153,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1242,7 +1247,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
 
@@ -1342,7 +1346,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
 
@@ -1480,7 +1483,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
         
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1585,7 +1587,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
         
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1708,7 +1709,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1832,7 +1832,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -2138,7 +2137,7 @@ public class NetSynth {
      */
     public static String create_VerilogFile(List<String> filelines, String filename) {
         String filestring = "";
-        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+
         filestring = NetSynth.getResourcesFilepath();
         filestring += filename + ".v";
         File fespinp = new File(filestring);
@@ -2802,7 +2801,6 @@ public class NetSynth {
      */
     public static List<String> runEspresso(String pathFile) {
 
-        Filepath = getFilepath();
         
         List<String> espressoOutput = new ArrayList<String>();
         String x = System.getProperty("os.name");
