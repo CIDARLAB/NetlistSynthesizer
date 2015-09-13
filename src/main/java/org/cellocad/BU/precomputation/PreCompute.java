@@ -37,7 +37,7 @@ public class PreCompute {
         inputOrder.add("b");
         inputOrder.add("c");
         
-       
+        
         Map<Integer,SubcircuitLibrary> library = new HashMap<Integer,SubcircuitLibrary>();
         List<List<String>> string_netlists = new ArrayList<List<String>>();
         

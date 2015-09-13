@@ -699,8 +699,8 @@ public class TestSynthesis {
         
         String path = Filepath;
         
-        Filepath = NetSynth.getFilepath();
-        path = Filepath + "/resources/Verilog.v";
+        Filepath = NetSynth.getResourcesFilepath();
+        path = Filepath + "/Verilog.v";
         //Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
         //System.out.println("File path : " + Filepath);
         /*if(Filepath.contains("prash"))

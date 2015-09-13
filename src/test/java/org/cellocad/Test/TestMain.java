@@ -51,7 +51,7 @@ public class TestMain {
             
             //TestSynthesis.testANDConversion();
                
-            //TestSynthesis.testVerilogrunNetSynth();
+            TestSynthesis.testVerilogrunNetSynth();
             
             //TestSubcircuit.testGetSubcircuit();
             //TestSubcircuit.testTTisomorphism();
@@ -66,7 +66,7 @@ public class TestMain {
             
             //TestSubcircuit.testgetSubcircuitDetails();
             
-            TestSynthesis.testNewgetNetlist(4, 150);
+            //TestSynthesis.testNewgetNetlist(4, 150);
             //NetSynth.runNetSynthCode(null, null);
 
 
