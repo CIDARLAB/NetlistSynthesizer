@@ -4,8 +4,8 @@
  */
 package org.cellocad.BU.netsynth;
 
-import org.cellocad.BU.CelloGraph.DAGVertex.VertexType;
-import org.cellocad.BU.CelloGraph.DAGW;
+import org.cellocad.BU.DAG.DAGVertex.VertexType;
+import org.cellocad.BU.DAG.DAGW;
 import org.cellocad.BU.ParseVerilog.Blif;
 import org.cellocad.BU.ParseVerilog.CircuitDetails;
 import org.cellocad.BU.ParseVerilog.Convert;
@@ -140,6 +140,9 @@ public class NetSynth {
         if (Filepath.contains("/target/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
         }
+        else if (Filepath.contains("/src/")) {
+            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/src/"));
+        }
 
     }
 
@@ -148,6 +151,10 @@ public class NetSynth {
         if (_filepath.contains("/target/")) {
             _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
         }
+        else if (_filepath.contains("/src/")) {
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
+        }
+        Filepath = _filepath;
         return _filepath;
     }
 
@@ -269,14 +276,35 @@ public class NetSynth {
         netlist = rewireNetlist(netlist);
         
         finaldag = CreateMultDAGW(netlist);
-        System.out.println(inputnames);
+        //System.out.println(inputnames);
         
         finaldag = DAGW.addDanglingInputs(finaldag, inputnames);
         finaldag = DAGW.reorderinputs(finaldag, inputnames);
 
         return finaldag;
     }
+    
+    
+    public static DAGW runNetSynthCode(String codeLines, List<NetSynthSwitches> switches) {
 
+        DAGW finaldag = new DAGW();
+        
+        String filepath = "";
+        filepath = getResourcesFilepath();
+        filepath += "tempVerilog.v";
+        File fespinp = new File(filepath);
+        try {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            output.write(codeLines);
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finaldag = runNetSynth(filepath,switches);
+
+        return finaldag;
+    }
+    
     public static DAGW runNetSynth(String vfilepath, List<NetSynthSwitches> switches) {
 
         DAGW finaldag = new DAGW();
@@ -299,14 +327,14 @@ public class NetSynth {
         netlist = rewireNetlist(netlist);
         
         finaldag = CreateMultDAGW(netlist);
-        System.out.println(inputnames);
+        //System.out.println(inputnames);
         
         finaldag = DAGW.addDanglingInputs(finaldag, inputnames);
         finaldag = DAGW.reorderinputs(finaldag, inputnames);
 
         return finaldag;
     }
-
+    
     /**
      * Function ************************************************************
      * <br>
@@ -869,9 +897,10 @@ public class NetSynth {
                     dirnetlist = runEspressoAndABC(direct, switches);
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
                     
+
                     dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                     invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
-                    
+
                     dirsize = getRepressorsCost(dirnetlist);
                     invsize = getRepressorsCost(invnetlist);
 
@@ -1049,7 +1078,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1125,7 +1153,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1220,7 +1247,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
 
@@ -1320,7 +1346,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
 
@@ -1397,9 +1422,9 @@ public class NetSynth {
             ABCCircuit = parseEspressoOutToABC(EspOutput);
         }
 
-        if (synthmode.contains(NetSynthSwitches.abc)) {
+        if (synthmode.contains(NetSynthSwitches.abc) && !synthmode.contains(NetSynthSwitches.espresso)) {
             return finalABCCircuit;
-        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+        } else if (synthmode.contains(NetSynthSwitches.espresso) && !synthmode.contains(NetSynthSwitches.abc)) {
             return finalEspCircuit;
         } else {
             if (finalEspCircuit.size() < finalABCCircuit.size()) {
@@ -1458,7 +1483,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
         
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1563,7 +1587,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
         
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1591,7 +1614,8 @@ public class NetSynth {
 
         EspCircuit = convertPOStoNORNOT(EspOutput);
         EspCircuit = optimize(EspCircuit);
-
+        
+        
         File fabcinp = new File(filestringblif);
         try {
             Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
@@ -1623,9 +1647,9 @@ public class NetSynth {
         }
         fabcinp.deleteOnExit();
 
-        if (synthmode.contains(NetSynthSwitches.abc)) {
+        if (synthmode.contains(NetSynthSwitches.abc) && !synthmode.contains(NetSynthSwitches.espresso)) {
             return ABCCircuit;
-        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+        } else if (synthmode.contains(NetSynthSwitches.espresso) && !synthmode.contains(NetSynthSwitches.abc)) {
             return EspCircuit;
         } else {
             if (EspCircuit.size() < ABCCircuit.size()) {
@@ -1685,7 +1709,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1809,7 +1832,6 @@ public class NetSynth {
         espressoFile = Espresso.createFile(circ);
         blifFile = Blif.createFile(circ);
         String filestring = "";
-        String Filepath = getFilepath();
 
         filestring = getResourcesFilepath();
         String filestringblif = "";
@@ -1908,9 +1930,9 @@ public class NetSynth {
         finalABCCircuit = separateOutputGates(finalABCCircuit);
         finalABCCircuit = optimize(finalABCCircuit);
 
-        if (synthmode.contains(NetSynthSwitches.abc)) {
+        if (synthmode.contains(NetSynthSwitches.abc) && !synthmode.contains(NetSynthSwitches.espresso)) {
             return finalABCCircuit;
-        } else if (synthmode.contains(NetSynthSwitches.espresso)) {
+        } else if (synthmode.contains(NetSynthSwitches.espresso) && !synthmode.contains(NetSynthSwitches.abc)) {
             return finalEspCircuit;
         } else {
             if (finalEspCircuit.size() < finalABCCircuit.size()) {
@@ -2115,7 +2137,7 @@ public class NetSynth {
      */
     public static String create_VerilogFile(List<String> filelines, String filename) {
         String filestring = "";
-        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+
         filestring = NetSynth.getResourcesFilepath();
         filestring += filename + ".v";
         File fespinp = new File(filestring);
@@ -2779,7 +2801,6 @@ public class NetSynth {
      */
     public static List<String> runEspresso(String pathFile) {
 
-        Filepath = getFilepath();
         
         List<String> espressoOutput = new ArrayList<String>();
         String x = System.getProperty("os.name");
@@ -2818,7 +2839,7 @@ public class NetSynth {
                 output.write(line);
             }
             output.close();
-            fbool.deleteOnExit();
+            fbool.delete();
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -3197,6 +3218,7 @@ public class NetSynth {
 
         //for(String xespinp:espinp)
         //    System.out.println(xespinp);
+        
         List<DGate> netlist = new ArrayList<DGate>();
         one = new DWire("_one", DWireType.Source);
         zero = new DWire("_zero", DWireType.GND);
@@ -4251,6 +4273,7 @@ public class NetSynth {
             for (int j = i + 1; j < inpnetlist.size(); j++) {
                 String logic2 = inpnetlist.get(j).output.logicValue;
                 if (logic1.equals(logic2)) {
+                    
                     if (inpnetlist.get(i).output.wtype.equals(DWireType.output)) {
                         for (DGate xgate : inpnetlist) {
                             for (int k = 0; k < xgate.input.size(); k++) {
@@ -5372,7 +5395,9 @@ public class NetSynth {
 
     public static List<DGate> assignWireLogic(List<String> inputNames, List<DGate> netlist) {
         int pow = (int) Math.pow(2, inputNames.size());
-
+        for(DGate gate:netlist){
+            gate.output.logicValue = "";
+        }
         for (int i = 0; i < pow; i++) {
             String inputBool = Convert.dectoBin(i, inputNames.size());
             Map<String, Character> inputVals = new HashMap<String, Character>();

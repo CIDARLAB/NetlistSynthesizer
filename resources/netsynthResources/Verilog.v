@@ -1,13 +1,15 @@
-module structural(output out1, out2, input A, B, C);
-
-wire w1,w2,w3,w4,w5,w6,w7,w8;
-
-   nor (w5, A, B);
-   not (w6, C);
-   nor (w2, w5, w6);
-   not (w1, w2);
-   nor (w4, w2, w6);
-   nor (out2, B, w4);
-   not (out1, w1);   
-   
+module A(output out1, out2, out3, out4,  input in1, in2, in3);
+  always@(in1,in2,in3)
+    begin
+      case({in1,in2,in3})
+        3'b000: {out1,out2,out3,out4} = 4'b0000;
+        3'b001: {out1,out2,out3,out4} = 4'b1001;
+        3'b010: {out1,out2,out3,out4} = 4'b0000;
+        3'b011: {out1,out2,out3,out4} = 4'b0110;
+        3'b100: {out1,out2,out3,out4} = 4'b1100;
+        3'b101: {out1,out2,out3,out4} = 4'b1001;
+        3'b110: {out1,out2,out3,out4} = 4'b1100;
+        3'b111: {out1,out2,out3,out4} = 4'b0110;
+      endcase
+    end
 endmodule

@@ -18,5 +18,9 @@ public enum DGateType{
            AND, 
            OR, 
            XOR,
-           XNOR;
+           XNOR,
+           
+           INPUT,
+           OUTPUT;   
+             
     }

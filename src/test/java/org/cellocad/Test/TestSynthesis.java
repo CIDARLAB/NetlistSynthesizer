@@ -4,7 +4,7 @@
  */
 package org.cellocad.Test;
 
-import org.cellocad.BU.CelloGraph.DAGW;
+import org.cellocad.BU.DAG.DAGW;
 import org.cellocad.BU.ParseVerilog.Blif;
 import org.cellocad.BU.ParseVerilog.CircuitDetails;
 import org.cellocad.BU.ParseVerilog.Convert;
@@ -699,8 +699,8 @@ public class TestSynthesis {
         
         String path = Filepath;
         
-        Filepath = NetSynth.getFilepath();
-        path = Filepath + "/resources/Verilog.v";
+        Filepath = NetSynth.getResourcesFilepath();
+        path = Filepath + "/Verilog.v";
         //Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
         //System.out.println("File path : " + Filepath);
         /*if(Filepath.contains("prash"))
