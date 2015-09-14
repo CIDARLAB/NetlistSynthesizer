@@ -4,6 +4,8 @@
  */
 package org.cellocad.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.precomputation.PreCompute;
 
@@ -50,7 +52,9 @@ public class TestMain {
             //TestVerilogGenerator.testVerilogFromEq();
             
             //TestSynthesis.testANDConversion();
-               
+        
+            
+        
             TestSynthesis.testVerilogrunNetSynth();
             
             //TestSubcircuit.testGetSubcircuit();

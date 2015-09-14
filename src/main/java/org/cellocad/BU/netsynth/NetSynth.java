@@ -896,7 +896,6 @@ public class NetSynth {
                     
                     dirnetlist = runEspressoAndABC(direct, switches);
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
-                    
 
                     dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                     invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
@@ -1823,7 +1822,6 @@ public class NetSynth {
 
     public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ, List<NetSynthSwitches> synthmode) {
 
-        
         List<DGate> EspCircuit = new ArrayList<DGate>();
         List<DGate> ABCCircuit = new ArrayList<DGate>();
         List<String> espressoFile = new ArrayList<String>();
@@ -1858,7 +1856,7 @@ public class NetSynth {
         fespinp.deleteOnExit();
 
         EspCircuit = convertPOStoNORNOT(EspOutput);
-
+        
         File fabcinp = new File(filestringblif);
         try {
             Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
@@ -1887,11 +1885,12 @@ public class NetSynth {
         }
 
         fabcinp.deleteOnExit();
-
+        
         List<DGate> finalEspCircuit = new ArrayList<DGate>();
         List<DGate> finalABCCircuit = new ArrayList<DGate>();
 
-        for (int i = 0; i < EspCircuit.size(); i++) {
+        finalEspCircuit = invertCircuit(EspCircuit);
+        /*for (int i = 0; i < EspCircuit.size(); i++) {
             if (EspCircuit.get(i).output.wtype.equals(DWireType.output)) {
                 String outname = "";
                 outname = EspCircuit.get(i).output.name.trim();
@@ -1907,8 +1906,10 @@ public class NetSynth {
             } else {
                 finalEspCircuit.add(EspCircuit.get(i));
             }
-        }
-        for (int i = 0; i < ABCCircuit.size(); i++) {
+        }*/
+        
+        finalABCCircuit = invertCircuit(ABCCircuit);
+        /*for (int i = 0; i < ABCCircuit.size(); i++) {
             if (ABCCircuit.get(i).output.wtype.equals(DWireType.output)) {
                 String outname = "";
                 outname = ABCCircuit.get(i).output.name.trim();
@@ -1924,8 +1925,11 @@ public class NetSynth {
             } else {
                 finalABCCircuit.add(ABCCircuit.get(i));
             }
-        }
-
+        }*/
+        
+        finalEspCircuit = rewireNetlist(finalEspCircuit);
+        finalABCCircuit = rewireNetlist(finalABCCircuit);
+        
         finalEspCircuit = optimize(finalEspCircuit);
         finalABCCircuit = separateOutputGates(finalABCCircuit);
         finalABCCircuit = optimize(finalABCCircuit);
@@ -1944,6 +1948,36 @@ public class NetSynth {
 
     }
 
+    
+    public static List<DGate> invertCircuit(List<DGate> netlist){
+        for(int i=0;i<netlist.size();i++){
+            if(netlist.get(i).output.wtype.equals(DWireType.output)){
+                
+                String notInpWireName = "0Wire" + Global.wirecount++;
+                String outputName = netlist.get(i).output.name;
+                DWire notInpWire = new DWire(notInpWireName,DWireType.connector);
+                DGate notGate = new DGate();
+                notGate.gtype = DGateType.NOT;
+                notGate.input.add(notInpWire);
+                notGate.output = new DWire(outputName,DWireType.output);
+                
+                netlist.get(i).output.name = notInpWire.name;
+                netlist.get(i).output.wtype = notInpWire.wtype;
+                for(int j=i+1;j<netlist.size();j++){
+                    for(DWire input:netlist.get(j).input){
+                        if(input.name.equals(outputName)){
+                            input.name = notInpWire.name;
+                            input.wtype = notInpWire.wtype; 
+                        }
+                    }
+                }
+                netlist.add(i+1, notGate);
+                i = i+1;
+                
+            }
+        }
+        return netlist;
+    }
     
     /**
      * Function ************************************************************

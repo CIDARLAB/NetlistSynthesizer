@@ -722,8 +722,8 @@ public class TestSynthesis {
        
         
         DAGW resdag = new DAGW();
-        
-        resdag = NetSynth.runNetSynth(path,NetSynthSwitches.originalstructural,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
+        List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
+        resdag = NetSynth.runNetSynth(path,switches);
         for(Gate xgate:resdag.Gates)
         {
             System.out.println("Type: " + xgate.Type + " ::: Name: "+ xgate.Name);
