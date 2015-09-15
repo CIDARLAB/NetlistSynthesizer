@@ -4,7 +4,7 @@
  */
 package org.cellocad.BU.netsynth;
 
-import org.cellocad.BU.DAG.DAGVertex.VertexType;
+
 import org.cellocad.BU.DAG.DAGW;
 import org.cellocad.BU.ParseVerilog.Blif;
 import org.cellocad.BU.ParseVerilog.CircuitDetails;
@@ -955,7 +955,6 @@ public class NetSynth {
         return netlist;
     }
     
-    
     /**
      * Function ************************************************************
      * <br>
@@ -1141,7 +1140,6 @@ public class NetSynth {
             }
         }
     }
-
     
     public static List<DGate> runDCEspressoAndABC(CircuitDetails circ, List<NetSynthSwitches> synthmode) {
         List<DGate> EspCircuit = new ArrayList<DGate>();
@@ -1199,7 +1197,6 @@ public class NetSynth {
             }
         }
     }
-
     
     /**
      * Function ************************************************************
@@ -1433,7 +1430,6 @@ public class NetSynth {
             }
         }
     }
-
     
     /**
      * Function ************************************************************
@@ -1555,7 +1551,6 @@ public class NetSynth {
         }
     }
     
-    
     /**
      * Function ************************************************************
      * <br>
@@ -1658,9 +1653,6 @@ public class NetSynth {
             }
         }
     }
-    
-    
-    
     
     /**
      * Function ************************************************************
@@ -1947,7 +1939,6 @@ public class NetSynth {
         }
 
     }
-
     
     public static List<DGate> invertCircuit(List<DGate> netlist){
         for(int i=0;i<netlist.size();i++){

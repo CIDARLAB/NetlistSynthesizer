@@ -5,7 +5,6 @@
 package org.cellocad.MIT.heuristicsearch;
 
 import org.cellocad.BU.DAG.DAGW;
-import org.cellocad.BU.DAG.DAGW_assignment;
 import org.cellocad.BU.ParseVerilog.Convert;
 import org.cellocad.MIT.dnacompiler.BGateCombo;
 import org.cellocad.MIT.dnacompiler.BGateNode;
@@ -55,7 +54,7 @@ public class HeuristicSearch {
         Synthetic_Gates.genNortrips(roadblockingrules);
         Synthetic_Gates.genNotpairs();
         
-        DAGW_assignment assignmentresult = new DAGW_assignment();
+        //DAGW_assignment assignmentresult = new DAGW_assignment();
         List<BGateCombo> allcombos = new ArrayList<BGateCombo>();
         allcombos = LoadTables.getAllCombos(cutoff);
         int gates_size = dagCirc.Gates.size();
@@ -283,7 +282,7 @@ public class HeuristicSearch {
         
         //Start Heuristic Search Algo
         List<Integer> indices = new ArrayList<Integer>();
-        assignmentresult.dagobject = dagCirc;
+        //assignmentresult.dagobject = dagCirc;
         
         int assigncounter =0;
         //System.out.println("\n\n\nStart Heuristic Algorithm!!\n");

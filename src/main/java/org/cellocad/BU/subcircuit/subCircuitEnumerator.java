@@ -7,6 +7,7 @@ package org.cellocad.BU.subcircuit;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.cellocad.BU.DAG.DNode;
 import org.cellocad.BU.ParseVerilog.Convert;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
 import org.cellocad.BU.netsynth.DGate;
@@ -20,6 +21,22 @@ import org.cellocad.BU.netsynth.NetSynth;
  */
 public class subCircuitEnumerator {
 
+    public static DNode getGraph(List<DGate> netlist){
+        DNode output = new DNode();
+        
+        
+        
+        return output;
+    }
+    
+    public static void nameGates(List<DGate> netlist){
+        
+        int count=0;
+        for(DGate gate:netlist){
+            gate.gname = "g" + count;
+            count++;
+        }
+    }
     
     public static List<SubNetlist> getSubNetlistDetails(List<DGate> netlist,int index){
         List<SubNetlist> subNList = new ArrayList<SubNetlist>();
@@ -61,7 +78,6 @@ public class subCircuitEnumerator {
         return subNList;
     }
     
-    
     public static List<SubNetlist> getSubNetlistDetails_PolyMethod(List<DGate> netlist,int index){
         List<SubNetlist> subNList = new ArrayList<SubNetlist>();
         List<List<Integer>> allIndices = new ArrayList<List<Integer>>();
@@ -101,8 +117,6 @@ public class subCircuitEnumerator {
         }
         return subNList;
     }
-    
-    
     
     public static List<List<DGate>> getSubcircuits(List<DGate> netlist) {
         NetSynth.assignGateIndex(netlist);

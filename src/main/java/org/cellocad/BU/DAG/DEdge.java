@@ -6,22 +6,21 @@
 package org.cellocad.BU.DAG;
 
 import java.util.List;
-import org.cellocad.BU.netsynth.DGateType;
-import org.cellocad.BU.netsynth.DWire;
+import org.cellocad.BU.netsynth.DWireType;
 
 /**
  *
  * @author prash
  */
-
-public class DGNode {
+public class DEdge {
     
-    public DGateType gateType;
+    public List<DNode> to;
+    public DNode from;
+    public String wirename;
+    public DWireType type;
     
-    public List<DGNode> to;
-    public List<DGNode> from;
-    public List<DGNode> sibling;
-    
-    public DWire outgoing;
+    public DEdge(){
+        
+    }
     
 }

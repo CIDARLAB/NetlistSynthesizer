@@ -13,7 +13,7 @@ import java.util.List;
  */
 
 public class DGate implements Serializable{
-    String gname;
+    public String gname;
     
     public DGateType gtype;
     public List<DWire> input;
