@@ -5,7 +5,10 @@
  */
 package org.cellocad.BU.DAG;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.cellocad.BU.netsynth.DGateType;
 
 /**
@@ -18,8 +21,11 @@ public class DNode {
     public DEdge output;
     public String gatename;
     public DGateType type;
-    
+    public Set<Set<String>> subcircuitLeaves;
     public DNode(){
+        subcircuitLeaves = new HashSet<Set<String>>();
+        inputs = new ArrayList<DEdge>();
+        //output = new DEdge();
         
     }
 }

@@ -5,6 +5,7 @@
  */
 package org.cellocad.BU.DAG;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.cellocad.BU.netsynth.DWireType;
 
@@ -20,7 +21,8 @@ public class DEdge {
     public DWireType type;
     
     public DEdge(){
-        
+        to = new ArrayList<DNode>();
+        //from = new DNode();
     }
     
 }

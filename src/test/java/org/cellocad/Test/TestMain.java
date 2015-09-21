@@ -55,7 +55,9 @@ public class TestMain {
         
             
         
-            TestSynthesis.testVerilogrunNetSynth();
+            //TestSynthesis.testVerilogrunNetSynth();
+            
+            TestSubcircuit.testGraphAndSubcircuit();
             
             //TestSubcircuit.testGetSubcircuit();
             //TestSubcircuit.testTTisomorphism();

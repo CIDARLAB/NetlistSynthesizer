@@ -7,8 +7,12 @@ package org.cellocad.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.cellocad.BU.DAG.DNode;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
 import org.cellocad.BU.netsynth.DGate;
 import org.cellocad.BU.netsynth.DGateType;
@@ -213,6 +217,86 @@ public class TestSubcircuit {
         netlist.add(nor2);
         
         return netlist;
+    }
+    
+    public static List<DGate> getSampleNetlist4(){
+        List<DGate> netlist = new ArrayList<DGate>();
+        
+        DWire a = new DWire("a",DWireType.input);
+        DWire b = new DWire("b",DWireType.input);
+        DWire c = new DWire("c",DWireType.input);
+        DWire d = new DWire("d",DWireType.input);
+        
+        DWire out = new DWire("out",DWireType.output);
+        
+        DWire w1 = new DWire("w1",DWireType.connector);
+        DWire w2 = new DWire("w2",DWireType.connector);
+        DWire w3 = new DWire("w3",DWireType.connector);
+        DWire w4 = new DWire("w4",DWireType.connector);
+        DWire w5 = new DWire("w5",DWireType.connector);
+        DWire w6 = new DWire("w6",DWireType.connector);
+        
+        DGate n1 = new DGate();
+        DGate n2 = new DGate();
+        DGate n3 = new DGate();
+        DGate n4 = new DGate();
+        DGate n5 = new DGate();
+        DGate n6 = new DGate();
+        DGate n7 = new DGate();
+        
+        n1.gtype = DGateType.NOT;
+        n1.input.add(c);
+        n1.output = w2;
+        
+        n2.gtype = DGateType.NOT;
+        n2.input.add(a);
+        n2.output = w1;
+        
+        n3.gtype = DGateType.NOR;
+        n3.input.add(b);
+        n3.input.add(w2);
+        n3.output = w4;
+        
+        n4.gtype = DGateType.NOR;
+        n4.input.add(d);
+        n4.output = w3;
+        
+        n5.gtype = DGateType.NOR;
+        n5.input.add(w1);
+        n5.input.add(w4);
+        n5.output = w5;
+        
+        n6.gtype = DGateType.NOR;
+        n6.input.add(w4);
+        n6.input.add(w3);
+        n6.output = w6;
+        
+        n7.gtype = DGateType.NOR;
+        n7.input.add(w5);
+        n7.input.add(w6);
+        n7.output = out;
+        
+        netlist.add(n1);
+        netlist.add(n2);
+        netlist.add(n3);
+        netlist.add(n4);
+        netlist.add(n5);
+        netlist.add(n6);
+        netlist.add(n7);
+        
+        return netlist;
+    }
+    
+    public static void testGraphAndSubcircuit(){
+        List<DGate> netlist = getSampleNetlist4();
+        DNode node = subCircuitEnumerator.createGraph(netlist);
+        Set<Set<String>> sets = subCircuitEnumerator.getSubCircuitInputs(node, 3);
+        for(Iterator<Set<String>> it=sets.iterator();it.hasNext();){
+            Set<String> set = new HashSet<String>();
+            set = it.next();
+            System.out.println("Set : "+set);
+        }
+        
     }
     
     

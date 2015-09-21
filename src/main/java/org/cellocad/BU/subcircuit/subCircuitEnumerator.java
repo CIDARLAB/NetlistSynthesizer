@@ -6,7 +6,13 @@
 package org.cellocad.BU.subcircuit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.cellocad.BU.DAG.DEdge;
 import org.cellocad.BU.DAG.DNode;
 import org.cellocad.BU.ParseVerilog.Convert;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
@@ -21,18 +27,132 @@ import org.cellocad.BU.netsynth.NetSynth;
  */
 public class subCircuitEnumerator {
 
-    public static DNode getGraph(List<DGate> netlist){
+    public static DNode createGraph(List<DGate> netlist){
         DNode output = new DNode();
+        Map<String,DEdge> edges = new HashMap<String, DEdge>();
+        Map<String,DNode> nodes = new HashMap<String, DNode>();
+        nameGates(netlist);
+        for (DGate gate : netlist) {
+            
+            //Make O gates?
+            List<String> inputs = getInputs(netlist);
+            List<String> outputs = getOutputs(netlist);
+            DNode node = new DNode();
+            node.gatename = gate.gname;
+            node.type = gate.gtype;
+            node.inputs = new ArrayList<DEdge>();
+            for(DWire input:gate.input){
+                if(!edges.containsKey(input.name)){
+                    DEdge edge = new DEdge();
+                    edge.type = input.wtype;
+                    edge.wirename = input.name;
+                    edges.put(edge.wirename, edge);
+                }
+                if(input.wtype.equals(DWireType.input)){
+                    if(!nodes.containsKey(input.name)){
+                        DNode inputNode = new DNode();
+                        inputNode.gatename = input.name;
+                        inputNode.output = edges.get(input.name);
+                        nodes.put(inputNode.gatename, inputNode);
+                    }
+                    edges.get(input.name).from = nodes.get(input.name);
+                }
+                node.inputs.add(edges.get(input.name));
+                edges.get(input.name).to.add(node);
+            }
+            if(!edges.containsKey(gate.output.name)){
+                DEdge edge = new DEdge();
+                edge.type = gate.output.wtype;
+                edge.wirename = gate.output.name;
+                edges.put(edge.wirename, edge);
+            }
+            node.output = edges.get(gate.output.name);
+            edges.get(gate.output.name).from = node;
+            nodes.put(node.gatename, node);
+        }
+        return nodes.get(netlist.get(netlist.size()-1).gname);
+    }
+    
+    public static Set<Set<String>> getSubCircuitInputs(DNode node, int k){
         
-        
-        
-        return output;
+        if(node.subcircuitLeaves.isEmpty()){
+            Set<String> nodeVal = new HashSet<String>();
+            nodeVal.add(node.gatename);
+            node.subcircuitLeaves.add(nodeVal);
+            List<Set<Set<String>>> sets = new ArrayList<Set<Set<String>>>();
+            for(DEdge edge:node.inputs){
+               sets.add(getSubCircuitInputs(edge.from,k));
+            }
+            node.subcircuitLeaves.addAll(computeSetUnion(sets,k));
+        }
+        return node.subcircuitLeaves;
+    }
+    
+    public static Set<Set<String>> computeSetUnion(List<Set<Set<String>>> sets, int k){
+        Set<Set<String>> union = new HashSet<Set<String>>();
+        if(sets.size() == 1)
+        {
+            return sets.get(0);
+        }
+        else if(sets.size() > 1){
+            union = compute2SetUnion(sets.get(0),sets.get(1),k);
+            for(int i=2;i<sets.size();i++){
+                union = compute2SetUnion(union,sets.get(i),k);
+            }
+        }
+        return union;
+    }
+    
+    public static Set<Set<String>> compute2SetUnion(Set<Set<String>> set1,Set<Set<String>> set2, int k){
+        Set<Set<String>> union = new HashSet<Set<String>>();
+        for(Iterator<Set<String>> it1 = set1.iterator();it1.hasNext();){
+            Set<String> set1subset = new HashSet<String>();
+            set1subset = it1.next();
+            for(Iterator<Set<String>> it2 = set2.iterator();it2.hasNext();){
+                Set<String> set2subset = new HashSet<String>();
+                set2subset = it2.next();
+                Set<String> subset = new HashSet<String>();
+                subset.addAll(set1subset);
+                subset.addAll(set2subset);
+                if(subset.size() <= k){
+                    union.add(subset);
+                }
+            }            
+        }
+        return union;
+    }
+    
+    public static List<String> getInputs(List<DGate> netlist){
+        List<String> inputs = new ArrayList<String>();
+        for(DGate gate:netlist){
+            for(DWire wire:gate.input){
+                if(wire.wtype.equals(DWireType.input)){
+                    if(!inputs.contains(wire.name)){
+                        inputs.add(wire.name);
+                    }
+                }
+            }
+        }
+        return inputs;
+    }
+    
+    public static List<String> getOutputs(List<DGate> netlist){
+        List<String> outputs = new ArrayList<String>();
+        for(DGate gate:netlist){
+            if (gate.output.wtype.equals(DWireType.output)) {
+                if (!outputs.contains(gate.output.name)) {
+                    outputs.add(gate.output.name);
+                }
+            }
+        }
+        return outputs;
     }
     
     public static void nameGates(List<DGate> netlist){
         
         int count=0;
         for(DGate gate:netlist){
+            gate.gindex = count;
             gate.gname = "g" + count;
             count++;
         }
