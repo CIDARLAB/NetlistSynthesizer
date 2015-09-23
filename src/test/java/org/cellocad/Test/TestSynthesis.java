@@ -672,12 +672,19 @@ public class TestSynthesis {
         int count =0;
         for(int i=0;i<maxpow;i++)
         {
+            if(i== 0 || i == (maxpow-1)){
+                continue;
+            }
             List<String> verilogFileLines = new ArrayList<String>();
             verilogFileLines = genVerilogFile.createSingleOutpVerilogFile(n, i);
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitch.defaultmode,  NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode, NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode);
+            //newdag = NetSynth.runNetSynth(filepath, NetSynthSwitch.defaultmode,  NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode, NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode);
+            
+            List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
+            //switches.add(NetSynthSwitch.noswap);
+            newdag = NetSynth.runNetSynth(filepath, switches);
             
             /*if(newdag.Gates.size() == 4)
             {

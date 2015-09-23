@@ -247,47 +247,21 @@ public class subCircuitEnumerator {
         }
     }
     
-    public static List<SubNetlist> getSubNetlistDetails(List<DGate> netlist,int index){
-        List<SubNetlist> subNList = new ArrayList<SubNetlist>();
-        List<List<Integer>> allIndices = new ArrayList<List<Integer>>();
+    public static List<SubNetlist> getSubNetlistDetailsGraph(List<DGate> netlist,int index,int k){
+        List<SubNetlist> subnetlist = new ArrayList<SubNetlist>();
+        Map<String,DNode> nodeMap = new HashMap();
         
-        int high = getHigh(index);
-        int low = getLow(index);
-        for(int j=high;j>=low;j--){
-            String binEq = Convert.dectoBin(j, index + 1);
-            String revBin = new StringBuilder(binEq).reverse().toString();
-                List<DGate> subNetlist = new ArrayList<DGate>();
-                for (int k = 0; k < revBin.length(); k++) {
-                    if (revBin.charAt(k) == '1') {
-                        subNetlist.add(netlist.get(k));
-                    }
-                }
-                List<DGate> modifiedsubNetlist = new ArrayList<DGate>();
-                modifiedsubNetlist = removeDanglingNodeInSubnetlist(subNetlist);
-                List<String> inputs = getSubnetlistInputs(modifiedsubNetlist);
-                modifiedsubNetlist = NetSynth.rewireNetlist(modifiedsubNetlist);
-                if (inputs.size() <= 3) {
-                    List<String> tt = BooleanSimulator.getTruthTable(modifiedsubNetlist, inputs);
-                    //NetSynth.printNetlist(modifiedsubNetlist);
-                    List<Integer> indices = new ArrayList<Integer>();
-                    for(int k=0;k<modifiedsubNetlist.size();k++)
-                        indices.add(modifiedsubNetlist.get(k).gindex);
-                    
-                    if(!containsSubcircuit(indices,allIndices)){
-                        allIndices.add(indices);
-                        SubNetlist newsubnlist = new SubNetlist();
-                        newsubnlist.tt = tt.get(0);
-                        newsubnlist.inputs.addAll(inputs);
-                        subNList.add(newsubnlist);
-                        
-                        //allSubcircuits.add(modifiedsubNetlist);
-                    }
-                }
-        }
-        return subNList;
+        //Change this to create Graph for netlist from index to end?
+        nodeMap = createGraph(netlist);
+        //node = nodes.get(netlist.get(netlist.size()-1).gname);
+        Set<Set<String>> sets = new HashSet<Set<String>>();
+        sets = subCircuitEnumerator.getSubCircuitInputs(nodeMap.get(netlist.get(index).gname), k);
+        subnetlist = subCircuitEnumerator.getSubNetlists(nodeMap.get(netlist.get(index).gname),sets,nodeMap);
+        
+        return subnetlist;
     }
     
-    public static List<SubNetlist> getSubNetlistDetails_PolyMethod(List<DGate> netlist,int index){
+    public static List<SubNetlist> getSubNetlistDetails(List<DGate> netlist,int index){
         List<SubNetlist> subNList = new ArrayList<SubNetlist>();
         List<List<Integer>> allIndices = new ArrayList<List<Integer>>();
         

@@ -32,7 +32,8 @@ public enum NetSynthSwitch {
    AND2OR,
    
    nor3,
-  
+   
+   noswap,
    
    no2notstonor
     

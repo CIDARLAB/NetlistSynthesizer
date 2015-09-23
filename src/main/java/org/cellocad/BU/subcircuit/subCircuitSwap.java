@@ -97,8 +97,12 @@ public class subCircuitSwap {
             output.add(new DGate(gate));
         }
         output = NetSynth.rewireNetlist(output);
+        netlist = NetSynth.rewireNetlist(netlist);
         List<SubNetlist> subnet = new ArrayList<SubNetlist>();
-        subnet = subCircuitEnumerator.getSubNetlistDetails(netlist, index);
+        
+        //This is where stuff changes
+        //subnet = subCircuitEnumerator.getSubNetlistDetails(netlist, index);
+        subnet = subCircuitEnumerator.getSubNetlistDetailsGraph(netlist, index, 3);
         
         for(int i=0;i<subnet.size();i++){
             int tt = Convert.bintoDec(subnet.get(i).tt);

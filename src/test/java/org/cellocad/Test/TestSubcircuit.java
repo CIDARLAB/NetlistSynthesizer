@@ -288,6 +288,9 @@ public class TestSubcircuit {
     }
     
     public static void testGraphAndSubcircuit(){
+        //List<DGate> netlist = getSampleNetlist1();
+        //List<DGate> netlist = getSampleNetlist2();
+        //List<DGate> netlist = getSampleNetlist3();
         List<DGate> netlist = getSampleNetlist4();
         Map<String,DNode> nodes = subCircuitEnumerator.createGraph(netlist);
         DNode node = new DNode();

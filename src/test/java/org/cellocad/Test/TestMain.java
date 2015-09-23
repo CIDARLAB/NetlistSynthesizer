@@ -58,7 +58,10 @@ public class TestMain {
             //TestSynthesis.testVerilogrunNetSynth();
             
             TestSubcircuit.testGraphAndSubcircuit();
-            
+            //TestSynthesis.testAllnInputVerilog(3);
+        
+        
+        
             //TestSubcircuit.testGetSubcircuit();
             //TestSubcircuit.testTTisomorphism();
             //TestSubcircuit.testStringPermutation("01234567",3);
@@ -82,8 +85,7 @@ public class TestMain {
             //TestSynthesis.testMultDaGW();
             //TestSynthesis.test3norconversion();
             //TestSynthesis.testSpecInputVerilog(3,25);
-            //TestSynthesis.testAllnInputVerilog(3);
-        
+            
         /*try {
             ClothoSocket.connect();
         } catch (DeploymentException ex) {

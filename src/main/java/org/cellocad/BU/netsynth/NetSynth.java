@@ -838,10 +838,11 @@ public class NetSynth {
             dirnetlist = runEspressoAndABC(direct,switches);
             invnetlist = runInvertedEspressoAndABC(inverted,switches);
             
-            
-            structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,sublibrary);
-            dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
-            invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
+            if(!switches.contains(NetSynthSwitch.noswap)){
+                structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,sublibrary);
+                dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
+            }
             
             dirsize = getRepressorsCost(dirnetlist);
             invsize = getRepressorsCost(invnetlist);
