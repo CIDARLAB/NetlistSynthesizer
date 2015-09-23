@@ -57,8 +57,8 @@ public class TestMain {
         
             //TestSynthesis.testVerilogrunNetSynth();
             
-            TestSubcircuit.testGraphAndSubcircuit();
-            //TestSynthesis.testAllnInputVerilog(3);
+            //TestSubcircuit.testGraphAndSubcircuit();
+            TestSynthesis.testAllnInputVerilog(3);
         
         
         

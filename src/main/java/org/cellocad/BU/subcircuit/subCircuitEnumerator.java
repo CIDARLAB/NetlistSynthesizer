@@ -107,8 +107,8 @@ public class subCircuitEnumerator {
             subnetlist.tt = getSubCircuitTruthTable(node,leaveValues);
             subnetlists.add(subnetlist);
             
-            System.out.println("Inputs ::" +subnetlist.inputs);
-            System.out.println("TT     ::" +subnetlist.tt);
+            //System.out.println("Inputs ::" +subnetlist.inputs);
+            //System.out.println("TT     ::" +subnetlist.tt);
             
         }
         

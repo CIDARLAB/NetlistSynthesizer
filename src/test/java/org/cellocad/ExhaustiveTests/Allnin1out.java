@@ -40,7 +40,9 @@ public class Allnin1out {
         for(int i=0;i<noOfTT;i++){
             try {
                 
-                
+                if(i==0 || i==(noOfTT-1)){
+                    continue;
+                }
                 
                 List<String> verilogFileLines = new ArrayList<String>();
                 verilogFileLines = genVerilogFile.createSingleOutpVerilogFile(size, i);
@@ -93,8 +95,8 @@ public class Allnin1out {
        boolean result;
        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
        //switches.add(NetSynthSwitches.espresso);
-       switches.add(NetSynthSwitch.outputOR);
-       int size = 4;
+       //switches.add(NetSynthSwitch.outputOR);
+       int size = 3;
        result = verify3in1out(switches,size);
        String assertMessage = size + " Input 1 Output Test Failed.";
        assertTrue(assertMessage,result);
