@@ -15,9 +15,11 @@ import java.util.Set;
 import org.cellocad.BU.DAG.DEdge;
 import org.cellocad.BU.DAG.DNode;
 import org.cellocad.BU.ParseVerilog.Convert;
+import org.cellocad.BU.booleanLogic.BooleanFunctions;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
 import org.cellocad.BU.netsynth.DGate;
 import org.cellocad.BU.netsynth.DWire;
+import org.cellocad.BU.netsynth.DWire.DWireValue;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
 
@@ -88,6 +90,29 @@ public class subCircuitEnumerator {
         return node.subcircuitLeaves;
     }
     
+    public static List<SubNetlist> getSubNetlists(DNode node, Set<Set<String>> leaves){
+        List<SubNetlist> subnetlists = new ArrayList<SubNetlist>();
+        for(Iterator<Set<String>> it = leaves.iterator();it.hasNext();){
+            Set<String> set = new HashSet<String>();
+            set = it.next();
+            SubNetlist subnetlist = new SubNetlist();
+            
+            for(Iterator<String> leaf = set.iterator();leaf.hasNext();){
+                String leafVal = leaf.next();
+                subnetlist.inputs.add(leafVal);
+            }
+            
+            subnetlist.tt = getSubCircuitTruthTable(node,subnetlist.inputs);
+            subnetlists.add(subnetlist);
+            
+            System.out.println("Inputs ::" +subnetlist.inputs);
+            System.out.println("TT     ::" +subnetlist.tt);
+            
+        }
+        
+        return subnetlists;
+    }
+    
     public static Set<Set<String>> computeSetUnion(List<Set<Set<String>>> sets, int k){
         Set<Set<String>> union = new HashSet<Set<String>>();
         if(sets.size() == 1)
@@ -120,6 +145,68 @@ public class subCircuitEnumerator {
             }            
         }
         return union;
+    }
+    
+    public static String getSubCircuitTruthTable(DNode node, List<String> leaves){
+        String tt = "";
+        int pow = (int)Math.pow(2, leaves.size());
+        for(int i=0;i<pow;i++){
+            String inpRow = Convert.dectoBin(i, leaves.size());
+            Map<String,DWireValue> inputMap = new HashMap<String,DWireValue>();
+            for(int j=0;j<leaves.size();j++){
+                DWireValue val;
+                switch(inpRow.charAt(j)){
+                    case '1': val = DWireValue._1;
+                        break;
+                    case '0': val = DWireValue._0;
+                        break;
+                    default : val = DWireValue._x;
+                        break;
+                }
+                inputMap.put(leaves.get(j), val);
+            }
+            DWireValue output;
+            output = getEdgeValue(node,inputMap);
+            switch (output) {
+                case _1: tt += "1";
+                    break;
+                case _0: tt += "0";
+                    break;
+                default: tt += "-";
+                    break;
+            }
+        }
+        return tt;
+    }
+    
+    public static DWireValue getEdgeValue(DNode node,Map<String,DWireValue> inputMap){
+        if(inputMap.containsKey(node.gatename)){
+            return inputMap.get(node.gatename);
+        }
+        else{
+            List<DWireValue> gateInputValues = new ArrayList<DWireValue>();
+            for(DEdge gateInput : node.inputs){
+                gateInputValues.add(getEdgeValue(gateInput.from,inputMap));
+            }
+            return BooleanFunctions.bcompute(node.type, gateInputValues);
+        }
+    }
+    
+    public static List<DNode> getSubcircuit(DNode node, Set<String> leaves, List<DNode> allNodes, Set<String> listOfNodes){
+        //List<DNode> subnodes = new ArrayList<DNode>();
+        if(leaves.contains(node.gatename)){
+            
+        }
+        else{
+            if(!listOfNodes.contains(node.gatename)){
+                allNodes.add(node);
+                listOfNodes.add(node.gatename);
+            }
+            for(DEdge edge:node.inputs){
+                getSubcircuit(edge.from,leaves,allNodes,listOfNodes);
+            }
+        }
+        return allNodes;
     }
     
     public static List<String> getInputs(List<DGate> netlist){

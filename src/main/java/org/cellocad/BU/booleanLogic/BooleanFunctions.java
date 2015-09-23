@@ -4,15 +4,34 @@
  */
 package org.cellocad.BU.booleanLogic;
 
+import java.util.List;
 import org.cellocad.BU.netsynth.DGate;
+import org.cellocad.BU.netsynth.DGateType;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWire.DWireValue;
+import org.cellocad.BU.netsynth.Global;
 
 /**
  *
  * @author prashantvaidyanathan
  */
 public class BooleanFunctions {
+    
+    public static DWireValue bcompute(DGateType gateType, List<DWireValue> inputs){
+        DWireValue value = DWireValue._x;
+        DGate gate = new DGate();
+        gate.gtype = gateType;
+        
+        for(DWireValue val:inputs){
+            DWire wire = new DWire();
+            wire.wValue = val;
+            gate.input.add(wire);
+        }
+        DWire output = new DWire();
+        gate.output = output;
+        BooleanSimulator.bfunction(gate);
+        return gate.output.wValue;
+    }
     
     public static void bAND(DGate and)
     {

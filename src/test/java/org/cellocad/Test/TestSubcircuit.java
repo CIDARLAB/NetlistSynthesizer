@@ -291,12 +291,12 @@ public class TestSubcircuit {
         List<DGate> netlist = getSampleNetlist4();
         DNode node = subCircuitEnumerator.createGraph(netlist);
         Set<Set<String>> sets = subCircuitEnumerator.getSubCircuitInputs(node, 3);
-        for(Iterator<Set<String>> it=sets.iterator();it.hasNext();){
+        /*for(Iterator<Set<String>> it=sets.iterator();it.hasNext();){
             Set<String> set = new HashSet<String>();
             set = it.next();
             System.out.println("Set : "+set);
-        }
-        
+        }*/
+        subCircuitEnumerator.getSubNetlists(node,sets);
     }
     
     
