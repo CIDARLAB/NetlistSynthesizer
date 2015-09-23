@@ -29,7 +29,7 @@ import org.cellocad.BU.netsynth.NetSynth;
  */
 public class subCircuitEnumerator {
 
-    public static DNode createGraph(List<DGate> netlist){
+    public static Map<String,DNode> createGraph(List<DGate> netlist){
         DNode output = new DNode();
         Map<String,DEdge> edges = new HashMap<String, DEdge>();
         Map<String,DNode> nodes = new HashMap<String, DNode>();
@@ -72,7 +72,8 @@ public class subCircuitEnumerator {
             edges.get(gate.output.name).from = node;
             nodes.put(node.gatename, node);
         }
-        return nodes.get(netlist.get(netlist.size()-1).gname);
+        //return nodes.get(netlist.get(netlist.size()-1).gname);
+        return nodes;
     }
     
     public static Set<Set<String>> getSubCircuitInputs(DNode node, int k){
@@ -90,19 +91,20 @@ public class subCircuitEnumerator {
         return node.subcircuitLeaves;
     }
     
-    public static List<SubNetlist> getSubNetlists(DNode node, Set<Set<String>> leaves){
+    public static List<SubNetlist> getSubNetlists(DNode node, Set<Set<String>> leaves,Map<String,DNode> nodes){
         List<SubNetlist> subnetlists = new ArrayList<SubNetlist>();
         for(Iterator<Set<String>> it = leaves.iterator();it.hasNext();){
             Set<String> set = new HashSet<String>();
             set = it.next();
             SubNetlist subnetlist = new SubNetlist();
-            
+            List<String> leaveValues = new ArrayList<String>();
             for(Iterator<String> leaf = set.iterator();leaf.hasNext();){
                 String leafVal = leaf.next();
-                subnetlist.inputs.add(leafVal);
+                subnetlist.inputs.add(nodes.get(leafVal).output.wirename);
+                leaveValues.add(leafVal);
             }
             
-            subnetlist.tt = getSubCircuitTruthTable(node,subnetlist.inputs);
+            subnetlist.tt = getSubCircuitTruthTable(node,leaveValues);
             subnetlists.add(subnetlist);
             
             System.out.println("Inputs ::" +subnetlist.inputs);

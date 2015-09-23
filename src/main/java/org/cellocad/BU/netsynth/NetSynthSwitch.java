@@ -10,7 +10,7 @@ package org.cellocad.BU.netsynth;
  *
  * @author prashantvaidyanathan
  */
-public enum NetSynthSwitches {
+public enum NetSynthSwitch {
    
    defaultmode,
    

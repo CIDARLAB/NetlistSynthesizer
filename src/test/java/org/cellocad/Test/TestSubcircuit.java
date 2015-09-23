@@ -19,7 +19,7 @@ import org.cellocad.BU.netsynth.DGateType;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
-import org.cellocad.BU.netsynth.NetSynthSwitches;
+import org.cellocad.BU.netsynth.NetSynthSwitch;
 import org.cellocad.BU.precomputation.PreCompute;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.cellocad.BU.subcircuit.isomorphicFunction;
@@ -289,14 +289,16 @@ public class TestSubcircuit {
     
     public static void testGraphAndSubcircuit(){
         List<DGate> netlist = getSampleNetlist4();
-        DNode node = subCircuitEnumerator.createGraph(netlist);
+        Map<String,DNode> nodes = subCircuitEnumerator.createGraph(netlist);
+        DNode node = new DNode();
+        node = nodes.get(netlist.get(netlist.size()-1).gname);
         Set<Set<String>> sets = subCircuitEnumerator.getSubCircuitInputs(node, 3);
         /*for(Iterator<Set<String>> it=sets.iterator();it.hasNext();){
             Set<String> set = new HashSet<String>();
             set = it.next();
             System.out.println("Set : "+set);
         }*/
-        subCircuitEnumerator.getSubNetlists(node,sets);
+        subCircuitEnumerator.getSubNetlists(node,sets,nodes);
     }
     
     
@@ -338,8 +340,8 @@ public class TestSubcircuit {
         System.out.println("====================================\n");
         NetSynth.initializeSubLibrary();
         System.out.println("TT : "+ BooleanSimulator.getTruthTable(netlist,inputNames));
-        List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
-        switches.add(NetSynthSwitches.outputOR);
+        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
+        switches.add(NetSynthSwitch.outputOR);
         
         List<DGate> output = subCircuitSwap.implementSwap(netlist,switches, NetSynth.sublibrary);
         

@@ -13,7 +13,7 @@ import org.cellocad.BU.netsynth.DGate;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
-import org.cellocad.BU.netsynth.NetSynthSwitches;
+import org.cellocad.BU.netsynth.NetSynthSwitch;
 
 /**
  *
@@ -24,21 +24,21 @@ public class CircuitLibrary {
     public List<String> inputs;
     public List<String> outputs;
     public List<String> truthtables;
-    public List<NetSynthSwitches> switches;
+    public List<NetSynthSwitch> switches;
     
     public CircuitLibrary(){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
         outputs = new ArrayList<String>();
         truthtables = new ArrayList<String>();
-        switches = new ArrayList<NetSynthSwitches>();
+        switches = new ArrayList<NetSynthSwitch>();
     }
     public CircuitLibrary(List<DGate> _netlist){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
         outputs = new ArrayList<String>();
         truthtables = new ArrayList<String>();
-        switches = new ArrayList<NetSynthSwitches>();
+        switches = new ArrayList<NetSynthSwitch>();
         for(DGate gate:_netlist){
             netlist.add(gate);
         }
@@ -53,7 +53,7 @@ public class CircuitLibrary {
         inputs = new ArrayList<String>();
         outputs = new ArrayList<String>();
         truthtables = new ArrayList<String>();
-        switches = new ArrayList<NetSynthSwitches>();
+        switches = new ArrayList<NetSynthSwitch>();
         for(DGate gate:_netlist){
             netlist.add(gate);
         }
@@ -70,7 +70,7 @@ public class CircuitLibrary {
         inputs = new ArrayList<String>();
         outputs = new ArrayList<String>();
         truthtables = new ArrayList<String>();
-        switches = new ArrayList<NetSynthSwitches>();
+        switches = new ArrayList<NetSynthSwitch>();
         for(DGate gate:_netlist){
             netlist.add(gate);
         }

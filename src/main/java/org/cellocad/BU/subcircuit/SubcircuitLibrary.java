@@ -14,7 +14,7 @@ import org.cellocad.BU.netsynth.DGate;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
-import org.cellocad.BU.netsynth.NetSynthSwitches;
+import org.cellocad.BU.netsynth.NetSynthSwitch;
 
 /**
  *
@@ -25,19 +25,19 @@ public class SubcircuitLibrary {
     public List<String> inputs;
     public String output;
     public String truthtable;
-    public List<NetSynthSwitches> switches;
+    public List<NetSynthSwitch> switches;
     
     public SubcircuitLibrary(){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
-        switches = new ArrayList<NetSynthSwitches>();
+        switches = new ArrayList<NetSynthSwitch>();
         output = "";
         truthtable = "";
     }
     public SubcircuitLibrary(List<DGate> _netlist){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
-        switches = new ArrayList<NetSynthSwitches>();
+        switches = new ArrayList<NetSynthSwitch>();
         output = "";
         truthtable = "";
         
@@ -54,7 +54,7 @@ public class SubcircuitLibrary {
     public SubcircuitLibrary(List<DGate> _netlist,List<String> inputOrder){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
-        switches = new ArrayList<NetSynthSwitches>();
+        switches = new ArrayList<NetSynthSwitch>();
         output = "";
         truthtable = "";
         
@@ -76,7 +76,7 @@ public class SubcircuitLibrary {
     public SubcircuitLibrary(List<DGate> _netlist,List<String> inputOrder,String _output){
         netlist = new ArrayList<DGate>();
         inputs = new ArrayList<String>();
-        switches = new ArrayList<NetSynthSwitches>();
+        switches = new ArrayList<NetSynthSwitch>();
         truthtable = "";
         
         for(DGate gate:_netlist){

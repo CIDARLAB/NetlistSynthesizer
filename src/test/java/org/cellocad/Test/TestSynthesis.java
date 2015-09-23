@@ -23,7 +23,7 @@ import static org.cellocad.BU.netsynth.NetSynth.parseEspressoToNORNAND;
 import static org.cellocad.BU.netsynth.NetSynth.printGate;
 import static org.cellocad.BU.netsynth.NetSynth.runEspresso;
 import org.cellocad.BU.netsynth.NetSynthModes;
-import org.cellocad.BU.netsynth.NetSynthSwitches;
+import org.cellocad.BU.netsynth.NetSynthSwitch;
 import org.cellocad.BU.netsynth.NetlistConversionFunctions;
 import org.cellocad.BU.precomputation.PreCompute;
 import org.cellocad.BU.precomputation.genVerilogFile;
@@ -102,7 +102,7 @@ public class TestSynthesis {
         
     }
     
-    public static void testMain(String filename, NetSynthModes mode, NetSynthSwitches switches[])
+    public static void testMain(String filename, NetSynthModes mode, NetSynthSwitch switches[])
     {
         System.out.println("File name "+filename);
         System.out.println("---------------------");
@@ -631,9 +631,9 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
-            switches.add(NetSynthSwitches.espresso);
-            switches.add(NetSynthSwitches.outputOR);
+            List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
+            switches.add(NetSynthSwitch.espresso);
+            switches.add(NetSynthSwitch.outputOR);
             
             newdag = NetSynth.runNetSynth(filepath, switches);
             System.out.println("\nDAGW Gates");
@@ -655,7 +655,7 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitch.defaultmode,  NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode);
             System.out.println("\nDAGW Gates");
             for(Gate xgate:newdag.Gates)
             {
@@ -677,7 +677,7 @@ public class TestSynthesis {
             String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
             DAGW newdag = new DAGW();
             //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitches.defaultmode,  NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode, NetSynthSwitches.defaultmode,NetSynthSwitches.defaultmode);
+            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitch.defaultmode,  NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode, NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode);
             
             /*if(newdag.Gates.size() == 4)
             {
@@ -722,7 +722,7 @@ public class TestSynthesis {
        
         
         DAGW resdag = new DAGW();
-        List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
+        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
         resdag = NetSynth.runNetSynth(path,switches);
         for(Gate xgate:resdag.Gates)
         {

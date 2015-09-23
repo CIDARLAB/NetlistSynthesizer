@@ -17,7 +17,7 @@ import org.cellocad.BU.netsynth.DGateType;
 import org.cellocad.BU.netsynth.DWire;
 import org.cellocad.BU.netsynth.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
-import org.cellocad.BU.netsynth.NetSynthSwitches;
+import org.cellocad.BU.netsynth.NetSynthSwitch;
 
 /**
  *
@@ -26,7 +26,7 @@ import org.cellocad.BU.netsynth.NetSynthSwitches;
 public class subCircuitSwap {
     
     //Need to make some framework. Can be done later. Implement 3 input 1 output motifs now. 
-    public static List<DGate> implementSwap(List<DGate> netlist, List<NetSynthSwitches> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
+    public static List<DGate> implementSwap(List<DGate> netlist, List<NetSynthSwitch> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
     {
         
         netlist = NetSynth.rewireNetlist(netlist);
@@ -90,7 +90,7 @@ public class subCircuitSwap {
         return count;
     }
     
-    public static List<DGate> nodeRewrite(List<DGate> netlist,List<NetSynthSwitches> switches,int index,Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
+    public static List<DGate> nodeRewrite(List<DGate> netlist,List<NetSynthSwitch> switches,int index,Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
         
         List<DGate> output = new ArrayList<DGate>();
         for(DGate gate:netlist){
@@ -118,9 +118,9 @@ public class subCircuitSwap {
                         
                         canSwap = containsSwitches(switches,sublibrary.get(inpSize).get(ttPerm).get(k).switches);
                         if(canSwap){
-                            if(switches.contains(NetSynthSwitches.outputOR)){
+                            if(switches.contains(NetSynthSwitch.outputOR)){
                                 if(!netlist.get(index).output.wtype.equals(DWireType.output)){
-                                    if(sublibrary.get(inpSize).get(ttPerm).get(k).switches.contains(NetSynthSwitches.outputOR)){
+                                    if(sublibrary.get(inpSize).get(ttPerm).get(k).switches.contains(NetSynthSwitch.outputOR)){
                                         canSwap = false;
                                     }
                                 }
@@ -200,9 +200,9 @@ public class subCircuitSwap {
         return res;
     }
     
-    public static boolean containsSwitches(List<NetSynthSwitches> switches, List<NetSynthSwitches> constraints){
+    public static boolean containsSwitches(List<NetSynthSwitch> switches, List<NetSynthSwitch> constraints){
         boolean contains = true;
-        for(NetSynthSwitches sw:constraints){
+        for(NetSynthSwitch sw:constraints){
             if(!switches.contains(sw)){
                 contains = false;
                 break;

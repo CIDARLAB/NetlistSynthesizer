@@ -19,7 +19,7 @@ import org.cellocad.BU.booleanLogic.BooleanSimulator;
 import org.cellocad.BU.netsynth.DGate;
 import org.cellocad.BU.netsynth.NetSynth;
 import static org.cellocad.BU.netsynth.NetSynth.getResourcesFilepath;
-import org.cellocad.BU.netsynth.NetSynthSwitches;
+import org.cellocad.BU.netsynth.NetSynthSwitch;
 import org.cellocad.BU.precomputation.genVerilogFile;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import org.junit.Test;
  * @author prash
  */
 public class Allnin1out {
-    public static boolean verify3in1out(List<NetSynthSwitches> switches,int size){
+    public static boolean verify3in1out(List<NetSynthSwitch> switches,int size){
         boolean result = true;
         
         String filepath = "";
@@ -91,9 +91,9 @@ public class Allnin1out {
     @Test
     public void testAllCombinations(){
        boolean result;
-       List<NetSynthSwitches> switches = new ArrayList<NetSynthSwitches>();
+       List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
        //switches.add(NetSynthSwitches.espresso);
-       switches.add(NetSynthSwitches.outputOR);
+       switches.add(NetSynthSwitch.outputOR);
        int size = 4;
        result = verify3in1out(switches,size);
        String assertMessage = size + " Input 1 Output Test Failed.";

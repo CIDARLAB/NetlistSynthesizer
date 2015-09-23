@@ -237,7 +237,7 @@ public class NetlistConversionFunctions {
     
     
     
-    public static List<DGate> GatetoNORNOT(DGate g, NetSynthSwitches originalAND)
+    public static List<DGate> GatetoNORNOT(DGate g, NetSynthSwitch originalAND)
     {
        List<DGate> nor_eq = new ArrayList<DGate>();
        
@@ -248,7 +248,7 @@ public class NetlistConversionFunctions {
         } 
         else if (g.gtype == DGateType.AND) 
         {
-            if (originalAND.equals(NetSynthSwitches.originalstructuralAND) || originalAND.equals(NetSynthSwitches.originalstructuralANDOR)) 
+            if (originalAND.equals(NetSynthSwitch.originalstructuralAND) || originalAND.equals(NetSynthSwitch.originalstructuralANDOR)) 
             {
                 g.calculateStage();
                 nor_eq.add(g);
