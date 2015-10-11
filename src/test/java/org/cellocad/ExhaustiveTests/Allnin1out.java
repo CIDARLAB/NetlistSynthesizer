@@ -29,7 +29,7 @@ import org.junit.Test;
  * @author prash
  */
 public class Allnin1out {
-    public static boolean verify3in1out(List<NetSynthSwitch> switches,int size){
+    public static boolean verifyNin1out(List<NetSynthSwitch> switches,int size){
         boolean result = true;
         
         String filepath = "";
@@ -43,7 +43,7 @@ public class Allnin1out {
                 if(i==0 || i==(noOfTT-1)){
                     continue;
                 }
-                
+                System.out.println("Truth Table :: " +i);
                 List<String> verilogFileLines = new ArrayList<String>();
                 verilogFileLines = genVerilogFile.createSingleOutpVerilogFile(size, i);
                 File file = new File(filepath);
@@ -69,13 +69,13 @@ public class Allnin1out {
                 System.out.println("That took ::"+duration+" milliseconds");
                 String tt = BooleanSimulator.getTruthTable(netlist, inputnames).get(0); 
                 
-                System.out.println("TT Val ::"+i+":: Circuit Size = " + netlist.size());
+                System.out.println("Circuit Size = " + netlist.size()+"\n");
                 
                 
                 int ttIntVal = Convert.bintoDec(tt);
                 if(ttIntVal != i){
                     result = false;
-                    System.out.println("Circuit "+i+ " does not work");
+                    System.out.println("Circuit "+i+ " does not work\n");
                 }
                 
                 file.delete();
@@ -96,8 +96,10 @@ public class Allnin1out {
        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
        //switches.add(NetSynthSwitches.espresso);
        //switches.add(NetSynthSwitch.outputOR);
-       int size = 3;
-       result = verify3in1out(switches,size);
+       switches.add(NetSynthSwitch.abc);
+       switches.add(NetSynthSwitch.noswap);
+       int size = 4;
+       result = verifyNin1out(switches,size);
        String assertMessage = size + " Input 1 Output Test Failed.";
        assertTrue(assertMessage,result);
     }

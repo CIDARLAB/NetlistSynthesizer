@@ -25,10 +25,11 @@ import org.cellocad.BU.netsynth.NetSynthSwitch;
  */
 public class subCircuitSwap {
     
+    public static int swapCount;
     //Need to make some framework. Can be done later. Implement 3 input 1 output motifs now. 
     public static List<DGate> implementSwap(List<DGate> netlist, List<NetSynthSwitch> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
     {
-        
+        swapCount =0;
         netlist = NetSynth.rewireNetlist(netlist);
         renameWires(netlist,false);
         netlist = NetSynth.rewireNetlist(netlist);
@@ -72,7 +73,7 @@ public class subCircuitSwap {
             output = NetSynth.assignWireLogic(inputNames, output);
             
         }while(true);
-        
+        System.out.println("Total Swaps :: "+swapCount);
         return output;
     }
     
@@ -174,6 +175,7 @@ public class subCircuitSwap {
                                     output.add(new DGate(gate));
                                 }
                                 output = NetSynth.rewireNetlist(output);
+                                swapCount++;
                             }
                             
                         }
