@@ -725,11 +725,13 @@ public class TestSynthesis {
             path = Filepath + "org/cellocad/BU/ParseVerilog/Verilog.v";
         }*/
         //System.out.println("Netlist:");
-        //NetSynth.printNetlist(NetSynth.getNetlist(path));
-       
+        
         
         DAGW resdag = new DAGW();
         List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
+        
+        NetSynth.printNetlist(NetSynth.getNetlist(path,switches));
+        System.out.println("\n\n");
         resdag = NetSynth.runNetSynth(path,switches);
         for(Gate xgate:resdag.Gates)
         {

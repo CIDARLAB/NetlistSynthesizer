@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.cellocad.BU.subcircuit.CircuitLibrary;
-import org.cellocad.BU.subcircuit.SubNetlist;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.cellocad.BU.subcircuit.subCircuitSwap;
 
@@ -136,7 +134,7 @@ public class NetSynth {
      */
     public static void initializeFilepath() {
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-
+        System.out.println(NetSynth.class.getClassLoader().getResource(".").toExternalForm());
         if (Filepath.contains("/target/")) {
             Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
         }
@@ -145,7 +143,7 @@ public class NetSynth {
         }
 
     }
-
+    
     public static String getFilepath() {
         String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
         if (_filepath.contains("/target/")) {
@@ -153,6 +151,9 @@ public class NetSynth {
         }
         else if (_filepath.contains("/src/")) {
             _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
+        }
+        else if (_filepath.contains("/build/classes/")){
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
         }
         Filepath = _filepath;
         return _filepath;
@@ -2839,6 +2840,9 @@ public class NetSynth {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/espresso.mac -epos " + pathFile);
         } else if ("Linux".equals(x)) {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/espresso.linux -epos " + pathFile);
+        }
+        else if("Windows".equals(x)){
+            commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\espresso.exe -epos " + pathFile);           
         }
 
         String command = commandBuilder.toString();

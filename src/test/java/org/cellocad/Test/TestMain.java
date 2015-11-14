@@ -54,11 +54,10 @@ public class TestMain {
             //TestSynthesis.testANDConversion();
         
             
-        
-            //TestSynthesis.testVerilogrunNetSynth();
+            TestSynthesis.testVerilogrunNetSynth();
             
             //TestSubcircuit.testGraphAndSubcircuit();
-            TestSynthesis.testAllnInputVerilog(3);
+            //TestSynthesis.testAllnInputVerilog(3);
         
         
         
