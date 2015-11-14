@@ -2815,6 +2815,33 @@ public class NetSynth {
         return netout;
     }
 
+    
+    public static boolean isWindows(String os){
+        if(os.toLowerCase().indexOf("win") >=0){
+            return true;
+        }
+        return false;
+    }
+    
+    public static boolean isLinux(String os){
+        if((os.toLowerCase().indexOf("nix") >=0) || (os.indexOf("nux") >=0) || (os.indexOf("aix") >0)){
+            return true;
+        }
+        return false;
+    }
+    public static boolean isMac(String os){
+        if(os.toLowerCase().indexOf("mac") >=0){
+            return true;
+        }
+        return false;
+    }
+    public static boolean isSolaris(String os){
+        if(os.toLowerCase().indexOf("sunos") >=0){
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * Function ************************************************************
      * <br>
@@ -2836,12 +2863,12 @@ public class NetSynth {
         List<String> espressoOutput = new ArrayList<String>();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
-        if (x.contains("Mac")) {
+        if (isMac(x)) {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/espresso.mac -epos " + pathFile);
-        } else if ("Linux".equals(x)) {
+        } else if (isLinux(x)) {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/espresso.linux -epos " + pathFile);
         }
-        else if("Windows".equals(x)){
+        else if(isWindows(x)){
             commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\espresso.exe -epos " + pathFile);           
         }
 
