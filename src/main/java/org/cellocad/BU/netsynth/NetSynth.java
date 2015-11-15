@@ -27,7 +27,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -133,35 +135,76 @@ public class NetSynth {
      * *********************************************************************
      */
     public static void initializeFilepath() {
+        
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        System.out.println(NetSynth.class.getClassLoader().getResource(".").toExternalForm());
-        if (Filepath.contains("/target/")) {
-            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
+        if(isWindows()){
+            
+            try {
+                Filepath = URLDecoder.decode(Filepath,"utf-8");
+                Filepath = new File(Filepath).getPath();
+                if (Filepath.contains("\\target\\")) {
+                    Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\target\\"));
+                } else if (Filepath.contains("\\src\\")) {
+                    Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\src\\"));
+                }
+                System.out.println("Filepath in initializeFilepath() ifWindows clause ::" + Filepath);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        else if (Filepath.contains("/src/")) {
-            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/src/"));
+        else {
+            
+            System.out.println(NetSynth.class.getClassLoader().getResource(".").toExternalForm());
+            if (Filepath.contains("/target/")) {
+                Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
+            } else if (Filepath.contains("/src/")) {
+                Filepath = Filepath.substring(0, Filepath.lastIndexOf("/src/"));
+            }
         }
 
     }
     
     public static String getFilepath() {
         String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (_filepath.contains("/target/")) {
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
+        if(isWindows()){
+            try {
+                _filepath = URLDecoder.decode(_filepath,"utf-8");
+                _filepath = new File(_filepath).getPath();
+                
+                
+                if (_filepath.contains("\\target\\")) {
+                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\target\\"));
+                } else if (_filepath.contains("\\src\\")) {
+                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\src\\"));
+                } else if (_filepath.contains("\\build\\classes\\")) {
+                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\build\\classes\\"));
+                }
+                
+                
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        else if (_filepath.contains("/src/")) {
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
+        else{
+            if (_filepath.contains("/target/")) {
+                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
+            } else if (_filepath.contains("/src/")) {
+                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
+            } else if (_filepath.contains("/build/classes/")) {
+                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
+            }
         }
-        else if (_filepath.contains("/build/classes/")){
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
-        }
+        
+        
+        System.out.println("File path in getFilepath()" + _filepath);
+        
         Filepath = _filepath;
         return _filepath;
     }
 
     public static String getResourcesFilepath() {
         String _filepath = getFilepath();
-        _filepath += "/resources/netsynthResources/";
+        _filepath += "\\resources\\netsynthResources\\";
         return _filepath;
     }
 
@@ -2431,20 +2474,27 @@ public class NetSynth {
         initializeFilepath();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
-        if (x.contains("Mac")) {
+        if (isMac(x)) {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc.mac -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-        } else if ("Linux".equals(x)) {
+        } else if (isLinux(x)) {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-            //}
-
+        } else if (isWindows(x)) {
+            commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\abc -c \"read " + Filepath + "\\resources\\netsynthResources\\" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
         }
+        
 
         String command = commandBuilder.toString();
         
         String filestring = "";
         String clist = "";
-        filestring += Filepath + "/resources/netsynthResources/script";
-        clist = Filepath + "/resources/netsynthResources/script";
+        if(isWindows(x)){
+            filestring += Filepath + "\\resources\\netsynthResources\\script.cmd";
+            clist = Filepath + "\\resources\\netsynthResources\\script.cmd";
+        }
+        else{
+            filestring += Filepath + "/resources/netsynthResources/script";
+            clist = Filepath + "/resources/netsynthResources/script";
+        }
         File fespinp = new File(filestring);
         //Writer output;
         try {
@@ -2490,16 +2540,23 @@ public class NetSynth {
         initializeFilepath();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
-        if (x.contains("Mac")) {
+        if (isMac(x)) {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc.mac -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-        } else if ("Linux".equals(x)) {
+        } else if (isLinux(x)) {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
+        } else if (isWindows(x)){
+            commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\abc.exe -c \"read " + Filepath + "\\resources\\netsynthResources\\" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
         }
 
         String command = commandBuilder.toString();
         
         String filestring = "";
-        filestring += Filepath + "/resources/netsynthResources/script";
+        if(isWindows(x)){
+            filestring += Filepath + "\\resources\\netsynthResources\\script.cmd";
+        }
+        else{
+            filestring += Filepath + "/resources/netsynthResources/script";
+        }
         File fespinp = new File(filestring);
         
         //Writer output;
@@ -2512,8 +2569,12 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         String clist = "";
-        clist = Filepath + "/resources/netsynthResources/script";
-        
+        if(isWindows(x)){
+            clist = Filepath + "\\resources\\netsynthResources\\script.cmd";
+        }
+        else{
+            clist = Filepath + "/resources/netsynthResources/script";
+        }
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
         List<DGate> finalnetlist = new ArrayList<DGate>();
@@ -2547,15 +2608,23 @@ public class NetSynth {
         initializeFilepath();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
-        if (x.contains("Mac")) {
+        if (isMac(x)) {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc.mac -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-        } else if ("Linux".equals(x)) {
+        } else if (isLinux(x)) {
             commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
+        } else if (isWindows(x)){
+            commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
         }
 
         String command = commandBuilder.toString();
         String filestring = "";
-        filestring += Filepath + "/resources/netsynthResources/script";
+        if(isWindows(x)){
+            filestring += Filepath + "\\resources\\netsynthResources\\script.cmd";
+        }
+        else{
+            filestring += Filepath + "/resources/netsynthResources/script";
+        }
+        
         
         File fespinp = new File(filestring);
         
@@ -2569,8 +2638,13 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         String clist = "";
+        if(isWindows(x)){
+            clist = Filepath + "\\resources\\netsynthResources\\script.cmd";
+        }
+        else{
+            clist = Filepath + "/resources/netsynthResources/script";
+        }
         
-        clist = Filepath + "/resources/netsynthResources/script";
         
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
@@ -2815,6 +2889,10 @@ public class NetSynth {
         return netout;
     }
 
+    public static boolean isWindows(){
+        String os = System.getProperty("os.name");
+        return isWindows(os);
+    }
     
     public static boolean isWindows(String os){
         if(os.toLowerCase().indexOf("win") >=0){
@@ -2823,18 +2901,35 @@ public class NetSynth {
         return false;
     }
     
+    public static boolean isLinux(){
+        String os = System.getProperty("os.name");
+        return isLinux(os);
+    }
+    
     public static boolean isLinux(String os){
         if((os.toLowerCase().indexOf("nix") >=0) || (os.indexOf("nux") >=0) || (os.indexOf("aix") >0)){
             return true;
         }
         return false;
     }
+    
+    public static boolean isMac(){
+        String os = System.getProperty("os.name");
+        return isMac(os);
+    }
+    
     public static boolean isMac(String os){
         if(os.toLowerCase().indexOf("mac") >=0){
             return true;
         }
         return false;
     }
+    
+    public static boolean isSolaris(){
+        String os = System.getProperty("os.name");
+        return isSolaris(os);
+    }
+    
     public static boolean isSolaris(String os){
         if(os.toLowerCase().indexOf("sunos") >=0){
             return true;
@@ -2871,9 +2966,10 @@ public class NetSynth {
         else if(isWindows(x)){
             commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\espresso.exe -epos " + pathFile);           
         }
-
+        
         String command = commandBuilder.toString();
-
+        System.out.println("Command " + command);
+        
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
         try {
