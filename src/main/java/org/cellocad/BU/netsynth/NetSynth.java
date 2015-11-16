@@ -217,15 +217,18 @@ public class NetSynth {
         }
         
         
-        System.out.println("File path in getFilepath()" + _filepath);
-        
         Filepath = _filepath;
         return _filepath;
     }
 
     public static String getResourcesFilepath() {
         String _filepath = getFilepath();
-        _filepath += "\\resources\\netsynthResources\\";
+        if(isWindows()){
+            _filepath += "\\resources\\netsynthResources\\";
+        }
+        else{
+            _filepath += "/resources/netsynthResources/";
+        }
         return _filepath;
     }
 
@@ -2989,7 +2992,6 @@ public class NetSynth {
         }
         
         String command = commandBuilder.toString();
-        System.out.println("Command " + command);
         
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
