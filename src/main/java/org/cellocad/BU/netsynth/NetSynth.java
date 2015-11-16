@@ -146,7 +146,10 @@ public class NetSynth {
                     Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\target\\"));
                 } else if (Filepath.contains("\\src\\")) {
                     Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\src\\"));
+                } else if (Filepath.contains("\\build\\classes\\")) {
+                    Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\build\\classes\\"));
                 }
+                
                 System.out.println("Filepath in initializeFilepath() ifWindows clause ::" + Filepath);
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
@@ -159,6 +162,9 @@ public class NetSynth {
                 Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
             } else if (Filepath.contains("/src/")) {
                 Filepath = Filepath.substring(0, Filepath.lastIndexOf("/src/"));
+            }
+            else if (Filepath.contains("/build/classes/")) {
+                Filepath = Filepath.substring(0, Filepath.lastIndexOf("/build/classes/"));
             }
         }
 
