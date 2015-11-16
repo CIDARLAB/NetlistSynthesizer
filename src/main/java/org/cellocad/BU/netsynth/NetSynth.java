@@ -137,6 +137,13 @@ public class NetSynth {
     public static void initializeFilepath() {
         
         Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if (Filepath.contains("/target/")) {
+            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
+        } else if (Filepath.contains("/src/")) {
+            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/src/"));
+        } else if (Filepath.contains("/build/classes/")) {
+            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/build/classes/"));
+        }
         if(isWindows()){
             
             try {
@@ -172,6 +179,14 @@ public class NetSynth {
     
     public static String getFilepath() {
         String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if (_filepath.contains("/target/")) {
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
+        } else if (_filepath.contains("/src/")) {
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
+        } else if (_filepath.contains("/build/classes/")) {
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
+        }
+
         if(isWindows()){
             try {
                 _filepath = URLDecoder.decode(_filepath,"utf-8");
