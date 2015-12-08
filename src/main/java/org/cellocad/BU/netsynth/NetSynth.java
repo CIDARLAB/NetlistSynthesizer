@@ -87,17 +87,17 @@ public class NetSynth {
         for(int i=0;i<4;i++){
             init1.put(i, new ArrayList<SubcircuitLibrary>());
         }
-        NetSynth.sublibrary.put(1, init1);
+        sublibrary.put(1, init1);
         Map<Integer,List<SubcircuitLibrary>> init2 = new HashMap<Integer,List<SubcircuitLibrary>>();
         for(int i=0;i<16;i++){
             init2.put(i, new ArrayList<SubcircuitLibrary>());
         }
-        NetSynth.sublibrary.put(2, init2);
+        sublibrary.put(2, init2);
         Map<Integer,List<SubcircuitLibrary>> init3 = new HashMap<Integer,List<SubcircuitLibrary>>();
         for(int i=0;i<256;i++){
             init3.put(i, new ArrayList<SubcircuitLibrary>());
         }
-        NetSynth.sublibrary.put(3, init3);
+        sublibrary.put(3, init3);
         List<SubcircuitLibrary> net3in1out = new ArrayList<SubcircuitLibrary>();
         net3in1out = PreCompute.getCircuitLibrary("netlist_in3out1.json");
         List<SubcircuitLibrary> net3in1outOr = new ArrayList<SubcircuitLibrary>();
@@ -117,7 +117,7 @@ public class NetSynth {
             subcirc = net3in1outOr.get(i);
             subcirc.setInputs();
             subcirc.setTT();
-            subcirc.switches.add(NetSynthSwitch.outputOR);           
+            subcirc.switches.add(NetSynthSwitch.output_or);           
             sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
         }
         //System.out.println("sublibrary"+sublibrary);
@@ -157,14 +157,14 @@ public class NetSynth {
                     Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\build\\classes\\"));
                 }
                 
-                System.out.println("Filepath in initializeFilepath() ifWindows clause ::" + Filepath);
+                //System.out.println("Filepath in initializeFilepath() ifWindows clause ::" + Filepath);
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         else {
             
-            System.out.println(NetSynth.class.getClassLoader().getResource(".").toExternalForm());
+            //System.out.println(NetSynth.class.getClassLoader().getResource(".").toExternalForm());
             if (Filepath.contains("/target/")) {
                 Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
             } else if (Filepath.contains("/src/")) {
@@ -5211,7 +5211,7 @@ public class NetSynth {
             }
 
             if (netg.output.wtype == DWireType.output) {
-                if (netg.gtype == DGateType.OR) {
+                if (netg.gtype == DGateType.OUTPUT_OR) {
                     Gate outor = null;
                     outpIndx = IndX;
                     outor = new Gate(IndX++, GateType.OUTPUT_OR);

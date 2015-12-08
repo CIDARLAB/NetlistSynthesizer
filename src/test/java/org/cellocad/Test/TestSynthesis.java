@@ -633,7 +633,7 @@ public class TestSynthesis {
             //newdag = NetSynth.runNetSynth(filepath);
             List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
             switches.add(NetSynthSwitch.espresso);
-            switches.add(NetSynthSwitch.outputOR);
+            //switches.add(NetSynthSwitch.outputOR);
             
             newdag = NetSynth.runNetSynth(filepath, switches);
             System.out.println("\nDAGW Gates");
@@ -690,7 +690,7 @@ public class TestSynthesis {
         String path = Filepath;
         
         Filepath = NetSynth.getResourcesFilepath();
-        path = Filepath + "/TestNinput.v";
+        path = Filepath + "/Verilog.v";
         //Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
         //System.out.println("File path : " + Filepath);
         /*if(Filepath.contains("prash"))
@@ -712,8 +712,9 @@ public class TestSynthesis {
         
         DAGW resdag = new DAGW();
         List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
-        switches.add(NetSynthSwitch.espresso);
+        //switches.add(NetSynthSwitch.output_or);
         NetSynth.printNetlist(NetSynth.getNetlist(path,switches));
+        BooleanSimulator.printTruthTable(NetSynth.getNetlist(path,switches));
         System.out.println("\n\n");
         resdag = NetSynth.runNetSynth(path,switches);
         for(Gate xgate:resdag.Gates)
