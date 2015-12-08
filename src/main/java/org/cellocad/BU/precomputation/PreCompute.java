@@ -31,7 +31,7 @@ import org.json.JSONObject;
  */
 public class PreCompute {
     
-    public static Map<Integer,SubcircuitLibrary> getCircuitLibraryMap(String filename){
+    public static Map<Integer,SubcircuitLibrary> getCircuitLibraryMap(String filepath){
         List<String> inputOrder = new ArrayList<String>();
         inputOrder.add("a");
         inputOrder.add("b");
@@ -43,10 +43,7 @@ public class PreCompute {
         
         // <editor-fold defaultstate="collapsed" desc="Read from Input File"> 
         
-        String Filepath="";
-        Filepath = NetSynth.getResourcesFilepath();
-        Filepath += "/"+filename;
-        File file = new File(Filepath);
+        File file = new File(filepath);
         
         BufferedReader br;
         FileReader fr;

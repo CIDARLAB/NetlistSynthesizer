@@ -117,14 +117,6 @@ public class NetSynth {
         }
     }
     
-    public static boolean containsOUTPUT_OR(List<DGate> netlist){
-        for(DGate gate:netlist){
-            if(gate.gtype.equals(DGateType.OUTPUT_OR))
-                return true;
-        }
-        return false;
-    }
-    
     public static void initializeSubLibrary(){
         sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
         Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
@@ -142,10 +134,14 @@ public class NetSynth {
             init3.put(i, new ArrayList<SubcircuitLibrary>());
         }
         sublibrary.put(3, init3);
+        
+        String filepathNet3in1out = NetSynth.getResourcesFilepath() + "/netlist_in3out1.json";
+        String filepathNet3in1out_or = NetSynth.getResourcesFilepath() + "/netlist_in3out1_OR.json";
+        
         List<SubcircuitLibrary> net3in1out = new ArrayList<SubcircuitLibrary>();
-        net3in1out = PreCompute.getCircuitLibrary("netlist_in3out1.json");
+        net3in1out = PreCompute.getCircuitLibrary(filepathNet3in1out);
         List<SubcircuitLibrary> net3in1outOr = new ArrayList<SubcircuitLibrary>();
-        net3in1outOr = PreCompute.getCircuitLibrary("netlist_in3out1_OR.json");
+        net3in1outOr = PreCompute.getCircuitLibrary(filepathNet3in1out_or);
         
         for(int i=0;i<net3in1out.size();i++)
         {
@@ -161,11 +157,23 @@ public class NetSynth {
             subcirc = net3in1outOr.get(i);
             subcirc.setInputs();
             subcirc.setTT();
-            subcirc.switches.add(NetSynthSwitch.output_or);           
+            if(containsOUTPUT_OR(subcirc.netlist)){
+                subcirc.switches.add(NetSynthSwitch.output_or);           
+            }         
             sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
         }
         //System.out.println("sublibrary"+sublibrary);
     }
+    
+    public static boolean containsOUTPUT_OR(List<DGate> netlist){
+        for(DGate gate:netlist){
+            if(gate.gtype.equals(DGateType.OUTPUT_OR))
+                return true;
+        }
+        return false;
+    }
+    
+    
     /**
      * Function ************************************************************
      * <br>
@@ -4886,7 +4894,7 @@ public class NetSynth {
         for (DGate xgate : netlist) {
             if (xgate.output.wtype.equals(DWireType.output)) {
                 outputwires.add(xgate.output.name.trim());
-                if (xgate.gtype.equals(DGateType.OR)) {
+                if (xgate.gtype.equals(DGateType.OUTPUT_OR)) {
                     outputORwires.add(xgate.output.name.trim());
                 }
             }
