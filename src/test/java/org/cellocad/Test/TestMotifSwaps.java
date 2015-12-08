@@ -41,7 +41,7 @@ public class TestMotifSwaps {
         ArrayList<String> outputs = new ArrayList();
         outputs.add("y");
         ArrayList<String> netlist = new ArrayList();
-        netlist.add("OUTPUT_OR(y, a, b)");
+        netlist.add("AND(y, a, b)");
 
         JSONObject motif = new JSONObject();
         motif.put("collection", "motif_library");
@@ -57,7 +57,8 @@ public class TestMotifSwaps {
         int nor = 0;
         int not = 0;
         int output_or = 0;
-
+        int and = 0;
+        
         for(Gate g: GW.Gates) {
             if(g.Type.equals(Gate.GateType.NOR)) {
                 nor++;
@@ -68,11 +69,15 @@ public class TestMotifSwaps {
             if(g.Type.equals(Gate.GateType.OUTPUT_OR)) {
                 output_or++;
             }
+            if(g.Type.equals(Gate.GateType.AND)) {
+                and++;
+            }
+            
         }
 
         System.out.println(nor);
         System.out.println(not);
         System.out.println(output_or);
-
+        System.out.println(and);
     }
 }

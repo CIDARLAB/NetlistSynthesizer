@@ -458,13 +458,16 @@ public class NetSynth {
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
         return getNetlist(vfilepath,switches);
     
     }
-        
+
     public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
-        
-        initializeSubLibrary();
+        if(sublibrary.isEmpty()){
+            initializeSubLibrary();
+        }
         List<String> inputnames = new ArrayList<String>();
         List<String> outputnames = new ArrayList<String>();
         
@@ -630,6 +633,7 @@ public class NetSynth {
         
         return netlist;
     }
+    
     
     /**
      * Function ************************************************************
