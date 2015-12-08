@@ -17,6 +17,7 @@ public enum DGateType{
            NAND, 
            AND, 
            OR, 
+           OUTPUT_OR,
            XOR,
            XNOR,
            

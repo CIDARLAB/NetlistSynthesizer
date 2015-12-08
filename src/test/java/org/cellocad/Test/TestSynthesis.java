@@ -646,24 +646,7 @@ public class TestSynthesis {
     }
     
     
-    
-    public static void testSpecInputVerilog(int n,int tt)
-    {
-       
-            List<String> verilogFileLines = new ArrayList<String>();
-            verilogFileLines = genVerilogFile.createSingleOutpVerilogFile(n, tt);
-            String filepath = NetSynth.create_VerilogFile(verilogFileLines, "TestNinput");
-            DAGW newdag = new DAGW();
-            //newdag = NetSynth.runNetSynth(filepath);
-            newdag = NetSynth.runNetSynth(filepath, NetSynthSwitch.defaultmode,  NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode,NetSynthSwitch.defaultmode);
-            System.out.println("\nDAGW Gates");
-            for(Gate xgate:newdag.Gates)
-            {
-                System.out.println("Gate Type: " + xgate.Type + " : Gate Name: " + xgate.Name);
-            }
-            
-            System.out.println("\n\nPrint Graph: \n"+newdag.printGraph());
-    }
+   
     
     
     public static void testAllnInputVerilog(int n) // Also perform check to make sure the truthtable produced is correct

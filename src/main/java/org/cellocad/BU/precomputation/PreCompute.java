@@ -212,6 +212,9 @@ public class PreCompute {
         else if(dgate.startsWith(DGateType.OR.toString())){
             gate.gtype = DGateType.OR;
         }
+        else if(dgate.startsWith(DGateType.OUTPUT_OR.toString())){
+            gate.gtype = DGateType.OUTPUT_OR;
+        }
         else if(dgate.startsWith(DGateType.XNOR.toString())){
             gate.gtype = DGateType.XNOR;
         }
