@@ -80,7 +80,7 @@ public class subCircuitSwap {
     public static int circCost(List<DGate> netlist){
         int count =0;
         for(DGate gate:netlist){
-            if(gate.output.wtype.equals(DWireType.output) && gate.gtype.equals(DGateType.OR)){
+            if(gate.output.wtype.equals(DWireType.output) && gate.gtype.equals(DGateType.OUTPUT_OR)){
                 
             }
             else
@@ -121,16 +121,20 @@ public class subCircuitSwap {
                     } 
                     else {
                         
-                        canSwap = containsSwitches(switches,sublibrary.get(inpSize).get(ttPerm).get(k).switches);
-                        if(canSwap){
-                            if(switches.contains(NetSynthSwitch.outputOR)){
+                        //canSwap = containsSwitches(switches,sublibrary.get(inpSize).get(ttPerm).get(k).switches);
+                        //if(canSwap){
+                            //if(switches.contains(NetSynthSwitch.output_or)){
                                 if(!netlist.get(index).output.wtype.equals(DWireType.output)){
-                                    if(sublibrary.get(inpSize).get(ttPerm).get(k).switches.contains(NetSynthSwitch.outputOR)){
+                                    if(sublibrary.get(inpSize).get(ttPerm).get(k).switches.contains(NetSynthSwitch.output_or)){
                                         canSwap = false;
                                     }
                                 }
-                            }
-                        }
+                                else{
+                                    canSwap = true;
+                                }
+                                    
+                            //}
+                        //}
                     }
                     if (canSwap) {
                         //System.out.println("TT ORG"+subnet.get(i).tt);

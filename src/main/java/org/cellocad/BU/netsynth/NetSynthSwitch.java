@@ -16,25 +16,11 @@ public enum NetSynthSwitch {
    
    abc,
    espresso,
-   precompute,
-   noprecompute,
+   output_or,
+   
    originalstructural,
-   originalstructuralAND,
-   originalstructuralANDOR,
-   
-   noinv,
-   
-   outputOR,
-   //nooutputOR,
-   outputOR3,
-   
-   AND2,
-   AND2OR,
-   
-   nor3,
    
    noswap,
-   
-   no2notstonor
+  
     
 }

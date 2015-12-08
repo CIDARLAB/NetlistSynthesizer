@@ -248,14 +248,14 @@ public class NetlistConversionFunctions {
         } 
         else if (g.gtype == DGateType.AND) 
         {
-            if (originalAND.equals(NetSynthSwitch.originalstructuralAND) || originalAND.equals(NetSynthSwitch.originalstructuralANDOR)) 
-            {
-                g.calculateStage();
-                nor_eq.add(g);
+            //if (originalAND.equals(NetSynthSwitch.originalstructuralAND) || originalAND.equals(NetSynthSwitch.originalstructuralANDOR)) 
+            //{
+            //    g.calculateStage();
+            //    nor_eq.add(g);
 
-            } 
-            else 
-            {
+            //} 
+            //else 
+            //{
                 DGate not1 = new DGate();
                 not1.gtype = DGateType.NOT;
                 not1.input.add(g.input.get(0));
@@ -283,7 +283,7 @@ public class NetlistConversionFunctions {
                 nor_eq.add(not1);
                 nor_eq.add(not2);
                 nor_eq.add(nor1);
-            }
+            //}
 
         }
        

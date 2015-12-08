@@ -78,7 +78,7 @@ public class Allnin1out {
                     System.out.println("Circuit "+i+ " does not work\n");
                 }
                 
-                file.delete();
+                //file.delete();
                 
                 //result = true;
                 //System.out.println("Verilog File Lines" + verilogFileLines);
@@ -96,9 +96,9 @@ public class Allnin1out {
        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
        //switches.add(NetSynthSwitches.espresso);
        //switches.add(NetSynthSwitch.outputOR);
-       switches.add(NetSynthSwitch.abc);
-       switches.add(NetSynthSwitch.noswap);
-       int size = 4;
+       //switches.add(NetSynthSwitch.abc);
+       //switches.add(NetSynthSwitch.noswap);
+       int size = 3;
        result = verifyNin1out(switches,size);
        String assertMessage = size + " Input 1 Output Test Failed.";
        assertTrue(assertMessage,result);
