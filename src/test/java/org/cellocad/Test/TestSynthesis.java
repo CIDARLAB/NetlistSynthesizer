@@ -707,7 +707,7 @@ public class TestSynthesis {
         String path = Filepath;
         
         Filepath = NetSynth.getResourcesFilepath();
-        path = Filepath + "/Verilog.v";
+        path = Filepath + "/TestNinput.v";
         //Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
         //System.out.println("File path : " + Filepath);
         /*if(Filepath.contains("prash"))
@@ -729,7 +729,7 @@ public class TestSynthesis {
         
         DAGW resdag = new DAGW();
         List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
-        
+        switches.add(NetSynthSwitch.espresso);
         NetSynth.printNetlist(NetSynth.getNetlist(path,switches));
         System.out.println("\n\n");
         resdag = NetSynth.runNetSynth(path,switches);
