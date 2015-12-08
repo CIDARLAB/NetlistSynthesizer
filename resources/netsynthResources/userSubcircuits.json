@@ -1,0 +1,1 @@
+[{"outputs":["y"],"inputs":["a","b"],"netlist":["OUTPUT_OR(y, a, b)"],"collection":"motif_library"}]
