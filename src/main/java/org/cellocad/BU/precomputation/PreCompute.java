@@ -111,7 +111,7 @@ public class PreCompute {
         return library;
     }
     
-    public static List<SubcircuitLibrary> getCircuitLibrary(String filename){
+    public static List<SubcircuitLibrary> getCircuitLibrary(String filepath){
         List<String> inputOrder = new ArrayList<String>();
         inputOrder.add("a");
         inputOrder.add("b");
@@ -123,10 +123,7 @@ public class PreCompute {
         
         // <editor-fold defaultstate="collapsed" desc="Read from Input File"> 
         
-        String Filepath="";
-        Filepath = NetSynth.getResourcesFilepath();
-        Filepath += "/"+filename;
-        File file = new File(Filepath);
+        File file = new File(filepath);
         
         BufferedReader br;
         FileReader fr;

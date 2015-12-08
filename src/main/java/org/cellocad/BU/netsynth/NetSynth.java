@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.cellocad.BU.subcircuit.subCircuitSwap;
+import org.json.JSONArray;
 
 /**
  *
@@ -79,6 +80,49 @@ public class NetSynth {
         zero = new DWire("_zero", DWireType.GND);
         Filepath = NetSynth.getFilepath();
 
+    }
+    
+    public static void initializeSubLibrary(String filepath){
+        
+        sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
+        Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<4;i++){
+            init1.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        sublibrary.put(1, init1);
+        Map<Integer,List<SubcircuitLibrary>> init2 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<16;i++){
+            init2.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        sublibrary.put(2, init2);
+        Map<Integer,List<SubcircuitLibrary>> init3 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<256;i++){
+            init3.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        sublibrary.put(3, init3);
+        
+        List<SubcircuitLibrary> subcircuits = new ArrayList<SubcircuitLibrary>();
+        subcircuits = PreCompute.getCircuitLibrary(filepath);
+        
+        for(int i=0;i<subcircuits.size();i++)
+        {
+            SubcircuitLibrary subcirc = new SubcircuitLibrary();
+            subcirc = subcircuits.get(i);
+            subcirc.setInputs();
+            subcirc.setTT();
+            if(containsOUTPUT_OR(subcirc.netlist)){
+                subcirc.switches.add(NetSynthSwitch.output_or);           
+            }
+            sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
+        }
+    }
+    
+    public static boolean containsOUTPUT_OR(List<DGate> netlist){
+        for(DGate gate:netlist){
+            if(gate.gtype.equals(DGateType.OUTPUT_OR))
+                return true;
+        }
+        return false;
     }
     
     public static void initializeSubLibrary(){
@@ -232,6 +276,41 @@ public class NetSynth {
         return _filepath;
     }
 
+    public static DAGW runNetSynthCode(String codeLines, List<NetSynthSwitch> switches, JSONArray subcircuits){
+        String filepathSubCirc = getResourcesFilepath() + "/userSubcircuits.json"; 
+        File file = new File(filepathSubCirc);
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(subcircuits.toString());
+            writer.flush();
+            writer.close();
+            initializeSubLibrary(filepathSubCirc);
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return runNetSynthCode(codeLines,switches);
+    }
+    
+    public static DAGW runNetSynthCode(String codeLines, List<NetSynthSwitch> switches) {
+
+        DAGW finaldag = new DAGW();
+        
+        String filepath = "";
+        filepath = getResourcesFilepath();
+        filepath += "tempVerilog.v";
+        File fespinp = new File(filepath);
+        try {
+            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            output.write(codeLines);
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finaldag = runNetSynth(filepath,switches);
+
+        return finaldag;
+    }
+    
     /**
      * Function ************************************************************
      * <br>
@@ -253,24 +332,23 @@ public class NetSynth {
         return runNetSynth(vfilepath, new ArrayList<NetSynthSwitch>());
     }
     
-    public static DAGW runNetSynthCode(String codeLines, List<NetSynthSwitch> switches) {
-
-        DAGW finaldag = new DAGW();
+    public static DAGW runNetSynth(String vfilepath, List<NetSynthSwitch> switches, JSONArray subcircuits){
         
-        String filepath = "";
-        filepath = getResourcesFilepath();
-        filepath += "tempVerilog.v";
-        File fespinp = new File(filepath);
+        DAGW finaldag = new DAGW();
+
+        String filepathSubCirc = getResourcesFilepath() + "/userSubcircuits.json"; 
+        File file = new File(filepathSubCirc);
         try {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-            output.write(codeLines);
-            output.close();
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(subcircuits.toString());
+            writer.flush();
+            writer.close();
+            initializeSubLibrary(filepathSubCirc);
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
-        finaldag = runNetSynth(filepath,switches);
-
-        return finaldag;
+        
+        return runNetSynth(vfilepath,switches);
     }
     
     public static DAGW runNetSynth(String vfilepath, List<NetSynthSwitch> switches) {
@@ -358,6 +436,24 @@ public class NetSynth {
         return getNetlist(vfilepath, new ArrayList<NetSynthSwitch>());
     }
     
+        
+    
+    public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches, JSONArray subcircuits){
+        String filepathSubCirc = getResourcesFilepath() + "/userSubcircuits.json";
+        File file = new File(filepathSubCirc);
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(subcircuits.toString());
+            writer.flush();
+            writer.close();
+            initializeSubLibrary(filepathSubCirc);
+        } catch (IOException ex) {
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return getNetlist(vfilepath,switches);
+    
+    }
+        
     public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
         
         initializeSubLibrary();
