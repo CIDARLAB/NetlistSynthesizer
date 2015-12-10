@@ -514,7 +514,12 @@ public class NetSynth {
             
             if(!switches.contains(NetSynthSwitch.noswap)){
                 structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,sublibrary);
+                structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,sublibrary);
+                
                 dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                
+                invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                 invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
             }
             
@@ -556,6 +561,9 @@ public class NetSynth {
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
                         dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                        dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                        
+                        invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                         invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
@@ -575,6 +583,9 @@ public class NetSynth {
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
                     if (!switches.contains(NetSynthSwitch.noswap)) {
                         dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                        dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                        
+                        invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                         invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
@@ -611,6 +622,9 @@ public class NetSynth {
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
                         dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                        dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                        
+                        invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                         invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
