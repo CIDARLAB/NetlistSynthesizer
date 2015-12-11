@@ -1,1 +1,1 @@
-[{"outputs":["y"],"inputs":["a","b","c"],"netlist":["NOR(y, a, b, c)"],"collection":"motif_library"}]
+[{"inputs":["a","b","c"],"netlist":["NOR(y, a, b, c)"],"collection":"motif_library","outputs":["y"]}]
