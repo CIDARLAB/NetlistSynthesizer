@@ -427,7 +427,7 @@ public class NetSynth {
     public static int getRepressorCount(List<DGate> netlist){
         int count =0;
         for(DGate gate:netlist){
-            if(!gate.gtype.equals(DGateType.OUTPUT_OR)){
+            if(!(gate.gtype.equals(DGateType.OUTPUT_OR)||gate.gtype.equals(DGateType.BUF))){
                 count++;
             }
         }
