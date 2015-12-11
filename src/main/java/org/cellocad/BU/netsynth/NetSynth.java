@@ -58,7 +58,7 @@ public class NetSynth {
     /**
      *
      */
-    public static Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary;
+    public Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
     //sublibrary.get(i) gives a Map of all Subcircuits with i inputs
     //sublibrary.get(i).get(4) Gives a List of all subcircuits with i inputs, and truthtable == 4. 
     
@@ -84,7 +84,7 @@ public class NetSynth {
 
     }
     
-    public static void initializeSubLibrary(String filepath){
+    public void initializeSubLibrary(String filepath){
         
         sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
         Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
@@ -119,7 +119,7 @@ public class NetSynth {
         }
     }
     
-    public static void initializeSubLibrary(){
+    public void initializeSubLibrary(){
         sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
         Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
         for(int i=0;i<4;i++){
@@ -294,7 +294,8 @@ public class NetSynth {
             writer.write(subcircuits.toString());
             writer.flush();
             writer.close();
-            initializeSubLibrary(filepathSubCirc);
+            NetSynth net = new NetSynth();
+            net.initializeSubLibrary(filepathSubCirc);
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -353,7 +354,8 @@ public class NetSynth {
             writer.write(subcircuits.toString());
             writer.flush();
             writer.close();
-            initializeSubLibrary(filepathSubCirc);
+            NetSynth net = new NetSynth();
+            net.initializeSubLibrary(filepathSubCirc);
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -466,25 +468,24 @@ public class NetSynth {
     public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches, JSONArray subcircuits){
         String filepathSubCirc = getResourcesFilepath() + "/userSubcircuits.json";
         File file = new File(filepathSubCirc);
+        NetSynth net = new NetSynth();
+        
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.write(subcircuits.toString());
             writer.flush();
             writer.close();
-            initializeSubLibrary(filepathSubCirc);
+            net.initializeSubLibrary(filepathSubCirc);
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         
-        return getNetlist(vfilepath,switches);
+        return net.getNetlist(vfilepath,switches,net.sublibrary);
     
     }
-
-    public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
-        if(sublibrary.isEmpty()){
-            initializeSubLibrary();
-        }
+    
+    public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches,Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
         List<String> inputnames = new ArrayList<String>();
         List<String> outputnames = new ArrayList<String>();
         
@@ -643,6 +644,190 @@ public class NetSynth {
                         
                         invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                         invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
+                    }
+                    dirsize = getRepressorsCost(dirnetlist);
+                    invsize = getRepressorsCost(invnetlist);
+
+                    if (dirsize < invsize) {
+                        return dirnetlist;
+                    } else {
+                        return invnetlist;
+                    }
+
+                    //printNetlist(abcNetlist);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            //seehere
+        }
+        
+        
+        return netlist;
+    }
+    
+    public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
+        
+        NetSynth net = new NetSynth();
+        net.initializeSubLibrary();
+        List<String> inputnames = new ArrayList<String>();
+        List<String> outputnames = new ArrayList<String>();
+        
+        double dirsize = 0;
+        double invsize = 0;
+        double structsize = 0;
+        double netsize = 0;
+        
+        List<DGate> netlist = new ArrayList<DGate>();
+        List<DGate> dirnetlist = new ArrayList<DGate>();
+        List<DGate> invnetlist = new ArrayList<DGate>();
+        List<DGate> naiveNetlist = new ArrayList<DGate>();
+        List<DGate> structNetlist = new ArrayList<DGate>();
+        
+        boolean isStructural = false;
+        boolean hasCaseStatements = false;
+        boolean hasDontCares = false;
+        
+        String alllines = parseVerilogFile.verilogFileLines(vfilepath);
+        isStructural = parseVerilogFile.isStructural(alllines);
+        inputnames = parseVerilogFile.getInputNames(alllines);
+        outputnames = parseVerilogFile.getOutputNames(alllines);
+        if(isStructural){
+            naiveNetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
+            naiveNetlist = rewireNetlist(naiveNetlist);
+            if (switches.contains(NetSynthSwitch.originalstructural)) {
+                return naiveNetlist;
+            } 
+            else {
+                
+                structNetlist = convertNaiveToNORNOT(naiveNetlist); // Convert Naive Netlist to List of DGates containing only NOR and NOTs
+            }
+            List<String> ttValues = new ArrayList<String>();
+            List<String> invttValues = new ArrayList<String>();
+
+            ttValues = BooleanSimulator.getTruthTable(structNetlist, inputnames);  // Compute Truth Table of Each Output
+            invttValues = BooleanSimulator.invertTruthTable(ttValues); // Compute Inverse Truth Table of Each Output
+
+            CircuitDetails direct = new CircuitDetails(inputnames, outputnames, ttValues);
+            CircuitDetails inverted = new CircuitDetails(inputnames, outputnames, invttValues);
+            
+            dirnetlist = runEspressoAndABC(direct,switches);
+            invnetlist = runInvertedEspressoAndABC(inverted,switches);
+            
+            if(!switches.contains(NetSynthSwitch.noswap)){
+                structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,net.sublibrary);
+                structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,net.sublibrary);
+                
+                dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, net.sublibrary);
+                dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, net.sublibrary);
+                
+                invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, net.sublibrary);
+                invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, net.sublibrary);
+            }
+            
+            dirsize = getRepressorsCost(dirnetlist);
+            invsize = getRepressorsCost(invnetlist);
+            structsize = getRepressorsCost(structNetlist);
+            
+            if ((structsize <= dirsize) && (structsize <= invsize)) {
+                return structNetlist;
+            } 
+            else {
+                if (dirsize == invsize) {
+                    if (NOR3count(dirnetlist) < NOR3count(invnetlist)) {
+                        return dirnetlist;
+                    } else {
+                        return invnetlist;
+                    }
+                } else if (dirsize < invsize) {
+                    return dirnetlist;
+                } else {
+                    return invnetlist;
+                }
+            }
+        }
+        else{
+            hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
+            if(hasCaseStatements){
+                CircuitDetails direct = new CircuitDetails();
+                direct = parseVerilogFile.parseCaseStatements(alllines);
+                List<String> invttValues = new ArrayList<String>();
+                invttValues = BooleanSimulator.invertTruthTable(direct.truthTable);
+                CircuitDetails inverted = new CircuitDetails(direct.inputNames, direct.outputNames, invttValues);
+
+                hasDontCares = parseVerilogFile.hasDontCares(direct.truthTable);
+                //<editor-fold desc="Behavioral- Case Statements - Has Don't Cares">
+                if (hasDontCares) {
+                    dirnetlist = runDCEspressoAndABC(direct, switches);
+                    invnetlist = runInvertedDCEspressoAndABC(inverted, switches);
+                    
+                    if (!switches.contains(NetSynthSwitch.noswap)) {
+                        dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, net.sublibrary);
+                        dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, net.sublibrary);
+                        
+                        invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, net.sublibrary);
+                        invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, net.sublibrary);
+                    }
+                    dirsize = getRepressorsCost(dirnetlist);
+                    invsize = getRepressorsCost(invnetlist);
+
+                    if (dirsize <= invsize) {
+                        return dirnetlist;
+                    } else {
+                        return invnetlist;                        
+                    }
+                    
+                } //</editor-fold>
+                //<editor-fold desc="Behavioral- Case Statements - NO Don't Cares">
+                else {
+                    
+                    dirnetlist = runEspressoAndABC(direct, switches);
+                    invnetlist = runInvertedEspressoAndABC(inverted, switches);
+                    if (!switches.contains(NetSynthSwitch.noswap)) {
+                        dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, net.sublibrary);
+                        dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, net.sublibrary);
+                        
+                        invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, net.sublibrary);
+                        invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, net.sublibrary);
+                    }
+                    dirsize = getRepressorsCost(dirnetlist);
+                    invsize = getRepressorsCost(invnetlist);
+
+                    if (dirsize <= invsize) {
+                        return dirnetlist;
+                    } else {
+                        return invnetlist;
+                    }
+                }
+                //</editor-fold>
+            }
+            else
+            {
+                try {
+                    String modifiedVfilepath = genVerilogFile.modifyAssignVerilog(vfilepath);
+                    List<DGate> abcNetlist = runABCverilog_fullFilePath(modifiedVfilepath);
+
+                    List<String> ttValues = new ArrayList<String>();
+                    List<String> invttValues = new ArrayList<String>();
+
+                    inputnames = parseVerilogFile.getInputNames(alllines);
+                    outputnames = parseVerilogFile.getOutputNames(alllines);
+
+                    ttValues = BooleanSimulator.getTruthTable(abcNetlist, inputnames);  // Compute Truth Table of Each Output
+                    invttValues = BooleanSimulator.invertTruthTable(ttValues); // Compute Inverse Truth Table of Each Output
+
+                    CircuitDetails direct = new CircuitDetails(inputnames, outputnames, ttValues);
+                    CircuitDetails inverted = new CircuitDetails(inputnames, outputnames, invttValues);
+
+                    dirnetlist = runEspressoAndABC(direct,switches);
+                    invnetlist = runInvertedEspressoAndABC(inverted, switches);
+                    
+                    if (!switches.contains(NetSynthSwitch.noswap)) {
+                        dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, net.sublibrary);
+                        dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, net.sublibrary);
+                        
+                        invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, net.sublibrary);
+                        invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, net.sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
                     invsize = getRepressorsCost(invnetlist);

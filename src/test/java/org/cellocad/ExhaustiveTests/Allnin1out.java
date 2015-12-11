@@ -62,11 +62,11 @@ public class Allnin1out {
         int ttSize = (int)Math.pow(2, size);
         int noOfTT = (int)Math.pow(2, ttSize);
         
-        String filepathNet3in1out_or = NetSynth.getResourcesFilepath() + "/netlist_in3out1_OR.json";
-        String filepathNet3in1out = NetSynth.getResourcesFilepath() + "/netlist_in3out1.json";
+        String filepathNet3in1out_or = NetSynth.getResourcesFilepath() + "/netlist_in3out1_OUTPUT_OR.json";
+        //String filepathNet3in1out = NetSynth.getResourcesFilepath() + "/netlist_in3out1.json";
         
         List<SubcircuitLibrary> lib_or = PreCompute.getCircuitLibrary(filepathNet3in1out_or);
-        List<SubcircuitLibrary> lib = PreCompute.getCircuitLibrary(filepathNet3in1out);
+        //List<SubcircuitLibrary> lib = PreCompute.getCircuitLibrary(filepathNet3in1out);
         
         for(int i=0;i<noOfTT;i++){
             try {
@@ -90,9 +90,11 @@ public class Allnin1out {
                     inputnames.add(inpName);
                 }
                 List<DGate> netlist = new ArrayList<DGate>();
-                
+                List<DGate> netlist_swap = new ArrayList<DGate>();
                 long startTime = System.nanoTime();
                 netlist = NetSynth.getNetlist(filepath, switches,motifs);
+                netlist_swap = NetSynth.getNetlist(filepath, switches);
+                
                 long endTime = System.nanoTime();
                 
                 long duration = (endTime - startTime)/1000000;
@@ -105,44 +107,11 @@ public class Allnin1out {
                 //System.out.println("Same circuit :: " + NetSynth.equivalentNetlist(netlist, lib.get(i-1).netlist)+"\n");
                 
                 int netlistSize = NetSynth.getRepressorCount(netlist);
+                int netlist_swapSize = NetSynth.getRepressorCount(netlist_swap);
                 int libSize_or = NetSynth.getRepressorCount(lib_or.get(i-1).netlist);
-                int libSize = NetSynth.getRepressorCount(lib.get(i-1).netlist);
+                //int libSize = NetSynth.getRepressorCount(lib.get(i-1).netlist);
                 
-                /*if(NetSynth.containsOUTPUT_OR(netlist)){
-                    netlistSize = netlist.size()-1;
-                }
-                if(NetSynth.containsOUTPUT_OR(lib.get(i-1).netlist)){
-                    libSize = lib.get(i-1).netlist.size()-1;
-                }*/
-                
-                /*if(i == 22){
-                    List<String> inputList = new ArrayList<String>();
-                    inputList.add("a");
-                    inputList.add("b");
-                    inputList.add("c");
-                    
-                    List<String> inputListNetSynth = new ArrayList<String>();
-                    inputListNetSynth.add("inp1");
-                    inputListNetSynth.add("inp2");
-                    inputListNetSynth.add("inp3");
-                    
-                    
-                    System.out.println("NetSynth");
-                    //NetSynth.printNetlist(netlist);
-                    BooleanSimulator.printTruthTable(netlist, inputListNetSynth);
-                    
-                    System.out.println("JSON");
-                    //NetSynth.printNetlist(lib.get(i-1).netlist);
-                    BooleanSimulator.printTruthTable(lib.get(i-1).netlist, inputList);
-                    
-                    System.out.println("JSON OR");
-                    //NetSynth.printNetlist(lib_or.get(i-1).netlist);
-                    BooleanSimulator.printTruthTable(lib_or.get(i-1).netlist, inputList);
-                    
-                    
-                }*/
-                
-                System.out.println(i+"," + netlistSize+","+libSize+","+libSize_or+","+NetSynth.equivalentNetlist(netlist, lib_or.get(i-1).netlist));
+                System.out.println(i+"," + netlistSize+","+netlist_swapSize+","+NetSynth.equivalentNetlist(netlist,netlist_swap));
                 
                 int ttIntVal = Convert.bintoDec(tt);
                 if(ttIntVal != i){

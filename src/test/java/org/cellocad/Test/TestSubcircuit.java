@@ -342,12 +342,13 @@ public class TestSubcircuit {
         netlist = getSampleNetlist2();
         NetSynth.printNetlist(netlist);
         System.out.println("====================================\n");
-        NetSynth.initializeSubLibrary();
+        //NetSynth.initializeSubLibrary();
         System.out.println("TT : "+ BooleanSimulator.getTruthTable(netlist,inputNames));
         List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
         //switches.add(NetSynthSwitch.outputOR);
-        
-        List<DGate> output = subCircuitSwap.implementSwap(netlist,switches, NetSynth.sublibrary);
+        NetSynth net = new NetSynth();
+        net.initializeSubLibrary();
+        List<DGate> output = subCircuitSwap.implementSwap(netlist,switches, net.sublibrary);
         
         NetSynth.printNetlist(output);
         System.out.println("====================================\n");
