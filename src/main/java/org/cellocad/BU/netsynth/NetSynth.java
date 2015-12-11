@@ -33,8 +33,10 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
@@ -419,6 +421,18 @@ public class NetSynth {
 
         }
 
+        return count;
+    }
+    
+    public static int getRepressorCount(List<DGate> netlist){
+        int count =0;
+        for(DGate gate:netlist){
+            if(!(gate.gtype.equals(DGateType.OUTPUT_OR)||gate.gtype.equals(DGateType.BUF))){
+                count++;
+            }
+        }
+        
+        
         return count;
     }
 
@@ -4396,6 +4410,8 @@ public class NetSynth {
         output = removeDuplicateNots(output);
         output = rewireNetlist(output);
         
+        output = convert2NOTsToNOR(output);
+        output = rewireNetlist(output);
         
         output = removeDanglingGates(output);
         output = rewireNetlist(output);
@@ -5193,7 +5209,71 @@ public class NetSynth {
         }
         return equal;
     }
-
+    
+    public static boolean equivalentNetlist(List<DGate> netlist1, List<DGate> netlist2){
+        List<String> inputSet1 = new ArrayList<String>();
+        List<String> inputSet2 = new ArrayList<String>();
+        
+        if(!(netlist1.size() == netlist2.size())){
+            return false;
+        }
+        assignGateLevel(netlist1);
+        assignGateLevel(netlist2);
+        
+        Map<Integer,List<DGateType>> levelGateMap1 = new HashMap<>();
+        Map<Integer,List<DGateType>> levelGateMap2 = new HashMap<>();
+        
+        int netlist1Level = netlist1.get(netlist1.size()-1).gatestage;
+        int netlist2Level = netlist2.get(netlist2.size()-1).gatestage;
+        if(netlist1Level != netlist2Level){
+            return false;
+        }
+        for(int i=1;i<=netlist1Level;i++){
+            levelGateMap1.put(i, new ArrayList<DGateType>());
+            levelGateMap2.put(i, new ArrayList<DGateType>());
+        }
+        for(DGate gate:netlist1){
+            levelGateMap1.get(gate.gatestage).add(gate.gtype);
+        }
+        for(DGate gate:netlist2){
+            levelGateMap2.get(gate.gatestage).add(gate.gtype);
+        }
+        for(int i=1;i<=netlist1Level;i++){
+            List<DGateType> list1 = new ArrayList<>();
+            List<DGateType> list2 = new ArrayList<>();
+            list1 = levelGateMap1.get(i);
+            list2 = levelGateMap2.get(i);
+            
+            if(list1.size()!= list2.size()){
+                return false;
+            }
+            Set<DGateType> checkedtypes = new HashSet<>();
+            for(DGateType type:list1){
+                if(checkedtypes.contains(type)){
+                    continue;
+                }
+                checkedtypes.add(type);
+                int count1 =0;
+                int count2 =0;
+                for(DGateType type1:list1){
+                    if(type1.equals(type)){
+                        count1++;
+                    }
+                }
+                for(DGateType type2:list2){
+                    if(type2.equals(type)){
+                        count2++;
+                    }
+                }
+                if(count1 != count2){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    
     public static List<DGate> assignWireLogic(List<String> inputNames, List<DGate> netlist) {
         int pow = (int) Math.pow(2, inputNames.size());
         for(DGate gate:netlist){
@@ -5466,6 +5546,21 @@ public class NetSynth {
         }
     }
     
+    public static void assignGateLevel(List<DGate> netlist){
+        for(DGate gate:netlist){
+            int maxInputStage = -1;
+            for(DWire wire:gate.input){
+                if(wire.wtype.equals(DWireType.input)){
+                    wire.wirestage = 0;
+                }
+                if(wire.wirestage>maxInputStage){
+                    maxInputStage = wire.wirestage;
+                }
+            }
+            gate.gatestage = maxInputStage + 1;
+            gate.output.wirestage = gate.gatestage;            
+        }
+    }
     
     /**
      * *************************************************************Function
