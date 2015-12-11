@@ -102,15 +102,15 @@ public class Allnin1out {
                 //System.out.println("Circuit Size All Netlists= " + lib.get(i-1).netlist.size());
                 //System.out.println("Same circuit :: " + NetSynth.equivalentNetlist(netlist, lib.get(i-1).netlist)+"\n");
                 
-                int netlistSize = netlist.size();
-                int libSize = lib.get(i-1).netlist.size();
+                int netlistSize = NetSynth.getRepressorCount(netlist);
+                int libSize = NetSynth.getRepressorCount(lib.get(i-1).netlist);
                 
-                if(NetSynth.containsOUTPUT_OR(netlist)){
-                    netlistSize = netlist.size()-2;
+                /*if(NetSynth.containsOUTPUT_OR(netlist)){
+                    netlistSize = netlist.size()-1;
                 }
                 if(NetSynth.containsOUTPUT_OR(lib.get(i-1).netlist)){
-                    libSize = lib.get(i-1).netlist.size()-2;
-                }
+                    libSize = lib.get(i-1).netlist.size()-1;
+                }*/
                 
                 System.out.println(i+"," + netlistSize+","+libSize+","+NetSynth.equivalentNetlist(netlist, lib.get(i-1).netlist));
                 
