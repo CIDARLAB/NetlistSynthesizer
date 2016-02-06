@@ -1,7 +1,7 @@
 package org.cellocad.Test;
 
 
-import org.cellocad.BU.DAG.DAGW;
+import org.cellocad.BU.DOM.DAGW;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.netsynth.NetSynthSwitch;
 import org.cellocad.MIT.dnacompiler.Gate;

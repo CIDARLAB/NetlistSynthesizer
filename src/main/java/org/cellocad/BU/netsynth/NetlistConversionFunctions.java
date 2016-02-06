@@ -4,10 +4,12 @@
  */
 package org.cellocad.BU.netsynth;
 
+import org.cellocad.BU.DOM.DWire;
+import org.cellocad.BU.DOM.DGate;
 import java.util.ArrayList;
 import java.util.List;
-import org.cellocad.BU.netsynth.DGateType;
-import org.cellocad.BU.netsynth.DWireType;
+import org.cellocad.BU.DOM.DGateType;
+import org.cellocad.BU.DOM.DWireType;
 
 /**
  *

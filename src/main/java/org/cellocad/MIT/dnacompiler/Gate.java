@@ -1,5 +1,6 @@
 package org.cellocad.MIT.dnacompiler;
 
+import org.cellocad.BU.DOM.DWire;
 import org.cellocad.BU.netsynth.*;
 
 import java.lang.Math;

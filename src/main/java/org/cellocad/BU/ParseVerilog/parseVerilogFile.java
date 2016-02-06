@@ -4,10 +4,10 @@
  */
 package org.cellocad.BU.ParseVerilog;
 
-import org.cellocad.BU.netsynth.DGate;
-import org.cellocad.BU.netsynth.DGateType;
-import org.cellocad.BU.netsynth.DWire;
-import org.cellocad.BU.netsynth.DWireType;
+import org.cellocad.BU.DOM.DGate;
+import org.cellocad.BU.DOM.DGateType;
+import org.cellocad.BU.DOM.DWire;
+import org.cellocad.BU.DOM.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.netsynth.NetSynthSwitch;
 import java.io.BufferedReader;

@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cellocad.BU.ParseVerilog.Convert;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
-import org.cellocad.BU.netsynth.DGate;
+import org.cellocad.BU.DOM.DGate;
 import org.cellocad.BU.netsynth.NetSynth;
 import static org.cellocad.BU.netsynth.NetSynth.getResourcesFilepath;
 import org.cellocad.BU.netsynth.NetSynthSwitch;

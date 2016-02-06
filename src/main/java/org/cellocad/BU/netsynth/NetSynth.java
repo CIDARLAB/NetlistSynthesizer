@@ -5,14 +5,18 @@
 package org.cellocad.BU.netsynth;
 
 
-import org.cellocad.BU.DAG.DAGW;
+import org.cellocad.BU.DOM.DWire;
+import org.cellocad.BU.DOM.DWireType;
+import org.cellocad.BU.DOM.DGate;
+import org.cellocad.BU.DOM.DGateType;
+import org.cellocad.BU.DOM.DAGW;
 import org.cellocad.BU.ParseVerilog.Blif;
 import org.cellocad.BU.ParseVerilog.CircuitDetails;
 import org.cellocad.BU.ParseVerilog.Convert;
 import org.cellocad.BU.ParseVerilog.Espresso;
 import org.cellocad.BU.ParseVerilog.parseVerilogFile;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
-import org.cellocad.BU.netsynth.DWire.DWireValue;
+import org.cellocad.BU.DOM.DWire.DWireValue;
 import org.cellocad.BU.precomputation.PreCompute;
 import org.cellocad.BU.precomputation.genVerilogFile;
 import org.cellocad.MIT.dnacompiler.Gate;
@@ -209,7 +213,6 @@ public class NetSynth {
                     Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\build\\classes\\"));
                 }
                 
-                //System.out.println("Filepath in initializeFilepath() ifWindows clause ::" + Filepath);
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -392,39 +395,6 @@ public class NetSynth {
     /**
      * Function ************************************************************
      * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param netlist
-     * @return
-     * *********************************************************************
-     */
-    public static double getRepressorsCost(List<DGate> netlist) {
-        double count = 0;
-        for (DGate xgate : netlist) {
-            if (xgate.gtype.equals(DGateType.NOR)) {
-                count += 1.5;
-            }
-            if (xgate.gtype.equals(DGateType.NOT)) {
-                count += 1;
-            }
-            if (xgate.gtype.equals(DGateType.AND)) {
-                count += 2;
-            }
-
-        }
-
-        return count;
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
      * Synopsis [Controller function in NetSynth. Parses Verilog to a Directed
      * Acyclic Graph]
      * <br>
@@ -443,8 +413,6 @@ public class NetSynth {
         
         return getNetlist(vfilepath, new ArrayList<NetSynthSwitch>());
     }
-    
-        
     
     public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches, JSONArray subcircuits){
         String filepathSubCirc = getResourcesFilepath() + "/userSubcircuits.json";
@@ -660,181 +628,28 @@ public class NetSynth {
      * <br>
      * SeeAlso []
      *
-     * @param inpnetlist
-     * @param inpnames
-     * @param outpnames
-     * @param outpor
-     * @param twonots2nor
+     * @param netlist
      * @return
      * *********************************************************************
      */
-    public static List<DGate> runinvPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitch outpor, NetSynthSwitch twonots2nor, NetSynthSwitch nor3) {
-        DGate finalnot = new DGate();
-        finalnot.gtype = DGateType.NOT;
-        inpnetlist.get(inpnetlist.size() - 1).output.wtype = DWireType.connector;
-        finalnot.input.add(inpnetlist.get(inpnetlist.size() - 1).output);
-        DWire notout = new DWire();
-        notout.name = outpnames.get(0);
-        notout.wtype = DWireType.output;
-        finalnot.output = notout;
-        inpnetlist.add(finalnot);
-        return runPrecomp(inpnetlist, inpnames, outpnames, outpor, twonots2nor, nor3);
+    public static double getRepressorsCost(List<DGate> netlist) {
+        double count = 0;
+        for (DGate xgate : netlist) {
+            if (xgate.gtype.equals(DGateType.NOR)) {
+                count += 1.5;
+            }
+            if (xgate.gtype.equals(DGateType.NOT)) {
+                count += 1;
+            }
+            if (xgate.gtype.equals(DGateType.AND)) {
+                count += 2;
+            }
+
+        }
+
+        return count;
     }
 
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param inpnetlist
-     * @param inpnames
-     * @param outpnames
-     * @param outpor
-     * @param twonots2nor
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> runPrecomp(List<DGate> inpnetlist, List<String> inpnames, List<String> outpnames, NetSynthSwitch outpor, NetSynthSwitch twonots2nor, NetSynthSwitch nor3) {
-        List<DGate> finalnetlist = new ArrayList<DGate>();
-        inpnetlist.get(inpnetlist.size() - 1).output.name = outpnames.get(0);
-        inpnetlist.get(inpnetlist.size() - 1).output.wtype = DWireType.output;
-
-        for (DGate xgate : inpnetlist) {
-            for (DWire xwire : xgate.input) {
-                if (xwire.wtype == DWireType.input) {
-                    if (xwire.name.trim().equals("a")) {
-                        xwire.name = inpnames.get(0);
-                    }
-                    if (xwire.name.trim().equals("b")) {
-                        xwire.name = inpnames.get(1);
-                    }
-                    if (xwire.name.trim().equals("c")) {
-                        xwire.name = inpnames.get(2);
-                    }
-                }
-            }
-        }
-        boolean outor;
-        boolean not2nor;
-        boolean nor3in = true;
-        if (nor3.equals(NetSynthSwitch.defaultmode)) {
-            nor3in = false;
-        }
-        if (outpor.equals(NetSynthSwitch.defaultmode)) {
-            outor = true;
-        } else {
-            outor = false;
-        }
-
-        if (twonots2nor.equals(NetSynthSwitch.defaultmode)) {
-            not2nor = true;
-        } else {
-            not2nor = false;
-        }
-
-        finalnetlist = optimizeNetlist(inpnetlist, outor, not2nor, nor3in);
-
-        return finalnetlist;
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param circ
-     * @param synthmode
-     * @param outpor
-     * @param twonots2nor
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> runDCEspressoAndABC(CircuitDetails circ, NetSynthSwitch synthmode, NetSynthSwitch outpor, NetSynthSwitch twonots2nor, NetSynthSwitch nor3) {
-        List<DGate> EspCircuit = new ArrayList<DGate>();
-        List<DGate> ABCCircuit = new ArrayList<DGate>();
-        List<String> espressoFile = new ArrayList<String>();
-        List<String> blifFile = new ArrayList<String>();
-
-        espressoFile = Espresso.createFile(circ);
-        blifFile = Blif.createFile(circ);
-        String filestring = "";
-
-        filestring = getResourcesFilepath();
-        String filestringblif = "";
-        filestringblif = filestring + "Blif_File";
-        filestringblif += ".blif";
-        String filestringesp = "";
-
-        filestringesp += filestring + "Espresso_File" + ".txt";
-        File fespinp = new File(filestringesp);
-        //Writer output;
-        try {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-
-            for (String xline : espressoFile) {
-                String newl = (xline + "\n");
-                output.write(newl);
-            }
-            output.close();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        List<String> EspOutput = new ArrayList<String>();
-        EspOutput = runEspresso(filestringesp);
-        fespinp.deleteOnExit();
-
-        boolean outor;
-        boolean not2nor;
-        boolean nor3in = true;
-        if (nor3.equals(NetSynthSwitch.defaultmode)) {
-            nor3in = false;
-        }
-        if (outpor.equals(NetSynthSwitch.defaultmode)) {
-            outor = true;
-        } else {
-            outor = false;
-        }
-
-        if (twonots2nor.equals(NetSynthSwitch.defaultmode)) {
-            not2nor = true;
-        } else {
-            not2nor = false;
-        }
-
-        if (!synthmode.equals(NetSynthSwitch.abc)) {
-            EspCircuit = convertPOStoNORNOT(EspOutput);
-            EspCircuit = optimizeNetlist(EspCircuit, outor, not2nor, nor3in);
-        }
-
-        if (!synthmode.equals(NetSynthSwitch.espresso)) {
-            ABCCircuit = parseEspressoOutToABC(EspOutput, outpor, twonots2nor, nor3);
-        }
-
-        if (synthmode.equals(NetSynthSwitch.abc)) {
-            return ABCCircuit;
-        } else if (synthmode.equals(NetSynthSwitch.espresso)) {
-            return EspCircuit;
-        } else {
-            if (EspCircuit.size() < ABCCircuit.size()) {
-                return EspCircuit;
-            } else {
-                return ABCCircuit;
-            }
-        }
-    }
-    
     public static List<DGate> runDCEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
         List<DGate> EspCircuit = new ArrayList<DGate>();
         List<DGate> ABCCircuit = new ArrayList<DGate>();
@@ -892,140 +707,6 @@ public class NetSynth {
         }
     }
     
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param circ
-     * @param synthmode
-     * @param outpor
-     * @param twonots2nor
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> runInvertedDCEspressoAndABC(CircuitDetails circ, NetSynthSwitch synthmode, NetSynthSwitch outpor, NetSynthSwitch twonots2nor, NetSynthSwitch nor3) {
-
-        boolean outor;
-        boolean not2nor;
-        boolean nor3in = true;
-        if (nor3.equals(NetSynthSwitch.defaultmode)) {
-            nor3in = false;
-        }
-        if (outpor.equals(NetSynthSwitch.defaultmode)) {
-            outor = true;
-        } else {
-            outor = false;
-        }
-
-        if (twonots2nor.equals(NetSynthSwitch.defaultmode)) {
-            not2nor = true;
-        } else {
-            not2nor = false;
-        }
-        List<DGate> EspCircuit = new ArrayList<DGate>();
-        List<DGate> ABCCircuit = new ArrayList<DGate>();
-        List<String> espressoFile = new ArrayList<String>();
-        List<String> blifFile = new ArrayList<String>();
-
-        espressoFile = Espresso.createFile(circ);
-        blifFile = Blif.createFile(circ);
-        String filestring = "";
-
-        filestring = getResourcesFilepath();
-
-        String filestringblif = "";
-        filestringblif = filestring + "Blif_File";
-        filestringblif += ".blif";
-        String filestringesp = "";
-
-        filestringesp += filestring + "Espresso_File" + ".txt";
-        File fespinp = new File(filestringesp);
-        //Writer output;
-        try {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-
-            for (String xline : espressoFile) {
-                String newl = (xline + "\n");
-                output.write(newl);
-            }
-            output.close();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        List<String> EspOutput = new ArrayList<String>();
-        EspOutput = runEspresso(filestringesp);
-        fespinp.deleteOnExit();
-
-        EspCircuit = convertPOStoNORNOT(EspOutput);
-        ABCCircuit = parseINVEspressoOutToABC(EspOutput);
-
-        List<DGate> finalEspCircuit = new ArrayList<DGate>();
-        List<DGate> finalABCCircuit = new ArrayList<DGate>();
-
-        for (int i = 0; i < EspCircuit.size(); i++) {
-            if (EspCircuit.get(i).output.wtype.equals(DWireType.output)) {
-                String outname = "";
-                outname = EspCircuit.get(i).output.name.trim();
-                String notinpwirename = "0Wire" + Global.wirecount++;
-                DWire notinp = new DWire(notinpwirename, DWireType.connector);
-                EspCircuit.get(i).output = notinp;
-                finalEspCircuit.add(EspCircuit.get(i));
-                DGate outnot = new DGate();
-                outnot.gtype = DGateType.NOT;
-                outnot.input.add(notinp);
-                outnot.output = new DWire(outname, DWireType.output);
-                finalEspCircuit.add(outnot);
-            } else {
-                finalEspCircuit.add(EspCircuit.get(i));
-            }
-        }
-        for (int i = 0; i < ABCCircuit.size(); i++) {
-            if (ABCCircuit.get(i).output.wtype.equals(DWireType.output)) {
-                String outname = "";
-                outname = ABCCircuit.get(i).output.name.trim();
-                String notinpwirename = "0Wire" + Global.wirecount++;
-                DWire notinp = new DWire(notinpwirename, DWireType.connector);
-                ABCCircuit.get(i).output = notinp;
-                finalABCCircuit.add(ABCCircuit.get(i));
-                DGate outnot = new DGate();
-                outnot.gtype = DGateType.NOT;
-                outnot.input.add(notinp);
-                outnot.output = new DWire(outname, DWireType.output);
-                finalABCCircuit.add(outnot);
-            } else {
-                finalABCCircuit.add(ABCCircuit.get(i));
-            }
-        }
-
-        finalEspCircuit = optimizeNetlist(finalEspCircuit, outor, not2nor, nor3in);
-
-        finalABCCircuit = separateOutputGates(finalABCCircuit);
-        finalABCCircuit = optimizeNetlist(finalABCCircuit, outor, not2nor, nor3in);
-
-        if (!synthmode.equals(NetSynthSwitch.espresso)) {
-            ABCCircuit = parseEspressoOutToABC(EspOutput, outpor, twonots2nor, nor3);
-        }
-
-        if (synthmode.equals(NetSynthSwitch.abc)) {
-            return finalABCCircuit;
-        } else if (synthmode.equals(NetSynthSwitch.espresso)) {
-            return finalEspCircuit;
-        } else {
-            if (finalEspCircuit.size() < finalABCCircuit.size()) {
-                return finalEspCircuit;
-            } else {
-                return finalABCCircuit;
-            }
-        }
-    }
-
     public static List<DGate> runInvertedDCEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
 
         List<DGate> EspCircuit = new ArrayList<DGate>();
@@ -1144,126 +825,6 @@ public class NetSynth {
      * @return
      * *********************************************************************
      */
-    public static List<DGate> runEspressoAndABC(CircuitDetails circ, NetSynthSwitch synthmode, NetSynthSwitch outpor, NetSynthSwitch twonots2nor, NetSynthSwitch nor3) {
-
-        boolean outor;
-        boolean not2nor;
-        boolean nor3in = true;
-        if (nor3.equals(NetSynthSwitch.defaultmode)) {
-            nor3in = false;
-        }
-        if (outpor.equals(NetSynthSwitch.defaultmode)) {
-            outor = true;
-        } else {
-            outor = false;
-        }
-
-        if (twonots2nor.equals(NetSynthSwitch.defaultmode)) {
-            not2nor = true;
-        } else {
-            not2nor = false;
-        }
-
-        List<DGate> EspCircuit = new ArrayList<DGate>();
-        List<DGate> ABCCircuit = new ArrayList<DGate>();
-        List<String> espressoFile = new ArrayList<String>();
-        List<String> blifFile = new ArrayList<String>();
-
-        espressoFile = Espresso.createFile(circ);
-        blifFile = Blif.createFile(circ);
-        String filestring = "";
-        
-        filestring = getResourcesFilepath();
-        String filestringblif = "";
-        filestringblif = filestring + "Blif_File";
-        filestringblif += ".blif";
-        String filestringesp = "";
-
-        filestringesp += filestring + "Espresso_File" + ".txt";
-        File fespinp = new File(filestringesp);
-        //Writer output;
-        try {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-
-            for (String xline : espressoFile) {
-                String newl = (xline + "\n");
-                output.write(newl);
-            }
-            output.close();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        List<String> EspOutput = new ArrayList<String>();
-        EspOutput = runEspresso(filestringesp);
-        fespinp.deleteOnExit();
-
-        EspCircuit = convertPOStoNORNOT(EspOutput);
-        EspCircuit = optimizeNetlist(EspCircuit, outor, not2nor, nor3in);
-
-        File fabcinp = new File(filestringblif);
-        try {
-            Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
-            for (String xline : blifFile) {
-                String newl = (xline + "\n");
-                outputblif.write(newl);
-            }
-            outputblif.close();
-            List<DGate> abcoutput = new ArrayList<DGate>();
-
-            try {
-                abcoutput = runABC("Blif_File");
-
-            } catch (InterruptedException ex) {
-                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            abcoutput = separateOutputGates(abcoutput);
-
-            abcoutput = optimizeNetlist(abcoutput, outor, not2nor, nor3in);
-
-            for (DGate xgate : abcoutput) {
-                ABCCircuit.add(xgate);
-            }
-            ABCCircuit = removeDanglingGates(ABCCircuit);
-            fabcinp.deleteOnExit();
-
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        fabcinp.deleteOnExit();
-
-        if (synthmode.equals(NetSynthSwitch.abc)) {
-            return ABCCircuit;
-        } else if (synthmode.equals(NetSynthSwitch.espresso)) {
-            return EspCircuit;
-        } else {
-            if (EspCircuit.size() < ABCCircuit.size()) {
-                return EspCircuit;
-            } else {
-                return ABCCircuit;
-            }
-        }
-    }
-    
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param circ
-     * @param synthmode
-     * @param outpor
-     * @param twonots2nor
-     * @param nor3
-     * @return
-     * *********************************************************************
-     */
     public static List<DGate> runEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
 
         
@@ -1348,164 +909,6 @@ public class NetSynth {
         }
     }
     
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param circ
-     * @param synthmode
-     * @param outpor
-     * @param twonots2nor
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ, NetSynthSwitch synthmode, NetSynthSwitch outpor, NetSynthSwitch twonots2nor, NetSynthSwitch nor3) {
-
-        boolean outor;
-        boolean not2nor;
-        boolean nor3in = true;
-        if (nor3.equals(NetSynthSwitch.defaultmode)) {
-            nor3in = false;
-        }
-        if (outpor.equals(NetSynthSwitch.defaultmode)) {
-            outor = true;
-        } else {
-            outor = false;
-        }
-
-        if (twonots2nor.equals(NetSynthSwitch.defaultmode)) {
-            not2nor = true;
-        } else {
-            not2nor = false;
-        }
-
-        List<DGate> EspCircuit = new ArrayList<DGate>();
-        List<DGate> ABCCircuit = new ArrayList<DGate>();
-        List<String> espressoFile = new ArrayList<String>();
-        List<String> blifFile = new ArrayList<String>();
-
-        espressoFile = Espresso.createFile(circ);
-        blifFile = Blif.createFile(circ);
-        String filestring = "";
-
-        filestring = getResourcesFilepath();
-        String filestringblif = "";
-        filestringblif = filestring + "Blif_File";
-        filestringblif += ".blif";
-        String filestringesp = "";
-
-        filestringesp += filestring + "Espresso_File" + ".txt";
-        File fespinp = new File(filestringesp);
-        //Writer output;
-        try {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-
-            for (String xline : espressoFile) {
-                String newl = (xline + "\n");
-                output.write(newl);
-            }
-            output.close();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        List<String> EspOutput = new ArrayList<String>();
-        EspOutput = runEspresso(filestringesp);
-        fespinp.deleteOnExit();
-
-        EspCircuit = convertPOStoNORNOT(EspOutput);
-
-        File fabcinp = new File(filestringblif);
-        try {
-            Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
-            for (String xline : blifFile) {
-                String newl = (xline + "\n");
-                outputblif.write(newl);
-            }
-            outputblif.close();
-            List<DGate> abcoutput = new ArrayList<DGate>();
-
-            try {
-                abcoutput = runABC("Blif_File");
-
-            } catch (InterruptedException ex) {
-                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            for (DGate xgate : abcoutput) {
-                ABCCircuit.add(xgate);
-            }
-            ABCCircuit = removeDanglingGates(ABCCircuit);
-            fabcinp.deleteOnExit();
-
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        fabcinp.deleteOnExit();
-
-        List<DGate> finalEspCircuit = new ArrayList<DGate>();
-        List<DGate> finalABCCircuit = new ArrayList<DGate>();
-
-        for (int i = 0; i < EspCircuit.size(); i++) {
-            if (EspCircuit.get(i).output.wtype.equals(DWireType.output)) {
-                String outname = "";
-                outname = EspCircuit.get(i).output.name.trim();
-                String notinpwirename = "0Wire" + Global.wirecount++;
-                DWire notinp = new DWire(notinpwirename, DWireType.connector);
-                EspCircuit.get(i).output = notinp;
-                finalEspCircuit.add(EspCircuit.get(i));
-                DGate outnot = new DGate();
-                outnot.gtype = DGateType.NOT;
-                outnot.input.add(notinp);
-                outnot.output = new DWire(outname, DWireType.output);
-                finalEspCircuit.add(outnot);
-            } else {
-                finalEspCircuit.add(EspCircuit.get(i));
-            }
-        }
-        for (int i = 0; i < ABCCircuit.size(); i++) {
-            if (ABCCircuit.get(i).output.wtype.equals(DWireType.output)) {
-                String outname = "";
-                outname = ABCCircuit.get(i).output.name.trim();
-                String notinpwirename = "0Wire" + Global.wirecount++;
-                DWire notinp = new DWire(notinpwirename, DWireType.connector);
-                ABCCircuit.get(i).output = notinp;
-                finalABCCircuit.add(ABCCircuit.get(i));
-                DGate outnot = new DGate();
-                outnot.gtype = DGateType.NOT;
-                outnot.input.add(notinp);
-                outnot.output = new DWire(outname, DWireType.output);
-                finalABCCircuit.add(outnot);
-            } else {
-                finalABCCircuit.add(ABCCircuit.get(i));
-            }
-        }
-
-        finalEspCircuit = optimizeNetlist(finalEspCircuit, outor, not2nor, nor3in);
-        finalABCCircuit = separateOutputGates(finalABCCircuit);
-        finalABCCircuit = optimizeNetlist(finalABCCircuit, outor, not2nor, nor3in);
-
-        if (synthmode.equals(NetSynthSwitch.abc)) {
-            return finalABCCircuit;
-        } else if (synthmode.equals(NetSynthSwitch.espresso)) {
-            return finalEspCircuit;
-        } else {
-            if (finalEspCircuit.size() < finalABCCircuit.size()) {
-                return finalEspCircuit;
-            } else {
-                return finalABCCircuit;
-            }
-        }
-
-    }
-
     public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
 
         List<DGate> EspCircuit = new ArrayList<DGate>();
@@ -1786,69 +1189,6 @@ public class NetSynth {
      * <br>
      * SeeAlso []
      *
-     * @param filename
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> parseVerilogABC(String filename) {
-        List<DGate> netlistResult = new ArrayList<DGate>();
-        List<String> blifinput = new ArrayList<String>();
-        CircuitDetails circ = new CircuitDetails();
-        circ = parseVerilogFile.parseCaseStatements(filename);
-        blifinput = Blif.createFile(circ);
-        String filestring = "";
-        String filestringblif = "";
-        if (Filepath.contains("prash")) {
-            filestring += Filepath + "src/org/cellocad/BU/resources/netsynthResources/";
-        } else {
-            filestring += Filepath + "org/cellocad/BU/resources/netsynthResources/";
-        }
-        filestringblif = filestring + "blifinp";
-        filestringblif += ".blif";
-
-        File fabcinp = new File(filestringblif);
-        try {
-            Writer outputblif = new BufferedWriter(new FileWriter(fabcinp));
-            for (String xline : blifinput) {
-                String newl = (xline + "\n");
-                outputblif.write(newl);
-            }
-            outputblif.close();
-            List<DGate> abcoutput = new ArrayList<DGate>();
-
-            try {
-                abcoutput = runABC("blifinp");
-
-            } catch (InterruptedException ex) {
-                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            abcoutput = optimizeNetlist(abcoutput, true, true, false);
-            
-            for (DGate xgate : abcoutput) {
-                netlistResult.add(xgate);
-            }
-            netlistResult = removeDanglingGates(netlistResult);
-            fabcinp.deleteOnExit();
-
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return netlistResult;
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
      * @param filelines
      * @param filename
      * @return
@@ -1917,60 +1257,6 @@ public class NetSynth {
 
     }
 
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param espout
-     * @param outpor
-     * @param twonots2nor
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> parseEspressoOutToABC(List<String> espout, NetSynthSwitch outpor, NetSynthSwitch twonots2nor, NetSynthSwitch nor3) {
-        List<DGate> netlistout = new ArrayList<DGate>();
-        
-        boolean outor = false;
-        boolean not2nor = false;
-        boolean nor3in = true;
-
-        if (outpor.equals(NetSynthSwitch.defaultmode)) {
-            outor = true;
-        }
-
-        if (nor3.equals(NetSynthSwitch.defaultmode)) {
-            nor3in = false;
-        }
-
-        if (twonots2nor.equals(NetSynthSwitch.defaultmode)) {
-            not2nor = true;
-        }
-
-        List<String> vfilelines = new ArrayList<String>();
-
-        vfilelines = convertEspressoOutputToVerilog(espout);
-        String vfilepath = "";
-        vfilepath = create_VerilogFile(vfilelines, "espressoVerilog");
-        try {
-            netlistout = runABCverilog("espressoVerilog");
-            netlistout = separateOutputGates(netlistout);
-
-            netlistout = optimizeNetlist(netlistout, outor, not2nor, nor3in);
-
-        } catch (InterruptedException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return netlistout;
-    }
-
     public static List<DGate> parseEspressoOutToABC(List<String> espout) {
         List<DGate> netlistout = new ArrayList<DGate>();
         List<String> vfilelines = new ArrayList<String>();
@@ -2024,7 +1310,8 @@ public class NetSynth {
 
         return netlistout;
     }
-
+    
+    
     /**
      * Function ************************************************************
      * <br>
@@ -2060,43 +1347,6 @@ public class NetSynth {
         }
 
         return netlistout;
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param x
-     * @return
-     * *********************************************************************
-     */
-    public static DAGW computeDAGW(int x) {
-        one = new DWire("_one", DWireType.Source);
-        zero = new DWire("_zero", DWireType.GND);
-        DAGW outputdag = new DAGW();
-        List<List<DGate>> precomp;
-        precomp = PreCompute.parseNetlistFile();
-        DAGW circ = new DAGW();
-
-        circ = CreateMultDAGW(precomp.get(x));
-
-        for (int i = 0; i < precomp.get(x).size(); i++) {
-            System.out.println(printGate(precomp.get(x).get(i)));
-        }
-
-        for (int i = 0; i < circ.Gates.size(); i++) {
-            System.out.println(circ.Gates.get(i).Name);
-        }
-        System.out.println("\n\n");
-        outputdag = new DAGW(circ.Gates, circ.Wires);
-        return outputdag;
     }
 
     /**
@@ -4190,50 +3440,6 @@ public class NetSynth {
         System.out.println("=======================");
     }
 
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param naivenetlist
-     * @param nor3
-     * @param originalAND
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> parseStructuralVtoNORNOT(List<DGate> naivenetlist, NetSynthSwitch nor3, NetSynthSwitch originalAND) {
-        List<DGate> structnetlist = new ArrayList<DGate>();
-        
-        naivenetlist = removeDanglingGates(naivenetlist);
-        //System.out.println("------------------------------------");
-        List<DGate> reducedfanin = new ArrayList<DGate>();
-
-        for (int i = 0; i < naivenetlist.size(); i++) {
-            for (DGate redgate : NetlistConversionFunctions.ConvertToFanin2(naivenetlist.get(i))) {
-                reducedfanin.add(redgate);
-            }
-        }
-        for (int i = 0; i < reducedfanin.size(); i++) {
-            for (DGate structgate : NetlistConversionFunctions.GatetoNORNOT(reducedfanin.get(i), originalAND)) {
-                structnetlist.add(structgate);
-            }
-        }
-
-        boolean nor3in = true;
-        if (nor3.equals(NetSynthSwitch.defaultmode)) {
-            nor3in = false;
-        }
-        structnetlist = optimizeNetlist(structnetlist, true, true, nor3in);
-
-        return structnetlist;
-    }
-    
     public static List<DGate> convertNaiveToNORNOT(List<DGate> netlist){
         List<DGate> output = new ArrayList<DGate>();
         
@@ -5140,38 +4346,6 @@ public class NetSynth {
         }
         //DAGW outputDAG = new DAGW(outDAG.Gates,outDAG.Wires);
         return outDAG;
-    }
-
-    /**
-     * *************************************************************Function
-     * <br>
-     * Synopsis [Netlist to Directed Acyclic Graph]
-     * <br>
-     * Description [Converts a Netlist into a Directed Acyclic Graph with
-     * multiple outputs]
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param netlist Input Netlist
-     * @return Directed Acyclic Graph with multiple outputs
-     * *********************************************************************
-     */
-    public static DAGW CreateMultDAGW(List<String> inputnames, List<String> outputnames, List<DGate> netlist) {
-        DAGW dag = new DAGW();
-
-        for (String inp : inputnames) {
-
-        }
-
-        return dag;
-    }
-
-    public static Map<String, List<DGate>> getWireToGateMap(List<DGate> netlist) {
-        Map<String, List<DGate>> map = new HashMap<String, List<DGate>>();
-
-        return map;
     }
 
     public static boolean equalLogicInputs(List<List<String>> inplogic) {

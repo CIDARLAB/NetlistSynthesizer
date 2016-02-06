@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.DAG;
+package org.cellocad.BU.DOM;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.cellocad.BU.netsynth.DGateType;
 
 /**
  *

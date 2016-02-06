@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.cellocad.BU.ParseVerilog.Convert;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
-import org.cellocad.BU.netsynth.DGate;
-import org.cellocad.BU.netsynth.DWire;
-import org.cellocad.BU.netsynth.DWireType;
+import org.cellocad.BU.DOM.DGate;
+import org.cellocad.BU.DOM.DWire;
+import org.cellocad.BU.DOM.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.netsynth.NetSynthSwitch;
 

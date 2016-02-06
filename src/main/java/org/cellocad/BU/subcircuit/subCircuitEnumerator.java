@@ -12,15 +12,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.cellocad.BU.DAG.DEdge;
-import org.cellocad.BU.DAG.DNode;
+import org.cellocad.BU.DOM.DEdge;
+import org.cellocad.BU.DOM.DNode;
 import org.cellocad.BU.ParseVerilog.Convert;
 import org.cellocad.BU.booleanLogic.BooleanFunctions;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
-import org.cellocad.BU.netsynth.DGate;
-import org.cellocad.BU.netsynth.DWire;
-import org.cellocad.BU.netsynth.DWire.DWireValue;
-import org.cellocad.BU.netsynth.DWireType;
+import org.cellocad.BU.DOM.DGate;
+import org.cellocad.BU.DOM.DWire;
+import org.cellocad.BU.DOM.DWire.DWireValue;
+import org.cellocad.BU.DOM.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
 
 /**

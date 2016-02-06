@@ -4,7 +4,7 @@
  */
 package org.cellocad.Test;
 
-import org.cellocad.BU.DAG.DAGW;
+import org.cellocad.BU.DOM.DAGW;
 import org.cellocad.BU.ParseVerilog.Blif;
 import org.cellocad.BU.ParseVerilog.CircuitDetails;
 import org.cellocad.BU.ParseVerilog.Convert;
@@ -12,10 +12,10 @@ import org.cellocad.BU.ParseVerilog.Espresso;
 import org.cellocad.BU.ParseVerilog.Parser;
 import org.cellocad.BU.ParseVerilog.parseVerilogFile;
 import org.cellocad.BU.booleanLogic.BooleanSimulator;
-import org.cellocad.BU.netsynth.DGate;
-import org.cellocad.BU.netsynth.DGateType;
-import org.cellocad.BU.netsynth.DWire;
-import org.cellocad.BU.netsynth.DWireType;
+import org.cellocad.BU.DOM.DGate;
+import org.cellocad.BU.DOM.DGateType;
+import org.cellocad.BU.DOM.DWire;
+import org.cellocad.BU.DOM.DWireType;
 import org.cellocad.BU.netsynth.Global;
 import org.cellocad.BU.netsynth.NetSynth;
 import static org.cellocad.BU.netsynth.NetSynth.Filepath;

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.cellocad.BU.netsynth;
+package org.cellocad.BU.DOM;
 
 /**
  *

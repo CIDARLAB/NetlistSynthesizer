@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.DAG;
+package org.cellocad.BU.DOM;
 
 import org.cellocad.MIT.dnacompiler.Gate;
 import org.cellocad.MIT.dnacompiler.Gate.GateType;

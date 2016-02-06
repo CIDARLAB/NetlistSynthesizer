@@ -4,7 +4,7 @@
  */
 package org.cellocad.MIT.dnacompiler;
 
-import org.cellocad.BU.netsynth.DWire;
+import org.cellocad.BU.DOM.DWire;
 
 /**
  *

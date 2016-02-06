@@ -5,10 +5,10 @@
 package org.cellocad.BU.booleanLogic;
 
 import java.util.List;
-import org.cellocad.BU.netsynth.DGate;
-import org.cellocad.BU.netsynth.DGateType;
-import org.cellocad.BU.netsynth.DWire;
-import org.cellocad.BU.netsynth.DWire.DWireValue;
+import org.cellocad.BU.DOM.DGate;
+import org.cellocad.BU.DOM.DGateType;
+import org.cellocad.BU.DOM.DWire;
+import org.cellocad.BU.DOM.DWire.DWireValue;
 import org.cellocad.BU.netsynth.Global;
 
 /**

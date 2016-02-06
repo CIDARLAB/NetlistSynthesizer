@@ -3,17 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package org.cellocad.BU.netsynth;
+package org.cellocad.BU.adaptors;
 
 /**
  *
- * @author prashantvaidyanathan
+ * @author prash
  */
-public enum DWireType{
-         input,
-         output,
-         GND,
-         Source,
-         connector;
-     }
+public class ABCAdaptor {
+    
+}

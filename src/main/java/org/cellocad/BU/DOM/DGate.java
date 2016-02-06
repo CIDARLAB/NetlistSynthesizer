@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.netsynth;
+package org.cellocad.BU.DOM;
 
 import java.io.Serializable;
 import java.util.ArrayList;

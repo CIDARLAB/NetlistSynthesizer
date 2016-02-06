@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.DAG;
+package org.cellocad.BU.DOM;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.cellocad.BU.netsynth.DWire.DWireValue;
-import org.cellocad.BU.netsynth.DWireType;
+import org.cellocad.BU.DOM.DWire.DWireValue;
 
 /**
  *
