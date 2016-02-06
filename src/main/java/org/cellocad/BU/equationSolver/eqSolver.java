@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.precomputation.equationSolver;
+package org.cellocad.BU.equationSolver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.cellocad.BU.ParseVerilog.Convert;
-import org.cellocad.BU.precomputation.equationSolver.eqNode.eqNodeBooleanVal;
-import org.cellocad.BU.precomputation.equationSolver.eqNode.eqNodeColor;
-import org.cellocad.BU.precomputation.equationSolver.eqNode.eqNodeType;
+import org.cellocad.BU.parseVerilog.Convert;
+import org.cellocad.BU.equationSolver.eqNode.eqNodeBooleanVal;
+import org.cellocad.BU.equationSolver.eqNode.eqNodeColor;
+import org.cellocad.BU.equationSolver.eqNode.eqNodeType;
 
 /**
  *

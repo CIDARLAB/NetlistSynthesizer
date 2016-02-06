@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.DOM;
+package org.cellocad.BU.dom;
 
 import java.util.ArrayList;
 import java.util.HashSet;

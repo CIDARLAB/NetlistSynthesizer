@@ -4,8 +4,8 @@
  */
 package org.cellocad.MIT.heuristicsearch;
 
-import org.cellocad.BU.DOM.DAGW;
-import org.cellocad.BU.ParseVerilog.Convert;
+import org.cellocad.BU.dom.DAGW;
+import org.cellocad.BU.parseVerilog.Convert;
 import org.cellocad.MIT.dnacompiler.BGateCombo;
 import org.cellocad.MIT.dnacompiler.BGateNode;
 import org.cellocad.MIT.dnacompiler.BGateNode.nodecolor;

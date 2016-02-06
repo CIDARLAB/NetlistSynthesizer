@@ -2,13 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.booleanLogic;
+package org.cellocad.BU.simulators;
 
 import java.util.List;
-import org.cellocad.BU.DOM.DGate;
-import org.cellocad.BU.DOM.DGateType;
-import org.cellocad.BU.DOM.DWire;
-import org.cellocad.BU.DOM.DWire.DWireValue;
+import org.cellocad.BU.dom.DGate;
+import org.cellocad.BU.dom.DGateType;
+import org.cellocad.BU.dom.DWire;
+import org.cellocad.BU.dom.DWire.DWireValue;
 import org.cellocad.BU.netsynth.Global;
 
 /**

@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.ParseVerilog;
+package org.cellocad.BU.parseVerilog;
 
-import org.cellocad.BU.ParseVerilog.VerilogDetails.ioType;
+import org.cellocad.BU.parseVerilog.VerilogDetails.ioType;
 import java.util.ArrayList;
 import java.util.List;
 

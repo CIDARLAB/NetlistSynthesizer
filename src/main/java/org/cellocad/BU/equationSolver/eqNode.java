@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.precomputation.equationSolver;
+package org.cellocad.BU.equationSolver;
 
 import java.util.ArrayList;
 import java.util.List;

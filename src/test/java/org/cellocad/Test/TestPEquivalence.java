@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.cellocad.BU.ParseVerilog.Convert;
+import org.cellocad.BU.parseVerilog.Convert;
 import org.cellocad.BU.subcircuit.isomorphicFunction;
 import org.cellocad.BU.subcircuit.permutationMap;
 

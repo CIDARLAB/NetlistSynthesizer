@@ -2,16 +2,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.BU.ParseVerilog;
+package org.cellocad.BU.adaptors;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.cellocad.BU.parseVerilog.CircuitDetails;
+import org.cellocad.BU.parseVerilog.Convert;
 
 /**
  *
  * @author prashantvaidyanathan
  */
-public class Blif {
+public class BlifAdaptor {
     public static List<String> createFile(CircuitDetails circ)
     {
         List<String> esfile = new ArrayList<String>();

@@ -4,18 +4,16 @@
  */
 package org.cellocad.Test;
 
-import org.cellocad.BU.DOM.DAGW;
-import org.cellocad.BU.ParseVerilog.Blif;
-import org.cellocad.BU.ParseVerilog.CircuitDetails;
-import org.cellocad.BU.ParseVerilog.Convert;
-import org.cellocad.BU.ParseVerilog.Espresso;
-import org.cellocad.BU.ParseVerilog.Parser;
-import org.cellocad.BU.ParseVerilog.parseVerilogFile;
-import org.cellocad.BU.booleanLogic.BooleanSimulator;
-import org.cellocad.BU.DOM.DGate;
-import org.cellocad.BU.DOM.DGateType;
-import org.cellocad.BU.DOM.DWire;
-import org.cellocad.BU.DOM.DWireType;
+import org.cellocad.BU.dom.DAGW;
+import org.cellocad.BU.adaptors.BlifAdaptor;
+import org.cellocad.BU.parseVerilog.CircuitDetails;
+import org.cellocad.BU.parseVerilog.Convert;
+import org.cellocad.BU.parseVerilog.Parser;
+import org.cellocad.BU.simulators.BooleanSimulator;
+import org.cellocad.BU.dom.DGate;
+import org.cellocad.BU.dom.DGateType;
+import org.cellocad.BU.dom.DWire;
+import org.cellocad.BU.dom.DWireType;
 import org.cellocad.BU.netsynth.Global;
 import org.cellocad.BU.netsynth.NetSynth;
 import static org.cellocad.BU.netsynth.NetSynth.Filepath;
@@ -37,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.cellocad.BU.adaptors.EspressoAdaptor;
 
 /**
  *
@@ -767,7 +766,7 @@ public class TestSynthesis {
                 
                 circ.truthTable.add(Convert.dectoBin(i,circ.inputNames.size() ));
                 List<String> eslines = new ArrayList<String>();
-                eslines = Espresso.createFile(circ);
+                eslines = EspressoAdaptor.createFile(circ);
                 String filestring2 = "";
                 //if(Filepath.contains("prash"))
                 //{
@@ -1114,9 +1113,9 @@ public class TestSynthesis {
         circ.truthTable.add(Convert.dectoBin(69, 3));
         circ.truthTable.add(Convert.dectoBin(96, 3));
         List<String> espoutcirc = new ArrayList<String>();
-        espoutcirc = Espresso.createFile(circ);
+        espoutcirc = EspressoAdaptor.createFile(circ);
         List<String> blifoutcirc = new ArrayList<String>();
-        blifoutcirc = Blif.createFile(circ);
+        blifoutcirc = BlifAdaptor.createFile(circ);
         for(String xesp:espoutcirc)
         {
             System.out.println(xesp);

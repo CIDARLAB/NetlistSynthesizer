@@ -5,10 +5,10 @@
  */
 package org.cellocad.Test;
 
-import org.cellocad.BU.precomputation.equationSolver.eqNode;
-import org.cellocad.BU.precomputation.equationSolver.eqNode.eqNodeType;
-import org.cellocad.BU.precomputation.equationSolver.eqSolver;
-import org.cellocad.BU.precomputation.equationSolver.eqTree;
+import org.cellocad.BU.equationSolver.eqNode;
+import org.cellocad.BU.equationSolver.eqNode.eqNodeType;
+import org.cellocad.BU.equationSolver.eqSolver;
+import org.cellocad.BU.equationSolver.eqTree;
 
 /**
  *

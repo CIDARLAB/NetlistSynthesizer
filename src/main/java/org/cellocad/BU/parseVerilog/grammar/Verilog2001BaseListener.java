@@ -1,4 +1,4 @@
-package org.cellocad.BU.ParseVerilog.grammar;
+package org.cellocad.BU.parseVerilog.grammar;
 
 // Generated from Verilog2001.g4 by ANTLR 4.3
 

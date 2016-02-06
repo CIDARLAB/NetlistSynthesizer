@@ -8,11 +8,11 @@ package org.cellocad.BU.subcircuit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.cellocad.BU.ParseVerilog.Convert;
-import org.cellocad.BU.booleanLogic.BooleanSimulator;
-import org.cellocad.BU.DOM.DGate;
-import org.cellocad.BU.DOM.DWire;
-import org.cellocad.BU.DOM.DWireType;
+import org.cellocad.BU.parseVerilog.Convert;
+import org.cellocad.BU.simulators.BooleanSimulator;
+import org.cellocad.BU.dom.DGate;
+import org.cellocad.BU.dom.DWire;
+import org.cellocad.BU.dom.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.netsynth.NetSynthSwitch;
 

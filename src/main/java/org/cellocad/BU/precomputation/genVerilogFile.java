@@ -9,18 +9,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import org.cellocad.BU.ParseVerilog.Convert;
+import org.cellocad.BU.parseVerilog.Convert;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.cellocad.BU.ParseVerilog.parseVerilogFile;
+import org.cellocad.BU.parseVerilog.parseVerilogFile;
 import org.cellocad.BU.netsynth.NetSynth;
-import org.cellocad.BU.precomputation.equationSolver.eqNode;
-import org.cellocad.BU.precomputation.equationSolver.eqSolver;
-import org.cellocad.BU.precomputation.equationSolver.eqTree;
+import org.cellocad.BU.equationSolver.eqNode;
+import org.cellocad.BU.equationSolver.eqSolver;
+import org.cellocad.BU.equationSolver.eqTree;
 
 /**
  *

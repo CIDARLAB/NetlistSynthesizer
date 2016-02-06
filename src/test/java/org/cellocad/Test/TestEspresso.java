@@ -6,7 +6,7 @@
 
 package org.cellocad.Test;
 
-import org.cellocad.BU.DOM.DGate;
+import org.cellocad.BU.dom.DGate;
 import static org.cellocad.BU.netsynth.NetSynth.functionOutp;
 import static org.cellocad.BU.netsynth.NetSynth.parseEspressoOutput;
 import static org.cellocad.BU.netsynth.NetSynth.parseEspressoToNORNAND;

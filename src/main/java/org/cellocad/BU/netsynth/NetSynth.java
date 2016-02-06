@@ -5,18 +5,17 @@
 package org.cellocad.BU.netsynth;
 
 
-import org.cellocad.BU.DOM.DWire;
-import org.cellocad.BU.DOM.DWireType;
-import org.cellocad.BU.DOM.DGate;
-import org.cellocad.BU.DOM.DGateType;
-import org.cellocad.BU.DOM.DAGW;
-import org.cellocad.BU.ParseVerilog.Blif;
-import org.cellocad.BU.ParseVerilog.CircuitDetails;
-import org.cellocad.BU.ParseVerilog.Convert;
-import org.cellocad.BU.ParseVerilog.Espresso;
-import org.cellocad.BU.ParseVerilog.parseVerilogFile;
-import org.cellocad.BU.booleanLogic.BooleanSimulator;
-import org.cellocad.BU.DOM.DWire.DWireValue;
+import org.cellocad.BU.dom.DWire;
+import org.cellocad.BU.dom.DWireType;
+import org.cellocad.BU.dom.DGate;
+import org.cellocad.BU.dom.DGateType;
+import org.cellocad.BU.dom.DAGW;
+import org.cellocad.BU.adaptors.BlifAdaptor;
+import org.cellocad.BU.parseVerilog.CircuitDetails;
+import org.cellocad.BU.parseVerilog.Convert;
+import org.cellocad.BU.parseVerilog.parseVerilogFile;
+import org.cellocad.BU.simulators.BooleanSimulator;
+import org.cellocad.BU.dom.DWire.DWireValue;
 import org.cellocad.BU.precomputation.PreCompute;
 import org.cellocad.BU.precomputation.genVerilogFile;
 import org.cellocad.MIT.dnacompiler.Gate;
@@ -41,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.cellocad.BU.adaptors.EspressoAdaptor;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.cellocad.BU.subcircuit.subCircuitSwap;
 import org.json.JSONArray;
@@ -433,6 +433,9 @@ public class NetSynth {
     }
 
     public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
+        if(sublibrary == null){
+            initializeSubLibrary();
+        }
         if(sublibrary.isEmpty()){
             initializeSubLibrary();
         }
@@ -656,8 +659,8 @@ public class NetSynth {
         List<String> espressoFile = new ArrayList<String>();
         List<String> blifFile = new ArrayList<String>();
 
-        espressoFile = Espresso.createFile(circ);
-        blifFile = Blif.createFile(circ);
+        espressoFile = EspressoAdaptor.createFile(circ);
+        blifFile = BlifAdaptor.createFile(circ);
         String filestring = "";
 
         filestring = getResourcesFilepath();
@@ -714,8 +717,8 @@ public class NetSynth {
         List<String> espressoFile = new ArrayList<String>();
         List<String> blifFile = new ArrayList<String>();
 
-        espressoFile = Espresso.createFile(circ);
-        blifFile = Blif.createFile(circ);
+        espressoFile = EspressoAdaptor.createFile(circ);
+        blifFile = BlifAdaptor.createFile(circ);
         String filestring = "";
 
         filestring = getResourcesFilepath();
@@ -833,8 +836,8 @@ public class NetSynth {
         List<String> espressoFile = new ArrayList<String>();
         List<String> blifFile = new ArrayList<String>();
 
-        espressoFile = Espresso.createFile(circ);
-        blifFile = Blif.createFile(circ);
+        espressoFile = EspressoAdaptor.createFile(circ);
+        blifFile = BlifAdaptor.createFile(circ);
         String filestring = "";
         
         filestring = getResourcesFilepath();
@@ -916,8 +919,8 @@ public class NetSynth {
         List<String> espressoFile = new ArrayList<String>();
         List<String> blifFile = new ArrayList<String>();
 
-        espressoFile = Espresso.createFile(circ);
-        blifFile = Blif.createFile(circ);
+        espressoFile = EspressoAdaptor.createFile(circ);
+        blifFile = BlifAdaptor.createFile(circ);
         String filestring = "";
 
         filestring = getResourcesFilepath();

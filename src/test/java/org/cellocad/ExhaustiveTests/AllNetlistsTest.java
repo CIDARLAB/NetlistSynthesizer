@@ -6,10 +6,10 @@
 package org.cellocad.ExhaustiveTests;
 
 import java.util.List;
-import org.cellocad.BU.ParseVerilog.Convert;
-import org.cellocad.BU.booleanLogic.BooleanSimulator;
-import org.cellocad.BU.DOM.DGate;
-import org.cellocad.BU.DOM.DGateType;
+import org.cellocad.BU.parseVerilog.Convert;
+import org.cellocad.BU.simulators.BooleanSimulator;
+import org.cellocad.BU.dom.DGate;
+import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.precomputation.PreCompute;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.junit.Test;
