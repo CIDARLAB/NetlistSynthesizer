@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.Test;
+package org.cellocad.test;
 
 import org.cellocad.BU.dom.DAGW;
 import org.cellocad.BU.adaptors.BlifAdaptor;
@@ -19,7 +19,6 @@ import org.cellocad.BU.netsynth.NetSynth;
 import static org.cellocad.BU.netsynth.NetSynth.Filepath;
 import static org.cellocad.BU.netsynth.NetSynth.parseEspressoToNORNAND;
 import static org.cellocad.BU.netsynth.NetSynth.printGate;
-import static org.cellocad.BU.netsynth.NetSynth.runEspresso;
 import org.cellocad.BU.netsynth.NetSynthModes;
 import org.cellocad.BU.netsynth.NetSynthSwitch;
 import org.cellocad.BU.netsynth.NetlistConversionFunctions;
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cellocad.BU.adaptors.EspressoAdaptor;
+import org.cellocad.BU.netsynth.Utilities;
 
 /**
  *
@@ -688,7 +688,7 @@ public class TestSynthesis {
         
         String path = Filepath;
         
-        Filepath = NetSynth.getResourcesFilepath();
+        Filepath = Utilities.getResourcesFilepath();
         path = Filepath + "/Verilog.v";
         //Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
         //System.out.println("File path : " + Filepath);
@@ -789,7 +789,7 @@ public class TestSynthesis {
                     }
                     output2.close();
                     List<String> espout2 = new ArrayList<String>();
-                    espout2 = runEspresso(filestring2);
+                    espout2 = EspressoAdaptor.runEspresso(filestring2);
                     List<DGate> espoutput2 = new ArrayList<DGate>();
                     espoutput2 = parseEspressoToNORNAND(espout2);
                     String xf ="";
@@ -858,7 +858,7 @@ public class TestSynthesis {
     {
         String Filepath;
         String filestring ="";
-        Filepath = NetSynth.getFilepath();
+        Filepath = Utilities.getFilepath();
         /*Filepath = TestSynthesis.class.getClassLoader().getResource(".").getPath();
         if(Filepath.contains("build/classes/"))
             Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
@@ -1102,7 +1102,7 @@ public class TestSynthesis {
     
     public static void testespressogen()
     {
-        Filepath = NetSynth.getFilepath();
+        Filepath = Utilities.getFilepath();
         List<String> eslines = new ArrayList<String>();
         CircuitDetails circ = new CircuitDetails();
         circ.inputNames.add("inp1");
@@ -1150,7 +1150,7 @@ public class TestSynthesis {
         }
        
         List<String> espout = new ArrayList<String>();
-        espout = runEspresso(filestring);
+        espout = EspressoAdaptor.runEspresso(filestring);
         List<DGate> espoutput = new ArrayList<DGate>();
         espoutput = parseEspressoToNORNAND(espout);
     }

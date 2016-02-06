@@ -20,6 +20,7 @@ import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.dom.DWireType;
+import org.cellocad.BU.netsynth.Utilities;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -259,7 +260,7 @@ public class PreCompute {
         // <editor-fold defaultstate="collapsed" desc="Read from Input File"> 
         
         String Filepath="";
-        Filepath = NetSynth.getFilepath();
+        Filepath = Utilities.getFilepath();
         Filepath += "/resources/netsynthResources/allnetlists.txt";
         File file = new File(Filepath);
         
@@ -341,7 +342,7 @@ public class PreCompute {
         // <editor-fold defaultstate="collapsed" desc="Read from Input File"> 
         
         String Filepath="";
-        Filepath = NetSynth.getFilepath();
+        Filepath = Utilities.getFilepath();
         Filepath += "/resources/netsynthResources/allnetlists.txt";
         
         File file = new File(Filepath);

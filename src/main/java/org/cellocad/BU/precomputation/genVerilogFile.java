@@ -21,6 +21,7 @@ import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.equationSolver.eqNode;
 import org.cellocad.BU.equationSolver.eqSolver;
 import org.cellocad.BU.equationSolver.eqTree;
+import org.cellocad.BU.netsynth.Utilities;
 
 /**
  *
@@ -560,7 +561,7 @@ public class genVerilogFile {
 
         System.out.println(alllines);   
         
-        newFilePath = NetSynth.getResourcesFilepath() + "modifiedForABC.v";
+        newFilePath = Utilities.getResourcesFilepath() + "modifiedForABC.v";
         File newFile = new File(newFilePath);
         try {
             Writer output = new BufferedWriter(new FileWriter(newFile));

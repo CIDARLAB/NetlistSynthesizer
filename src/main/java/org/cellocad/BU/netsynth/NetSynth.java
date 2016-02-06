@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.cellocad.BU.adaptors.ABCAdaptor;
 import org.cellocad.BU.adaptors.EspressoAdaptor;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.cellocad.BU.subcircuit.subCircuitSwap;
@@ -82,8 +83,57 @@ public class NetSynth {
         functionOutp = false;
         one = new DWire("_one", DWireType.Source);
         zero = new DWire("_zero", DWireType.GND);
-        Filepath = NetSynth.getFilepath();
+        Filepath = Utilities.getFilepath();
 
+    }
+    
+    //<editor-fold desc="Initialize Subcircuit Library">
+    public static void initializeSubLibrary(){
+        sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
+        Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<4;i++){
+            init1.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        sublibrary.put(1, init1);
+        Map<Integer,List<SubcircuitLibrary>> init2 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<16;i++){
+            init2.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        sublibrary.put(2, init2);
+        Map<Integer,List<SubcircuitLibrary>> init3 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<256;i++){
+            init3.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        sublibrary.put(3, init3);
+        
+        String filepathNet3in1out = Utilities.getResourcesFilepath() + "/netlist_in3out1.json";
+        String filepathNet3in1out_or = Utilities.getResourcesFilepath() + "/netlist_in3out1_OR.json";
+        
+        List<SubcircuitLibrary> net3in1out = new ArrayList<SubcircuitLibrary>();
+        net3in1out = PreCompute.getCircuitLibrary(filepathNet3in1out);
+        List<SubcircuitLibrary> net3in1outOr = new ArrayList<SubcircuitLibrary>();
+        net3in1outOr = PreCompute.getCircuitLibrary(filepathNet3in1out_or);
+        
+        for(int i=0;i<net3in1out.size();i++)
+        {
+            SubcircuitLibrary subcirc = new SubcircuitLibrary();
+            subcirc = net3in1out.get(i);
+            subcirc.setInputs();
+            subcirc.setTT();
+            sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
+        }
+        for(int i=0;i<net3in1outOr.size();i++)
+        {
+            SubcircuitLibrary subcirc = new SubcircuitLibrary();
+            subcirc = net3in1outOr.get(i);
+            subcirc.setInputs();
+            subcirc.setTT();
+            if(containsOUTPUT_OR(subcirc.netlist)){
+                subcirc.switches.add(NetSynthSwitch.output_or);           
+            }         
+            sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
+        }
+        //System.out.println("sublibrary"+sublibrary);
     }
     
     public static void initializeSubLibrary(String filepath){
@@ -120,54 +170,7 @@ public class NetSynth {
             sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
         }
     }
-    
-    public static void initializeSubLibrary(){
-        sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
-        Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
-        for(int i=0;i<4;i++){
-            init1.put(i, new ArrayList<SubcircuitLibrary>());
-        }
-        sublibrary.put(1, init1);
-        Map<Integer,List<SubcircuitLibrary>> init2 = new HashMap<Integer,List<SubcircuitLibrary>>();
-        for(int i=0;i<16;i++){
-            init2.put(i, new ArrayList<SubcircuitLibrary>());
-        }
-        sublibrary.put(2, init2);
-        Map<Integer,List<SubcircuitLibrary>> init3 = new HashMap<Integer,List<SubcircuitLibrary>>();
-        for(int i=0;i<256;i++){
-            init3.put(i, new ArrayList<SubcircuitLibrary>());
-        }
-        sublibrary.put(3, init3);
-        
-        String filepathNet3in1out = NetSynth.getResourcesFilepath() + "/netlist_in3out1.json";
-        String filepathNet3in1out_or = NetSynth.getResourcesFilepath() + "/netlist_in3out1_OR.json";
-        
-        List<SubcircuitLibrary> net3in1out = new ArrayList<SubcircuitLibrary>();
-        net3in1out = PreCompute.getCircuitLibrary(filepathNet3in1out);
-        List<SubcircuitLibrary> net3in1outOr = new ArrayList<SubcircuitLibrary>();
-        net3in1outOr = PreCompute.getCircuitLibrary(filepathNet3in1out_or);
-        
-        for(int i=0;i<net3in1out.size();i++)
-        {
-            SubcircuitLibrary subcirc = new SubcircuitLibrary();
-            subcirc = net3in1out.get(i);
-            subcirc.setInputs();
-            subcirc.setTT();
-            sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
-        }
-        for(int i=0;i<net3in1outOr.size();i++)
-        {
-            SubcircuitLibrary subcirc = new SubcircuitLibrary();
-            subcirc = net3in1outOr.get(i);
-            subcirc.setInputs();
-            subcirc.setTT();
-            if(containsOUTPUT_OR(subcirc.netlist)){
-                subcirc.switches.add(NetSynthSwitch.output_or);           
-            }         
-            sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
-        }
-        //System.out.println("sublibrary"+sublibrary);
-    }
+    //</editor-fold>
     
     public static boolean containsOUTPUT_OR(List<DGate> netlist){
         for(DGate gate:netlist){
@@ -177,118 +180,9 @@ public class NetSynth {
         return false;
     }
     
-    
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     * *********************************************************************
-     */
-    public static void initializeFilepath() {
-        
-        Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (Filepath.contains("/target/")) {
-            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
-        } else if (Filepath.contains("/src/")) {
-            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/src/"));
-        } else if (Filepath.contains("/build/classes/")) {
-            Filepath = Filepath.substring(0, Filepath.lastIndexOf("/build/classes/"));
-        }
-        if(isWindows()){
-            
-            try {
-                Filepath = URLDecoder.decode(Filepath,"utf-8");
-                Filepath = new File(Filepath).getPath();
-                if (Filepath.contains("\\target\\")) {
-                    Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\target\\"));
-                } else if (Filepath.contains("\\src\\")) {
-                    Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\src\\"));
-                } else if (Filepath.contains("\\build\\classes\\")) {
-                    Filepath = Filepath.substring(0, Filepath.lastIndexOf("\\build\\classes\\"));
-                }
-                
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        else {
-            
-            //System.out.println(NetSynth.class.getClassLoader().getResource(".").toExternalForm());
-            if (Filepath.contains("/target/")) {
-                Filepath = Filepath.substring(0, Filepath.lastIndexOf("/target/"));
-            } else if (Filepath.contains("/src/")) {
-                Filepath = Filepath.substring(0, Filepath.lastIndexOf("/src/"));
-            }
-            else if (Filepath.contains("/build/classes/")) {
-                Filepath = Filepath.substring(0, Filepath.lastIndexOf("/build/classes/"));
-            }
-        }
-
-    }
-    
-    public static String getFilepath() {
-        String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (_filepath.contains("/target/")) {
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
-        } else if (_filepath.contains("/src/")) {
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
-        } else if (_filepath.contains("/build/classes/")) {
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
-        }
-
-        if(isWindows()){
-            try {
-                _filepath = URLDecoder.decode(_filepath,"utf-8");
-                _filepath = new File(_filepath).getPath();
-                
-                
-                if (_filepath.contains("\\target\\")) {
-                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\target\\"));
-                } else if (_filepath.contains("\\src\\")) {
-                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\src\\"));
-                } else if (_filepath.contains("\\build\\classes\\")) {
-                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\build\\classes\\"));
-                }
-                
-                
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        else{
-            if (_filepath.contains("/target/")) {
-                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
-            } else if (_filepath.contains("/src/")) {
-                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
-            } else if (_filepath.contains("/build/classes/")) {
-                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
-            }
-        }
-        
-        
-        Filepath = _filepath;
-        return _filepath;
-    }
-
-    public static String getResourcesFilepath() {
-        String _filepath = getFilepath();
-        if(isWindows()){
-            _filepath += "\\resources\\netsynthResources\\";
-        }
-        else{
-            _filepath += "/resources/netsynthResources/";
-        }
-        return _filepath;
-    }
-
+    //<editor-fold desc="Run NetSynth">
     public static DAGW runNetSynthCode(String codeLines, List<NetSynthSwitch> switches, JSONArray subcircuits){
-        String filepathSubCirc = getResourcesFilepath() + "/userSubcircuits.json"; 
+        String filepathSubCirc = Utilities.getResourcesFilepath() + "/userSubcircuits.json"; 
         File file = new File(filepathSubCirc);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -307,7 +201,7 @@ public class NetSynth {
         DAGW finaldag = new DAGW();
         
         String filepath = "";
-        filepath = getResourcesFilepath();
+        filepath = Utilities.getResourcesFilepath();
         filepath += "tempVerilog.v";
         File fespinp = new File(filepath);
         try {
@@ -347,7 +241,7 @@ public class NetSynth {
         
         DAGW finaldag = new DAGW();
 
-        String filepathSubCirc = getResourcesFilepath() + "/userSubcircuits.json"; 
+        String filepathSubCirc = Utilities.getResourcesFilepath() + "/userSubcircuits.json"; 
         File file = new File(filepathSubCirc);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -392,6 +286,9 @@ public class NetSynth {
         return finaldag;
     }
     
+    //</editor-fold>
+    
+    //<editor-fold desc="Get Netlist">
     /**
      * Function ************************************************************
      * <br>
@@ -415,7 +312,7 @@ public class NetSynth {
     }
     
     public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches, JSONArray subcircuits){
-        String filepathSubCirc = getResourcesFilepath() + "/userSubcircuits.json";
+        String filepathSubCirc = Utilities.getResourcesFilepath() + "/userSubcircuits.json";
         File file = new File(filepathSubCirc);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -574,7 +471,7 @@ public class NetSynth {
             {
                 try {
                     String modifiedVfilepath = genVerilogFile.modifyAssignVerilog(vfilepath);
-                    List<DGate> abcNetlist = runABCverilog_fullFilePath(modifiedVfilepath);
+                    List<DGate> abcNetlist = ABCAdaptor.runABCverilog_fullFilePath(modifiedVfilepath);
 
                     List<String> ttValues = new ArrayList<String>();
                     List<String> invttValues = new ArrayList<String>();
@@ -618,7 +515,7 @@ public class NetSynth {
         
         return netlist;
     }
-    
+    //</editor-fold>
     
     /**
      * Function ************************************************************
@@ -653,6 +550,7 @@ public class NetSynth {
         return count;
     }
 
+    //<editor-fold desc="Run ABC & Espresso">
     public static List<DGate> runDCEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
         List<DGate> EspCircuit = new ArrayList<DGate>();
         List<DGate> ABCCircuit = new ArrayList<DGate>();
@@ -663,7 +561,7 @@ public class NetSynth {
         blifFile = BlifAdaptor.createFile(circ);
         String filestring = "";
 
-        filestring = getResourcesFilepath();
+        filestring = Utilities.getResourcesFilepath();
         String filestringblif = "";
         filestringblif = filestring + "Blif_File";
         filestringblif += ".blif";
@@ -673,7 +571,7 @@ public class NetSynth {
         File fespinp = new File(filestringesp);
         //Writer output;
         try {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
+            BufferedWriter output = new BufferedWriter(new FileWriter(fespinp));
 
             for (String xline : espressoFile) {
                 String newl = (xline + "\n");
@@ -682,14 +580,15 @@ public class NetSynth {
             output.close();
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE,null,"Expresso_File.txt missing. Please verify if Espresso can run on your machine.\n");
         }
         List<String> EspOutput = new ArrayList<String>();
-        EspOutput = runEspresso(filestringesp);
+        EspOutput = EspressoAdaptor.runEspresso(filestringesp);
         fespinp.deleteOnExit();
 
         
         if (!synthmode.contains(NetSynthSwitch.abc)) {
-            EspCircuit = convertPOStoNORNOT(EspOutput);
+            EspCircuit = EspressoAdaptor.convertPOStoNORNOT(EspOutput);
             EspCircuit = optimize(EspCircuit);
         }
 
@@ -721,7 +620,7 @@ public class NetSynth {
         blifFile = BlifAdaptor.createFile(circ);
         String filestring = "";
 
-        filestring = getResourcesFilepath();
+        filestring = Utilities.getResourcesFilepath();
 
         String filestringblif = "";
         filestringblif = filestring + "Blif_File";
@@ -743,10 +642,10 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         List<String> EspOutput = new ArrayList<String>();
-        EspOutput = runEspresso(filestringesp);
+        EspOutput = EspressoAdaptor.runEspresso(filestringesp);
         fespinp.deleteOnExit();
 
-        EspCircuit = convertPOStoNORNOT(EspOutput);
+        EspCircuit = EspressoAdaptor.convertPOStoNORNOT(EspOutput);
         ABCCircuit = parseINVEspressoOutToABC(EspOutput);
 
         List<DGate> finalEspCircuit = new ArrayList<DGate>();
@@ -840,7 +739,7 @@ public class NetSynth {
         blifFile = BlifAdaptor.createFile(circ);
         String filestring = "";
         
-        filestring = getResourcesFilepath();
+        filestring = Utilities.getResourcesFilepath();
         String filestringblif = "";
         filestringblif = filestring + "Blif_File";
         filestringblif += ".blif";
@@ -861,10 +760,10 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         List<String> EspOutput = new ArrayList<String>();
-        EspOutput = runEspresso(filestringesp);
+        EspOutput = EspressoAdaptor.runEspresso(filestringesp);
         fespinp.deleteOnExit();
 
-        EspCircuit = convertPOStoNORNOT(EspOutput);
+        EspCircuit = EspressoAdaptor.convertPOStoNORNOT(EspOutput);
         EspCircuit = optimize(EspCircuit);
         
         
@@ -879,7 +778,7 @@ public class NetSynth {
             List<DGate> abcoutput = new ArrayList<DGate>();
 
             try {
-                abcoutput = runABC("Blif_File");
+                abcoutput = ABCAdaptor.runABC("Blif_File");
 
             } catch (InterruptedException ex) {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
@@ -923,7 +822,7 @@ public class NetSynth {
         blifFile = BlifAdaptor.createFile(circ);
         String filestring = "";
 
-        filestring = getResourcesFilepath();
+        filestring = Utilities.getResourcesFilepath();
         String filestringblif = "";
         filestringblif = filestring + "Blif_File";
         filestringblif += ".blif";
@@ -944,10 +843,10 @@ public class NetSynth {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         List<String> EspOutput = new ArrayList<String>();
-        EspOutput = runEspresso(filestringesp);
+        EspOutput = EspressoAdaptor.runEspresso(filestringesp);
         fespinp.deleteOnExit();
 
-        EspCircuit = convertPOStoNORNOT(EspOutput);
+        EspCircuit = EspressoAdaptor.convertPOStoNORNOT(EspOutput);
         
         File fabcinp = new File(filestringblif);
         try {
@@ -960,7 +859,7 @@ public class NetSynth {
             List<DGate> abcoutput = new ArrayList<DGate>();
 
             try {
-                abcoutput = runABC("Blif_File");
+                abcoutput = ABCAdaptor.runABC("Blif_File");
 
             } catch (InterruptedException ex) {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
@@ -1039,6 +938,7 @@ public class NetSynth {
         }
 
     }
+    //</editor-fold>
     
     public static List<DGate> invertCircuit(List<DGate> netlist){
         for(int i=0;i<netlist.size();i++){
@@ -1200,7 +1100,7 @@ public class NetSynth {
     public static String create_VerilogFile(List<String> filelines, String filename) {
         String filestring = "";
 
-        filestring = NetSynth.getResourcesFilepath();
+        filestring = Utilities.getResourcesFilepath();
         filestring += filename + ".v";
         File fespinp = new File(filestring);
         //Writer output;
@@ -1264,11 +1164,11 @@ public class NetSynth {
         List<DGate> netlistout = new ArrayList<DGate>();
         List<String> vfilelines = new ArrayList<String>();
 
-        vfilelines = convertEspressoOutputToVerilog(espout);
+        vfilelines = EspressoAdaptor.convertEspressoOutputToVerilog(espout);
         String vfilepath = "";
         vfilepath = create_VerilogFile(vfilelines, "espressoVerilog");
         try {
-            netlistout = runABCverilog("espressoVerilog");
+            netlistout = ABCAdaptor.runABCverilog("espressoVerilog");
             netlistout = separateOutputGates(netlistout);
 
             netlistout = optimize(netlistout);
@@ -1301,11 +1201,11 @@ public class NetSynth {
         
         List<String> vfilelines = new ArrayList<String>();
 
-        vfilelines = convertEspressoOutputToVerilog(espout);
+        vfilelines = EspressoAdaptor.convertEspressoOutputToVerilog(espout);
         String vfilepath = "";
         vfilepath = create_VerilogFile(vfilelines, "espressoVerilog");
         try {
-            netlistout = runABCverilog("espressoVerilog");
+            netlistout = ABCAdaptor.runABCverilog("espressoVerilog");
 
         } catch (InterruptedException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
@@ -1333,16 +1233,16 @@ public class NetSynth {
     public static List<DGate> parseEspressoFileToABC(String filename) {
         List<DGate> netlistout = new ArrayList<DGate>();
         List<String> espout = new ArrayList<String>();
-        espout = runEspresso(filename);
+        espout = EspressoAdaptor.runEspresso(filename);
         
         List<String> vfilelines = new ArrayList<String>();
 
-        vfilelines = convertEspressoOutputToVerilog(espout);
+        vfilelines = EspressoAdaptor.convertEspressoOutputToVerilog(espout);
         String vfilepath = "";
         vfilepath = create_VerilogFile(vfilelines, "espressoVerilog");
         try {
 
-            netlistout = runABCverilog("espressoVerilog");
+            netlistout = ABCAdaptor.runABCverilog("espressoVerilog");
             netlistout = optimizeNetlist(netlistout, true, true, false);
         
         } catch (InterruptedException ex) {
@@ -1352,1066 +1252,9 @@ public class NetSynth {
         return netlistout;
     }
 
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param filename
-     * @return
-     * @throws java.lang.InterruptedException
-     * *********************************************************************
-     */
-    public static List<DGate> runABC(String filename) throws InterruptedException {
-        initializeFilepath();
-        String x = System.getProperty("os.name");
-        StringBuilder commandBuilder = null;
-        if (isMac(x)) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc.mac -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-        } else if (isLinux(x)) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-        } else if (isWindows(x)) {
-            commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\abc -c \"read " + Filepath + "\\resources\\netsynthResources\\" + filename + ".blif; strash;  rewrite; refactor; balance; write " + Filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
-        }
-        
 
-        String command = commandBuilder.toString();
-        
-        String filestring = "";
-        String clist = "";
-        if(isWindows(x)){
-            filestring += Filepath + "\\resources\\netsynthResources\\script.cmd";
-            clist = Filepath + "\\resources\\netsynthResources\\script.cmd";
-        }
-        else{
-            filestring += Filepath + "/resources/netsynthResources/script";
-            clist = Filepath + "/resources/netsynthResources/script";
-        }
-        File fespinp = new File(filestring);
-        //Writer output;
-        try {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-            //output = new BufferedWriter(new FileWriter(fespinp));
-            output.write(command);
-            output.close();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        Runtime runtime = Runtime.getRuntime();
-        Process proc = null;
-        List<DGate> finalnetlist = new ArrayList<DGate>();
-        try {
-            proc = runtime.exec(clist);
-            proc.waitFor();
-            finalnetlist = convertBenchToAIG();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return finalnetlist;
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param filename
-     * @return
-     * @throws java.lang.InterruptedException
-     * *********************************************************************
-     */
-    public static List<DGate> runABCverilog(String filename) throws InterruptedException {
-
-        initializeFilepath();
-        String x = System.getProperty("os.name");
-        StringBuilder commandBuilder = null;
-        if (isMac(x)) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc.mac -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-        } else if (isLinux(x)) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + Filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-        } else if (isWindows(x)){
-            commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\abc.exe -c \"read " + Filepath + "\\resources\\netsynthResources\\" + filename + ".v; strash;  rewrite; refactor; balance; write " + Filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
-        }
-
-        String command = commandBuilder.toString();
-        
-        String filestring = "";
-        if(isWindows(x)){
-            filestring += Filepath + "\\resources\\netsynthResources\\script.cmd";
-        }
-        else{
-            filestring += Filepath + "/resources/netsynthResources/script";
-        }
-        File fespinp = new File(filestring);
-        
-        //Writer output;
-        try {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-            //output = new BufferedWriter(new FileWriter(fespinp));
-            output.write(command);
-            output.close();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        String clist = "";
-        if(isWindows(x)){
-            clist = Filepath + "\\resources\\netsynthResources\\script.cmd";
-        }
-        else{
-            clist = Filepath + "/resources/netsynthResources/script";
-        }
-        Runtime runtime = Runtime.getRuntime();
-        Process proc = null;
-        List<DGate> finalnetlist = new ArrayList<DGate>();
-        try {
-            proc = runtime.exec(clist);
-            proc.waitFor();
-            finalnetlist = convertBenchToAIG();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return finalnetlist;
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param filename
-     * @return
-     * @throws java.lang.InterruptedException
-     * *********************************************************************
-     */
-    public static List<DGate> runABCverilog_fullFilePath(String filename) throws InterruptedException {
-        initializeFilepath();
-        String x = System.getProperty("os.name");
-        StringBuilder commandBuilder = null;
-        if (isMac(x)) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc.mac -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-        } else if (isLinux(x)) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
-        } else if (isWindows(x)){
-            commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + Filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
-        }
-
-        String command = commandBuilder.toString();
-        String filestring = "";
-        if(isWindows(x)){
-            filestring += Filepath + "\\resources\\netsynthResources\\script.cmd";
-        }
-        else{
-            filestring += Filepath + "/resources/netsynthResources/script";
-        }
-        
-        
-        File fespinp = new File(filestring);
-        
-        //Writer output;
-        try {
-            Writer output = new BufferedWriter(new FileWriter(fespinp));
-            //output = new BufferedWriter(new FileWriter(fespinp));
-            output.write(command);
-            output.close();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        String clist = "";
-        if(isWindows(x)){
-            clist = Filepath + "\\resources\\netsynthResources\\script.cmd";
-        }
-        else{
-            clist = Filepath + "/resources/netsynthResources/script";
-        }
-        
-        
-        Runtime runtime = Runtime.getRuntime();
-        Process proc = null;
-        List<DGate> finalnetlist = new ArrayList<DGate>();
-        try {
-            proc = runtime.exec(clist);
-            proc.waitFor();
-            finalnetlist = convertBenchToAIG();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return finalnetlist;
-        //convertBenchToAIG();
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> convertBenchToAIG() {
-
-        initializeFilepath();
-        List<String> benchlines = new ArrayList<String>();
-        String filestring = "";
-        
-        filestring += Filepath + "/resources/netsynthResources/abcOutput.bench";
-        
-        File gate_file = new File(filestring);
-        BufferedReader brgate;
-        FileReader filebench;
-
-        try {
-            filebench = new FileReader(gate_file);
-            brgate = new BufferedReader(filebench);
-            String line;
-            try {
-                while ((line = brgate.readLine()) != null) {
-                    benchlines.add(line);
-                }
-            } catch (IOException ex) {
-                System.out.println("IOException when reading input file");
-            }
-        } catch (FileNotFoundException ex) {
-            System.out.println("FileNotFoundException when reading input file");
-        }
-        List<DGate> netlist = new ArrayList<DGate>();
-        List<DWire> inputwires = new ArrayList<DWire>();
-        List<DWire> outputwires = new ArrayList<DWire>();
-        List<DWire> allwires = new ArrayList<DWire>();
-
-        for (int i = 0; i < benchlines.size(); i++) {
-            if (benchlines.get(i).contains("INPUT")) {
-                String inpname = benchlines.get(i).substring(benchlines.get(i).indexOf("INPUT(") + 6);
-                inpname = inpname.substring(0, inpname.indexOf(")"));
-                inpname = inpname.trim();
-
-                DWire inpw = new DWire(inpname, DWireType.input);
-                inputwires.add(inpw);
-                allwires.add(inpw);
-            }
-            if (benchlines.get(i).contains("OUTPUT")) {
-                String outpname = benchlines.get(i).substring(benchlines.get(i).indexOf("OUTPUT(") + 7);
-                outpname = outpname.substring(0, outpname.indexOf(")"));
-                outpname = outpname.trim();
-
-                DWire outpw = new DWire(outpname, DWireType.output);
-                outputwires.add(outpw);
-                allwires.add(outpw);
-            }
-            if (benchlines.get(i).contains("=")) {
-                String outpwire = benchlines.get(i).substring(0, benchlines.get(i).indexOf("="));
-                outpwire = outpwire.trim();
-                int flag = 0;
-                for (DWire xwire : allwires) {
-                    if (xwire.name.equals(outpwire)) {
-                        flag = 1;
-                        break;
-                    }
-                }
-
-                if (flag == 0) {
-                    DWire connwire = new DWire(outpwire, DWireType.connector);
-                    allwires.add(connwire);
-                }
-                String gatestring = benchlines.get(i).substring(benchlines.get(i).indexOf("=") + 1);
-                gatestring = gatestring.trim();
-                if (gatestring.equals("vdd")) {
-                    DGate xgate = new DGate();
-                    xgate.gtype = DGateType.BUF;
-                    xgate.input.add(one);
-                    for (DWire xwire : allwires) {
-
-                        if (xwire.name.equals(outpwire)) {
-                            xgate.output = xwire;
-                        }
-                    }
-                    netlist.add(xgate);
-                }
-
-                if (gatestring.contains("BUFF")) {
-                    DGate xgate = new DGate();
-                    xgate.gtype = DGateType.BUF;
-                    String bufconn = gatestring.substring(gatestring.indexOf("(") + 1, gatestring.indexOf(")"));
-                    for (DWire xwire : allwires) {
-                        if (xwire.name.equals(bufconn)) {
-                            xgate.input.add(xwire);
-                        }
-                        if (xwire.name.equals(outpwire)) {
-                            xgate.output = xwire;
-                        }
-                    }
-                    netlist.add(xgate);
-                }
-                if (gatestring.contains("NOT")) {
-                    DGate xgate = new DGate();
-                    xgate.gtype = DGateType.NOT;
-                    String notconn = gatestring.substring(gatestring.indexOf("(") + 1, gatestring.indexOf(")"));
-                    notconn = notconn.trim();
-                    for (DWire xwire : allwires) {
-                        if (xwire.name.equals(notconn)) {
-                            xgate.input.add(xwire);
-                        }
-                        if (xwire.name.equals(outpwire)) {
-                            xgate.output = xwire;
-                        }
-                    }
-                    netlist.add(xgate);
-                }
-                if (gatestring.contains("AND")) {
-                    DGate xgate = new DGate();
-                    xgate.gtype = DGateType.AND;
-
-                    String conn = gatestring.substring(gatestring.indexOf("(") + 1, gatestring.indexOf(")"));
-                    conn = conn.trim();
-                    String[] connpieces = conn.split(",");
-                    String conn1 = connpieces[0].trim();
-                    String conn2 = connpieces[1].trim();
-                    conn1 = conn1.trim();
-                    conn2 = conn2.trim();
-                    for (DWire xwire : allwires) {
-                        if (xwire.name.equals(conn1)) {
-                            xgate.input.add(xwire);
-                        }
-                        if (xwire.name.equals(conn2)) {
-                            xgate.input.add(xwire);
-                        }
-                        if (xwire.name.equals(outpwire)) {
-                            xgate.output = xwire;
-                        }
-                    }
-                    netlist.add(xgate);
-                }
-            }
-        }
-        
-        List<DGate> netout = new ArrayList<DGate>();
-        netout = convertAIGtoNORNOT(netlist);
-        gate_file.deleteOnExit();
-        return netout;
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param netlist
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> convertAIGtoNORNOT(List<DGate> netlist) {
-        List<DGate> netout = new ArrayList<DGate>();
-
-        List<DGate> notcreated = new ArrayList<DGate>();
-
-        for (int i = 0; i < netlist.size(); i++) {
-            if (netlist.get(i).gtype.equals(DGateType.NOT)) {
-                netout.add(netlist.get(i));
-            }
-            if (netlist.get(i).gtype.equals(DGateType.BUF)) {
-                netout.add(netlist.get(i));
-            }
-            if (netlist.get(i).gtype.equals(DGateType.AND)) {
-                int flag1 = 0;
-                int flag2 = 0;
-                DGate newnor = new DGate();
-                newnor.gtype = DGateType.NOR;
-                newnor.output = netlist.get(i).output;
-                for (int j = 0; j < notcreated.size(); j++) {
-                    if (netlist.get(i).input.get(0).name.equals(notcreated.get(j).input.get(0).name)) {
-                        flag1 = 1;
-                        newnor.input.add(notcreated.get(j).output);
-                    }
-                    if (netlist.get(i).input.get(1).name.equals(notcreated.get(j).input.get(0).name)) {
-                        flag2 = 1;
-                        newnor.input.add(notcreated.get(j).output);
-                    }
-                }
-                if (flag1 == 0) {
-                    String wirename = "0Wire" + Global.wirecount++;
-                    DWire notout1 = new DWire(wirename, DWireType.connector);
-                    DGate newnot1 = new DGate();
-                    newnot1.gtype = DGateType.NOT;
-                    newnot1.input.add(netlist.get(i).input.get(0));
-                    newnot1.output = notout1;
-                    newnor.input.add(newnot1.output);
-                    netout.add(newnot1);
-                    notcreated.add(newnot1);
-
-                }
-                if (flag2 == 0) {
-                    String wirename = "0Wire" + Global.wirecount++;
-                    DWire notout2 = new DWire(wirename, DWireType.connector);
-                    DGate newnot2 = new DGate();
-                    newnot2.gtype = DGateType.NOT;
-                    newnot2.input.add(netlist.get(i).input.get(1));
-                    newnot2.output = notout2;
-                    newnor.input.add(newnot2.output);
-                    netout.add(newnot2);
-                    notcreated.add(newnot2);
-                }
-                netout.add(newnor);
-            }
-        }
-        
-        return netout;
-    }
-
-    public static boolean isWindows(){
-        String os = System.getProperty("os.name");
-        return isWindows(os);
-    }
     
-    public static boolean isWindows(String os){
-        if(os.toLowerCase().indexOf("win") >=0){
-            return true;
-        }
-        return false;
-    }
-    
-    public static boolean isLinux(){
-        String os = System.getProperty("os.name");
-        return isLinux(os);
-    }
-    
-    public static boolean isLinux(String os){
-        if((os.toLowerCase().indexOf("nix") >=0) || (os.indexOf("nux") >=0) || (os.indexOf("aix") >0)){
-            return true;
-        }
-        return false;
-    }
-    
-    public static boolean isMac(){
-        String os = System.getProperty("os.name");
-        return isMac(os);
-    }
-    
-    public static boolean isMac(String os){
-        if(os.toLowerCase().indexOf("mac") >=0){
-            return true;
-        }
-        return false;
-    }
-    
-    public static boolean isSolaris(){
-        String os = System.getProperty("os.name");
-        return isSolaris(os);
-    }
-    
-    public static boolean isSolaris(String os){
-        if(os.toLowerCase().indexOf("sunos") >=0){
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param pathFile
-     * @return
-     * *********************************************************************
-     */
-    public static List<String> runEspresso(String pathFile) {
 
-        
-        List<String> espressoOutput = new ArrayList<String>();
-        String x = System.getProperty("os.name");
-        StringBuilder commandBuilder = null;
-        if (isMac(x)) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/espresso.mac -epos " + pathFile);
-        } else if (isLinux(x)) {
-            commandBuilder = new StringBuilder(Filepath + "/resources/netsynthResources/espresso.linux -epos " + pathFile);
-        }
-        else if(isWindows(x)){
-            commandBuilder = new StringBuilder(Filepath + "\\resources\\netsynthResources\\espresso.exe -epos " + pathFile);           
-        }
-        
-        String command = commandBuilder.toString();
-        
-        Runtime runtime = Runtime.getRuntime();
-        Process proc = null;
-        try {
-            proc = runtime.exec(command);
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            String filestring = "";
-            filestring = getResourcesFilepath();
-            filestring += "write";
-            
-            filestring += Global.espout++;
-            filestring += ".txt";
-            File fbool = new File(filestring);
-            Writer output = new BufferedWriter(new FileWriter(fbool));
-            InputStream in = proc.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String line = null;
-
-            while ((line = br.readLine()) != null) {
-                espressoOutput.add(line);
-                line += "\n";
-                output.write(line);
-            }
-            output.close();
-            fbool.delete();
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return espressoOutput;
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param espinp
-     * @return
-     * *********************************************************************
-     */
-    public static List<String> convertEspressoOutputToVerilog(List<String> espinp) {
-        List<String> verilogfile = new ArrayList<String>();
-
-        one = new DWire("_one", DWireType.Source);
-        zero = new DWire("_zero", DWireType.GND);
-        String inpNames = null;
-        String outNames = null;
-        int numberOfMinterms = 0;
-        int expInd = 0;
-        List<String> inputWires = new ArrayList<String>();
-        List<String> outputWires = new ArrayList<String>();
-
-        List<DWire> inputINVWires = new ArrayList<DWire>();
-        List<DGate> inputINVGates = new ArrayList<DGate>();
-        List<Boolean> notGateexists = new ArrayList<Boolean>();
-        List<Boolean> notGateAdd = new ArrayList<Boolean>();
-
-        // <editor-fold defaultstate="collapsed" desc="Extract Input output and minterm lines from Espresso Output">
-        for (int i = 0; i < espinp.size(); i++) {
-            if (espinp.get(i).startsWith(".ilb")) {
-                inpNames = (espinp.get(i).substring(5));
-            } else if (espinp.get(i).startsWith(".ob")) {
-                outNames = (espinp.get(i).substring(4));
-            } else if (espinp.get(i).startsWith("#.phase")) {
-                POSmode = true;
-            } else if (espinp.get(i).startsWith(".p")) {
-                numberOfMinterms = Integer.parseInt(espinp.get(i).substring(3));
-                expInd = i + 1;
-                break;
-            }
-        }
-        // </editor-fold>
-
-        // <editor-fold defaultstate="collapsed" desc="Get Input Names">
-        for (String splitInp : inpNames.split(" ")) {
-            if (splitInp.equals(one.name) || splitInp.equals(zero.name)) {
-                splitInp += "I";
-            }
-            inputWires.add(splitInp.trim());
-            //System.out.println("INPUT : "+splitInp);
-        }
-        // </editor-fold>
-
-        // <editor-fold defaultstate="collapsed" desc="Get Output Names">
-        for (String splitInp : outNames.split(" ")) {
-            if (splitInp.equals(one.name) || splitInp.equals(zero.name)) {
-                splitInp += "O";
-            }
-            outputWires.add(splitInp.trim());
-            //System.out.println("OUTPUT : "+splitInp);
-        }
-        // </editor-fold>        
-
-        verilogfile.add("module EspToVerilog (");
-        String inputlist = "";
-        for (int i = 0; i < inputWires.size(); i++) {
-            inputlist += inputWires.get(i);
-            if (i != (inputWires.size() - 1)) {
-                inputlist += ", ";
-            }
-        }
-        String moduleinput = inputlist + ",";
-        verilogfile.add(moduleinput);
-
-        String outputlist = "";
-        for (int i = 0; i < outputWires.size(); i++) {
-            outputlist += outputWires.get(i);
-            if (i != (outputWires.size() - 1)) {
-                outputlist += ", ";
-            }
-        }
-        String moduleoutput = outputlist + " );";
-        verilogfile.add(moduleoutput);
-        String inputdeclare = "input " + inputlist + ";";
-        String outputdeclare = "output " + outputlist + ";";
-        verilogfile.add(inputdeclare);
-        verilogfile.add(outputdeclare);
-        // <editor-fold defaultstate="collapsed" desc="Declare wires for verilog file">
-        String wiredeclaration = "wire";
-        List<String> wirenames = new ArrayList<String>();
-        for (int i = 0; i < numberOfMinterms; i++) {
-            String wName = "w" + i;
-            wiredeclaration += (" " + wName);
-            wirenames.add(wName);
-            if (i == numberOfMinterms - 1) {
-                wiredeclaration += ";";
-            } else {
-                wiredeclaration += ",";
-            }
-        }
-        // </editor-fold>
-
-        verilogfile.add(wiredeclaration);
-
-        List<List<DWire>> outputsum = new ArrayList<List<DWire>>();
-        List<List<String>> outputassignlines = new ArrayList<List<String>>();
-
-        for (int i = 0; i < outputWires.size(); i++) {
-            List<String> outassign = new ArrayList<String>();
-            outputassignlines.add(outassign);
-            List<DWire> outsums = new ArrayList<DWire>();
-            outputsum.add(outsums);
-        }
-
-        int wIndx = 0;
-        for (int i = expInd; i < espinp.size() - 1; i++) {
-            //int null_literal =0;
-            List<DWire> sumterm = new ArrayList<DWire>();
-            String assgnwires = ("assign " + wirenames.get(wIndx) + " =");
-            String maxterm[] = espinp.get(i).split(" ");
-            boolean startassign = false;
-            for (int j = 0; j < inputWires.size(); j++) {
-                if (maxterm[0].charAt(j) == '1') {
-                    if (startassign) {
-                        assgnwires += " |";
-                    }
-                    startassign = true;
-                    assgnwires += " ~" + inputWires.get(j);
-
-                } else if (maxterm[0].charAt(j) == '0') {
-                    if (startassign) {
-                        assgnwires += " |";
-                    }
-                    startassign = true;
-                    assgnwires += " " + inputWires.get(j);
-                }
-
-                if (j == (inputWires.size() - 1)) {
-                    assgnwires += ";";
-                }
-
-            }
-
-            verilogfile.add(assgnwires);
-
-            for (int j = 0; j < outputWires.size(); j++) {
-                if (maxterm[1].charAt(j) == '1') {
-                    outputassignlines.get(j).add(wirenames.get(wIndx));
-                    //outputsum.get(j).add(sumlast);
-                }
-            }
-            wIndx++;
-        }
-
-        for (int i = 0; i < outputassignlines.size(); i++) {
-            String tempoutassign = "assign " + outputWires.get(i) + " = ";
-            for (int j = 0; j < outputassignlines.get(i).size(); j++) {
-                tempoutassign += (" " + outputassignlines.get(i).get(j));
-                if (j == (outputassignlines.get(i).size() - 1)) {
-                    tempoutassign += ";";
-                } else {
-                    tempoutassign += " &";
-                }
-            }
-            verilogfile.add(tempoutassign);
-        }
-        verilogfile.add("endmodule");
-        
-        return verilogfile;
-
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param espinp
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> parseEspressoOutput(List<String> espinp) {
-        one = new DWire("_one", DWireType.Source);
-        zero = new DWire("_zero", DWireType.GND);
-        List<DGate> sopexp = new ArrayList<DGate>();
-        List<DWire> wireInputs = new ArrayList<DWire>();
-        List<DWire> wireOutputs = new ArrayList<DWire>();
-        List<DWire> invWires = new ArrayList<DWire>();
-        List<DGate> inpInv = new ArrayList<DGate>();
-        functionOutp = false;
-        String inpNames = "";
-        String outNames = "";
-        POSmode = false;
-        int numberOfMinterms = 0;
-        int expInd = 0;
-
-        // <editor-fold defaultstate="collapsed" desc="Extract Input output and minterm lines from Espresso Output">
-        for (int i = 0; i < espinp.size(); i++) {
-            if (espinp.get(i).startsWith(".ilb")) {
-                inpNames = (espinp.get(i).substring(5));
-            } else if (espinp.get(i).startsWith(".ob")) {
-                outNames = (espinp.get(i).substring(4));
-            } else if (espinp.get(i).startsWith("#.phase")) {
-                POSmode = true;
-            } else if (espinp.get(i).startsWith(".p")) {
-                numberOfMinterms = Integer.parseInt(espinp.get(i).substring(3));
-                expInd = i + 1;
-                break;
-            }
-        }
-        // </editor-fold>
-
-        // <editor-fold defaultstate="collapsed" desc="Get Input Names">
-        for (String splitInp : inpNames.split(" ")) {
-            if (splitInp.equals(one.name) || splitInp.equals(zero.name)) {
-                splitInp += "I";
-            }
-            wireInputs.add(new DWire(splitInp, DWireType.input));
-        }
-        // </editor-fold>
-
-        // <editor-fold defaultstate="collapsed" desc="Create Not gates and NOT wires">
-        inpInv = notGates(wireInputs);
-        for (DGate gnots : inpInv) {
-            invWires.add(gnots.output);
-        }
-        // </editor-fold>
-
-        // <editor-fold defaultstate="collapsed" desc="Get Output Names">
-        for (String splitInp : outNames.split(" ")) {
-            if (splitInp.equals(one.name) || splitInp.equals(zero.name)) {
-                splitInp += "O";
-            }
-            wireOutputs.add(new DWire(splitInp, DWireType.output));
-        }
-        // </editor-fold>        
-
-        // <editor-fold defaultstate="collapsed" desc="Minterms = 0 and Output = 1 or 0">
-        if (numberOfMinterms == 0) {
-            functionOutp = true;
-            List<DWire> inp01 = new ArrayList<DWire>();
-
-            if (POSmode) {
-                inp01.add(one);
-            } else {
-                inp01.add(zero);
-            }
-            sopexp.add(new DGate(DGateType.BUF, inp01, wireOutputs.get(0)));
-            return sopexp;
-        } // </editor-fold>
-        // <editor-fold defaultstate="collapsed" desc="Minterm = 1 and Output = 1 or 0">
-        else if (numberOfMinterms == 1) {
-            String oneMinT = espinp.get(expInd).substring(0, (wireInputs.size()));
-            int flag = 0;
-            for (int j = 0; j < wireInputs.size(); j++) {
-                if (oneMinT.charAt(j) != '-') {
-                    flag = 1;
-                    break;
-                }
-            }
-            if (flag == 0) {
-                functionOutp = true;
-                List<DWire> inp01 = new ArrayList<DWire>();
-
-                if (POSmode) {
-                    inp01.add(zero);
-                } else {
-                    inp01.add(one);
-                }
-                sopexp.add(new DGate(DGateType.BUF, inp01, wireOutputs.get(0)));
-                return sopexp;
-            }
-
-        }
-        // </editor-fold>
-
-        List<DWire> minTemp = new ArrayList<DWire>();
-        List<DWire> orWires = new ArrayList<DWire>();
-        List<DGate> prodGates;
-
-        for (int i = expInd; i < (expInd + numberOfMinterms); i++) {
-
-            String minT = espinp.get(i).substring(0, (wireInputs.size()));
-            prodGates = new ArrayList<DGate>();
-            minTemp = new ArrayList<DWire>();
-
-            // <editor-fold defaultstate="collapsed" desc="Find a Minterm/Maxterm">
-            for (int j = 0; j < wireInputs.size(); j++) {
-                if (minT.charAt(j) == '-') {
-                    continue;
-                } else if (minT.charAt(j) == '0') {
-                    if (POSmode) {
-                        minTemp.add(wireInputs.get(j));
-                    } else {
-                        if (!sopexp.contains(inpInv.get(j))) {
-                            sopexp.add(inpInv.get(j));
-                        }
-                        minTemp.add(inpInv.get(j).output);
-                    }
-                } else if (minT.charAt(j) == '1') {
-                    if (POSmode) {
-                        if (!sopexp.contains(inpInv.get(j))) {
-                            sopexp.add(inpInv.get(j));
-                        }
-                        minTemp.add(inpInv.get(j).output);
-                    } else {
-                        minTemp.add(wireInputs.get(j));
-                    }
-                }
-            }
-            // </editor-fold>
-
-            if (minTemp.size() == 1) {
-                orWires.add(minTemp.get(0));
-            } else {
-                if (POSmode) {
-                    prodGates = AndORGates(minTemp, DGateType.OR);
-                } else {
-                    prodGates = AndORGates(minTemp, DGateType.AND);
-                }
-                orWires.add(prodGates.get(prodGates.size() - 1).output);
-                sopexp.addAll(prodGates);
-            }
-        }
-
-        prodGates = new ArrayList<DGate>();
-        if (POSmode) {
-            prodGates = AndORGates(orWires, DGateType.AND);
-        } else {
-            prodGates = AndORGates(orWires, DGateType.OR);
-        }
-        sopexp.addAll(prodGates);
-        if (sopexp.isEmpty()) {
-            DGate bufgate = new DGate(DGateType.BUF, orWires, wireOutputs.get(0));
-            sopexp.add(bufgate);
-        } else {
-            sopexp.get(sopexp.size() - 1).output = wireOutputs.get(0);
-        }
-        return sopexp;
-    }
-
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param espinp
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> convertPOStoNORNOT(List<String> espinp) {
-
-        //for(String xespinp:espinp)
-        //    System.out.println(xespinp);
-        
-        List<DGate> netlist = new ArrayList<DGate>();
-        one = new DWire("_one", DWireType.Source);
-        zero = new DWire("_zero", DWireType.GND);
-        String inpNames = null;
-        String outNames = null;
-        int numberOfMinterms;
-        int expInd = 0;
-        List<DWire> inputWires = new ArrayList<DWire>();
-        List<DWire> outputWires = new ArrayList<DWire>();
-
-        List<DWire> inputINVWires = new ArrayList<DWire>();
-        List<DGate> inputINVGates = new ArrayList<DGate>();
-        List<Boolean> notGateexists = new ArrayList<Boolean>();
-        List<Boolean> notGateAdd = new ArrayList<Boolean>();
-
-        // <editor-fold defaultstate="collapsed" desc="Extract Input output and minterm lines from Espresso Output">
-        for (int i = 0; i < espinp.size(); i++) {
-            if (espinp.get(i).startsWith(".ilb")) {
-                inpNames = (espinp.get(i).substring(5));
-            } else if (espinp.get(i).startsWith(".ob")) {
-                outNames = (espinp.get(i).substring(4));
-            } else if (espinp.get(i).startsWith("#.phase")) {
-                POSmode = true;
-            } else if (espinp.get(i).startsWith(".p")) {
-                numberOfMinterms = Integer.parseInt(espinp.get(i).substring(3));
-                expInd = i + 1;
-                break;
-            }
-        }
-        // </editor-fold>
-
-        // <editor-fold defaultstate="collapsed" desc="Get Input Names">
-        for (String splitInp : inpNames.split(" ")) {
-            if (splitInp.equals(one.name) || splitInp.equals(zero.name)) {
-                splitInp += "I";
-            }
-            inputWires.add(new DWire(splitInp, DWireType.input));
-            //System.out.println("INPUT : "+splitInp);
-        }
-        // </editor-fold>
-
-        // <editor-fold defaultstate="collapsed" desc="Create Not gates and NOT wires">
-        inputINVGates = notGates(inputWires);
-
-        for (DGate gnots : inputINVGates) {
-            notGateexists.add(false);
-            notGateAdd.add(false);
-            inputINVWires.add(gnots.output);
-        }
-        // </editor-fold>
-
-        // <editor-fold defaultstate="collapsed" desc="Get Output Names">
-        for (String splitInp : outNames.split(" ")) {
-            if (splitInp.equals(one.name) || splitInp.equals(zero.name)) {
-                splitInp += "O";
-            }
-            outputWires.add(new DWire(splitInp, DWireType.output));
-            //System.out.println("OUTPUT : "+splitInp);
-        }
-        // </editor-fold>        
-
-        List<List<DWire>> outputsum = new ArrayList<List<DWire>>();
-
-        for (int i = 0; i < outputWires.size(); i++) {
-            List<DWire> outsums = new ArrayList<DWire>();
-            outputsum.add(outsums);
-        }
-
-        for (int i = expInd; i < espinp.size() - 1; i++) {
-            //int null_literal =0;
-            List<DWire> sumterm = new ArrayList<DWire>();
-            String maxterm[] = espinp.get(i).split(" ");
-            for (int j = 0; j < inputWires.size(); j++) {
-
-                if (maxterm[0].charAt(j) == '1') {
-                    if (notGateexists.get(j) == false) {
-                        netlist.add(inputINVGates.get(j));
-                        notGateexists.set(j, true);
-                    }
-                    sumterm.add(inputINVWires.get(j));
-                } else if (maxterm[0].charAt(j) == '0') {
-                    sumterm.add(inputWires.get(j));
-                }
-            }
-            List<DGate> sumtermG = new ArrayList<DGate>();
-            DWire sumlast = new DWire();
-            if (sumterm.size() > 0) {
-                if (sumterm.size() == 1) {
-                    List<DWire> notsumterminp = new ArrayList<DWire>();
-                    notsumterminp.addAll(sumterm);
-                    String Wirename = "0Wire" + Global.wirecount++;
-                    DWire notsumtermout = new DWire(Wirename);
-                    DGate notsumtermgate = new DGate(DGateType.NOT, notsumterminp, notsumtermout);
-                    netlist.add(notsumtermgate);
-                    sumlast = notsumtermout;
-                } else {
-                    sumtermG = NORNANDGates(sumterm, DGateType.NOR);
-                    netlist.addAll(sumtermG);
-                    sumlast = sumtermG.get(sumtermG.size() - 1).output;
-                }
-            } else {
-                sumlast = new DWire(zero);
-            }
-            for (int j = 0; j < outputWires.size(); j++) {
-                if (maxterm[1].charAt(j) == '1') {
-                    outputsum.get(j).add(sumlast);
-                }
-            }
-        }
-
-        for (int j = 0; j < outputWires.size(); j++) {
-
-            if (outputsum.get(j).isEmpty()) {
-                List<DWire> inputbuflist = new ArrayList<DWire>();
-                inputbuflist.add(one);
-                DGate bufgate = new DGate(DGateType.BUF, inputbuflist, outputWires.get(j));
-                netlist.add(bufgate);
-            } else if (outputsum.get(j).size() == 1) {
-                if (outputsum.get(j).get(0).wtype == DWireType.GND) {
-                    List<DWire> inputbuflist = new ArrayList<DWire>();
-                    inputbuflist.add(zero);
-                    DGate bufgate = new DGate(DGateType.BUF, inputbuflist, outputWires.get(j));
-                    netlist.add(bufgate);
-                } else {
-                    List<DWire> singleNOTmaxterm = new ArrayList<DWire>();
-                    singleNOTmaxterm.add(outputsum.get(j).get(0));
-                    DGate singlemaxtermgate = new DGate(DGateType.NOT, singleNOTmaxterm, outputWires.get(j));
-                    netlist.add(singlemaxtermgate);
-                }
-            } else {
-                List<DGate> productGates = new ArrayList<DGate>();
-                productGates = NORNANDGates(outputsum.get(j), DGateType.NOR);
-                productGates.get(productGates.size() - 1).output = outputWires.get(j);
-                netlist.addAll(productGates);
-            }
-        }
-
-        return netlist;
-    }
 
     /**
      * Function ************************************************************

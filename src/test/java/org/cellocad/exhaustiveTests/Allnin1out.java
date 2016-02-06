@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.ExhaustiveTests;
+package org.cellocad.exhaustiveTests;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,8 +18,8 @@ import org.cellocad.BU.parseVerilog.Convert;
 import org.cellocad.BU.simulators.BooleanSimulator;
 import org.cellocad.BU.dom.DGate;
 import org.cellocad.BU.netsynth.NetSynth;
-import static org.cellocad.BU.netsynth.NetSynth.getResourcesFilepath;
 import org.cellocad.BU.netsynth.NetSynthSwitch;
+import org.cellocad.BU.netsynth.Utilities;
 import org.cellocad.BU.precomputation.genVerilogFile;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class Allnin1out {
         boolean result = true;
         
         String filepath = "";
-        filepath = getResourcesFilepath();
+        filepath = Utilities.getResourcesFilepath();
         filepath += "testVerilog.v";
         int ttSize = (int)Math.pow(2, size);
         int noOfTT = (int)Math.pow(2, ttSize);

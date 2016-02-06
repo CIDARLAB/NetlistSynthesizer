@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.Test;
+package org.cellocad.test;
 
 import java.util.ArrayList;
 import java.util.List;

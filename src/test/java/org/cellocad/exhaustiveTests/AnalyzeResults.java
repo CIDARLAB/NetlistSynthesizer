@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.ExhaustiveTests;
+package org.cellocad.exhaustiveTests;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cellocad.BU.netsynth.NetSynth;
+import org.cellocad.BU.netsynth.Utilities;
 
 /**
  *
@@ -106,13 +107,13 @@ public class AnalyzeResults {
     
     
     public static void main(String[] args) {
-        String file1 = NetSynth.getResourcesFilepath();
+        String file1 = Utilities.getResourcesFilepath();
         file1 += "/netSynthTestResults/all4input1output.txt";
         
-        String file2 = NetSynth.getResourcesFilepath();
+        String file2 = Utilities.getResourcesFilepath();
         file2 += "/netSynthTestResults/all4input1outputABC.txt";
         
-        String file3 = NetSynth.getResourcesFilepath();
+        String file3 = Utilities.getResourcesFilepath();
         file3 += "/netSynthTestResults/all4input1outputABCnoSwap.txt";
         //format1(file1);
         //format2(file2);

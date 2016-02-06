@@ -4,16 +4,15 @@
  * and open the template in the editor.
  */
 
-package org.cellocad.Test;
+package org.cellocad.test;
 
 import org.cellocad.BU.dom.DGate;
 import static org.cellocad.BU.netsynth.NetSynth.functionOutp;
-import static org.cellocad.BU.netsynth.NetSynth.parseEspressoOutput;
 import static org.cellocad.BU.netsynth.NetSynth.parseEspressoToNORNAND;
 import static org.cellocad.BU.netsynth.NetSynth.printGate;
-import static org.cellocad.BU.netsynth.NetSynth.runEspresso;
 import java.util.ArrayList;
 import java.util.List;
+import org.cellocad.BU.adaptors.EspressoAdaptor;
 
 /**
  *
@@ -25,12 +24,12 @@ public class TestEspresso {
     {
         
         List<String> espressoOut = new ArrayList<String>();
-        espressoOut = runEspresso("");
+        espressoOut = EspressoAdaptor.runEspresso("");
         
         List<DGate> SOPgates = new ArrayList<DGate>();
         List<DGate> NORgates = new ArrayList<DGate>();
         
-        SOPgates = parseEspressoOutput(espressoOut);
+        SOPgates = EspressoAdaptor.parseEspressoOutput(espressoOut);
         
         System.out.println("POS format : ");
         

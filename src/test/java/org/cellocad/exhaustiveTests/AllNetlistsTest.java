@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cellocad.ExhaustiveTests;
+package org.cellocad.exhaustiveTests;
 
 import java.util.List;
 import org.cellocad.BU.parseVerilog.Convert;

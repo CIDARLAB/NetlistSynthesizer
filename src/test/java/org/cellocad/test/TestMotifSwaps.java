@@ -1,4 +1,4 @@
-package org.cellocad.Test;
+package org.cellocad.test;
 
 
 import org.cellocad.BU.dom.DAGW;
