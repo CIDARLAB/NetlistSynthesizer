@@ -7,8 +7,6 @@ package org.cellocad.test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -315,20 +313,6 @@ public class TestSubcircuit {
     {
         List<DGate> netlist = getSampleNetlist1();
         subCircuitEnumerator.getSubcircuits(netlist);
-    }
-    
-    public static void testSubcircuitSwap(){
-        List<DGate> netlist = new ArrayList<DGate>();
-        List<DGate> subcircuit = new ArrayList<DGate>();
-        
-        netlist = getSampleNetlist2();
-        subcircuit = getSampleNetlist3();
-        
-        List<SubcircuitLibrary> library = new ArrayList<SubcircuitLibrary>();
-        library = PreCompute.getCircuitLibrary();
-        
-       // subCircuitSwap.implementSwap(netlist, library);
-        
     }
     
     public static void testgetSubcircuitDetails(){

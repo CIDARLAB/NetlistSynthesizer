@@ -5,11 +5,8 @@
  */
 package org.cellocad.BU.adaptors;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -177,23 +174,8 @@ public class ABCAdaptor {
         List<String> benchlines = new ArrayList<String>();
         String filestring = "";
         filestring += NetSynth.Filepath + "/resources/netsynthResources/abcOutput.bench";
-        File gate_file = new File(filestring);
-        BufferedReader brgate;
-        FileReader filebench;
-        try {
-            filebench = new FileReader(gate_file);
-            brgate = new BufferedReader(filebench);
-            String line;
-            try {
-                while ((line = brgate.readLine()) != null) {
-                    benchlines.add(line);
-                }
-            } catch (IOException ex) {
-                System.out.println("IOException when reading input file");
-            }
-        } catch (FileNotFoundException ex) {
-            System.out.println("FileNotFoundException when reading input file");
-        }
+        benchlines = Utilities.getFileContentAsStringList(filestring);
+        
         List<DGate> netlist = new ArrayList<DGate>();
         List<DWire> inputwires = new ArrayList<DWire>();
         List<DWire> outputwires = new ArrayList<DWire>();
@@ -298,7 +280,10 @@ public class ABCAdaptor {
         }
         List<DGate> netout = new ArrayList<DGate>();
         netout = convertAIGtoNORNOT(netlist);
-        gate_file.deleteOnExit();
+        
+        File benchFile = new File(filestring);
+        benchFile.deleteOnExit();
+        
         return netout;
     }
 

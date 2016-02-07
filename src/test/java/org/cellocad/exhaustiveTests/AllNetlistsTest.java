@@ -20,15 +20,6 @@ import org.junit.Test;
  */
 public class AllNetlistsTest {
     
-    @Test
-    public void testPrecomputedLibrary(){
-        List<SubcircuitLibrary> library = PreCompute.getCircuitLibrary();
-        for(SubcircuitLibrary subcirc:library){
-            System.out.println("Truth Table :: " + Convert.bintoDec(BooleanSimulator.getTruthTable(subcirc.netlist, subcirc.inputs).get(0)));
-            System.out.println(getRepressorCount(subcirc.netlist) + "\n");
-        }
-    }
-    
     private static int getRepressorCount(List<DGate> netlist){
         if(containsOUTPUT_OR(netlist)){
             return (netlist.size()-2);

@@ -8,16 +8,10 @@ import org.cellocad.BU.dom.DGate;
 import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.dom.DWireType;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.cellocad.BU.netsynth.Utilities;
 
 /**
  *
@@ -28,70 +22,31 @@ public class parseVerilogFile {
     public static String verilogFileLines(String Filepath)
     {
        
+        List<String> lines = new ArrayList<String>();
+        lines = Utilities.getFileContentAsStringList(Filepath);
         
-        String path = Filepath;
-        Filepath = parseVerilogFile.class.getClassLoader().getResource(".").getPath();
-         
-        /*if(Filepath.contains("prash"))
-        {
-            if(Filepath.contains("build/classes/"))
-                Filepath = Filepath.substring(0,Filepath.lastIndexOf("build/classes/")); 
-            else if(Filepath.contains("src"))
-                Filepath = Filepath.substring(0,Filepath.lastIndexOf("src/"));
-            Filepath += "src/org/cellocad/BU/ParseVerilog/Verilog.v";
-            path = Filepath;
-        }*/
-        
-        File file = new File(path);
-        BufferedReader br;
-        FileReader fr;
-        boolean addCodelines =false;
-        String alllines="";
-        List<String> filelines = new ArrayList<String>();
-        try
-        {
-            fr = new FileReader(file);
-            br = new BufferedReader(fr);
-            String line;
-            try 
-            {
-                while((line = br.readLine()) != null )
-                {
-                    line = line.trim();
-                    if(!addCodelines)
-                    {
-                        if(line.contains("module ") && (!line.startsWith("//")))
-                        {
-                            if(line.indexOf("module ")>0)
-                            {
-                                if(((line.charAt((line.indexOf("module "))-1)) == ' '))
-                                {
-                                    addCodelines = true;
-                                }     
-                                    
-                            }
-                            else
-                                addCodelines = true;
+        boolean addCodelines = false;
+        String alllines = "";
+
+        for (String line : lines) {
+            line = line.trim();
+            if (!addCodelines) {
+                if (line.contains("module ") && (!line.startsWith("//"))) {
+                    if (line.indexOf("module ") > 0) {
+                        if (((line.charAt((line.indexOf("module ")) - 1)) == ' ')) {
+                            addCodelines = true;
                         }
-                    }
-                    if((!line.isEmpty()) && addCodelines && (!line.startsWith("//")))
-                    {
-                        alllines+= (" " + line); 
-                        
-                        filelines.add(line);
-                        //System.out.println(line.trim());
+
+                    } else {
+                        addCodelines = true;
                     }
                 }
-            } 
-            catch (IOException ex) 
-            {
-                Logger.getLogger(parseVerilogFile.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } 
-        catch (FileNotFoundException ex) 
-        {
-            Logger.getLogger(parseVerilogFile.class.getName()).log(Level.SEVERE, null, ex);
+            if ((!line.isEmpty()) && addCodelines && (!line.startsWith("//"))) {
+                alllines += (" " + line);
+            }
         }
+
         //System.out.println(alllines);
         alllines = alllines.trim();
         return alllines;
@@ -220,8 +175,6 @@ public class parseVerilogFile {
         String moduleString = alllines.substring(alllines.indexOf("module "),alllines.indexOf(";"));
         alllines = alllines.substring((alllines.indexOf(moduleString) + moduleString.length()+1), alllines.indexOf(" endmodule"));
         alllines = alllines.trim();
-        //moduleString = moduleString.trim();
-        //moduleString = moduleString.substring((moduleString.indexOf("(")+1),moduleString.indexOf(")"));
         
         String[] vlines = alllines.split(";");
         for(int i=0;i<vlines.length;i++)
