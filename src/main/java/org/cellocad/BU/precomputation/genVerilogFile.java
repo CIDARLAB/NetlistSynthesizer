@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cellocad.BU.parseVerilog.parseVerilogFile;
-import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.equationSolver.eqNode;
 import org.cellocad.BU.equationSolver.eqSolver;
 import org.cellocad.BU.equationSolver.eqTree;

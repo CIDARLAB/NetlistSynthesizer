@@ -21,18 +21,11 @@ import org.cellocad.BU.precomputation.genVerilogFile;
 import org.cellocad.MIT.dnacompiler.Gate;
 import org.cellocad.MIT.dnacompiler.Gate.GateType;
 import org.cellocad.MIT.dnacompiler.Wire;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -110,9 +103,9 @@ public class NetSynth {
         String filepathNet3in1out_or = Utilities.getResourcesFilepath() + "/netlist_in3out1_OR.json";
         
         List<SubcircuitLibrary> net3in1out = new ArrayList<SubcircuitLibrary>();
-        net3in1out = PreCompute.getCircuitLibrary(filepathNet3in1out);
+        net3in1out = PreCompute.getCircuitLibrary(Utilities.getFileContentAsString(filepathNet3in1out));
         List<SubcircuitLibrary> net3in1outOr = new ArrayList<SubcircuitLibrary>();
-        net3in1outOr = PreCompute.getCircuitLibrary(filepathNet3in1out_or);
+        net3in1outOr = PreCompute.getCircuitLibrary(Utilities.getFileContentAsString(filepathNet3in1out_or));
         
         for(int i=0;i<net3in1out.size();i++)
         {
@@ -136,6 +129,40 @@ public class NetSynth {
         //System.out.println("sublibrary"+sublibrary);
     }
     
+    public static void initializeSubLibrary(JSONArray ucfJSON){
+        sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
+        Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<4;i++){
+            init1.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        sublibrary.put(1, init1);
+        Map<Integer,List<SubcircuitLibrary>> init2 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<16;i++){
+            init2.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        sublibrary.put(2, init2);
+        Map<Integer,List<SubcircuitLibrary>> init3 = new HashMap<Integer,List<SubcircuitLibrary>>();
+        for(int i=0;i<256;i++){
+            init3.put(i, new ArrayList<SubcircuitLibrary>());
+        }
+        sublibrary.put(3, init3);
+        
+        List<SubcircuitLibrary> subcircuits = new ArrayList<SubcircuitLibrary>();
+        subcircuits = PreCompute.getCircuitLibrary(ucfJSON);
+        
+        for(int i=0;i<subcircuits.size();i++)
+        {
+            SubcircuitLibrary subcirc = new SubcircuitLibrary();
+            subcirc = subcircuits.get(i);
+            subcirc.setInputs();
+            subcirc.setTT();
+            if(containsOUTPUT_OR(subcirc.netlist)){
+                subcirc.switches.add(NetSynthSwitch.output_or);           
+            }
+            sublibrary.get(subcirc.getInputCount()).get(subcirc.getTTDecimalVal()).add(subcirc);
+        }
+    }
+    
     public static void initializeSubLibrary(String filepath){
         
         sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
@@ -156,7 +183,7 @@ public class NetSynth {
         sublibrary.put(3, init3);
         
         List<SubcircuitLibrary> subcircuits = new ArrayList<SubcircuitLibrary>();
-        subcircuits = PreCompute.getCircuitLibrary(filepath);
+        subcircuits = PreCompute.getCircuitLibrary(Utilities.getFileContentAsString(filepath));
         
         for(int i=0;i<subcircuits.size();i++)
         {
@@ -182,17 +209,7 @@ public class NetSynth {
     
     //<editor-fold desc="Run NetSynth">
     public static DAGW runNetSynthCode(String codeLines, List<NetSynthSwitch> switches, JSONArray subcircuits){
-        String filepathSubCirc = Utilities.getResourcesFilepath() + "/userSubcircuits.json"; 
-        File file = new File(filepathSubCirc);
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(subcircuits.toString());
-            writer.flush();
-            writer.close();
-            initializeSubLibrary(filepathSubCirc);
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        initializeSubLibrary(subcircuits);
         return runNetSynthCode(codeLines,switches);
     }
     
@@ -238,21 +255,8 @@ public class NetSynth {
     }
     
     public static DAGW runNetSynth(String vfilepath, List<NetSynthSwitch> switches, JSONArray subcircuits){
-        
         DAGW finaldag = new DAGW();
-
-        String filepathSubCirc = Utilities.getResourcesFilepath() + "/userSubcircuits.json"; 
-        File file = new File(filepathSubCirc);
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(subcircuits.toString());
-            writer.flush();
-            writer.close();
-            initializeSubLibrary(filepathSubCirc);
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        initializeSubLibrary(subcircuits);
         return runNetSynth(vfilepath,switches);
     }
     
@@ -312,19 +316,8 @@ public class NetSynth {
     }
     
     public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches, JSONArray subcircuits){
-        String filepathSubCirc = Utilities.getResourcesFilepath() + "/userSubcircuits.json";
-        File file = new File(filepathSubCirc);
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(subcircuits.toString());
-            writer.flush();
-            writer.close();
-            initializeSubLibrary(filepathSubCirc);
-        } catch (IOException ex) {
-            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
-        
+        initializeSubLibrary(subcircuits);
         return getNetlist(vfilepath,switches);
     
     }

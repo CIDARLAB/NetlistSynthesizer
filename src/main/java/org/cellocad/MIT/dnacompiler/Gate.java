@@ -2,12 +2,7 @@ package org.cellocad.MIT.dnacompiler;
 
 import org.cellocad.BU.dom.DWire;
 
-import java.lang.Math;
-import java.util.Arrays;
 import java.util.ArrayList;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.math.*;
 import org.cellocad.MIT.dnacompiler.Wire;
 //import org.python.core.PyFloat;
 //import org.python.core.PyObject;

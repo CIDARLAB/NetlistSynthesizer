@@ -8,8 +8,6 @@ import org.cellocad.BU.dom.DGate;
 import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.dom.DWireType;
-import org.cellocad.BU.netsynth.NetSynth;
-import org.cellocad.BU.netsynth.NetSynthSwitch;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;

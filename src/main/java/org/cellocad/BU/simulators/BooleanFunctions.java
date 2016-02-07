@@ -9,7 +9,6 @@ import org.cellocad.BU.dom.DGate;
 import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.dom.DWire.DWireValue;
-import org.cellocad.BU.netsynth.Global;
 
 /**
  *

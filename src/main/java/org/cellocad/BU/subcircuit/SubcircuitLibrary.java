@@ -6,7 +6,6 @@
 package org.cellocad.BU.subcircuit;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.cellocad.BU.parseVerilog.Convert;
 import org.cellocad.BU.simulators.BooleanSimulator;

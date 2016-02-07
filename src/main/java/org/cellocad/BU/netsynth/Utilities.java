@@ -5,9 +5,15 @@
  */
 package org.cellocad.BU.netsynth;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,7 +22,9 @@ import java.util.logging.Logger;
  * @author prash
  */
 public class Utilities {
-
+    
+    
+    //<editor-fold desc="OS Check">
     public static boolean isSolaris() {
         String os = System.getProperty("os.name");
         return isSolaris(os);
@@ -64,53 +72,9 @@ public class Utilities {
         }
         return false;
     }
-
-    public static String getFilepath() {
-        String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (_filepath.contains("/target/")) {
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
-        } else if (_filepath.contains("/src/")) {
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
-        } else if (_filepath.contains("/build/classes/")) {
-            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
-        }
-        if (Utilities.isWindows()) {
-            try {
-                _filepath = URLDecoder.decode(_filepath, "utf-8");
-                _filepath = new File(_filepath).getPath();
-                if (_filepath.contains("\\target\\")) {
-                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\target\\"));
-                } else if (_filepath.contains("\\src\\")) {
-                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\src\\"));
-                } else if (_filepath.contains("\\build\\classes\\")) {
-                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\build\\classes\\"));
-                }
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            if (_filepath.contains("/target/")) {
-                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
-            } else if (_filepath.contains("/src/")) {
-                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
-            } else if (_filepath.contains("/build/classes/")) {
-                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
-            }
-        }
-        NetSynth.Filepath = _filepath;
-        return _filepath;
-    }
-
-    public static String getResourcesFilepath() {
-        String _filepath = getFilepath();
-        if (Utilities.isWindows()) {
-            _filepath += "\\resources\\netsynthResources\\";
-        } else {
-            _filepath += "/resources/netsynthResources/";
-        }
-        return _filepath;
-    }
-
+    //</editor-fold>  
+    
+    
     /**
      * Function ************************************************************
      * <br>
@@ -155,6 +119,91 @@ public class Utilities {
                 NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("/build/classes/"));
             }
         }
+    }
+    
+    public static String getFilepath() {
+        String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if (_filepath.contains("/target/")) {
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
+        } else if (_filepath.contains("/src/")) {
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
+        } else if (_filepath.contains("/build/classes/")) {
+            _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
+        }
+        if (Utilities.isWindows()) {
+            try {
+                _filepath = URLDecoder.decode(_filepath, "utf-8");
+                _filepath = new File(_filepath).getPath();
+                if (_filepath.contains("\\target\\")) {
+                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\target\\"));
+                } else if (_filepath.contains("\\src\\")) {
+                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\src\\"));
+                } else if (_filepath.contains("\\build\\classes\\")) {
+                    _filepath = _filepath.substring(0, _filepath.lastIndexOf("\\build\\classes\\"));
+                }
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            if (_filepath.contains("/target/")) {
+                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/target/"));
+            } else if (_filepath.contains("/src/")) {
+                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/src/"));
+            } else if (_filepath.contains("/build/classes/")) {
+                _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
+            }
+        }
+        NetSynth.Filepath = _filepath;
+        return _filepath;
+    }
+    
+    public static String getResourcesFilepath() {
+        String _filepath = getFilepath();
+        if (Utilities.isWindows()) {
+            _filepath += "\\resources\\netsynthResources\\";
+        } else {
+            _filepath += "/resources/netsynthResources/";
+        }
+        return _filepath;
+    }
+    
+    public static String getFileContentAsString(String filepath){
+        String filecontent = "";
+        
+        File file = new File(filepath);
+        try { 
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line= "";
+            while((line=reader.readLine()) != null){
+                filecontent += line;
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, "File at " + filepath + " not found.");
+        } catch (IOException ex) {
+            Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return filecontent;
+    }
+    
+    public static List<String> getFileContentAsStringList(String filepath){
+        List<String> filecontent = null;
+        
+        File file = new File(filepath);
+        try { 
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            filecontent = new ArrayList<String>();
+            String line= "";
+            while((line=reader.readLine()) != null){
+                filecontent.add(line);
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, "File at " + filepath + " not found.");
+        } catch (IOException ex) {
+            Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return filecontent;
     }
     
 }

@@ -8,9 +8,7 @@ import org.cellocad.MIT.dnacompiler.Gate;
 import org.cellocad.MIT.dnacompiler.Gate.GateType;
 import org.cellocad.MIT.dnacompiler.Wire;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 /**
