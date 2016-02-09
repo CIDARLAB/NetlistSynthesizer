@@ -19,12 +19,17 @@ import org.cellocad.BU.netsynth.Utilities;
  */
 public class parseVerilogFile {
     
-    public static String verilogFileLines(String Filepath)
-    {
-       
+    public static String verilogFileLinesCode(String verilogCode){
+        String pieces[] = verilogCode.split("[\\r\\n]+");
         List<String> lines = new ArrayList<String>();
-        lines = Utilities.getFileContentAsStringList(Filepath);
+        for(String line:pieces){
+            lines.add(line);
+        }
+        return verilogFileLinesCode(lines);
         
+    }
+    
+    public static String verilogFileLinesCode(List<String> lines){
         boolean addCodelines = false;
         String alllines = "";
 
@@ -50,6 +55,15 @@ public class parseVerilogFile {
         //System.out.println(alllines);
         alllines = alllines.trim();
         return alllines;
+    }
+    
+    public static String verilogFileLines(String Filepath)
+    {
+       
+        List<String> lines = new ArrayList<String>();
+        lines = Utilities.getFileContentAsStringList(Filepath);
+        return verilogFileLinesCode(lines);
+        
     }
     
     public static List<String> getInputNames(String alllines)
@@ -899,8 +913,6 @@ public class parseVerilogFile {
         //    System.out.println(NetSynth.netlist(structnetlist.get(i)));
         return structnetlist;
     }
-    
-    
     
     
     public static boolean hasDontCares(List<String> TruthTableVals)

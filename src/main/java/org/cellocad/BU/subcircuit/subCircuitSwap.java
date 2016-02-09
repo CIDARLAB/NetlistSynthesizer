@@ -72,7 +72,7 @@ public class subCircuitSwap {
             output = NetSynth.assignWireLogic(inputNames, output);
             
         }while(true);
-        System.out.println("Total Swaps :: "+swapCount);
+        //System.out.println("Total Swaps :: "+swapCount);
         return output;
     }
     

@@ -175,7 +175,7 @@ public class Utilities {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line= "";
             while((line=reader.readLine()) != null){
-                filecontent += line;
+                filecontent += (line+"\n");
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, ex);

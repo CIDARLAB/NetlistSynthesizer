@@ -574,5 +574,43 @@ public class genVerilogFile {
         
         return newFilePath;
     }
+    
+    
+    public static String modifyAssignVerilogCode(String alllines)
+    {
+        String newFilePath = "";
+        List<String> inputnames = parseVerilogFile.getInputNames(alllines);
+        List<String> outputnames = parseVerilogFile.getOutputNames(alllines);
+        String moduleSubstring = alllines.substring(alllines.indexOf("module "),alllines.indexOf(";")+1);
+        String modifiedModule = "module newAssignVerilog(";
+        String inputSeq="";
+        String outputSeq="";
+        for(int i=0;i<inputnames.size()-1;i++)
+            inputSeq += (inputnames.get(i) + ",");
+        inputSeq+= inputnames.get(inputnames.size()-1);
+        for(int i=0;i<outputnames.size()-1;i++)
+            outputSeq += (outputnames.get(i) + ",");
+        outputSeq+= outputnames.get(outputnames.size()-1);
+        modifiedModule+= (inputSeq + "," + outputSeq);
+        modifiedModule+= "); input " + inputSeq + "; output " + outputSeq + "; " ;
+        
+        alllines = alllines.replace(moduleSubstring, modifiedModule) + "\n";
 
+        System.out.println(alllines);   
+        
+        newFilePath = Utilities.getResourcesFilepath() + "modifiedForABC.v";
+        File newFile = new File(newFilePath);
+        try {
+            Writer output = new BufferedWriter(new FileWriter(newFile));
+            output.write(alllines);
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(genVerilogFile.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        System.out.println(newFilePath);
+        
+        return newFilePath;
+    }
+    
 }

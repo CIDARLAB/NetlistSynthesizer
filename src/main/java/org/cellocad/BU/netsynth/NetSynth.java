@@ -267,14 +267,7 @@ public class NetSynth {
         List<String> inputnames = new ArrayList<String>();
         List<String> outputnames = new ArrayList<String>();
         List<DGate> netlist = new ArrayList<DGate>();
-
-        boolean isStructural = false;
-        boolean hasCaseStatements = false;
-
         String alllines = parseVerilogFile.verilogFileLines(vfilepath);
-        isStructural = parseVerilogFile.isStructural(alllines);
-        hasCaseStatements = parseVerilogFile.hasCaseStatements(alllines);
-
         inputnames = parseVerilogFile.getInputNames(alllines);
         outputnames = parseVerilogFile.getOutputNames(alllines);
 
@@ -321,8 +314,15 @@ public class NetSynth {
         return getNetlist(vfilepath,switches);
     
     }
-
+    
+    
     public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
+        String verilogCode = Utilities.getFileContentAsString(vfilepath);
+        return getNetlistCode(verilogCode,switches);
+    }
+    
+    
+    public static List<DGate> getNetlistCode(String verilogCode,List<NetSynthSwitch> switches){
         if(sublibrary == null){
             initializeSubLibrary();
         }
@@ -347,7 +347,7 @@ public class NetSynth {
         boolean hasCaseStatements = false;
         boolean hasDontCares = false;
         
-        String alllines = parseVerilogFile.verilogFileLines(vfilepath);
+        String alllines = parseVerilogFile.verilogFileLinesCode(verilogCode);
         isStructural = parseVerilogFile.isStructural(alllines);
         inputnames = parseVerilogFile.getInputNames(alllines);
         outputnames = parseVerilogFile.getOutputNames(alllines);
@@ -463,7 +463,7 @@ public class NetSynth {
             else
             {
                 try {
-                    String modifiedVfilepath = genVerilogFile.modifyAssignVerilog(vfilepath);
+                    String modifiedVfilepath = genVerilogFile.modifyAssignVerilogCode(verilogCode);
                     List<DGate> abcNetlist = ABCAdaptor.runABCverilog_fullFilePath(modifiedVfilepath);
 
                     List<String> ttValues = new ArrayList<String>();
@@ -508,7 +508,10 @@ public class NetSynth {
         
         return netlist;
     }
+    
+    
     //</editor-fold>
+    
     
     /**
      * Function ************************************************************
