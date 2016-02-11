@@ -5,6 +5,9 @@
  */
 package org.cellocad.BU.netsynth;
 
+import com.fasterxml.uuid.EthernetAddress;
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.TimeBasedGenerator;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,6 +78,26 @@ public class Utilities {
     }
     //</editor-fold>  
     
+    public static String getUUID(){
+        TimeBasedGenerator gen = Generators.timeBasedGenerator(EthernetAddress.fromInterface());
+        UUID uuid = gen.generate();
+        return uuid.toString();
+    }
+    
+    public static boolean makeDirectory(String filepath){
+        File file = new File(filepath);
+        return file.mkdir();
+    }
+    
+    public static boolean validFilepath(String filepath){
+        File file = new File(filepath);
+        return file.exists();
+    }
+    
+    public static boolean isDirectory(String filepath){
+        File file = new File(filepath);
+        return file.isDirectory();
+    }
     
     /**
      * Function ************************************************************
@@ -120,6 +144,8 @@ public class Utilities {
             }
         }
     }
+    
+    
     
     public static String getFilepath() {
         String _filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
