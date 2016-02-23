@@ -111,36 +111,36 @@ public class Utilities {
      * SeeAlso []
      * *********************************************************************
      */
-    public static void initializeFilepath() {
-        NetSynth.Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (NetSynth.Filepath.contains("/target/")) {
-            NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("/target/"));
-        } else if (NetSynth.Filepath.contains("/src/")) {
-            NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("/src/"));
-        } else if (NetSynth.Filepath.contains("/build/classes/")) {
-            NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("/build/classes/"));
+    public static void initializeFilepath(NetSynth netsynth) {
+        netsynth.Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+        if (netsynth.Filepath.contains("/target/")) {
+            netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/target/"));
+        } else if (netsynth.Filepath.contains("/src/")) {
+            netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/src/"));
+        } else if (netsynth.Filepath.contains("/build/classes/")) {
+            netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/build/classes/"));
         }
         if (Utilities.isWindows()) {
             try {
-                NetSynth.Filepath = URLDecoder.decode(NetSynth.Filepath, "utf-8");
-                NetSynth.Filepath = new File(NetSynth.Filepath).getPath();
-                if (NetSynth.Filepath.contains("\\target\\")) {
-                    NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("\\target\\"));
-                } else if (NetSynth.Filepath.contains("\\src\\")) {
-                    NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("\\src\\"));
-                } else if (NetSynth.Filepath.contains("\\build\\classes\\")) {
-                    NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("\\build\\classes\\"));
+                netsynth.Filepath = URLDecoder.decode(netsynth.Filepath, "utf-8");
+                netsynth.Filepath = new File(netsynth.Filepath).getPath();
+                if (netsynth.Filepath.contains("\\target\\")) {
+                    netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("\\target\\"));
+                } else if (netsynth.Filepath.contains("\\src\\")) {
+                    netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("\\src\\"));
+                } else if (netsynth.Filepath.contains("\\build\\classes\\")) {
+                    netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("\\build\\classes\\"));
                 }
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            if (NetSynth.Filepath.contains("/target/")) {
-                NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("/target/"));
-            } else if (NetSynth.Filepath.contains("/src/")) {
-                NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("/src/"));
-            } else if (NetSynth.Filepath.contains("/build/classes/")) {
-                NetSynth.Filepath = NetSynth.Filepath.substring(0, NetSynth.Filepath.lastIndexOf("/build/classes/"));
+            if (netsynth.Filepath.contains("/target/")) {
+                netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/target/"));
+            } else if (netsynth.Filepath.contains("/src/")) {
+                netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/src/"));
+            } else if (netsynth.Filepath.contains("/build/classes/")) {
+                netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/build/classes/"));
             }
         }
     }
@@ -179,7 +179,7 @@ public class Utilities {
                 _filepath = _filepath.substring(0, _filepath.lastIndexOf("/build/classes/"));
             }
         }
-        NetSynth.Filepath = _filepath;
+       
         return _filepath;
     }
     

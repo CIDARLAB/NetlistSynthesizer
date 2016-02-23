@@ -62,7 +62,8 @@ public class Allnin1out {
                 List<DGate> netlist = new ArrayList<DGate>();
                 
                 long startTime = System.nanoTime();
-                netlist = NetSynth.getNetlist(filepath, switches);
+                NetSynth netSynth = new NetSynth();
+                netlist = netSynth.getNetlist(filepath, switches);
                 long endTime = System.nanoTime();
                 
                 long duration = (endTime - startTime)/1000000;

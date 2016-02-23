@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import lombok.Getter;
+import lombok.Setter;
 import org.cellocad.BU.adaptors.ABCAdaptor;
 import org.cellocad.BU.adaptors.EspressoAdaptor;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
@@ -45,16 +47,20 @@ import org.json.JSONArray;
  */
 public class NetSynth {
 
-    public static DWire one;
-    public static boolean POSmode;
-    public static DWire zero;
+    @Getter
+    @Setter        
+    public boolean POSmode;
+    
     public static boolean functionOutp;
-    public static String Filepath;
+    //public int wirecount;
+    public int espout;
+    public int espinp;
+    public String Filepath;
     
     /**
      *
      */
-    public static Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary;
+    public Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary;
     //sublibrary.get(i) gives a Map of all Subcircuits with i inputs
     //sublibrary.get(i).get(4) Gives a List of all subcircuits with i inputs, and truthtable == 4. 
     
@@ -62,26 +68,25 @@ public class NetSynth {
     //This would be something like. Rows = # of Inputs. Columns = # of Outputs
     //So library.get(i).get(o) would give the library of all subnetlists with i+1 inputs and o+1 outputs
     //Integer = Decimal value of the truthtable. 
-    public static CircuitDetails caseCirc;
+    
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
 
-        Global.wirecount = 0;
-        Global.espinp = 0;
-        Global.espout = 0;
+    }
+    
+    public void initializeNetSynth(NetSynth netsynth){
+        
+        espout = 0;
         POSmode = false;
         functionOutp = false;
-        one = new DWire("_one", DWireType.Source);
-        zero = new DWire("_zero", DWireType.GND);
-        Filepath = Utilities.getFilepath();
-
+        netsynth.Filepath = Utilities.getFilepath();
     }
     
     //<editor-fold desc="Initialize Subcircuit Library">
-    public static void initializeSubLibrary(){
+    public void initializeSubLibrary(){
         sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
         Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
         for(int i=0;i<4;i++){
@@ -129,7 +134,7 @@ public class NetSynth {
         //System.out.println("sublibrary"+sublibrary);
     }
     
-    public static void initializeSubLibrary(JSONArray ucfJSON){
+    public void initializeSubLibrary(JSONArray ucfJSON){
         sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
         Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
         for(int i=0;i<4;i++){
@@ -163,7 +168,7 @@ public class NetSynth {
         }
     }
     
-    public static void initializeSubLibrary(String filepath){
+    public void initializeSubLibrary(String filepath){
         
         sublibrary = new HashMap<Integer,Map<Integer,List<SubcircuitLibrary>>>();
         Map<Integer,List<SubcircuitLibrary>> init1 = new HashMap<Integer,List<SubcircuitLibrary>>();
@@ -207,13 +212,13 @@ public class NetSynth {
         return false;
     }
     
-    //<editor-fold desc="Run NetSynth">
-    public static DAGW runNetSynthCode(String codeLines, List<NetSynthSwitch> switches, JSONArray subcircuits){
+    //<editor-fold desc="Run NetSynth" defaultstate="collapsed">
+    public DAGW runNetSynthCode(String codeLines, List<NetSynthSwitch> switches, JSONArray subcircuits){
         initializeSubLibrary(subcircuits);
         return runNetSynthCode(codeLines,switches);
     }
     
-    public static DAGW runNetSynthCode(String codeLines, List<NetSynthSwitch> switches) {
+    public DAGW runNetSynthCode(String codeLines, List<NetSynthSwitch> switches) {
 
         DAGW finaldag = new DAGW();
         
@@ -250,17 +255,17 @@ public class NetSynth {
      * @return
      * *********************************************************************
      */
-    public static DAGW runNetSynth(String vfilepath) {
+    public DAGW runNetSynth(String vfilepath) {
         return runNetSynth(vfilepath, new ArrayList<NetSynthSwitch>());
     }
     
-    public static DAGW runNetSynth(String vfilepath, List<NetSynthSwitch> switches, JSONArray subcircuits){
+    public DAGW runNetSynth(String vfilepath, List<NetSynthSwitch> switches, JSONArray subcircuits){
         DAGW finaldag = new DAGW();
         initializeSubLibrary(subcircuits);
         return runNetSynth(vfilepath,switches);
     }
     
-    public static DAGW runNetSynth(String vfilepath, List<NetSynthSwitch> switches) {
+    public DAGW runNetSynth(String vfilepath, List<NetSynthSwitch> switches) {
 
         DAGW finaldag = new DAGW();
 
@@ -272,7 +277,7 @@ public class NetSynth {
         outputnames = parseVerilogFile.getOutputNames(alllines);
 
         netlist = getNetlist(vfilepath, switches);
-        netlist = rewireNetlist(netlist);
+        rewireNetlist(netlist);
         
         finaldag = CreateMultDAGW(netlist);
         //System.out.println(inputnames);
@@ -285,7 +290,7 @@ public class NetSynth {
     
     //</editor-fold>
     
-    //<editor-fold desc="Get Netlist">
+    //<editor-fold desc="Get Netlist" defaultstate="collapsed" >
     /**
      * Function ************************************************************
      * <br>
@@ -303,12 +308,12 @@ public class NetSynth {
      * @return
      * *********************************************************************
      */
-    public static List<DGate> getNetlist(String vfilepath) {
+    public List<DGate> getNetlist(String vfilepath) {
         
         return getNetlist(vfilepath, new ArrayList<NetSynthSwitch>());
     }
     
-    public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches, JSONArray subcircuits){
+    public List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches, JSONArray subcircuits){
         
         initializeSubLibrary(subcircuits);
         return getNetlist(vfilepath,switches);
@@ -316,13 +321,13 @@ public class NetSynth {
     }
     
     
-    public static List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
+    public List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
         String verilogCode = Utilities.getFileContentAsString(vfilepath);
         return getNetlistCode(verilogCode,switches);
     }
     
     
-    public static List<DGate> getNetlistCode(String verilogCode,List<NetSynthSwitch> switches){
+    public List<DGate> getNetlistCode(String verilogCode,List<NetSynthSwitch> switches){
         if(sublibrary == null){
             initializeSubLibrary();
         }
@@ -353,7 +358,7 @@ public class NetSynth {
         outputnames = parseVerilogFile.getOutputNames(alllines);
         if(isStructural){
             naiveNetlist = parseVerilogFile.parseStructural(alllines); //Convert Verilog File to List of DGates 
-            naiveNetlist = rewireNetlist(naiveNetlist);
+            rewireNetlist(naiveNetlist);
             if (switches.contains(NetSynthSwitch.originalstructural)) {
                 return naiveNetlist;
             } 
@@ -513,40 +518,9 @@ public class NetSynth {
     //</editor-fold>
     
     
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param netlist
-     * @return
-     * *********************************************************************
-     */
-    public static double getRepressorsCost(List<DGate> netlist) {
-        double count = 0;
-        for (DGate xgate : netlist) {
-            if (xgate.gtype.equals(DGateType.NOR)) {
-                count += 1.5;
-            }
-            if (xgate.gtype.equals(DGateType.NOT)) {
-                count += 1;
-            }
-            if (xgate.gtype.equals(DGateType.AND)) {
-                count += 2;
-            }
+    
 
-        }
-
-        return count;
-    }
-
-    //<editor-fold desc="Run ABC & Espresso">
+    //<editor-fold desc="Run ABC & Espresso" defaultstate="collapsed">
     public static List<DGate> runDCEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
         List<DGate> EspCircuit = new ArrayList<DGate>();
         List<DGate> ABCCircuit = new ArrayList<DGate>();
@@ -605,8 +579,8 @@ public class NetSynth {
         }
     }
     
-    public static List<DGate> runInvertedDCEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
-
+    public List<DGate> runInvertedDCEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
+        int wirecount =0;
         List<DGate> EspCircuit = new ArrayList<DGate>();
         List<DGate> ABCCircuit = new ArrayList<DGate>();
         List<String> espressoFile = new ArrayList<String>();
@@ -651,7 +625,7 @@ public class NetSynth {
             if (EspCircuit.get(i).output.wtype.equals(DWireType.output)) {
                 String outname = "";
                 outname = EspCircuit.get(i).output.name.trim();
-                String notinpwirename = "0Wire" + Global.wirecount++;
+                String notinpwirename = "0Wire" + wirecount++;
                 DWire notinp = new DWire(notinpwirename, DWireType.connector);
                 EspCircuit.get(i).output = notinp;
                 finalEspCircuit.add(EspCircuit.get(i));
@@ -668,7 +642,7 @@ public class NetSynth {
             if (ABCCircuit.get(i).output.wtype.equals(DWireType.output)) {
                 String outname = "";
                 outname = ABCCircuit.get(i).output.name.trim();
-                String notinpwirename = "0Wire" + Global.wirecount++;
+                String notinpwirename = "0Wire" + wirecount++;
                 DWire notinp = new DWire(notinpwirename, DWireType.connector);
                 ABCCircuit.get(i).output = notinp;
                 finalABCCircuit.add(ABCCircuit.get(i));
@@ -681,7 +655,9 @@ public class NetSynth {
                 finalABCCircuit.add(ABCCircuit.get(i));
             }
         }
-
+        renameWires(finalEspCircuit);
+        renameWires(finalABCCircuit);
+        
         finalEspCircuit = optimize(finalEspCircuit);
 
         finalABCCircuit = separateOutputGates(finalABCCircuit);
@@ -723,7 +699,7 @@ public class NetSynth {
      * @return
      * *********************************************************************
      */
-    public static List<DGate> runEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
+    public List<DGate> runEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
 
         
         List<DGate> EspCircuit = new ArrayList<DGate>();
@@ -807,7 +783,7 @@ public class NetSynth {
         }
     }
     
-    public static List<DGate> runInvertedEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
+    public List<DGate> runInvertedEspressoAndABC(CircuitDetails circ, List<NetSynthSwitch> synthmode) {
 
         List<DGate> EspCircuit = new ArrayList<DGate>();
         List<DGate> ABCCircuit = new ArrayList<DGate>();
@@ -914,8 +890,8 @@ public class NetSynth {
             }
         }*/
         
-        finalEspCircuit = rewireNetlist(finalEspCircuit);
-        finalABCCircuit = rewireNetlist(finalABCCircuit);
+        rewireNetlist(finalEspCircuit);
+        rewireNetlist(finalABCCircuit);
         
         finalEspCircuit = optimize(finalEspCircuit);
         finalABCCircuit = separateOutputGates(finalABCCircuit);
@@ -936,11 +912,187 @@ public class NetSynth {
     }
     //</editor-fold>
     
-    public static List<DGate> invertCircuit(List<DGate> netlist){
+    
+    public static boolean isOutputWire(DWire wire){
+        return wire.wtype.equals(DWireType.output);
+    }
+    
+    public static boolean isConnector(DWire wire){
+        return wire.wtype.equals(DWireType.connector);
+    }
+    
+    public static boolean isInputWire(DWire wire){
+        return wire.wtype.equals(DWireType.input);
+    }
+    
+    //<editor-fold desc="Netlist operations" defaultstate="collapsed"> 
+    
+    
+    public static void renameWires(List<DGate> netlist){
+        renameWires(netlist,"0Wire",0);
+    }
+    
+    public static void renameWires(List<DGate> netlist, String wireprefix){
+        renameWires(netlist,wireprefix,0);
+    }
+    
+    public static void renameWires(List<DGate> netlist, int startIndex){
+        renameWires(netlist,"0Wire",startIndex);
+    }
+    
+    public static void renameWires(List<DGate> netlist, String wireprefix, int startIndex){
+        String tempPrefix = "1Wire";
+        Map<String,String> tempRename = new HashMap<String,String>();
+        Map<String,String> finalRename = new HashMap<String,String>();
+        
+        for(DGate gate:netlist){
+            if(isConnector(gate.output)){
+                if(!tempRename.containsKey(gate.output.name)){
+                    String tempName = tempPrefix + startIndex;
+                    String finalName = wireprefix + startIndex;
+                    startIndex++;
+                    tempRename.put(gate.output.name, tempName);
+                    finalRename.put(tempName, finalName);
+                }
+            }
+        }
+        renameWires(netlist,tempRename);
+        renameWires(netlist,finalRename);
+        
+    }
+    
+    public static void renameWires(List<DGate> netlist, Map<String,String> renameMap){
+        for(DGate gate:netlist){
+            if(renameMap.containsKey(gate.output.name)){
+                gate.output.name = renameMap.get(gate.output.name);
+            }
+            for(DWire input:gate.input){
+                if(renameMap.containsKey(input.name)){
+                    input.name = renameMap.get(input.name);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Function ************************************************************
+     * <br>
+     * Synopsis []
+     * <br>
+     * Description []
+     * <br>
+     * SideEffects []
+     * <br>
+     * SeeAlso []
+     *
+     * @param netlist
+     * @return
+     * *********************************************************************
+     */
+    public static void rewireNetlist(List<DGate> netlist) {
+        for (int i = 0; i < netlist.size(); i++) {
+            for (int j = 0; j <= i; j++) {
+                if (i != j) {
+                    for (int m = 0; m < netlist.get(i).input.size(); m++) {
+                        if (netlist.get(i).input.get(m).name.equals(netlist.get(j).output.name)) {
+                            netlist.get(i).input.set(m, netlist.get(j).output);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    
+    
+    /**
+     * Function ************************************************************
+     * <br>
+     * Synopsis []
+     * <br>
+     * Description []
+     * <br>
+     * SideEffects []
+     * <br>
+     * SeeAlso []
+     *
+     * @param inpNetlist
+     * @return
+     * *********************************************************************
+     */
+    public static List<DGate> removeDuplicateNots(List<DGate> inpNetlist) {
+        List<DGate> outpNetlist = new ArrayList<DGate>();
+        List<Integer> removelist = new ArrayList<Integer>();
+        for (int i = 0; i < inpNetlist.size(); i++) {
+            if (inpNetlist.get(i).gtype.equals(DGateType.NOT) && (!inpNetlist.get(i).output.wtype.equals(DWireType.output))) {
+                String inpname = inpNetlist.get(i).input.get(0).name.trim();
+                String setoutname = inpNetlist.get(i).output.name.trim();
+                for (int j = i + 1; j < inpNetlist.size(); j++) {
+                    if (inpNetlist.get(j).gtype.equals(DGateType.NOT) && (!inpNetlist.get(j).output.wtype.equals(DWireType.output)) && inpNetlist.get(j).input.get(0).name.trim().equals(inpname)) {
+                        removelist.add(j);
+                        String outpname = inpNetlist.get(j).output.name.trim();
+                        for (int k = j + 1; k < inpNetlist.size(); k++) {
+                            for (int m = 0; m < inpNetlist.get(k).input.size(); m++) {
+                                if (inpNetlist.get(k).input.get(m).name.trim().equals(outpname)) {
+                                    inpNetlist.get(k).input.get(m).name = setoutname;
+                                }
+                            }
+                        }
+                        inpNetlist.get(j).output.name = setoutname;
+                    }
+                }
+            }
+        }
+        //System.out.println(removelist.size());
+        for (int i = 0; i < inpNetlist.size(); i++) {
+            if (!removelist.contains(i)) {
+                outpNetlist.add(inpNetlist.get(i));
+            }
+        }
+
+        return outpNetlist;
+    }
+
+    
+    /**
+     * Function ************************************************************
+     * <br>
+     * Synopsis []
+     * <br>
+     * Description []
+     * <br>
+     * SideEffects []
+     * <br>
+     * SeeAlso []
+     *
+     * @param netlist
+     * @return
+     * *********************************************************************
+     */
+    public static double getRepressorsCost(List<DGate> netlist) {
+        double count = 0;
+        for (DGate xgate : netlist) {
+            if (xgate.gtype.equals(DGateType.NOR)) {
+                count += 1.5;
+            }
+            if (xgate.gtype.equals(DGateType.NOT)) {
+                count += 1;
+            }
+            if (xgate.gtype.equals(DGateType.AND)) {
+                count += 2;
+            }
+
+        }
+
+        return count;
+    }
+    
+    public List<DGate> invertCircuit(List<DGate> netlist){
+        int wirecount =0;
         for(int i=0;i<netlist.size();i++){
             if(netlist.get(i).output.wtype.equals(DWireType.output)){
                 
-                String notInpWireName = "0Wire" + Global.wirecount++;
+                String notInpWireName = "0Wire" + wirecount++;
                 String outputName = netlist.get(i).output.name;
                 DWire notInpWire = new DWire(notInpWireName,DWireType.connector);
                 DGate notGate = new DGate();
@@ -963,6 +1115,7 @@ public class NetSynth {
                 
             }
         }
+        renameWires(netlist);
         return netlist;
     }
     
@@ -982,6 +1135,7 @@ public class NetSynth {
      * *********************************************************************
      */
     public static List<DGate> separateOutputGates(List<DGate> netlist) {
+        int wirecount = 0;
         List<DGate> finalnetlist = new ArrayList<DGate>();
         HashMap<Integer, DGate> addgate = new HashMap<Integer, DGate>();
         int outToOutflag = 0;
@@ -1005,7 +1159,7 @@ public class NetSynth {
                         DGate newg = new DGate();
                         newg.gtype = netlist.get(i).gtype;
                         newg.input.addAll(netlist.get(i).input);
-                        String Wname = "0Wire" + Global.wirecount++;
+                        String Wname = "0Wire" + wirecount++;
                         DWire outW = new DWire(Wname, DWireType.connector);
                         newg.output = outW;
                         addgate.put(i, newg);
@@ -1049,7 +1203,7 @@ public class NetSynth {
                     DGate newg = new DGate();
                     newg.gtype = netlist.get(i).gtype;
                     newg.input.addAll(netlist.get(i).input);
-                    String Wname = "0Wire" + Global.wirecount++;
+                    String Wname = "0Wire" + wirecount++;
                     DWire outW = new DWire(Wname, DWireType.connector);
                     newg.output = outW;
                     addgate.put(i, newg);
@@ -1130,7 +1284,7 @@ public class NetSynth {
      * @param filename
      * *********************************************************************
      */
-    public static void create_VerilogFile(int inputs, String hex, String filename) {
+    public void create_VerilogFile(int inputs, String hex, String filename) {
         List<String> filelines = new ArrayList<String>();
         filelines = genVerilogFile.createSingleOutpVerilogFile(inputs, hex);
         String filestring = "";
@@ -1252,36 +1406,7 @@ public class NetSynth {
     
 
 
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param netlist
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> rewireNetlist(List<DGate> netlist) {
-        for (int i = 0; i < netlist.size(); i++) {
-            for (int j = 0; j <= i; j++) {
-                if (i != j) {
-                    for (int m = 0; m < netlist.get(i).input.size(); m++) {
-                        if (netlist.get(i).input.get(m).name.equals(netlist.get(j).output.name)) {
-                            netlist.get(i).input.set(m, netlist.get(j).output);
-                        }
-                    }
-                }
-            }
-        }
-        return netlist;
-    }
-
+    
     /**
      * *************************************************************
      * Function
@@ -1439,6 +1564,7 @@ public class NetSynth {
      * *********************************************************************
      */
     public static List<DGate> convertORbeforeAND(List<DGate> netlistinp) {
+        int wirecount =0;
         for (int i = 0; i < netlistinp.size(); i++) {
             if (netlistinp.get(i).gtype.equals(DGateType.NOR)) {
                 for (int j = i + 1; j < netlistinp.size(); j++) {
@@ -1459,7 +1585,7 @@ public class NetSynth {
                                     DGate orgate = new DGate();
                                     orgate.input.addAll(netlistinp.get(i).input);
                                     orgate.gtype = DGateType.OR;
-                                    DWire orOutWire = new DWire("0Wire" + Global.wirecount++, netlistinp.get(j).output.wtype);
+                                    DWire orOutWire = new DWire("0Wire" + wirecount++, netlistinp.get(j).output.wtype);
                                     orgate.output = orOutWire;
                                     netlistinp.get(k).input.add(orOutWire);
                                     netlistinp.add(k, orgate);
@@ -1470,7 +1596,7 @@ public class NetSynth {
                 }
             }
         }
-
+        renameWires(netlistinp);
         netlistinp = removeDanglingGates(netlistinp);
         return netlistinp;
     }
@@ -1547,7 +1673,7 @@ public class NetSynth {
      */
     public static List<DGate> convertFindORbeforeAND(List<DGate> netlistinp) {
         int countAND = 0;
-
+        int wirecount =0;
         for (int i = 0; i < netlistinp.size(); i++) {
             if (netlistinp.get(i).gtype.equals(DGateType.NOR) || netlistinp.get(i).gtype.equals(DGateType.NOT)) {
                 for (int j = i + 1; j < netlistinp.size(); j++) {
@@ -1568,8 +1694,8 @@ public class NetSynth {
                                     or1.input.addAll(netlistinp.get(i).input);
                                     or2.input.addAll(netlistinp.get(j).input);
 
-                                    DWire orOut1 = new DWire("0Wire" + Global.wirecount++, DWireType.connector);
-                                    DWire orOut2 = new DWire("0Wire" + Global.wirecount++, DWireType.connector);
+                                    DWire orOut1 = new DWire("0Wire" + wirecount++, DWireType.connector);
+                                    DWire orOut2 = new DWire("0Wire" + wirecount++, DWireType.connector);
 
                                     or1.output = orOut1;
                                     or2.output = orOut2;
@@ -1618,8 +1744,9 @@ public class NetSynth {
             }
         }
         //}
-
+        
         netlistinp = removeDanglingGates(netlistinp);
+        renameWires(netlistinp);
         return netlistinp;
     }
 
@@ -1640,6 +1767,7 @@ public class NetSynth {
      * *********************************************************************
      */
     public static List<DGate> convert2NOTsToNOR(List<DGate> netlistinp) {
+        int wirecount =0;
         List<Integer> removegates = new ArrayList<Integer>();
         List<Integer> addgates = new ArrayList<Integer>();
 
@@ -1776,7 +1904,7 @@ public class NetSynth {
                                 addnor.input.add(w1);
                                 addnor.input.add(w2);
 
-                                String noroutWname = "0Wire" + Global.wirecount++;
+                                String noroutWname = "0Wire" + wirecount++;
                                 noroutW = new DWire(noroutWname, DWireType.connector);
                                 addnor.output = noroutW;
                                 if (gate2flag == 1) {
@@ -1881,7 +2009,7 @@ public class NetSynth {
                 finalnetout.add(finalnetlist.get(i));
             }
         }
-
+        renameWires(finalnetout);
         return finalnetout;
     }
 
@@ -1896,10 +2024,92 @@ public class NetSynth {
      * <br>
      * SeeAlso []
      *
-     * @param netlistinp
+     * @param netlist
      * @return
      * *********************************************************************
      */
+    public static List<DGate> removeDoubleInverters(List<DGate> netlist){
+        renameWires(netlist);
+        int wirecount =0;
+        String wirename = "0removeDoubleInvertersWire";
+        
+        boolean algorithmIncomplete = false;
+        do {
+            for (int i = 0; i < netlist.size() - 1; i++) {
+                if (netlist.get(i).gtype.equals(DGateType.NOT)) { //First Gate is of type NOT
+                    for (int j = i + 1; j < netlist.size(); j++) {
+                        if (netlist.get(j).gtype.equals(DGateType.NOT)) { //Second Gate is of type NOT
+                            if (netlist.get(j).input.get(0).name.equals(netlist.get(i).output.name)) { //output of first not is the input of the 2nd not
+                                if (isOutputWire(netlist.get(j).output)) { // Second NOT's output is an OUPUT WIRE
+                                    DWire newOutput = new DWire(netlist.get(j).output.name, DWireType.output);
+                                    DGate newBuffGate = new DGate();
+                                    newBuffGate.output = newOutput;
+
+                                    if (isInputWire(netlist.get(i).input.get(0))) {//First NOT's input is an INPUT WIRE.
+                                        newBuffGate.gtype = DGateType.BUF;
+                                        newBuffGate.input.addAll(netlist.get(i).input);
+                                    } else { //First NOT's input is either an output or a connector
+                                        for (int k = 0; k < i; k++) {
+                                            if (netlist.get(k).output.name.equals(netlist.get(i).input.get(0).name)) {
+                                                newBuffGate.gtype = netlist.get(k).gtype;
+                                                newBuffGate.input.addAll(netlist.get(k).input);
+                                            }
+                                        }
+                                    }
+
+                                    for (int k = j + 1; k < netlist.size(); k++) {
+                                        for (DWire wire : netlist.get(k).input) {
+                                            if (wire.name.equals(netlist.get(j).output.name)) {
+                                                wire.name = newOutput.name;
+                                                wire.wtype = newOutput.wtype;
+                                            }
+                                        }
+                                    }
+                                    DWire newConnector = new DWire((wirename + wirecount++),DWireType.connector);
+                                    netlist.get(j).output = newConnector;
+                                    netlist.add(j, newBuffGate);
+                                    
+                                } else { //2nd NOT's output is a connector
+                                    for (int k = j + 1; k < netlist.size(); k++) {
+                                        for (DWire wire : netlist.get(k).input) {
+                                            if (wire.name.equals(netlist.get(j).output.name)) {
+                                                DWire newWire = new DWire(netlist.get(i).input.get(0).name, netlist.get(i).input.get(0).wtype);
+                                                wire = newWire;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            netlist = removeDanglingGates(netlist);
+            renameWires(netlist);
+            algorithmIncomplete = false;
+            for (int i = 0; i < netlist.size() - 1; i++) {
+                if (netlist.get(i).gtype.equals(DGateType.NOT)) { //First Gate is of type NOT
+                    for (int j = i + 1; j < netlist.size(); j++) {
+                        if (netlist.get(j).gtype.equals(DGateType.NOT)) { //Second Gate is of type NOT
+                            if (netlist.get(j).input.get(0).name.equals(netlist.get(i).output.name)) {
+                                algorithmIncomplete = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (algorithmIncomplete) {
+                        break;
+                    }
+                }
+            }
+        } while (algorithmIncomplete);
+
+        
+        return netlist;
+    }
+    
+    
+    /*
     public static List<DGate> removeDoubleInverters(List<DGate> netlistinp) {
         //Remove Redundant NOT Gates
 
@@ -2100,7 +2310,7 @@ public class NetSynth {
 
         return finalnetlist;
     }
-
+    */
     /**
      * Function ************************************************************
      * <br>
@@ -2275,7 +2485,9 @@ public class NetSynth {
 
         return reducednetlist;
     }
-
+    
+    //</editor-fold>
+    
     public static void printDebugStatement(String message) {
         System.out.println("=======================");
         System.out.println("======= " + message);
@@ -2298,6 +2510,7 @@ public class NetSynth {
             for (DGate structgate : NetlistConversionFunctions.GatetoNORNOT(reducedfanin.get(i))) {
                 output.add(structgate);
             }
+            renameWires(output);
         }
 
         output = optimize(output);
@@ -2305,54 +2518,7 @@ public class NetSynth {
         return output;
     }
     
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param inpNetlist
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> removeDuplicateNots(List<DGate> inpNetlist) {
-        List<DGate> outpNetlist = new ArrayList<DGate>();
-        List<Integer> removelist = new ArrayList<Integer>();
-        for (int i = 0; i < inpNetlist.size(); i++) {
-            if (inpNetlist.get(i).gtype.equals(DGateType.NOT) && (!inpNetlist.get(i).output.wtype.equals(DWireType.output))) {
-                String inpname = inpNetlist.get(i).input.get(0).name.trim();
-                String setoutname = inpNetlist.get(i).output.name.trim();
-                for (int j = i + 1; j < inpNetlist.size(); j++) {
-                    if (inpNetlist.get(j).gtype.equals(DGateType.NOT) && (!inpNetlist.get(j).output.wtype.equals(DWireType.output)) && inpNetlist.get(j).input.get(0).name.trim().equals(inpname)) {
-                        removelist.add(j);
-                        String outpname = inpNetlist.get(j).output.name.trim();
-                        for (int k = j + 1; k < inpNetlist.size(); k++) {
-                            for (int m = 0; m < inpNetlist.get(k).input.size(); m++) {
-                                if (inpNetlist.get(k).input.get(m).name.trim().equals(outpname)) {
-                                    inpNetlist.get(k).input.get(m).name = setoutname;
-                                }
-                            }
-                        }
-                        inpNetlist.get(j).output.name = setoutname;
-                    }
-                }
-            }
-        }
-        //System.out.println(removelist.size());
-        for (int i = 0; i < inpNetlist.size(); i++) {
-            if (!removelist.contains(i)) {
-                outpNetlist.add(inpNetlist.get(i));
-            }
-        }
-
-        return outpNetlist;
-    }
-
+    
     /**
      * Function ************************************************************
      * <br>
@@ -2422,7 +2588,7 @@ public class NetSynth {
 
         outpNetlist = removeDanglingGates(outpNetlist);
 
-        outpNetlist = rewireNetlist(outpNetlist);
+        rewireNetlist(outpNetlist);
 
         return outpNetlist;
     }
@@ -2433,20 +2599,20 @@ public class NetSynth {
         List<DGate> output = new ArrayList<DGate>();
         
         output = removeDanglingGates(netlist);
-        output = rewireNetlist(output);
+        rewireNetlist(output);
         
         output = separateOutputGates(output);
-        output = rewireNetlist(output);
+        rewireNetlist(output);
         
         //What is going on here???? Need to check this.
         output = removeDuplicateNots(output);
         output = removeDoubleInverters(output);
         output = removeDuplicateNots(output);
-        output = rewireNetlist(output);
+         rewireNetlist(output);
         
         
         output = removeDanglingGates(output);
-        output = rewireNetlist(output);
+        rewireNetlist(output);
         
         
         List<String> inputNames = new ArrayList<String>();
@@ -2462,11 +2628,11 @@ public class NetSynth {
         
         output = NetSynth.assignWireLogic(inputNames, output);
         output = removeDuplicateLogicGate(output);
-        output = rewireNetlist(output);
+        rewireNetlist(output);
         
         
         output = removeDanglingGates(output);
-        output = rewireNetlist(output);
+        rewireNetlist(output);
         
         return output;
     }
@@ -2486,10 +2652,11 @@ public class NetSynth {
      * @return
      * *********************************************************************
      */
-    public static List<DGate> parseEspressoToNORNAND(List<String> espinp) {
-
-        one = new DWire("_one", DWireType.Source);
-        zero = new DWire("_zero", DWireType.GND);
+    private List<DGate> parseEspressoToNORNAND(List<String> espinp) {
+        
+        int wirecount =0;
+        Global.one = new DWire("_one", DWireType.Source);
+        Global.zero = new DWire("_zero", DWireType.GND);
 
         for (String lists : espinp) {
             System.out.println(lists);
@@ -2528,7 +2695,7 @@ public class NetSynth {
 
         // <editor-fold defaultstate="collapsed" desc="Get Input Names">
         for (String splitInp : inpNames.split(" ")) {
-            if (splitInp.equals(one.name) || splitInp.equals(zero.name)) {
+            if (splitInp.equals(Global.one.name) || splitInp.equals(Global.zero.name)) {
                 splitInp += "I";
             }
             wireInputs.add(new DWire(splitInp, DWireType.input));
@@ -2548,7 +2715,7 @@ public class NetSynth {
 
         // <editor-fold defaultstate="collapsed" desc="Get Output Names">
         for (String splitInp : outNames.split(" ")) {
-            if (splitInp.equals(one.name) || splitInp.equals(zero.name)) {
+            if (splitInp.equals(Global.one.name) || splitInp.equals(Global.zero.name)) {
                 splitInp += "O";
             }
             wireOutputs.add(new DWire(splitInp, DWireType.output));
@@ -2562,9 +2729,9 @@ public class NetSynth {
             List<DWire> inp01 = new ArrayList<DWire>();
 
             if (POSmode) {
-                inp01.add(one);
+                inp01.add(Global.one);
             } else {
-                inp01.add(zero);
+                inp01.add(Global.zero);
             }
             sopexp.add(new DGate(DGateType.BUF, inp01, wireOutputs.get(0)));
             return sopexp;
@@ -2584,9 +2751,9 @@ public class NetSynth {
                 List<DWire> inp01 = new ArrayList<DWire>();
 
                 if (POSmode) {
-                    inp01.add(zero);
+                    inp01.add(Global.zero);
                 } else {
-                    inp01.add(one);
+                    inp01.add(Global.one);
                 }
                 sopexp.add(new DGate(DGateType.BUF, inp01, wireOutputs.get(0)));
                 return sopexp;
@@ -2693,7 +2860,7 @@ public class NetSynth {
         } else {
             if (no2ndstageGate) {
                 if (!((numberOfMinterms == 1) && (minTemp.size() == 1))) {
-                    String Wirename = "0Wire" + Global.wirecount++;
+                    String Wirename = "0Wire" + wirecount++;
                     DWire aout = new DWire(Wirename);
                     List<DWire> notfinalinp = new ArrayList<DWire>();
                     notfinalinp.add(sopexp.get(sopexp.size() - 1).output);
@@ -2723,9 +2890,10 @@ public class NetSynth {
      * *********************************************************************
      */
     public static List<DGate> notGates(List<DWire> inpWires) {
+        int wirecount =0;
         List<DGate> notInp = new ArrayList<DGate>();
         for (DWire xWire : inpWires) {
-            String Wirename = "0Wire" + Global.wirecount++;
+            String Wirename = "0NGWire" + wirecount++;
             DWire aout = new DWire(Wirename);
             List<DWire> inpNot = new ArrayList<DWire>();
             inpNot.add(xWire);
@@ -2751,6 +2919,7 @@ public class NetSynth {
      * *********************************************************************
      */
     public static List<DGate> NORNANDGates(List<DWire> inpWires, DGateType gtype) {
+        int wirecount =0;
         if (inpWires.isEmpty()) {
             return null;
         }
@@ -2773,13 +2942,13 @@ public class NetSynth {
                 List<DWire> ainp = new ArrayList<DWire>();
                 ainp.add(temp.get(indx));
                 ainp.add(temp.get(indx + 1));
-                String Wirename = "0Wire" + Global.wirecount++;
+                String Wirename = "0NORNANDWire" + wirecount++;
 
                 DWire aout = new DWire(Wirename);
                 DGate andG = new DGate(gtype, ainp, aout);
                 minterm.add(andG);
                 if (wireCount > 2) {
-                    Wirename = "0Wire" + Global.wirecount++;
+                    Wirename = "0NORNANDWire" + wirecount++;
                     List<DWire> ninp = new ArrayList<DWire>();
                     ninp.add(aout);
                     DWire anout = new DWire(Wirename);
@@ -2800,7 +2969,7 @@ public class NetSynth {
                 List<DWire> ainp = new ArrayList<DWire>();
                 ainp.add(nextLevelWires.get(0));
                 ainp.add(nextLevelWires.get(1));
-                String Wirename = "0Wire" + Global.wirecount++;
+                String Wirename = "0NORNANDWire" + wirecount++;
                 DWire aout = new DWire(Wirename);
                 DGate andG = new DGate(gtype, ainp, aout);
                 minterm.add(andG);
@@ -2827,6 +2996,7 @@ public class NetSynth {
      * *********************************************************************
      */
     public static List<DGate> AndORGates(List<DWire> inpWires, DGateType gOrAnd) {
+        int wirecount =0;
         if (inpWires.isEmpty()) {
             return null;
         }
@@ -2849,7 +3019,7 @@ public class NetSynth {
                 List<DWire> ainp = new ArrayList<DWire>();
                 ainp.add(temp.get(indx));
                 ainp.add(temp.get(indx + 1));
-                String Wirename = "0Wire" + Global.wirecount++;
+                String Wirename = "0AndORWire" + wirecount++;
 
                 DWire aout = new DWire(Wirename);
                 nextLevelWires.add(aout);
@@ -2866,7 +3036,7 @@ public class NetSynth {
                 List<DWire> ainp = new ArrayList<DWire>();
                 ainp.add(nextLevelWires.get(0));
                 ainp.add(nextLevelWires.get(1));
-                String Wirename = "0Wire" + Global.wirecount++;
+                String Wirename = "0AndORWire" + wirecount++;
                 DWire aout = new DWire(Wirename);
                 DGate andG = new DGate(gOrAnd, ainp, aout);
                 minterm.add(andG);
@@ -2937,10 +3107,10 @@ public class NetSynth {
         for (int i = netlist.size() - 1; i >= 0; i--) // This step is for a NOR Gate that has a Zero as an input. Replace it with a simple NOT gate. 
         {
             DGate netg = netlist.get(i);
-            if (netg.input.contains(zero)) {
+            if (netg.input.contains(Global.zero)) {
                 DGate tempNot = new DGate();
                 for (DWire xi : netg.input) {
-                    if (!(xi.equals(zero))) {
+                    if (!(xi.equals(Global.zero))) {
                         tempNot.input.add(xi);
                     }
                     tempNot.output = netg.output;
@@ -3313,10 +3483,10 @@ public class NetSynth {
         for (int i = netlist.size() - 1; i >= 0; i--) // This step is for a NOR Gate that has a Zero as an input. Replace it with a simple NOT gate. 
         {
             DGate netg = netlist.get(i);
-            if (netg.input.contains(zero)) {
+            if (netg.input.contains(Global.zero)) {
                 DGate tempNot = new DGate();
                 for (DWire xi : netg.input) {
-                    if (!(xi.equals(zero))) {
+                    if (!(xi.equals(Global.zero))) {
                         tempNot.input.add(xi);
                     }
                     tempNot.output = netg.output;

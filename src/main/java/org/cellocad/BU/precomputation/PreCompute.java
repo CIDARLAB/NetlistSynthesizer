@@ -20,6 +20,7 @@ import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.dom.DWireType;
+import org.cellocad.BU.netsynth.Global;
 import org.cellocad.BU.netsynth.Utilities;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.json.JSONArray;
@@ -336,8 +337,8 @@ public class PreCompute {
     
     public static DGate parseNorGate(String xg)
     {
-        NetSynth.one = new DWire("_one", DWireType.Source);
-        NetSynth.zero = new DWire("_zero", DWireType.GND);
+        Global.one = new DWire("_one", DWireType.Source);
+        Global.zero = new DWire("_zero", DWireType.GND);
        if(!xg.contains("NOR"))
        {
            DGate bufgate = new DGate();
@@ -374,18 +375,18 @@ public class PreCompute {
            if(i==0)
            {
                if(xwtype == DWireType.GND)
-                outw = NetSynth.zero;
+                outw = Global.zero;
                else if(xwtype == DWireType.Source)
-                outw = NetSynth.one;
+                outw = Global.one;
                else
                 outw = new DWire(parts[i].trim(),xwtype);
            }
            else
            {
                if(xwtype == DWireType.GND)
-                   inp.add(NetSynth.zero);
+                   inp.add(Global.zero);
                else if(xwtype == DWireType.Source)
-                   inp.add(NetSynth.one);
+                   inp.add(Global.one);
                else
                    inp.add(new DWire(parts[i].trim(),xwtype));
            }

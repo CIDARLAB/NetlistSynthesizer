@@ -90,15 +90,17 @@ public class EspressoAdaptor {
      * *********************************************************************
      */
     public static List<String> runEspresso(String pathFile) {
+       
+        String filepath = Utilities.getFilepath();
         List<String> espressoOutput = new ArrayList<String>();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (Utilities.isMac(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "/resources/netsynthResources/espresso.mac -epos " + pathFile);
+            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/espresso.mac -epos " + pathFile);
         } else if (Utilities.isLinux(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "/resources/netsynthResources/espresso.linux -epos " + pathFile);
+            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/espresso.linux -epos " + pathFile);
         } else if (Utilities.isWindows(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "\\resources\\netsynthResources\\espresso.exe -epos " + pathFile);
+            commandBuilder = new StringBuilder(filepath + "\\resources\\netsynthResources\\espresso.exe -epos " + pathFile);
         }
         String command = commandBuilder.toString();
         Runtime runtime = Runtime.getRuntime();
@@ -112,7 +114,8 @@ public class EspressoAdaptor {
             String filestring = "";
             filestring = Utilities.getResourcesFilepath();
             filestring += "write";
-            filestring += Global.espout++;
+            //filestring += NetSynth.espout++; //CHANGE
+            filestring += 0;
             filestring += ".txt";
             File fbool = new File(filestring);
             Writer output = new BufferedWriter(new FileWriter(fbool));
@@ -132,152 +135,152 @@ public class EspressoAdaptor {
         return espressoOutput;
     }
 
-    /**
-     * Function ************************************************************
-     * <br>
-     * Synopsis []
-     * <br>
-     * Description []
-     * <br>
-     * SideEffects []
-     * <br>
-     * SeeAlso []
-     *
-     * @param espinp
-     * @return
-     * *********************************************************************
-     */
-    public static List<DGate> parseEspressoOutput(List<String> espinp) {
-        NetSynth.one = new DWire("_one", DWireType.Source);
-        NetSynth.zero = new DWire("_zero", DWireType.GND);
-        List<DGate> sopexp = new ArrayList<DGate>();
-        List<DWire> wireInputs = new ArrayList<DWire>();
-        List<DWire> wireOutputs = new ArrayList<DWire>();
-        List<DWire> invWires = new ArrayList<DWire>();
-        List<DGate> inpInv = new ArrayList<DGate>();
-        NetSynth.functionOutp = false;
-        String inpNames = "";
-        String outNames = "";
-        NetSynth.POSmode = false;
-        int numberOfMinterms = 0;
-        int expInd = 0;
-        for (int i = 0; i < espinp.size(); i++) {
-            if (espinp.get(i).startsWith(".ilb")) {
-                inpNames = (espinp.get(i).substring(5));
-            } else if (espinp.get(i).startsWith(".ob")) {
-                outNames = (espinp.get(i).substring(4));
-            } else if (espinp.get(i).startsWith("#.phase")) {
-                NetSynth.POSmode = true;
-            } else if (espinp.get(i).startsWith(".p")) {
-                numberOfMinterms = Integer.parseInt(espinp.get(i).substring(3));
-                expInd = i + 1;
-                break;
-            }
-        }
-        for (String splitInp : inpNames.split(" ")) {
-            if (splitInp.equals(NetSynth.one.name) || splitInp.equals(NetSynth.zero.name)) {
-                splitInp += "I";
-            }
-            wireInputs.add(new DWire(splitInp, DWireType.input));
-        }
-        inpInv = NetSynth.notGates(wireInputs);
-        for (DGate gnots : inpInv) {
-            invWires.add(gnots.output);
-        }
-        for (String splitInp : outNames.split(" ")) {
-            if (splitInp.equals(NetSynth.one.name) || splitInp.equals(NetSynth.zero.name)) {
-                splitInp += "O";
-            }
-            wireOutputs.add(new DWire(splitInp, DWireType.output));
-        }
-        if (numberOfMinterms == 0) {
-            NetSynth.functionOutp = true;
-            List<DWire> inp01 = new ArrayList<DWire>();
-            if (NetSynth.POSmode) {
-                inp01.add(NetSynth.one);
-            } else {
-                inp01.add(NetSynth.zero);
-            }
-            sopexp.add(new DGate(DGateType.BUF, inp01, wireOutputs.get(0)));
-            return sopexp;
-        } else if (numberOfMinterms == 1) {
-            String oneMinT = espinp.get(expInd).substring(0, wireInputs.size());
-            int flag = 0;
-            for (int j = 0; j < wireInputs.size(); j++) {
-                if (oneMinT.charAt(j) != '-') {
-                    flag = 1;
-                    break;
-                }
-            }
-            if (flag == 0) {
-                NetSynth.functionOutp = true;
-                List<DWire> inp01 = new ArrayList<DWire>();
-                if (NetSynth.POSmode) {
-                    inp01.add(NetSynth.zero);
-                } else {
-                    inp01.add(NetSynth.one);
-                }
-                sopexp.add(new DGate(DGateType.BUF, inp01, wireOutputs.get(0)));
-                return sopexp;
-            }
-        }
-        List<DWire> minTemp = new ArrayList<DWire>();
-        List<DWire> orWires = new ArrayList<DWire>();
-        List<DGate> prodGates;
-        for (int i = expInd; i < (expInd + numberOfMinterms); i++) {
-            String minT = espinp.get(i).substring(0, wireInputs.size());
-            prodGates = new ArrayList<DGate>();
-            minTemp = new ArrayList<DWire>();
-            for (int j = 0; j < wireInputs.size(); j++) {
-                if (minT.charAt(j) == '-') {
-                    continue;
-                } else if (minT.charAt(j) == '0') {
-                    if (NetSynth.POSmode) {
-                        minTemp.add(wireInputs.get(j));
-                    } else {
-                        if (!sopexp.contains(inpInv.get(j))) {
-                            sopexp.add(inpInv.get(j));
-                        }
-                        minTemp.add(inpInv.get(j).output);
-                    }
-                } else if (minT.charAt(j) == '1') {
-                    if (NetSynth.POSmode) {
-                        if (!sopexp.contains(inpInv.get(j))) {
-                            sopexp.add(inpInv.get(j));
-                        }
-                        minTemp.add(inpInv.get(j).output);
-                    } else {
-                        minTemp.add(wireInputs.get(j));
-                    }
-                }
-            }
-            if (minTemp.size() == 1) {
-                orWires.add(minTemp.get(0));
-            } else {
-                if (NetSynth.POSmode) {
-                    prodGates = NetSynth.AndORGates(minTemp, DGateType.OR);
-                } else {
-                    prodGates = NetSynth.AndORGates(minTemp, DGateType.AND);
-                }
-                orWires.add(prodGates.get(prodGates.size() - 1).output);
-                sopexp.addAll(prodGates);
-            }
-        }
-        prodGates = new ArrayList<DGate>();
-        if (NetSynth.POSmode) {
-            prodGates = NetSynth.AndORGates(orWires, DGateType.AND);
-        } else {
-            prodGates = NetSynth.AndORGates(orWires, DGateType.OR);
-        }
-        sopexp.addAll(prodGates);
-        if (sopexp.isEmpty()) {
-            DGate bufgate = new DGate(DGateType.BUF, orWires, wireOutputs.get(0));
-            sopexp.add(bufgate);
-        } else {
-            sopexp.get(sopexp.size() - 1).output = wireOutputs.get(0);
-        }
-        return sopexp;
-    }
+//    /**
+//     * Function ************************************************************
+//     * <br>
+//     * Synopsis []
+//     * <br>
+//     * Description []
+//     * <br>
+//     * SideEffects []
+//     * <br>
+//     * SeeAlso []
+//     *
+//     * @param espinp
+//     * @return
+//     * *********************************************************************
+//     */
+//    public static List<DGate> parseEspressoOutput(List<String> espinp) {
+//        Global.one = new DWire("_one", DWireType.Source);
+//        Global.zero = new DWire("_zero", DWireType.GND);
+//        List<DGate> sopexp = new ArrayList<DGate>();
+//        List<DWire> wireInputs = new ArrayList<DWire>();
+//        List<DWire> wireOutputs = new ArrayList<DWire>();
+//        List<DWire> invWires = new ArrayList<DWire>();
+//        List<DGate> inpInv = new ArrayList<DGate>();
+//        NetSynth.functionOutp = false;
+//        String inpNames = "";
+//        String outNames = "";
+//        boolean POSmode = false;
+//        int numberOfMinterms = 0;
+//        int expInd = 0;
+//        for (int i = 0; i < espinp.size(); i++) {
+//            if (espinp.get(i).startsWith(".ilb")) {
+//                inpNames = (espinp.get(i).substring(5));
+//            } else if (espinp.get(i).startsWith(".ob")) {
+//                outNames = (espinp.get(i).substring(4));
+//            } else if (espinp.get(i).startsWith("#.phase")) {
+//                POSmode = true;
+//            } else if (espinp.get(i).startsWith(".p")) {
+//                numberOfMinterms = Integer.parseInt(espinp.get(i).substring(3));
+//                expInd = i + 1;
+//                break;
+//            }
+//        }
+//        for (String splitInp : inpNames.split(" ")) {
+//            if (splitInp.equals(Global.one.name) || splitInp.equals(Global.zero.name)) {
+//                splitInp += "I";
+//            }
+//            wireInputs.add(new DWire(splitInp, DWireType.input));
+//        }
+//        inpInv = NetSynth.notGates(wireInputs);
+//        for (DGate gnots : inpInv) {
+//            invWires.add(gnots.output);
+//        }
+//        for (String splitInp : outNames.split(" ")) {
+//            if (splitInp.equals(Global.one.name) || splitInp.equals(Global.zero.name)) {
+//                splitInp += "O";
+//            }
+//            wireOutputs.add(new DWire(splitInp, DWireType.output));
+//        }
+//        if (numberOfMinterms == 0) {
+//            NetSynth.functionOutp = true;
+//            List<DWire> inp01 = new ArrayList<DWire>();
+//            if (POSmode) {
+//                inp01.add(Global.one);
+//            } else {
+//                inp01.add(Global.zero);
+//            }
+//            sopexp.add(new DGate(DGateType.BUF, inp01, wireOutputs.get(0)));
+//            return sopexp;
+//        } else if (numberOfMinterms == 1) {
+//            String oneMinT = espinp.get(expInd).substring(0, wireInputs.size());
+//            int flag = 0;
+//            for (int j = 0; j < wireInputs.size(); j++) {
+//                if (oneMinT.charAt(j) != '-') {
+//                    flag = 1;
+//                    break;
+//                }
+//            }
+//            if (flag == 0) {
+//                NetSynth.functionOutp = true;
+//                List<DWire> inp01 = new ArrayList<DWire>();
+//                if (POSmode) {
+//                    inp01.add(Global.zero);
+//                } else {
+//                    inp01.add(Global.one);
+//                }
+//                sopexp.add(new DGate(DGateType.BUF, inp01, wireOutputs.get(0)));
+//                return sopexp;
+//            }
+//        }
+//        List<DWire> minTemp = new ArrayList<DWire>();
+//        List<DWire> orWires = new ArrayList<DWire>();
+//        List<DGate> prodGates;
+//        for (int i = expInd; i < (expInd + numberOfMinterms); i++) {
+//            String minT = espinp.get(i).substring(0, wireInputs.size());
+//            prodGates = new ArrayList<DGate>();
+//            minTemp = new ArrayList<DWire>();
+//            for (int j = 0; j < wireInputs.size(); j++) {
+//                if (minT.charAt(j) == '-') {
+//                    continue;
+//                } else if (minT.charAt(j) == '0') {
+//                    if (POSmode) {
+//                        minTemp.add(wireInputs.get(j));
+//                    } else {
+//                        if (!sopexp.contains(inpInv.get(j))) {
+//                            sopexp.add(inpInv.get(j));
+//                        }
+//                        minTemp.add(inpInv.get(j).output);
+//                    }
+//                } else if (minT.charAt(j) == '1') {
+//                    if (POSmode) {
+//                        if (!sopexp.contains(inpInv.get(j))) {
+//                            sopexp.add(inpInv.get(j));
+//                        }
+//                        minTemp.add(inpInv.get(j).output);
+//                    } else {
+//                        minTemp.add(wireInputs.get(j));
+//                    }
+//                }
+//            }
+//            if (minTemp.size() == 1) {
+//                orWires.add(minTemp.get(0));
+//            } else {
+//                if (POSmode) {
+//                    prodGates = NetSynth.AndORGates(minTemp, DGateType.OR);
+//                } else {
+//                    prodGates = NetSynth.AndORGates(minTemp, DGateType.AND);
+//                }
+//                orWires.add(prodGates.get(prodGates.size() - 1).output);
+//                sopexp.addAll(prodGates);
+//            }
+//        }
+//        prodGates = new ArrayList<DGate>();
+//        if (POSmode) {
+//            prodGates = NetSynth.AndORGates(orWires, DGateType.AND);
+//        } else {
+//            prodGates = NetSynth.AndORGates(orWires, DGateType.OR);
+//        }
+//        sopexp.addAll(prodGates);
+//        if (sopexp.isEmpty()) {
+//            DGate bufgate = new DGate(DGateType.BUF, orWires, wireOutputs.get(0));
+//            sopexp.add(bufgate);
+//        } else {
+//            sopexp.get(sopexp.size() - 1).output = wireOutputs.get(0);
+//        }
+//        return sopexp;
+//    }
 
     /**
      * Function ************************************************************
@@ -296,12 +299,13 @@ public class EspressoAdaptor {
      */
     public static List<String> convertEspressoOutputToVerilog(List<String> espinp) {
         List<String> verilogfile = new ArrayList<String>();
-        NetSynth.one = new DWire("_one", DWireType.Source);
-        NetSynth.zero = new DWire("_zero", DWireType.GND);
+        Global.one = new DWire("_one", DWireType.Source);
+        Global.zero = new DWire("_zero", DWireType.GND);
         String inpNames = null;
         String outNames = null;
         int numberOfMinterms = 0;
         int expInd = 0;
+        boolean POSmode = false;
         List<String> inputWires = new ArrayList<String>();
         List<String> outputWires = new ArrayList<String>();
         List<DWire> inputINVWires = new ArrayList<DWire>();
@@ -314,7 +318,7 @@ public class EspressoAdaptor {
             } else if (espinp.get(i).startsWith(".ob")) {
                 outNames = (espinp.get(i).substring(4));
             } else if (espinp.get(i).startsWith("#.phase")) {
-                NetSynth.POSmode = true;
+                POSmode = true;
             } else if (espinp.get(i).startsWith(".p")) {
                 numberOfMinterms = Integer.parseInt(espinp.get(i).substring(3));
                 expInd = i + 1;
@@ -322,13 +326,13 @@ public class EspressoAdaptor {
             }
         }
         for (String splitInp : inpNames.split(" ")) {
-            if (splitInp.equals(NetSynth.one.name) || splitInp.equals(NetSynth.zero.name)) {
+            if (splitInp.equals(Global.one.name) || splitInp.equals(Global.zero.name)) {
                 splitInp += "I";
             }
             inputWires.add(splitInp.trim());
         }
         for (String splitInp : outNames.split(" ")) {
-            if (splitInp.equals(NetSynth.one.name) || splitInp.equals(NetSynth.zero.name)) {
+            if (splitInp.equals(Global.one.name) || splitInp.equals(Global.zero.name)) {
                 splitInp += "O";
             }
             outputWires.add(splitInp.trim());
@@ -442,8 +446,10 @@ public class EspressoAdaptor {
      */
     public static List<DGate> convertPOStoNORNOT(List<String> espinp) {
         List<DGate> netlist = new ArrayList<DGate>();
-        NetSynth.one = new DWire("_one", DWireType.Source);
-        NetSynth.zero = new DWire("_zero", DWireType.GND);
+        Global.one = new DWire("_one", DWireType.Source);
+        Global.zero = new DWire("_zero", DWireType.GND);
+        boolean POSmode = false;
+        int wirecount =0;
         String inpNames = null;
         String outNames = null;
         int numberOfMinterms;
@@ -460,7 +466,7 @@ public class EspressoAdaptor {
             } else if (espinp.get(i).startsWith(".ob")) {
                 outNames = (espinp.get(i).substring(4));
             } else if (espinp.get(i).startsWith("#.phase")) {
-                NetSynth.POSmode = true;
+                POSmode = true;
             } else if (espinp.get(i).startsWith(".p")) {
                 numberOfMinterms = Integer.parseInt(espinp.get(i).substring(3));
                 expInd = i + 1;
@@ -468,7 +474,7 @@ public class EspressoAdaptor {
             }
         }
         for (String splitInp : inpNames.split(" ")) {
-            if (splitInp.equals(NetSynth.one.name) || splitInp.equals(NetSynth.zero.name)) {
+            if (splitInp.equals(Global.one.name) || splitInp.equals(Global.zero.name)) {
                 splitInp += "I";
             }
             inputWires.add(new DWire(splitInp, DWireType.input));
@@ -480,7 +486,7 @@ public class EspressoAdaptor {
             inputINVWires.add(gnots.output);
         }
         for (String splitInp : outNames.split(" ")) {
-            if (splitInp.equals(NetSynth.one.name) || splitInp.equals(NetSynth.zero.name)) {
+            if (splitInp.equals(Global.one.name) || splitInp.equals(Global.zero.name)) {
                 splitInp += "O";
             }
             outputWires.add(new DWire(splitInp, DWireType.output));
@@ -510,7 +516,7 @@ public class EspressoAdaptor {
                 if (sumterm.size() == 1) {
                     List<DWire> notsumterminp = new ArrayList<DWire>();
                     notsumterminp.addAll(sumterm);
-                    String Wirename = "0Wire" + Global.wirecount++;
+                    String Wirename = "0convertPOStoNORNOTWire" + wirecount++;
                     DWire notsumtermout = new DWire(Wirename);
                     DGate notsumtermgate = new DGate(DGateType.NOT, notsumterminp, notsumtermout);
                     netlist.add(notsumtermgate);
@@ -521,7 +527,7 @@ public class EspressoAdaptor {
                     sumlast = sumtermG.get(sumtermG.size() - 1).output;
                 }
             } else {
-                sumlast = new DWire(NetSynth.zero);
+                sumlast = new DWire(Global.zero);
             }
             for (int j = 0; j < outputWires.size(); j++) {
                 if (maxterm[1].charAt(j) == '1') {
@@ -532,13 +538,13 @@ public class EspressoAdaptor {
         for (int j = 0; j < outputWires.size(); j++) {
             if (outputsum.get(j).isEmpty()) {
                 List<DWire> inputbuflist = new ArrayList<DWire>();
-                inputbuflist.add(NetSynth.one);
+                inputbuflist.add(Global.one);
                 DGate bufgate = new DGate(DGateType.BUF, inputbuflist, outputWires.get(j));
                 netlist.add(bufgate);
             } else if (outputsum.get(j).size() == 1) {
                 if (outputsum.get(j).get(0).wtype == DWireType.GND) {
                     List<DWire> inputbuflist = new ArrayList<DWire>();
-                    inputbuflist.add(NetSynth.zero);
+                    inputbuflist.add(Global.zero);
                     DGate bufgate = new DGate(DGateType.BUF, inputbuflist, outputWires.get(j));
                     netlist.add(bufgate);
                 } else {
@@ -554,6 +560,7 @@ public class EspressoAdaptor {
                 netlist.addAll(productGates);
             }
         }
+        NetSynth.renameWires(netlist);
         return netlist;
     }
     

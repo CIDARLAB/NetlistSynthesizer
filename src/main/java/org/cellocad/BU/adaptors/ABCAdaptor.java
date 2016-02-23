@@ -44,6 +44,8 @@ public class ABCAdaptor {
      * *********************************************************************
      */
     public static List<DGate> convertAIGtoNORNOT(List<DGate> netlist) {
+        NetSynth.renameWires(netlist);
+        int wirecount =0;
         List<DGate> netout = new ArrayList<DGate>();
         List<DGate> notcreated = new ArrayList<DGate>();
         for (int i = 0; i < netlist.size(); i++) {
@@ -70,7 +72,7 @@ public class ABCAdaptor {
                     }
                 }
                 if (flag1 == 0) {
-                    String wirename = "0Wire" + Global.wirecount++;
+                    String wirename = "0convertAIGtoNORNOTWire" + wirecount++;
                     DWire notout1 = new DWire(wirename, DWireType.connector);
                     DGate newnot1 = new DGate();
                     newnot1.gtype = DGateType.NOT;
@@ -81,7 +83,7 @@ public class ABCAdaptor {
                     notcreated.add(newnot1);
                 }
                 if (flag2 == 0) {
-                    String wirename = "0Wire" + Global.wirecount++;
+                    String wirename = "0convertAIGtoNORNOTWire" + wirecount++;
                     DWire notout2 = new DWire(wirename, DWireType.connector);
                     DGate newnot2 = new DGate();
                     newnot2.gtype = DGateType.NOT;
@@ -94,6 +96,7 @@ public class ABCAdaptor {
                 netout.add(newnor);
             }
         }
+        NetSynth.renameWires(netout);
         return netout;
     }
 
@@ -114,25 +117,25 @@ public class ABCAdaptor {
      * *********************************************************************
      */
     public static List<DGate> runABC(String filename) throws InterruptedException {
-        Utilities.initializeFilepath();
+        String filepath = Utilities.getFilepath();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (Utilities.isMac(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "/resources/netsynthResources/abc.mac -c \"read " + NetSynth.Filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + NetSynth.Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/abc.mac -c \"read " + filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
         } else if (Utilities.isLinux(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "/resources/netsynthResources/abc -c \"read " + NetSynth.Filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + NetSynth.Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/abc -c \"read " + filepath + "/resources/netsynthResources/" + filename + ".blif; strash;  rewrite; refactor; balance; write " + filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
         } else if (Utilities.isWindows(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "\\resources\\netsynthResources\\abc -c \"read " + NetSynth.Filepath + "\\resources\\netsynthResources\\" + filename + ".blif; strash;  rewrite; refactor; balance; write " + NetSynth.Filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(filepath + "\\resources\\netsynthResources\\abc -c \"read " + filepath + "\\resources\\netsynthResources\\" + filename + ".blif; strash;  rewrite; refactor; balance; write " + filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
         }
         String command = commandBuilder.toString();
         String filestring = "";
         String clist = "";
         if (Utilities.isWindows(x)) {
-            filestring += NetSynth.Filepath + "\\resources\\netsynthResources\\script.cmd";
-            clist = NetSynth.Filepath + "\\resources\\netsynthResources\\script.cmd";
+            filestring += filepath + "\\resources\\netsynthResources\\script.cmd";
+            clist = filepath + "\\resources\\netsynthResources\\script.cmd";
         } else {
-            filestring += NetSynth.Filepath + "/resources/netsynthResources/script";
-            clist = NetSynth.Filepath + "/resources/netsynthResources/script";
+            filestring += filepath + "/resources/netsynthResources/script";
+            clist = filepath + "/resources/netsynthResources/script";
         }
         File fespinp = new File(filestring);
         try {
@@ -170,10 +173,10 @@ public class ABCAdaptor {
      * *********************************************************************
      */
     public static List<DGate> convertBenchToAIG() {
-        Utilities.initializeFilepath();
+        String filepath = Utilities.getFilepath();
         List<String> benchlines = new ArrayList<String>();
         String filestring = "";
-        filestring += NetSynth.Filepath + "/resources/netsynthResources/abcOutput.bench";
+        filestring += filepath + "/resources/netsynthResources/abcOutput.bench";
         benchlines = Utilities.getFileContentAsStringList(filestring);
         
         List<DGate> netlist = new ArrayList<DGate>();
@@ -216,7 +219,7 @@ public class ABCAdaptor {
                 if (gatestring.equals("vdd")) {
                     DGate xgate = new DGate();
                     xgate.gtype = DGateType.BUF;
-                    xgate.input.add(NetSynth.one);
+                    xgate.input.add(Global.one);
                     for (DWire xwire : allwires) {
                         if (xwire.name.equals(outpwire)) {
                             xgate.output = xwire;
@@ -304,22 +307,22 @@ public class ABCAdaptor {
      * *********************************************************************
      */
     public static List<DGate> runABCverilog_fullFilePath(String filename) throws InterruptedException {
-        Utilities.initializeFilepath();
+        String filepath = Utilities.getFilepath();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (Utilities.isMac(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "/resources/netsynthResources/abc.mac -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + NetSynth.Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/abc.mac -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
         } else if (Utilities.isLinux(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "/resources/netsynthResources/abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + NetSynth.Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
         } else if (Utilities.isWindows(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "\\resources\\netsynthResources\\abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + NetSynth.Filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(filepath + "\\resources\\netsynthResources\\abc -c \"read " + filename + "; strash;  rewrite; refactor; balance; write " + filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
         }
         String command = commandBuilder.toString();
         String filestring = "";
         if (Utilities.isWindows(x)) {
-            filestring += NetSynth.Filepath + "\\resources\\netsynthResources\\script.cmd";
+            filestring += filepath + "\\resources\\netsynthResources\\script.cmd";
         } else {
-            filestring += NetSynth.Filepath + "/resources/netsynthResources/script";
+            filestring += filepath + "/resources/netsynthResources/script";
         }
         File fespinp = new File(filestring);
         try {
@@ -331,9 +334,9 @@ public class ABCAdaptor {
         }
         String clist = "";
         if (Utilities.isWindows(x)) {
-            clist = NetSynth.Filepath + "\\resources\\netsynthResources\\script.cmd";
+            clist = filepath + "\\resources\\netsynthResources\\script.cmd";
         } else {
-            clist = NetSynth.Filepath + "/resources/netsynthResources/script";
+            clist = filepath + "/resources/netsynthResources/script";
         }
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;
@@ -365,22 +368,22 @@ public class ABCAdaptor {
      * *********************************************************************
      */
     public static List<DGate> runABCverilog(String filename) throws InterruptedException {
-        Utilities.initializeFilepath();
+        String filepath = Utilities.getFilepath();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (Utilities.isMac(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "/resources/netsynthResources/abc.mac -c \"read " + NetSynth.Filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + NetSynth.Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/abc.mac -c \"read " + filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
         } else if (Utilities.isLinux(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "/resources/netsynthResources/abc -c \"read " + NetSynth.Filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + NetSynth.Filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/abc -c \"read " + filepath + "/resources/netsynthResources/" + filename + ".v; strash;  rewrite; refactor; balance; write " + filepath + "/resources/netsynthResources/abcOutput.bench; quit\"");
         } else if (Utilities.isWindows(x)) {
-            commandBuilder = new StringBuilder(NetSynth.Filepath + "\\resources\\netsynthResources\\abc.exe -c \"read " + NetSynth.Filepath + "\\resources\\netsynthResources\\" + filename + ".v; strash;  rewrite; refactor; balance; write " + NetSynth.Filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
+            commandBuilder = new StringBuilder(filepath + "\\resources\\netsynthResources\\abc.exe -c \"read " + filepath + "\\resources\\netsynthResources\\" + filename + ".v; strash;  rewrite; refactor; balance; write " + filepath + "\\resources\\netsynthResources\\abcOutput.bench; quit\"");
         }
         String command = commandBuilder.toString();
         String filestring = "";
         if (Utilities.isWindows(x)) {
-            filestring += NetSynth.Filepath + "\\resources\\netsynthResources\\script.cmd";
+            filestring += filepath + "\\resources\\netsynthResources\\script.cmd";
         } else {
-            filestring += NetSynth.Filepath + "/resources/netsynthResources/script";
+            filestring += filepath + "/resources/netsynthResources/script";
         }
         File fespinp = new File(filestring);
         try {
@@ -392,9 +395,9 @@ public class ABCAdaptor {
         }
         String clist = "";
         if (Utilities.isWindows(x)) {
-            clist = NetSynth.Filepath + "\\resources\\netsynthResources\\script.cmd";
+            clist = filepath + "\\resources\\netsynthResources\\script.cmd";
         } else {
-            clist = NetSynth.Filepath + "/resources/netsynthResources/script";
+            clist = filepath + "/resources/netsynthResources/script";
         }
         Runtime runtime = Runtime.getRuntime();
         Process proc = null;

@@ -29,9 +29,9 @@ public class subCircuitSwap {
     public static List<DGate> implementSwap(List<DGate> netlist, List<NetSynthSwitch> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary)
     {
         swapCount =0;
-        netlist = NetSynth.rewireNetlist(netlist);
+        NetSynth.rewireNetlist(netlist);
         renameWires(netlist,false);
-        netlist = NetSynth.rewireNetlist(netlist);
+        NetSynth.rewireNetlist(netlist);
         
         List<String> inputNames = new ArrayList<String>();
         
@@ -96,8 +96,8 @@ public class subCircuitSwap {
         for(DGate gate:netlist){
             output.add(new DGate(gate));
         }
-        output = NetSynth.rewireNetlist(output);
-        netlist = NetSynth.rewireNetlist(netlist);
+        NetSynth.rewireNetlist(output);
+        NetSynth.rewireNetlist(netlist);
         List<SubNetlist> subnet = new ArrayList<SubNetlist>();
         
         //This is where stuff changes
@@ -177,7 +177,7 @@ public class subCircuitSwap {
                                 for (DGate gate : tempNetlist) {
                                     output.add(new DGate(gate));
                                 }
-                                output = NetSynth.rewireNetlist(output);
+                                NetSynth.rewireNetlist(output);
                                 swapCount++;
                             }
                             
@@ -250,7 +250,7 @@ public class subCircuitSwap {
         }
         
         //Rewire Nodes
-        output = NetSynth.rewireNetlist(output);
+        NetSynth.rewireNetlist(output);
         
         //Remove Dangling Nodes
         output = NetSynth.removeDanglingGates(output);
@@ -258,7 +258,7 @@ public class subCircuitSwap {
         
         
         //Rewire Nodes
-        output = NetSynth.rewireNetlist(output);
+        NetSynth.rewireNetlist(output);
         
         
         
@@ -277,7 +277,7 @@ public class subCircuitSwap {
         output = NetSynth.assignWireLogic(inputNames, output);
         
         output = NetSynth.removeDuplicateLogicGate(output);
-        output = NetSynth.rewireNetlist(output);
+        NetSynth.rewireNetlist(output);
         
         renameWires(output,false);
         

@@ -279,7 +279,7 @@ public class subCircuitEnumerator {
                 List<DGate> modifiedsubNetlist = new ArrayList<DGate>();
                 modifiedsubNetlist = removeDanglingNodeInSubnetlist(subNetlist);
                 List<String> inputs = getSubnetlistInputs(modifiedsubNetlist);
-                modifiedsubNetlist = NetSynth.rewireNetlist(modifiedsubNetlist);
+                NetSynth.rewireNetlist(modifiedsubNetlist);
                 if (inputs.size() <= 3) {
                     List<String> tt = BooleanSimulator.getTruthTable(modifiedsubNetlist, inputs);
                     //NetSynth.printNetlist(modifiedsubNetlist);
@@ -321,7 +321,7 @@ public class subCircuitEnumerator {
                 List<DGate> modifiedsubNetlist = new ArrayList<DGate>();
                 modifiedsubNetlist = removeDanglingNodeInSubnetlist(subNetlist);
                 List<String> inputs = getSubnetlistInputs(modifiedsubNetlist);
-                modifiedsubNetlist = NetSynth.rewireNetlist(modifiedsubNetlist);
+                NetSynth.rewireNetlist(modifiedsubNetlist);
                 if (inputs.size() <= 4) {
                     List<String> tt = BooleanSimulator.getTruthTable(modifiedsubNetlist, inputs);
                     //NetSynth.printNetlist(modifiedsubNetlist);
