@@ -107,13 +107,13 @@ public class AnalyzeResults {
     
     
     public static void main(String[] args) {
-        String file1 = Utilities.getResourcesFilepath();
+        String file1 = Utilities.getNetSynthResourcesFilepath();
         file1 += "/netSynthTestResults/all4input1output.txt";
         
-        String file2 = Utilities.getResourcesFilepath();
+        String file2 = Utilities.getNetSynthResourcesFilepath();
         file2 += "/netSynthTestResults/all4input1outputABC.txt";
         
-        String file3 = Utilities.getResourcesFilepath();
+        String file3 = Utilities.getNetSynthResourcesFilepath();
         file3 += "/netSynthTestResults/all4input1outputABCnoSwap.txt";
         //format1(file1);
         //format2(file2);

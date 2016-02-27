@@ -64,7 +64,7 @@ public class Utilities {
         }
         return false;
     }
-
+    
     public static boolean isMac() {
         String os = System.getProperty("os.name");
         return isMac(os);
@@ -111,39 +111,39 @@ public class Utilities {
      * SeeAlso []
      * *********************************************************************
      */
-    public static void initializeFilepath(NetSynth netsynth) {
-        netsynth.Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
-        if (netsynth.Filepath.contains("/target/")) {
-            netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/target/"));
-        } else if (netsynth.Filepath.contains("/src/")) {
-            netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/src/"));
-        } else if (netsynth.Filepath.contains("/build/classes/")) {
-            netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/build/classes/"));
-        }
-        if (Utilities.isWindows()) {
-            try {
-                netsynth.Filepath = URLDecoder.decode(netsynth.Filepath, "utf-8");
-                netsynth.Filepath = new File(netsynth.Filepath).getPath();
-                if (netsynth.Filepath.contains("\\target\\")) {
-                    netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("\\target\\"));
-                } else if (netsynth.Filepath.contains("\\src\\")) {
-                    netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("\\src\\"));
-                } else if (netsynth.Filepath.contains("\\build\\classes\\")) {
-                    netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("\\build\\classes\\"));
-                }
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            if (netsynth.Filepath.contains("/target/")) {
-                netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/target/"));
-            } else if (netsynth.Filepath.contains("/src/")) {
-                netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/src/"));
-            } else if (netsynth.Filepath.contains("/build/classes/")) {
-                netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/build/classes/"));
-            }
-        }
-    }
+//    public static void initializeFilepath(NetSynth netsynth) {
+//        netsynth.Filepath = NetSynth.class.getClassLoader().getResource(".").getPath();
+//        if (netsynth.Filepath.contains("/target/")) {
+//            netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/target/"));
+//        } else if (netsynth.Filepath.contains("/src/")) {
+//            netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/src/"));
+//        } else if (netsynth.Filepath.contains("/build/classes/")) {
+//            netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/build/classes/"));
+//        }
+//        if (Utilities.isWindows()) {
+//            try {
+//                netsynth.Filepath = URLDecoder.decode(netsynth.Filepath, "utf-8");
+//                netsynth.Filepath = new File(netsynth.Filepath).getPath();
+//                if (netsynth.Filepath.contains("\\target\\")) {
+//                    netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("\\target\\"));
+//                } else if (netsynth.Filepath.contains("\\src\\")) {
+//                    netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("\\src\\"));
+//                } else if (netsynth.Filepath.contains("\\build\\classes\\")) {
+//                    netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("\\build\\classes\\"));
+//                }
+//            } catch (UnsupportedEncodingException ex) {
+//                Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        } else {
+//            if (netsynth.Filepath.contains("/target/")) {
+//                netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/target/"));
+//            } else if (netsynth.Filepath.contains("/src/")) {
+//                netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/src/"));
+//            } else if (netsynth.Filepath.contains("/build/classes/")) {
+//                netsynth.Filepath = netsynth.Filepath.substring(0, netsynth.Filepath.lastIndexOf("/build/classes/"));
+//            }
+//        }
+//    }
     
     
     
@@ -183,12 +183,22 @@ public class Utilities {
         return _filepath;
     }
     
-    public static String getResourcesFilepath() {
+    public static String getNetSynthResourcesFilepath() {
         String _filepath = getFilepath();
         if (Utilities.isWindows()) {
             _filepath += "\\resources\\netsynthResources\\";
         } else {
             _filepath += "/resources/netsynthResources/";
+        }
+        return _filepath;
+    }
+    
+    public static String getResourcesFilepath() {
+        String _filepath = getFilepath();
+        if (Utilities.isWindows()) {
+            _filepath += "\\resources\\";
+        } else {
+            _filepath += "/resources/";
         }
         return _filepath;
     }

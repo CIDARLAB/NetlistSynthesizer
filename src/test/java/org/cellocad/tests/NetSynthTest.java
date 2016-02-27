@@ -13,6 +13,7 @@ import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.dom.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.netsynth.NetSynthSwitch;
+import org.cellocad.BU.simulators.BooleanSimulator;
 import org.junit.Test;
 
 /**
@@ -89,9 +90,9 @@ public class NetSynthTest {
         List<DGate> test3 = getTestNetlist3();
         List<DGate> test4 = getTestNetlist4();
         List<DGate> test5 = getTestNetlist5();
+        List<DGate> test6 = getTestNetlist6();
         
-        
-        NetSynth.printDebugStatement("BEFORE");
+        /*NetSynth.printDebugStatement("BEFORE");
         NetSynth.printNetlist(test1);
         test1 = NetSynth.removeDoubleInverters(test1);
         NetSynth.printDebugStatement("AFTER");
@@ -122,10 +123,46 @@ public class NetSynthTest {
         NetSynth.printDebugStatement("AFTER");
         NetSynth.printNetlist(test5);
         
+        NetSynth.printDebugStatement("BEFORE");
+        NetSynth.printNetlist(test6);
+        test6 = NetSynth.removeDoubleInverters(test6);
+        NetSynth.printDebugStatement("AFTER");
+        NetSynth.printNetlist(test6);*/
+        
+        
         
     }
     
-    
+    //@Test
+    public void testGetNetlist(){
+        String verilogLines = "module A(output out1, input in1, in2, in3);\n"
+                + "  always@(in1,in2,in3)\n"
+                + "    begin\n"
+                + "      case({in1,in2,in3})\n"
+                + "        3'b000: {out1} = 1'b1;\n"
+                + "        3'b001: {out1} = 1'b1;\n"
+                + "        3'b010: {out1} = 1'b1;\n"
+                + "        3'b011: {out1} = 1'b1;\n"
+                + "        3'b100: {out1} = 1'b1;\n"
+                + "        3'b101: {out1} = 1'b1;\n"
+                + "        3'b110: {out1} = 1'b1;\n"
+                + "        3'b111: {out1} = 1'b0;\n"
+                + "      endcase\n"
+                + "    end\n"
+                + "endmodule";
+        NetSynth netsynth = new NetSynth();
+        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
+        List<DGate> netlist = netsynth.getNetlistCode(verilogLines, switches);
+        System.out.println("\n\nNETLIST ::");
+        NetSynth.printNetlist(netlist);
+        List<String> inputs = new ArrayList<String>();
+        inputs.add("in1");
+        inputs.add("in2");
+        inputs.add("in3");
+        
+        BooleanSimulator.printTruthTable(netlist, inputs);
+        
+    }
     
     public static List<DGate> getTestNetlist1(){
         
@@ -208,7 +245,6 @@ public class NetSynthTest {
         return netlist;
     }
     
-    
     public static List<DGate> getTestNetlist3(){
         
         //NOT(w1,input)
@@ -246,7 +282,6 @@ public class NetSynthTest {
         
         return netlist;
     }
-    
     
     public static List<DGate> getTestNetlist4(){
         
@@ -334,4 +369,50 @@ public class NetSynthTest {
         return netlist;
     }
     
+    public static List<DGate> getTestNetlist6(){
+        //NOT(w0,in1)
+        //NOT(w1,w0)
+        //NOT(w2,in1)
+        //NOR(out,w1,w2)
+        List<DGate> netlist = new ArrayList<DGate>();
+        
+        DWire in1 = new DWire("in1",DWireType.input);
+        DWire in2 = new DWire("in2",DWireType.input);
+        
+        DWire w0 = new DWire("w0",DWireType.connector);
+        DWire w1 = new DWire("w1",DWireType.connector);
+        DWire w2 = new DWire("w2",DWireType.connector);
+        
+        DWire out = new DWire("out",DWireType.output);
+        
+        DGate not1 = new DGate();
+        DGate not2 = new DGate();
+        DGate not3 = new DGate();
+        
+        DGate nor1 = new DGate();
+        
+        not1.gtype = DGateType.NOT;
+        not1.input.add(in2);
+        not1.output = w0;
+        
+        not2.gtype = DGateType.NOT;
+        not2.input.add(w0);
+        not2.output = w1;
+        
+        not3.gtype = DGateType.NOT;
+        not3.input.add(in1);
+        not3.output = w2;
+        
+        nor1.gtype = DGateType.NOR;
+        nor1.input.add(w1);
+        nor1.input.add(w2);
+        nor1.output = out;
+        
+        netlist.add(not1);
+        netlist.add(not2);
+        netlist.add(not3);
+        netlist.add(nor1);
+        
+        return netlist;
+    }
 }

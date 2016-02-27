@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cellocad.BU.dom.DGate;
@@ -86,21 +87,22 @@ public class EspressoAdaptor {
      * SeeAlso []
      *
      * @param pathFile
+     * @param resourcesFilepath
      * @return
      * *********************************************************************
      */
-    public static List<String> runEspresso(String pathFile) {
+    public static List<String> runEspresso(String pathFile, String resourcesFilepath, String resultsFilePath) {
        
-        String filepath = Utilities.getFilepath();
+        //String filepath = Utilities.getFilepath();
         List<String> espressoOutput = new ArrayList<String>();
         String x = System.getProperty("os.name");
         StringBuilder commandBuilder = null;
         if (Utilities.isMac(x)) {
-            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/espresso.mac -epos " + pathFile);
+            commandBuilder = new StringBuilder(resourcesFilepath + "espresso.mac -epos " + pathFile);
         } else if (Utilities.isLinux(x)) {
-            commandBuilder = new StringBuilder(filepath + "/resources/netsynthResources/espresso.linux -epos " + pathFile);
+            commandBuilder = new StringBuilder(resourcesFilepath + "espresso.linux -epos " + pathFile);
         } else if (Utilities.isWindows(x)) {
-            commandBuilder = new StringBuilder(filepath + "\\resources\\netsynthResources\\espresso.exe -epos " + pathFile);
+            commandBuilder = new StringBuilder(resourcesFilepath + "espresso.exe -epos " + pathFile);
         }
         String command = commandBuilder.toString();
         Runtime runtime = Runtime.getRuntime();
@@ -112,11 +114,12 @@ public class EspressoAdaptor {
         }
         try {
             String filestring = "";
-            filestring = Utilities.getResourcesFilepath();
-            filestring += "write";
+            int writeoutputcount =0;
+            filestring += (resultsFilePath + "write");
+            do{
+                filestring = (resultsFilePath + "write" + (writeoutputcount++) + ".txt");
+            }while(Utilities.validFilepath(filestring));
             //filestring += NetSynth.espout++; //CHANGE
-            filestring += 0;
-            filestring += ".txt";
             File fbool = new File(filestring);
             Writer output = new BufferedWriter(new FileWriter(fbool));
             InputStream in = proc.getInputStream();
@@ -128,7 +131,7 @@ public class EspressoAdaptor {
                 output.write(line);
             }
             output.close();
-            fbool.delete();
+            //fbool.delete();
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -441,15 +444,15 @@ public class EspressoAdaptor {
      * SeeAlso []
      *
      * @param espinp
+     * @param wirecount
      * @return
      * *********************************************************************
      */
-    public static List<DGate> convertPOStoNORNOT(List<String> espinp) {
+    public static List<DGate> convertPOStoNORNOT(List<String> espinp, AtomicInteger wirecount) {
         List<DGate> netlist = new ArrayList<DGate>();
         Global.one = new DWire("_one", DWireType.Source);
         Global.zero = new DWire("_zero", DWireType.GND);
         boolean POSmode = false;
-        int wirecount =0;
         String inpNames = null;
         String outNames = null;
         int numberOfMinterms;
@@ -479,7 +482,7 @@ public class EspressoAdaptor {
             }
             inputWires.add(new DWire(splitInp, DWireType.input));
         }
-        inputINVGates = NetSynth.notGates(inputWires);
+        inputINVGates = notGates(inputWires, wirecount);
         for (DGate gnots : inputINVGates) {
             notGateexists.add(false);
             notGateAdd.add(false);
@@ -516,13 +519,13 @@ public class EspressoAdaptor {
                 if (sumterm.size() == 1) {
                     List<DWire> notsumterminp = new ArrayList<DWire>();
                     notsumterminp.addAll(sumterm);
-                    String Wirename = "0convertPOStoNORNOTWire" + wirecount++;
+                    String Wirename = "0Wire" + wirecount.getAndIncrement();
                     DWire notsumtermout = new DWire(Wirename);
                     DGate notsumtermgate = new DGate(DGateType.NOT, notsumterminp, notsumtermout);
                     netlist.add(notsumtermgate);
                     sumlast = notsumtermout;
                 } else {
-                    sumtermG = NetSynth.NORNANDGates(sumterm, DGateType.NOR);
+                    sumtermG = NORNANDGates(sumterm, DGateType.NOR, wirecount);
                     netlist.addAll(sumtermG);
                     sumlast = sumtermG.get(sumtermG.size() - 1).output;
                 }
@@ -534,6 +537,7 @@ public class EspressoAdaptor {
                     outputsum.get(j).add(sumlast);
                 }
             }
+            NetSynth.renameWires(netlist);
         }
         for (int j = 0; j < outputWires.size(); j++) {
             if (outputsum.get(j).isEmpty()) {
@@ -555,13 +559,116 @@ public class EspressoAdaptor {
                 }
             } else {
                 List<DGate> productGates = new ArrayList<DGate>();
-                productGates = NetSynth.NORNANDGates(outputsum.get(j), DGateType.NOR);
+                productGates = NORNANDGates(outputsum.get(j), DGateType.NOR, wirecount);
                 productGates.get(productGates.size() - 1).output = outputWires.get(j);
                 netlist.addAll(productGates);
             }
         }
-        NetSynth.renameWires(netlist);
         return netlist;
+    }
+    
+    /**
+     * Function ************************************************************
+     * <br>
+     * Synopsis []
+     * <br>
+     * Description []
+     * <br>
+     * SideEffects []
+     * <br>
+     * SeeAlso []
+     *
+     * @param inpWires
+     * @param gtype
+     * @return
+     * *********************************************************************
+     */
+    private static List<DGate> NORNANDGates(List<DWire> inpWires, DGateType gtype, AtomicInteger wirecount) {
+        if (inpWires.isEmpty()) {
+            return null;
+        }
+        List<DGate> minterm = new ArrayList<DGate>();
+
+        List<DWire> nextLevelWires = new ArrayList<DWire>();
+        List<DWire> temp = new ArrayList<DWire>();
+
+        int numberofWires, indx;
+        nextLevelWires.addAll(inpWires);
+        numberofWires = inpWires.size();
+
+        while (numberofWires > 1) {
+            temp = new ArrayList<DWire>();
+            temp.addAll(nextLevelWires);
+            nextLevelWires = new ArrayList<DWire>();
+            indx = 0;
+            while ((indx + 2) <= (numberofWires)) {
+
+                List<DWire> ainp = new ArrayList<DWire>();
+                ainp.add(temp.get(indx));
+                ainp.add(temp.get(indx + 1));
+                String Wirename = "0Wire" + wirecount.getAndIncrement();
+
+                DWire aout = new DWire(Wirename);
+                DGate andG = new DGate(gtype, ainp, aout);
+                minterm.add(andG);
+                if (numberofWires > 2) {
+                    Wirename = "0Wire" + wirecount.getAndIncrement();
+                    List<DWire> ninp = new ArrayList<DWire>();
+                    ninp.add(aout);
+                    DWire anout = new DWire(Wirename);
+                    DGate notG = new DGate(DGateType.NOT, ninp, anout);
+                    minterm.add(notG);
+                    nextLevelWires.add(anout);
+                } else {
+                    nextLevelWires.add(aout);
+                }
+                indx += 2;
+
+            }
+            if (temp.size() % 2 != 0) {
+                nextLevelWires.add(temp.get(numberofWires - 1));
+            }
+            numberofWires = nextLevelWires.size();
+            if (numberofWires == 2) {
+                List<DWire> ainp = new ArrayList<DWire>();
+                ainp.add(nextLevelWires.get(0));
+                ainp.add(nextLevelWires.get(1));
+                String Wirename = "0Wire" + wirecount.getAndIncrement();
+                DWire aout = new DWire(Wirename);
+                DGate andG = new DGate(gtype, ainp, aout);
+                minterm.add(andG);
+                break;
+            }
+        }
+        return minterm;
+    }
+    
+    
+    /**
+     * Function ************************************************************
+     * <br>
+     * Synopsis []
+     * <br>
+     * Description []
+     * <br>
+     * SideEffects []
+     * <br>
+     * SeeAlso []
+     *
+     * @param inpWires
+     * @return
+     * *********************************************************************
+     */
+    private static List<DGate> notGates(List<DWire> inpWires, AtomicInteger wirecount) {
+        List<DGate> notInp = new ArrayList<DGate>();
+        for (DWire xWire : inpWires) {
+            String Wirename = "0Wire" + wirecount.getAndIncrement();
+            DWire aout = new DWire(Wirename);
+            List<DWire> inpNot = new ArrayList<DWire>();
+            inpNot.add(xWire);
+            notInp.add(new DGate(DGateType.NOT, inpNot, aout));
+        }
+        return notInp;
     }
     
 }

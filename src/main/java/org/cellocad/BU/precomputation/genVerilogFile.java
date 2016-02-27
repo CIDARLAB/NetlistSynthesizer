@@ -560,7 +560,7 @@ public class genVerilogFile {
 
         System.out.println(alllines);   
         
-        newFilePath = Utilities.getResourcesFilepath() + "modifiedForABC.v";
+        newFilePath = Utilities.getNetSynthResourcesFilepath() + "modifiedForABC.v";
         File newFile = new File(newFilePath);
         try {
             Writer output = new BufferedWriter(new FileWriter(newFile));
@@ -598,7 +598,7 @@ public class genVerilogFile {
 
         System.out.println(alllines);   
         
-        newFilePath = Utilities.getResourcesFilepath() + "modifiedForABC.v";
+        newFilePath = Utilities.getNetSynthResourcesFilepath() + "modifiedForABC.v";
         File newFile = new File(newFilePath);
         try {
             Writer output = new BufferedWriter(new FileWriter(newFile));

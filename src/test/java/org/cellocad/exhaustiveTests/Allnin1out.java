@@ -33,7 +33,7 @@ public class Allnin1out {
         boolean result = true;
         
         String filepath = "";
-        filepath = Utilities.getResourcesFilepath();
+        filepath = Utilities.getNetSynthResourcesFilepath();
         filepath += "testVerilog.v";
         int ttSize = (int)Math.pow(2, size);
         int noOfTT = (int)Math.pow(2, ttSize);
@@ -91,7 +91,7 @@ public class Allnin1out {
         return result;
     }
     
-    @Test
+    //@Test
     public void testAllCombinations(){
        boolean result;
        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
