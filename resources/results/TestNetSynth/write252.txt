@@ -1,8 +1,0 @@
-.i 3
-.o 1
-.ilb inp1 inp2 inp3
-.ob out
-#.phase 0
-.p 1
-000 1
-.e
