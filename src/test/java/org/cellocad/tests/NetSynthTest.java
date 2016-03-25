@@ -23,7 +23,7 @@ import org.junit.Test;
 public class NetSynthTest {
     
     
-    //@Test //Work on this later..
+    @Test //Work on this later..
     public void testGetNetlistCode(){
         System.out.println("\ntestGetNetlistCode");
         List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
@@ -38,8 +38,12 @@ public class NetSynthTest {
                              "      endcase\n" +
                              "    end\n" +
                              "endmodule";
-        NetSynth netsynth = new NetSynth();
-        NetSynth.printNetlist(netsynth.getNetlistCode(verilogCode, switches));    
+        NetSynth netsynth = new NetSynth("deleteTest");
+        System.out.println("Folder :: " + netsynth.getResultsPath());
+        
+        
+        NetSynth.printNetlist(netsynth.getNetlistCode(verilogCode, switches)); 
+        netsynth.cleanDirectory();
     }
     
     //@Test //Work on this later

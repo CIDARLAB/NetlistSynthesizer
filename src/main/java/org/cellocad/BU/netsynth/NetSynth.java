@@ -44,6 +44,7 @@ import org.cellocad.BU.adaptors.ABCAdaptor;
 import org.cellocad.BU.adaptors.EspressoAdaptor;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.cellocad.BU.subcircuit.subCircuitSwap;
+import org.codehaus.plexus.util.FileUtils;
 import org.json.JSONArray;
 
 /**
@@ -77,16 +78,12 @@ public class NetSynth {
     @Setter
     private int swapCount;
     
+    
     /**
      *
      */
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-
-    }
+    
     
     public NetSynth(String id, String resourcesFilePath, String resultsFilePath){
         initializeSubLibrary();
@@ -290,6 +287,21 @@ public class NetSynth {
         
         return true;
     }
+    
+    public void cleanDirectory(){
+        try {
+            System.out.println("Start Clean Directory");
+            System.out.println("results file path :: " + this.resultsPath);
+            FileUtils.cleanDirectory(this.resultsPath);
+            File resultDir = new File(this.resultsPath);
+            resultDir.delete();
+        } catch (IOException ex) {
+            System.out.println("Error deleting files in  " + this.resultsPath);
+            Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
     
     private static boolean fileNotFoundError(String resources,String slash, String file){
         if(!Utilities.validFilepath(resources + slash + file)){
@@ -548,7 +560,6 @@ public class NetSynth {
     
     
     public List<DGate> getNetlistCode(String verilogCode,List<NetSynthSwitch> switches){
-        
         List<String> inputnames = new ArrayList<String>();
         List<String> outputnames = new ArrayList<String>();
         
@@ -725,8 +736,6 @@ public class NetSynth {
             }
             //seehere
         }
-        
-        
         return netlist;
     }
     
