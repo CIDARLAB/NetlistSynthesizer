@@ -83,7 +83,7 @@ public class NetSynthTest {
     }
     
     
-    @Test
+    //@Test
     public void testRemoveDoubleInverters(){
         List<DGate> test1 = getTestNetlist1();
         List<DGate> test2 = getTestNetlist2();

@@ -21,7 +21,7 @@ public class CodeTest {
     public static void main(String[] args) {
         //NetSynth netsynth = new NetSynth("demosomething");
         //NetSynth netsynth4 = new NetSynth();
-        
+        /*
         String verilogCode = "module A(output out1,  input in1, in2);\n" +
                              "  always@(in1,in2)\n" +
                              "    begin\n" +
@@ -35,6 +35,7 @@ public class CodeTest {
                              "endmodule";
         
         parseVerilogFile.parseVerilog(verilogCode);
+        */
         /*
         NetSynth.printNetlist(netsynth.getNetlistCode(verilogCode, new ArrayList<NetSynthSwitch>()));
         

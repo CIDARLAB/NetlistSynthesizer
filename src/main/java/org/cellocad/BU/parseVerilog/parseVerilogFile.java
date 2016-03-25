@@ -24,6 +24,7 @@ import org.cellocad.BU.parseVerilog.grammar.Verilog2001Parser;
  */
 public class parseVerilogFile {
     
+    /*
     public static ParseTree parseVerilog(String verilogCode){
         ANTLRInputStream input = new ANTLRInputStream(verilogCode);
         Verilog2001Lexer lexer = new Verilog2001Lexer(input);
@@ -50,6 +51,7 @@ public class parseVerilogFile {
             traverseTree(tree.getChild(i),level+1);
         }
     }
+    */
     
     public static String verilogFileLinesCode(String verilogCode){
         String pieces[] = verilogCode.split("[\\r\\n]+");
