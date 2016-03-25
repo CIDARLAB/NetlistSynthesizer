@@ -11,13 +11,45 @@ import org.cellocad.BU.dom.DWireType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.cellocad.BU.netsynth.Utilities;
+import org.cellocad.BU.parseVerilog.grammar.Verilog2001Lexer;
+import org.cellocad.BU.parseVerilog.grammar.Verilog2001Parser;
 
 /**
  *
  * @author prashantvaidyanathan
  */
 public class parseVerilogFile {
+    
+    public static ParseTree parseVerilog(String verilogCode){
+        ANTLRInputStream input = new ANTLRInputStream(verilogCode);
+        Verilog2001Lexer lexer = new Verilog2001Lexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        Verilog2001Parser parser = new Verilog2001Parser(tokens);
+        ParseTree tree = parser.module_declaration();
+        //Verilog2001Parser parser = new Verilog2001Parser();
+        
+        //System.out.println("TREE :: " + tree.toStringTree(parser));
+        traverseTree(tree,0);
+        return tree;
+    }
+    
+    public static void traverseTree(ParseTree tree,int level){
+//        if(tree.getParent() == null){
+//            level = 0;
+//            
+//        }
+        for(int i=0;i<level;i++){
+            System.out.print("--");
+        }
+        System.out.println(tree.getText());
+        for(int i=0;i<tree.getChildCount();i++){
+            traverseTree(tree.getChild(i),level+1);
+        }
+    }
     
     public static String verilogFileLinesCode(String verilogCode){
         String pieces[] = verilogCode.split("[\\r\\n]+");

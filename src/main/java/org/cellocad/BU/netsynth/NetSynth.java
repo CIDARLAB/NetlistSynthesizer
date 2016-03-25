@@ -660,17 +660,8 @@ public class NetSynth {
                 else {
                     
                     dirnetlist = runEspressoAndABC(direct, switches);
-                    
-                    printDebugStatement("Direct Netlist");
-                    printNetlist(dirnetlist);
-                    BooleanSimulator.printTruthTable(dirnetlist);
-                    
-                    System.out.println("\n\nInverted TT::"+inverted.truthTable);
-                    
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
                     
-                    printDebugStatement("Inverted Netlist");
-                    printNetlist(invnetlist);
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
                         runSubCircSwap(dirnetlist, switches, sublibrary);
@@ -888,8 +879,8 @@ public class NetSynth {
                 finalABCCircuit.add(ABCCircuit.get(i));
             }
         }
-        renameWires(finalEspCircuit);
-        renameWires(finalABCCircuit);
+//        renameWires(finalEspCircuit);
+//        renameWires(finalABCCircuit);
         
         finalEspCircuit = optimize(finalEspCircuit);
 
@@ -1124,26 +1115,12 @@ public class NetSynth {
         rewireNetlist(finalEspCircuit);
         rewireNetlist(finalABCCircuit);
         
-        printDebugStatement("After Running Inverted ABC Espresso");
-        System.out.println("ESP :: ");
-        printNetlist(finalEspCircuit);
-        BooleanSimulator.printTruthTable(finalEspCircuit);
-        System.out.println("ABC :: ");
-        printNetlist(finalABCCircuit);
-        BooleanSimulator.printTruthTable(finalABCCircuit);
         
         
-        printDebugStatement("Optimize Direct");
         finalEspCircuit = optimize(finalEspCircuit);
         finalABCCircuit = separateOutputGates(finalABCCircuit);
-        printDebugStatement("Optimize Inverted");
         finalABCCircuit = optimize(finalABCCircuit);
         
-        printDebugStatement("After Optimization");
-        printDebugStatement("ESP::");
-        printNetlist(finalEspCircuit);
-        printDebugStatement("ABC::");
-        printNetlist(finalABCCircuit);
         
         if (synthmode.contains(NetSynthSwitch.abc) && !synthmode.contains(NetSynthSwitch.espresso)) {
             return finalABCCircuit;
@@ -2242,9 +2219,6 @@ public class NetSynth {
                                     DWire newOutput = new DWire(netlist.get(j).output.name, DWireType.output);
                                     DGate newBuffGate = new DGate();
                                     newBuffGate.output = newOutput;
-                                    System.out.println("DGate J has an output wire :: " + printGate(netlist.get(j)));
-                                    System.out.println("DGate J has an output wire :: " + printGate(netlist.get(j)));
-                                    System.out.println("netlist.get(i).input.get(0)" + netlist.get(i).input.get(0).wtype.toString());
                                     if (isInputWire(netlist.get(i).input.get(0))) {//First NOT's input is an INPUT WIRE.
                                         newBuffGate.gtype = DGateType.BUF;
                                         newBuffGate.input.addAll(netlist.get(i).input);
@@ -2253,7 +2227,6 @@ public class NetSynth {
                                             if (netlist.get(k).output.name.equals(netlist.get(i).input.get(0).name)) {
                                                 newBuffGate.gtype = netlist.get(k).gtype;
                                                 newBuffGate.input.addAll(netlist.get(k).input);
-                                                System.out.println("DGATE :: " + printGate(newBuffGate));
                                             }
                                         }
                                     }
@@ -2715,13 +2688,11 @@ public class NetSynth {
             for (DGate redgate : NetlistConversionFunctions.ConvertToFanin2(netlist.get(i),this.wirecount)) {
                 reducedfanin.add(redgate);
             }
-            renameWires(reducedfanin);
         }
         for (int i = 0; i < reducedfanin.size(); i++) {
             for (DGate structgate : NetlistConversionFunctions.GatetoNORNOT(reducedfanin.get(i),this.wirecount)) {
                 output.add(structgate);
             }
-            renameWires(output);
         }
 
         output = optimize(output);

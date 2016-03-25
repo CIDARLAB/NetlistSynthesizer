@@ -113,24 +113,24 @@ public class EspressoAdaptor {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            String filestring = "";
-            int writeoutputcount =0;
-            filestring += (resultsFilePath + "write");
-            do{
-                filestring = (resultsFilePath + "write" + (writeoutputcount++) + ".txt");
-            }while(Utilities.validFilepath(filestring));
+            //String filestring = "";
+            //int writeoutputcount =0;
+            //filestring += (resultsFilePath + "write");
+            //do{
+            //    filestring = (resultsFilePath + "write" + (writeoutputcount++) + ".txt");
+            //}while(Utilities.validFilepath(filestring));
             //filestring += NetSynth.espout++; //CHANGE
-            File fbool = new File(filestring);
-            Writer output = new BufferedWriter(new FileWriter(fbool));
+            //File fbool = new File(filestring);
+            //Writer output = new BufferedWriter(new FileWriter(fbool));
             InputStream in = proc.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line = null;
             while ((line = br.readLine()) != null) {
                 espressoOutput.add(line);
-                line += "\n";
-                output.write(line);
+                //line += "\n";
+                //output.write(line);
             }
-            output.close();
+            //output.close();
             //fbool.delete();
         } catch (IOException ex) {
             Logger.getLogger(NetSynth.class.getName()).log(Level.SEVERE, null, ex);
@@ -537,7 +537,6 @@ public class EspressoAdaptor {
                     outputsum.get(j).add(sumlast);
                 }
             }
-            NetSynth.renameWires(netlist);
         }
         for (int j = 0; j < outputWires.size(); j++) {
             if (outputsum.get(j).isEmpty()) {

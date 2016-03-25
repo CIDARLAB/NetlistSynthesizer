@@ -37,6 +37,8 @@ public class Allnin1out {
         filepath += "testVerilog.v";
         int ttSize = (int)Math.pow(2, size);
         int noOfTT = (int)Math.pow(2, ttSize);
+        NetSynth netSynth = new NetSynth("fourInOneOut");
+        netSynth.setSwapCount(3);
         for(int i=0;i<noOfTT;i++){
             try {
                 
@@ -62,7 +64,7 @@ public class Allnin1out {
                 List<DGate> netlist = new ArrayList<DGate>();
                 
                 long startTime = System.nanoTime();
-                NetSynth netSynth = new NetSynth();
+                
                 netlist = netSynth.getNetlist(filepath, switches);
                 long endTime = System.nanoTime();
                 
@@ -91,7 +93,7 @@ public class Allnin1out {
         return result;
     }
     
-    //@Test
+    @Test
     public void testAllCombinations(){
        boolean result;
        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
@@ -99,7 +101,7 @@ public class Allnin1out {
        //switches.add(NetSynthSwitch.outputOR);
        //switches.add(NetSynthSwitch.abc);
        //switches.add(NetSynthSwitch.noswap);
-       int size = 3;
+       int size = 4;
        result = verifyNin1out(switches,size);
        String assertMessage = size + " Input 1 Output Test Failed.";
        assertTrue(assertMessage,result);

@@ -451,7 +451,7 @@ public class NetlistConversionFunctions {
             for (DGate xgate : reduceTofanin2(g, g.gtype,wirecount)) {
                 fanin2.add(xgate);
             }
-            NetSynth.renameWires(fanin2);
+//            NetSynth.renameWires(fanin2);
         }
 
         return fanin2;
