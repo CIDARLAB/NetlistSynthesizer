@@ -1,0 +1,7 @@
+# Benchmark "blif_file" written by ABC on Tue Mar 29 15:13:35 2016
+INPUT(inp1)
+INPUT(inp2)
+INPUT(inp3)
+OUTPUT(out)
+n4          = AND(inp1, inp2)
+out         = AND(inp3, n4)

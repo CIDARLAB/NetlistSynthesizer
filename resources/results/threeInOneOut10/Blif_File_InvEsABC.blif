@@ -1,0 +1,11 @@
+.model blif_file
+.inputs inp1 inp2 inp3
+.outputs out
+.names inp1 inp2 inp3 out
+000 1
+001 1
+010 1
+100 1
+110 1
+111 1
+.end

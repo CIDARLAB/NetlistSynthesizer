@@ -21,6 +21,9 @@ import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.netsynth.NetSynthSwitch;
 import org.cellocad.BU.netsynth.Utilities;
 import org.cellocad.BU.precomputation.genVerilogFile;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -29,7 +32,7 @@ import org.junit.Test;
  * @author prash
  */
 public class Allnin1out {
-    public static boolean verifyNin1out(List<NetSynthSwitch> switches,int size){
+    public static boolean verifyNin1out(List<NetSynthSwitch> switches,int size) throws JSONException{
         boolean result = true;
         
         String filepath = "";
@@ -37,8 +40,8 @@ public class Allnin1out {
         filepath += "testVerilog.v";
         int ttSize = (int)Math.pow(2, size);
         int noOfTT = (int)Math.pow(2, ttSize);
-        NetSynth netSynth = new NetSynth("fourInOneOut");
-        netSynth.setSwapCount(3);
+        NetSynth netSynth = new NetSynth("threeInOneOut");
+        netSynth.swapCount = 3;
         for(int i=0;i<noOfTT;i++){
             try {
                 
@@ -64,8 +67,8 @@ public class Allnin1out {
                 List<DGate> netlist = new ArrayList<DGate>();
                 
                 long startTime = System.nanoTime();
-                
                 netlist = netSynth.getNetlist(filepath, switches);
+                
                 long endTime = System.nanoTime();
                 
                 long duration = (endTime - startTime)/1000000;
@@ -94,14 +97,14 @@ public class Allnin1out {
     }
     
     @Test
-    public void testAllCombinations(){
+    public void testAllCombinations() throws JSONException{
        boolean result;
        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
        //switches.add(NetSynthSwitches.espresso);
-       //switches.add(NetSynthSwitch.outputOR);
+       switches.add(NetSynthSwitch.output_or);
        //switches.add(NetSynthSwitch.abc);
        //switches.add(NetSynthSwitch.noswap);
-       int size = 4;
+       int size = 3;
        result = verifyNin1out(switches,size);
        String assertMessage = size + " Input 1 Output Test Failed.";
        assertTrue(assertMessage,result);

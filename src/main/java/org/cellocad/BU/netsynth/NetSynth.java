@@ -74,9 +74,8 @@ public class NetSynth {
     @Getter
     private final String resultsPath;
     
-    @Getter
-    @Setter
-    private int swapCount;
+    
+    public int swapCount;
     
     
     /**
@@ -604,13 +603,13 @@ public class NetSynth {
             invnetlist = runInvertedEspressoAndABC(inverted,switches);
             
             if(!switches.contains(NetSynthSwitch.noswap)){
-                runSubCircSwap(structNetlist,switches,sublibrary);
+                structNetlist = runSubCircSwap(structNetlist,switches,sublibrary);
                 //structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,sublibrary);
                 
-                runSubCircSwap(dirnetlist, switches, sublibrary);
+                dirnetlist = runSubCircSwap(dirnetlist, switches, sublibrary);
                 //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                 
-                runSubCircSwap(invnetlist, switches, sublibrary);
+                invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
                 //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
             }
             
@@ -651,10 +650,10 @@ public class NetSynth {
                     invnetlist = runInvertedDCEspressoAndABC(inverted, switches);
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
-                        runSubCircSwap(dirnetlist, switches, sublibrary);
+                        dirnetlist = runSubCircSwap(dirnetlist, switches, sublibrary);
                         //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                         
-                        runSubCircSwap(invnetlist, switches, sublibrary);
+                        invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
                         //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
@@ -675,10 +674,10 @@ public class NetSynth {
                     
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
-                        runSubCircSwap(dirnetlist, switches, sublibrary);
+                        dirnetlist = runSubCircSwap(dirnetlist, switches, sublibrary);
                         //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                         
-                        runSubCircSwap(invnetlist, switches, sublibrary);
+                        invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
                         //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
@@ -714,10 +713,10 @@ public class NetSynth {
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
-                        runSubCircSwap(dirnetlist, switches, sublibrary);
+                        dirnetlist = runSubCircSwap(dirnetlist, switches, sublibrary);
                         //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                         
-                        runSubCircSwap(invnetlist, switches, sublibrary);
+                        invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
                         //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
@@ -743,14 +742,17 @@ public class NetSynth {
     //</editor-fold>
     
     
-    private void runSubCircSwap(List<DGate> netlist, List<NetSynthSwitch> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
+    private List<DGate> runSubCircSwap(List<DGate> netlist, List<NetSynthSwitch> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
         int count = swapCount;
         if(count <1){
             count = 1;
         }
         for(int i=0;i<count;i++){
             netlist = subCircuitSwap.implementSwap(netlist, switches, sublibrary);
+            //System.out.println("Swap " + i + " completed");
         }
+        
+        return netlist;
         //if()
     } 
 
