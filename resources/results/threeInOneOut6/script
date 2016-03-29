@@ -1,1 +1,0 @@
-/home/prash/cidar/netsynth/resources/netsynthResources/abc -c "read /home/prash/cidar/netsynth/resources/results/threeInOneOut6/Blif_File_InvEsABC.blif; strash;  rewrite; refactor; balance; write /home/prash/cidar/netsynth/resources/results/threeInOneOut6/abcOutput.bench; quit"
