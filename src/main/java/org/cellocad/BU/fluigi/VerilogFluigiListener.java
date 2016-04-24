@@ -110,6 +110,16 @@ public interface VerilogFluigiListener extends ParseTreeListener {
 	 */
 	void exitOp(VerilogFluigiParser.OpContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogFluigiParser#var}.
+	 * @param ctx the parse tree
+	 */
+	void enterVar(VerilogFluigiParser.VarContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogFluigiParser#var}.
+	 * @param ctx the parse tree
+	 */
+	void exitVar(VerilogFluigiParser.VarContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogFluigiParser#modName}.
 	 * @param ctx the parse tree
 	 */

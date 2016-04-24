@@ -138,6 +138,18 @@ public class VerilogFluigiBaseListener implements VerilogFluigiListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterVar(VerilogFluigiParser.VarContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVar(VerilogFluigiParser.VarContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterModName(VerilogFluigiParser.ModNameContext ctx) { }
 	/**
 	 * {@inheritDoc}

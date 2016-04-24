@@ -11,8 +11,8 @@ root
     ;
 
 modDec
-    : 'module' modName '(' 'input' (input ',')+ 'output' (output | ((output ',')+ output)) ')'
-    | 'module' modName '(' 'output' (output ',')+ 'input' (input | ((input ',')+ input)) ')'
+    : 'module' modName '(' 'input' (input ',')+ 'output' (output | ((output ',')+ output)) ')' ';'
+    | 'module' modName '(' 'output' (output ',')+ 'input' (input | ((input ',')+ input)) ')' ';'
     ;
 
 stats
@@ -20,8 +20,8 @@ stats
     ;
 
 stat
-    : assignStat ';'
-    | decl ';'
+    : assignStat
+    | decl
     ;
 
 decl
@@ -39,11 +39,11 @@ exp
     ;
 
 lhs
-    : (output|wire)
+    : (var)
     ;
 
 rhs
-    : (output|wire|input) (op (output|wire|input))+
+    : (var) (op (var))+
     ;
 
 op
@@ -60,6 +60,10 @@ op
     | '+'
     | '-'
     | '|'
+    ;
+
+var
+    : ID
     ;
 
 modName
