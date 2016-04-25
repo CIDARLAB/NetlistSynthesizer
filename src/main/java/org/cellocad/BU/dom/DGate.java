@@ -21,10 +21,14 @@ public class DGate implements Serializable{
     public int gatestage;
     public int gindex;
     
+    public String symbol;
+    public String picpath;
+            
     public DGate()
     {      
          input = new ArrayList<DWire>();
          output = new DWire();
+        
     }
     public DGate(DGateType gType, List<DWire> inputWires, DWire outputWire)
     {
@@ -44,7 +48,6 @@ public class DGate implements Serializable{
             output.wirestage = maxStage;
             gatestage = maxStage;
         }
-        
     }
     public DGate(DGateType gType, String gName, List<DWire> inputWires, DWire outputWire)
     {
@@ -97,5 +100,12 @@ public class DGate implements Serializable{
             this.gatestage = maxStage;
         }
         
+    }
+    
+    public boolean isuFGate(){
+        if(this.gtype.equals(DGateType.uF)){
+            return true;
+        }
+        return false;
     }
 }

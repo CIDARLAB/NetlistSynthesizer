@@ -3,25 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.cellocad.BU.dom;
 
 /**
  *
  * @author prashantvaidyanathan
  */
-public enum DGateType{
-           NOT,
-           BUF,
-           NOR, 
-           NAND, 
-           AND, 
-           OR, 
-           OUTPUT_OR,
-           XOR,
-           XNOR,
-           
-           INPUT,
-           OUTPUT;   
-             
-    }
+public enum DGateType {
+
+    //Digital Gates
+    NOT,
+    BUF,
+    NOR,
+    NAND,
+    AND,
+    OR,
+    OUTPUT_OR,
+    XOR,
+    XNOR,
+    
+    //uF Gate
+    uF,
+    
+    //I/O Gate
+    INPUT,
+    OUTPUT;
+}

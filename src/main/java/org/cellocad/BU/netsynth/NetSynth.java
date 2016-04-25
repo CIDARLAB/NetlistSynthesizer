@@ -3303,6 +3303,18 @@ public class NetSynth {
             System.out.println(printGate(gate));
         }
     }
+    
+    public static void printuFNetlist(List<DGate> netlist) {
+        for(DGate gate:netlist){
+            System.out.println(printuFGate(gate));
+        }
+    }
+    
+    public static void printuFLongNetlist(List<DGate> netlist) {
+        for(DGate gate:netlist){
+            System.out.println(printuFLongGate(gate));
+        }
+    }
 
     /**
      * *************************************************************
@@ -3336,4 +3348,37 @@ public class NetSynth {
         netbuilder += ")";
         return netbuilder;
     }
+    
+    
+    public static String printuFGate(DGate g){
+        String netbuilder = "";
+        netbuilder += g.symbol;
+        netbuilder += "(";
+        netbuilder += g.output.name;
+
+        for (DWire x : g.input) {
+            netbuilder += ",";
+            netbuilder += x.name;
+        
+        }
+        netbuilder += ")";
+        return netbuilder;
+    }
+    
+    
+    public static String printuFLongGate(DGate g){
+        String netbuilder = "";
+        netbuilder += g.gname;
+        netbuilder += "(";
+        netbuilder += g.output.name;
+
+        for (DWire x : g.input) {
+            netbuilder += ",";
+            netbuilder += x.name;
+        
+        }
+        netbuilder += ")";
+        return netbuilder;
+    }
+    
 }

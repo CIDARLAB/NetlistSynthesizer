@@ -27,7 +27,6 @@ public class FluigiCircuitDetails {
         inputs = new ArrayList<>();
         outputs = new ArrayList<>();
         wires = new ArrayList<>();
-        
     }
     
 }

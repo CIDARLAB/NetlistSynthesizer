@@ -5,9 +5,17 @@
  */
 package org.cellocad.BU.fluigi;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.cellocad.BU.dom.DGate;
+import org.cellocad.BU.dom.DGateType;
+import org.cellocad.BU.dom.DWire;
+import org.cellocad.BU.dom.DWireType;
 
 /**
  *
@@ -16,9 +24,16 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class VerilogFluigiWalker implements VerilogFluigiListener {
     
     public FluigiCircuitDetails details;
+    public Map<String,DWire> wireMap;
+    public List<DGate> netlist;
+    public DGate currentGate;
+    private boolean inLHS = false;
+    private boolean inRHS = false;
     
     public VerilogFluigiWalker(){
         details = new FluigiCircuitDetails();
+        wireMap = new HashMap<>();
+        netlist = new ArrayList<>();
     }
     
     @Override
@@ -63,10 +78,13 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
 
     @Override
     public void enterAssignStat(VerilogFluigiParser.AssignStatContext ctx) {
+        currentGate = new DGate();
+        currentGate.gtype = DGateType.uF;
     }
 
     @Override
     public void exitAssignStat(VerilogFluigiParser.AssignStatContext ctx) {
+        netlist.add(currentGate);
     }
 
     @Override
@@ -79,22 +97,27 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
 
     @Override
     public void enterLhs(VerilogFluigiParser.LhsContext ctx) {
+        inLHS = true;
     }
 
     @Override
     public void exitLhs(VerilogFluigiParser.LhsContext ctx) {
+        inLHS = false;
     }
 
     @Override
     public void enterRhs(VerilogFluigiParser.RhsContext ctx) {
+        inRHS = true;
     }
 
     @Override
     public void exitRhs(VerilogFluigiParser.RhsContext ctx) {
+        inRHS = false;
     }
 
     @Override
     public void enterOp(VerilogFluigiParser.OpContext ctx) {
+        currentGate.symbol = ctx.getText();
     }
 
     @Override
@@ -114,6 +137,10 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
     public void enterInput(VerilogFluigiParser.InputContext ctx) {
         if(!details.inputs.contains(ctx.getText())){
             details.inputs.add(ctx.getText());
+            DWire inp = new DWire();
+            inp.name = ctx.getText();
+            inp.wtype = DWireType.input;
+            wireMap.put(ctx.getText(), inp);
         }
     }
 
@@ -125,6 +152,10 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
     public void enterOutput(VerilogFluigiParser.OutputContext ctx) {
         if(!details.outputs.contains(ctx.getText())){
             details.outputs.add(ctx.getText());
+            DWire out = new DWire();
+            out.name = ctx.getText();
+            out.wtype = DWireType.output;
+            wireMap.put(ctx.getText(), out);
         }
     }
 
@@ -136,6 +167,10 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
     public void enterWire(VerilogFluigiParser.WireContext ctx) {
         if(!details.wires.contains(ctx.getText())){
             details.wires.add(ctx.getText());
+            DWire wire = new DWire();
+            wire.name = ctx.getText();
+            wire.wtype = DWireType.connector;
+            wireMap.put(ctx.getText(), wire);
         }
     }
 
@@ -161,6 +196,12 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
 
     @Override
     public void enterVar(VerilogFluigiParser.VarContext ctx) {
+        if(inLHS){
+            currentGate.output = wireMap.get(ctx.getText());
+        }
+        if(inRHS){
+            currentGate.input.add(wireMap.get(ctx.getText()));
+        }
     }
 
     @Override

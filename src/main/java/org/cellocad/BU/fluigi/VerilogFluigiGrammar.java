@@ -9,13 +9,15 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.cellocad.BU.netsynth.NetSynth;
 
 /**
  *
  * @author prash
  */
 public class VerilogFluigiGrammar {
-    public static ParseTree getParseTree(String line){
+    
+    public static VerilogFluigiWalker getuFWalker(String line){
         ANTLRInputStream antlrStream = new ANTLRInputStream(line);
         VerilogFluigiLexer lexer = new VerilogFluigiLexer(antlrStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -26,13 +28,8 @@ public class VerilogFluigiGrammar {
         
         ParseTreeWalker.DEFAULT.walk(walker, tree);
         
-        System.out.println("Module Name :: " + walker.details.modulename);
-        System.out.println("Inputs :: " + walker.details.inputs);
-        System.out.println("Outputs :: " + walker.details.outputs);
-        System.out.println("Wires :: " + walker.details.wires);
         
-        //System.out.println("TREE :: \n" + tree.toStringTree(parser));
         
-        return tree;
+        return walker;
     }
 }
