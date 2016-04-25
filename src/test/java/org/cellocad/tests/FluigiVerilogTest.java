@@ -7,6 +7,8 @@ package org.cellocad.tests;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.cellocad.BU.dom.DGate;
+import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.fluigi.VerilogFluigiGrammar;
 import org.cellocad.BU.fluigi.VerilogFluigiWalker;
 import org.cellocad.BU.netsynth.NetSynth;
@@ -48,5 +50,18 @@ public class FluigiVerilogTest {
         System.out.println("uF Netlist :: \n");
         NetSynth.printuFNetlist(walker.netlist);
         
+        DGate gate0 = walker.netlist.get(0);
+        System.out.println("INPUTS for Gate 0 " + gate0.input);
+        for(DWire input:gate0.input){
+            System.out.println("WIRE name :: " + input.name);
+            System.out.println("WIRE type :: " + input.wtype);
+        }
+        
+        System.out.println("Output Wire name for Gate 0 :: " + gate0.output.name);
+        System.out.println("Output Wire type for Gate 0 :: " + gate0.output.wtype);
+        
+        System.out.println("Gate Symbol :: " + gate0.symbol);
+        
+       
     }
 }
