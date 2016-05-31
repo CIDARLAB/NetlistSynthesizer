@@ -13,6 +13,7 @@ root
 modDec
     : 'module' modName '(' 'input' (input ',')+ 'output' (output | ((output ',')+ output)) ')' ';'
     | 'module' modName '(' 'output' (output ',')+ 'input' (input | ((input ',')+ input)) ')' ';'
+    | 'module' modName '(' (('finput' (finput ',')*)|('foutput' (foutput ',')*)|('cinput' (cinput ',')*)|('coutput' (coutput ',')*))* (('finput' (finput ',')* finput)|('foutput' (foutput ',')* foutput)|('cinput' (cinput ',')* cinput)|('coutput' (coutput ',')* coutput)) ')' ';'
     ;
 
 stats
@@ -26,7 +27,11 @@ stat
 
 decl
     : 'input' (input | ((input ',')+ input)) ';'
+    | 'finput' (finput | ((finput ',')+ finput)) ';'
+    | 'cinput' (cinput | ((cinput ',')+ cinput)) ';'
     | 'output' (output | ((output ',')+ output)) ';'
+    | 'coutput' (coutput | ((coutput ',')+ coutput)) ';'
+    | 'foutput' (foutput | ((foutput ',')+ foutput)) ';'
     | 'wire' (wire | ((wire ',')+ wire)) ';' 
     ;
 
@@ -44,6 +49,7 @@ lhs
 
 rhs
     : (var) (op (var))+
+    | (bufferVar)
     ;
 
 op
@@ -60,6 +66,11 @@ op
     | '+'
     | '-'
     | '|'
+    | '/'
+    ;
+
+bufferVar
+    : var
     ;
 
 var
@@ -77,6 +88,23 @@ input
 output
     : ID 
     ;
+
+finput
+    : ID
+    ;
+
+cinput 
+    : ID
+    ;
+
+foutput 
+    : ID
+    ;
+
+coutput
+    : ID
+    ;
+
 
 wire
     : ID 

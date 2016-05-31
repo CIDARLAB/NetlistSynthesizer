@@ -110,6 +110,16 @@ public interface VerilogFluigiListener extends ParseTreeListener {
 	 */
 	void exitOp(VerilogFluigiParser.OpContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogFluigiParser#bufferVar}.
+	 * @param ctx the parse tree
+	 */
+	void enterBufferVar(VerilogFluigiParser.BufferVarContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogFluigiParser#bufferVar}.
+	 * @param ctx the parse tree
+	 */
+	void exitBufferVar(VerilogFluigiParser.BufferVarContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogFluigiParser#var}.
 	 * @param ctx the parse tree
 	 */
@@ -149,6 +159,46 @@ public interface VerilogFluigiListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitOutput(VerilogFluigiParser.OutputContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogFluigiParser#finput}.
+	 * @param ctx the parse tree
+	 */
+	void enterFinput(VerilogFluigiParser.FinputContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogFluigiParser#finput}.
+	 * @param ctx the parse tree
+	 */
+	void exitFinput(VerilogFluigiParser.FinputContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogFluigiParser#cinput}.
+	 * @param ctx the parse tree
+	 */
+	void enterCinput(VerilogFluigiParser.CinputContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogFluigiParser#cinput}.
+	 * @param ctx the parse tree
+	 */
+	void exitCinput(VerilogFluigiParser.CinputContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogFluigiParser#foutput}.
+	 * @param ctx the parse tree
+	 */
+	void enterFoutput(VerilogFluigiParser.FoutputContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogFluigiParser#foutput}.
+	 * @param ctx the parse tree
+	 */
+	void exitFoutput(VerilogFluigiParser.FoutputContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogFluigiParser#coutput}.
+	 * @param ctx the parse tree
+	 */
+	void enterCoutput(VerilogFluigiParser.CoutputContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogFluigiParser#coutput}.
+	 * @param ctx the parse tree
+	 */
+	void exitCoutput(VerilogFluigiParser.CoutputContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link VerilogFluigiParser#wire}.
 	 * @param ctx the parse tree

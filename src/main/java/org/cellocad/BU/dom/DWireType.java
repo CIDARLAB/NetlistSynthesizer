@@ -12,7 +12,11 @@ package org.cellocad.BU.dom;
  */
 public enum DWireType{
          input,
+         cinput,
+         finput,
          output,
+         coutput,
+         foutput,
          GND,
          Source,
          connector;

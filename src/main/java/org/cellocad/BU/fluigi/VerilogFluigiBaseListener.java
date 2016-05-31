@@ -138,6 +138,18 @@ public class VerilogFluigiBaseListener implements VerilogFluigiListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBufferVar(VerilogFluigiParser.BufferVarContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBufferVar(VerilogFluigiParser.BufferVarContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterVar(VerilogFluigiParser.VarContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -181,6 +193,54 @@ public class VerilogFluigiBaseListener implements VerilogFluigiListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitOutput(VerilogFluigiParser.OutputContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFinput(VerilogFluigiParser.FinputContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFinput(VerilogFluigiParser.FinputContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCinput(VerilogFluigiParser.CinputContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCinput(VerilogFluigiParser.CinputContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFoutput(VerilogFluigiParser.FoutputContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFoutput(VerilogFluigiParser.FoutputContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCoutput(VerilogFluigiParser.CoutputContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCoutput(VerilogFluigiParser.CoutputContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

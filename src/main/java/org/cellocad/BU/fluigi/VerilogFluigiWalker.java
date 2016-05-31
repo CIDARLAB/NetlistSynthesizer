@@ -207,5 +207,74 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
     @Override
     public void exitVar(VerilogFluigiParser.VarContext ctx) {
     }
+
+    @Override
+    public void enterFinput(VerilogFluigiParser.FinputContext ctx) {
+        if (!details.inputs.contains(ctx.getText())) {
+            details.inputs.add(ctx.getText());
+            DWire inp = new DWire();
+            inp.name = ctx.getText();
+            inp.wtype = DWireType.finput;
+            wireMap.put(ctx.getText(), inp);
+        }
+    }
+
+    @Override
+    public void exitFinput(VerilogFluigiParser.FinputContext ctx) {
+    }
+
+    @Override
+    public void enterCinput(VerilogFluigiParser.CinputContext ctx) {
+        if (!details.inputs.contains(ctx.getText())) {
+            details.inputs.add(ctx.getText());
+            DWire inp = new DWire();
+            inp.name = ctx.getText();
+            inp.wtype = DWireType.cinput;
+            wireMap.put(ctx.getText(), inp);
+        }
+    }
+
+    @Override
+    public void exitCinput(VerilogFluigiParser.CinputContext ctx) {
+    }
+
+    @Override
+    public void enterFoutput(VerilogFluigiParser.FoutputContext ctx) {
+        if (!details.outputs.contains(ctx.getText())) {
+            details.outputs.add(ctx.getText());
+            DWire out = new DWire();
+            out.name = ctx.getText();
+            out.wtype = DWireType.foutput;
+            wireMap.put(ctx.getText(), out);
+        }
+    }
+
+    @Override
+    public void exitFoutput(VerilogFluigiParser.FoutputContext ctx) {
+    }
+
+    @Override
+    public void enterCoutput(VerilogFluigiParser.CoutputContext ctx) {
+        if (!details.outputs.contains(ctx.getText())) {
+            details.outputs.add(ctx.getText());
+            DWire out = new DWire();
+            out.name = ctx.getText();
+            out.wtype = DWireType.coutput;
+            wireMap.put(ctx.getText(), out);
+        }
+    }
+
+    @Override
+    public void exitCoutput(VerilogFluigiParser.CoutputContext ctx) {
+    }
+
+    @Override
+    public void enterBufferVar(VerilogFluigiParser.BufferVarContext ctx) {
+        this.currentGate.gtype = DGateType.BUF;
+    }
+
+    @Override
+    public void exitBufferVar(VerilogFluigiParser.BufferVarContext ctx) {
+    }
     
 }
