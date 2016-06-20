@@ -351,183 +351,148 @@ public class parseVerilogFile {
         return outputs;
     }
     
-    
-    public static CircuitDetails parseCaseStatements(String alllines)
-    {
-        
-         
-         List<String> inputs = new ArrayList<String>();
-         List<String> outputs = new ArrayList<String>();
-         List<String> unknownIO = new ArrayList<String>();
-         
-         int x = 0;
-        
+    public static CircuitDetails parseCaseStatements(String alllines) {
+
+        List<String> inputs = new ArrayList<String>();
+        List<String> outputs = new ArrayList<String>();
+        List<String> unknownIO = new ArrayList<String>();
+
+        int x = 0;
+
         CircuitDetails circuit = new CircuitDetails();
-        
+
         //System.out.println(alllines);
-        
         //<editor-fold desc="Extract Module IO Contraints">
-        String moduleString = alllines.substring(alllines.indexOf("module "),alllines.indexOf(";"));
-        alllines = alllines.substring((alllines.indexOf(moduleString) + moduleString.length()+1), alllines.indexOf(" endmodule"));
+        String moduleString = alllines.substring(alllines.indexOf("module "), alllines.indexOf(";"));
+        alllines = alllines.substring((alllines.indexOf(moduleString) + moduleString.length() + 1), alllines.indexOf(" endmodule"));
         alllines = alllines.trim();
         moduleString = moduleString.trim();
-        moduleString = moduleString.substring((moduleString.indexOf("(")+1),moduleString.indexOf(")"));
+        moduleString = moduleString.substring((moduleString.indexOf("(") + 1), moduleString.indexOf(")"));
         //System.out.println(alllines);
-        
+
         //System.out.println(moduleString);
         String[] modulePieces = moduleString.split(",");
-        for(int i=0;i<modulePieces.length;i++)
-        {
+        for (int i = 0; i < modulePieces.length; i++) {
             String IO = modulePieces[i].trim();
-            if(IO.contains("input "))
-            {
-                IO = IO.substring(IO.indexOf("input ")+6);
+            if (IO.contains("input ")) {
+                IO = IO.substring(IO.indexOf("input ") + 6);
                 IO = IO.trim();
                 inputs.add(IO);
-                
-            }
-            else if(IO.contains("output "))
-            {
-                
-                IO = IO.substring(IO.indexOf("output ")+7);
+
+            } else if (IO.contains("output ")) {
+
+                IO = IO.substring(IO.indexOf("output ") + 7);
                 IO = IO.trim();
                 outputs.add(IO);
-                
-            }
-            else
-            {
-                unknownIO.add(IO);   
-                
+
+            } else {
+                unknownIO.add(IO);
+
             }
         }
         //System.out.println(alllines);
         //</editor-fold>
-        
+
         List<String> VerilogLines = new ArrayList<String>();
-        String temp="";
-        int caseLocation=-1;
-        int cnt =0;
-        while(alllines.contains(";") || alllines.length()>0)
-        {
-            
-            if(alllines.startsWith("always ") || alllines.startsWith("always@"))
-            {
-                if(alllines.contains(" begin "))
-                {
-                    int lastbeginIndx=0;
-                    if((alllines.lastIndexOf(" end")+4) == alllines.length())
-                    {
-                        temp = alllines.substring(0, alllines.lastIndexOf(" end")+4);
+        String temp = "";
+        int caseLocation = -1;
+        int cnt = 0;
+        while (alllines.contains(";") || alllines.length() > 0) {
+
+            if (alllines.startsWith("always ") || alllines.startsWith("always@")) {
+                if (alllines.contains(" begin ")) {
+                    int lastbeginIndx = 0;
+                    if ((alllines.lastIndexOf(" end") + 4) == alllines.length()) {
+                        temp = alllines.substring(0, alllines.lastIndexOf(" end") + 4);
                         VerilogLines.add(temp);
-                        alllines = alllines.substring(alllines.lastIndexOf(" end")+4);
-                    }
-                    else
-                    {
-                        temp = alllines.substring(0, alllines.lastIndexOf(" end ")+5);
+                        alllines = alllines.substring(alllines.lastIndexOf(" end") + 4);
+                    } else {
+                        temp = alllines.substring(0, alllines.lastIndexOf(" end ") + 5);
                         VerilogLines.add(temp);
-                        alllines = alllines.substring(alllines.lastIndexOf(" end ")+5);
+                        alllines = alllines.substring(alllines.lastIndexOf(" end ") + 5);
                     }
-                if(temp.contains(" endcase "))
-                    caseLocation = cnt;
-                alllines = alllines.trim();
+                    if (temp.contains(" endcase ")) {
+                        caseLocation = cnt;
+                    }
+                    alllines = alllines.trim();
                 }
-                
-            }
-            else if(alllines.contains(";"))
-            {
+
+            } else if (alllines.contains(";")) {
                 //System.out.println(alllines);
-                VerilogLines.add(alllines.substring(0,alllines.indexOf(";")));
-                alllines = alllines.substring(alllines.indexOf(";")+1);
+                VerilogLines.add(alllines.substring(0, alllines.indexOf(";")));
+                alllines = alllines.substring(alllines.indexOf(";") + 1);
                 alllines = alllines.trim();
-            }    
-            else
-            {
+            } else {
                 VerilogLines.add(alllines);
                 alllines = "";
             }
-           
+
             cnt++;
         }
-        
-        if(caseLocation == -1)
+
+        if (caseLocation == -1) {
             System.out.println("No case statements");
-        
-        else
-        {
+        } else {
             String tempcase = VerilogLines.get(caseLocation);
             //List<String> caseStatements = new ArrayList<String>();
-            String caseblock ="";
+            String caseblock = "";
             String caseparam = "";
             String[] caseStatements;
             boolean unusualcase = false;
-            
-            if(tempcase.contains("case("))
-            {
-                caseblock = tempcase.substring(tempcase.indexOf("case(")+4);
+
+            if (tempcase.contains("case(")) {
+                caseblock = tempcase.substring(tempcase.indexOf("case(") + 4);
                 caseblock = caseblock.trim();
-            }
-            else if(tempcase.contains("case "))
-            {
-               
+            } else if (tempcase.contains("case ")) {
+
                 //System.out.println(tempcase);
-                caseblock = tempcase.substring(tempcase.indexOf("case ")+5);
+                caseblock = tempcase.substring(tempcase.indexOf("case ") + 5);
                 caseblock = caseblock.trim();
-                
-            }
-            else
-            {
+
+            } else {
                 unusualcase = true;
-                System.out.println("unusual Case Statement!!\n"+tempcase);
+                System.out.println("unusual Case Statement!!\n" + tempcase);
             }
-            
-            if(!unusualcase)
-            {
-                caseparam = caseblock.substring(caseblock.indexOf("(")+1,caseblock.indexOf(")"));
-                caseblock = caseblock.substring(caseblock.indexOf(")")+1);
-                caseblock = caseblock.substring(0,caseblock.indexOf("endcase"));
+
+            if (!unusualcase) {
+                caseparam = caseblock.substring(caseblock.indexOf("(") + 1, caseblock.indexOf(")"));
+                caseblock = caseblock.substring(caseblock.indexOf(")") + 1);
+                caseblock = caseblock.substring(0, caseblock.indexOf("endcase"));
                 caseblock = caseblock.trim();
                 caseStatements = caseblock.split(";");
-                
-                List<HashMap<Integer,Integer>> truthtable = new ArrayList<HashMap<Integer,Integer>>();
-                List<HashMap<Integer,Character>> charTruthTable = new ArrayList<HashMap<Integer,Character>>();
-                caseparam = caseparam.substring(caseparam.indexOf("{")+1, caseparam.indexOf("}"));
-                
+
+                List<HashMap<Integer, Integer>> truthtable = new ArrayList<HashMap<Integer, Integer>>();
+                List<HashMap<Integer, Character>> charTruthTable = new ArrayList<HashMap<Integer, Character>>();
+                caseparam = caseparam.substring(caseparam.indexOf("{") + 1, caseparam.indexOf("}"));
+
                 String[] caseinp = caseparam.split(",");
-                for(int i=0;i<caseinp.length;i++)
-                {
+                for (int i = 0; i < caseinp.length; i++) {
                     circuit.inputNames.add(caseinp[i].trim());
                 }
-                
-                String output = caseStatements[0].substring(caseStatements[0].indexOf(":")+1,caseStatements[0].indexOf("="));
+
+                String output = caseStatements[0].substring(caseStatements[0].indexOf(":") + 1, caseStatements[0].indexOf("="));
                 output = output.trim();
-                if(output.contains("{"))
-                {
-                    if(!output.contains("}"))
+                if (output.contains("{")) {
+                    if (!output.contains("}")) {
                         System.out.println("Wrong Case Statement!!");
-                    else
-                    {
-                        output = output.substring(output.indexOf("{")+1, output.lastIndexOf("}"));
+                    } else {
+                        output = output.substring(output.indexOf("{") + 1, output.lastIndexOf("}"));
                         String outputpieces[] = output.split(",");
-                        for(int i=0;i<outputpieces.length;i++)
-                        {
+                        for (int i = 0; i < outputpieces.length; i++) {
                             circuit.outputNames.add(outputpieces[i].trim());
                             //System.out.println("These are the outputs!!"+outputpieces[i].trim());
                         }
                     }
-                }
-                else
-                {
+                } else {
                     circuit.outputNames.add(output);
                     //System.out.println("OUTPUT : " + output);
                 }
-                
+
                 //System.out.println(output);
-                 HashMap<Integer,Character> tt = new HashMap<Integer,Character>();
-                for (int j = 0; j < circuit.outputNames.size(); j++) 
-                {
-                    tt = new HashMap<Integer,Character>();
-                    for (int i = 0; i < caseStatements.length; i++) 
-                    {
+                HashMap<Integer, Character> tt = new HashMap<Integer, Character>();
+                for (int j = 0; j < circuit.outputNames.size(); j++) {
+                    tt = new HashMap<Integer, Character>();
+                    for (int i = 0; i < caseStatements.length; i++) {
                         String xcase = caseStatements[i].trim();
                         String cNum = xcase.substring(0, xcase.indexOf(":")).trim();
                         int caseNumber = Convert.toDec(cNum);
@@ -536,39 +501,28 @@ public class parseVerilogFile {
                         //System.out.println("xcase : "+xcase);
                         //System.out.println("cNum : "+cNum);
                         //System.out.println("sNum : "+sNum);
-                        
-                        if (sNum.contains("'")) 
-                        {
-                            if (sNum.contains("b")) 
-                            {
-                                String bintt = sNum.substring(sNum.indexOf("b")+1);
+
+                        if (sNum.contains("'")) {
+                            if (sNum.contains("b")) {
+                                String bintt = sNum.substring(sNum.indexOf("b") + 1);
                                 char ttnum = bintt.charAt(j);
                                 //if(bintt.charAt(j) =='1')
                                 //    ttnum = '1';
                                 tt.put(caseNumber, ttnum);
-                            } 
-                            else if (sNum.contains("d")) 
-                            {
+                            } else if (sNum.contains("d")) {
                                 System.out.println("Feature not yet supported");
                             }
-                        }
-                        else if (sNum.contains("’")) 
-                        {
-                            if (sNum.contains("b")) 
-                            {
-                                String bintt = sNum.substring(sNum.indexOf("b")+1);
+                        } else if (sNum.contains("’")) {
+                            if (sNum.contains("b")) {
+                                String bintt = sNum.substring(sNum.indexOf("b") + 1);
                                 char ttnum = bintt.charAt(j);
                                 //if(bintt.charAt(j) =='1')
                                 //    ttnum = '1';
                                 tt.put(caseNumber, ttnum);
-                            } 
-                            else if (sNum.contains("d")) 
-                            {
+                            } else if (sNum.contains("d")) {
                                 System.out.println("Feature not yet supported");
                             }
-                        }
-                        else 
-                        {
+                        } else {
                             System.out.println("Feature not yet supported");
                             //String bintt = Convert.dectoBin(Integer.parseInt(sNum), circuit.outputNames.size());
                             //int ttnum=0;
@@ -580,7 +534,7 @@ public class parseVerilogFile {
                     //truthtable.add(tt);
                     charTruthTable.add(tt);
                 }
-                
+
                 //<editor-fold desc="Commented out code that could handle all types of assigments in case statements">
                 /*for (int j = 0; j < circuit.outputNames.size(); j++) 
                 {
@@ -648,32 +602,37 @@ public class parseVerilogFile {
                     truthtable.add(tt);
                 }*/
                 //</editor-fold>
-                
                 int numTT = (int) Math.pow(2, caseinp.length);
-                
-                char[] xbits = new char[numTT];
-                
-                for (int j = 0; j < circuit.outputNames.size(); j++) 
-                {
-                    xbits = new char[numTT];
-                    for (int i = 0; i < numTT; i++) 
-                    {
 
-                        if (charTruthTable.get(j).containsKey(i)) 
-                        {
+                char[] xbits = new char[numTT];
+
+                HashMap<String, String> latches = new HashMap();
+                
+                for (int j = 0; j < circuit.outputNames.size(); j++) {
+                    xbits = new char[numTT];
+                    for (int i = 0; i < numTT; i++) {
+
+                        if (charTruthTable.get(j).containsKey(i)) {
 
                             xbits[i] = charTruthTable.get(j).get(i).toString().charAt(0);
-                        } 
-                        else
-                        {
-                            if (charTruthTable.get(j).containsKey(-2)) 
-                            {
-                                xbits[i] = charTruthTable.get(j).get(-2).toString().charAt(0);
-                            } 
-                            else 
-                            {
-                                xbits[i] = '0';
+                        } else if (charTruthTable.get(j).containsKey(-2)) {
+                            xbits[i] = charTruthTable.get(j).get(-2).toString().charAt(0);
+                        } else {
+                            /* This is the line that completes the incomplete case statements
+                                '-' should be used instead and the latch catch mechanism has to be implemented (not for now, don't know whether Don't Care is supported);
+                                Latch Catch Mechanism is the updating of the hasLatch field in CircuitDetails and EnableTruthTable
+                             */
+                            
+                            if (!latches.containsKey(circuit.outputNames.get(j))) {
+                                circuit.outputNames.set(j, "DATA"+circuit.outputNames.get(j));
+                                String init = "";
+                                for (int k = 0; k < numTT; k++) {
+                                    init += "0";
+                                }
+                                latches.put(circuit.outputNames.get(j), init);
                             }
+                            latches.put(circuit.outputNames.get(j), latches.get(circuit.outputNames.get(j)).substring(0, i) + '1' + latches.get(circuit.outputNames.get(j)).substring(i + 1));
+                            xbits[i] = '-';
                         }
                     }
                     //int truthtableval = Convert.bintoDec(new String(xbits));
@@ -681,14 +640,21 @@ public class parseVerilogFile {
                     //System.out.println(truthtableval);
                     circuit.truthTable.add(truthtableval);
                 }
-            }
-            else
-            {
+
+                //System.out.println("LATCHES!!");
+                for (String name : latches.keySet()) {
+                    //System.out.println("output: " + name + "\tlatchTruthTable: " + direct.latches.get(name));
+                    circuit.outputNames.add("ENABLE" + name.substring(4));
+                    circuit.truthTable.add(latches.get(name));
+                }
+                //System.out.println("***********************************");
+                
+            } else {
                 return null;
             }
-            
+
         }
-        
+
         return circuit;
     }
     

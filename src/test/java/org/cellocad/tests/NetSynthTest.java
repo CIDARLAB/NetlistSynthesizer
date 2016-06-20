@@ -39,7 +39,7 @@ public class NetSynthTest {
                              "    end\n" +
                              "endmodule";
         NetSynth netsynth = new NetSynth("deleteTest");
-        System.out.println("Folder :: " + netsynth.getResultsPath());
+        //System.out.println("Folder :: " + netsynth.getResultsPath());
         
         
         NetSynth.printNetlist(netsynth.getNetlistCode(verilogCode, switches)); 

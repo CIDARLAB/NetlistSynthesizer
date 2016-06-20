@@ -21,6 +21,8 @@ public enum DGateType{
            XOR,
            XNOR,
            
+           DLATCH, //First input Data, second input Enable
+           
            INPUT,
            OUTPUT;   
              
