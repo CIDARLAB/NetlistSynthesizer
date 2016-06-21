@@ -3360,10 +3360,11 @@ public class NetSynth {
         for (int i = 0; i < theNetlist.size(); i++) {
             DGate dg = theNetlist.get(i);
             if (dg.output.name.contains("DATA")) {
-                DWire outputWire = new DWire("0Wire" + wirecount.getAndIncrement());
+                String outputName = dg.output.name.substring(4);
+                //DWire outputWire = new DWire("0Wire" + wirecount.getAndIncrement());
+                DWire outputWire = new DWire(outputName);
                 outputWire.wtype = DWireType.output;
                 dg.output.wtype = DWireType.connector;
-                String outputName = dg.output.name.substring(4);
                 //outputWire.name = outputName;
                 List<DWire> inputWires = new ArrayList();
                 inputWires.add(dg.output);
