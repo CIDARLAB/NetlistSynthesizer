@@ -2872,25 +2872,55 @@ public class NetSynth {
             if(gate.gtype.equals(DGateType.DLATCH)){
                 DGate nor1 = new DGate();
                 DGate nor2 = new DGate();
+                DGate nor3 = new DGate();
+                DGate nor4 = new DGate();
+                DGate not = new DGate();
                 
                 nor1.gtype = DGateType.NOR;
                 nor2.gtype = DGateType.NOR;
+                nor3.gtype = DGateType.NOR;
+                nor4.gtype = DGateType.NOR;
+                not.gtype = DGateType.NOT;
                 
                 
-                nor1.input.add(gate.input.get(0));
-                nor2.input.add(gate.input.get(1));
+                nor3.input.add(gate.input.get(0));
+                nor3.input.add(gate.input.get(1));
+                nor4.input.add(gate.input.get(1));
                 nor2.input.add(gate.output);
                 
                 nor1.output = gate.output;
                 
-                DWire internal = new DWire("0Wire" + wirecount.getAndIncrement());
-                internal.wtype = DWireType.connector;
+                DWire internal0 = new DWire("0Wire" + wirecount.getAndIncrement());
+                internal0.wtype = DWireType.connector;
                 
-                nor1.input.add(internal);
-                nor2.output = internal;
+                nor1.input.add(internal0);
+                nor2.output = internal0;
+                
+                DWire internal1 = new DWire("0Wire" + wirecount.getAndIncrement());
+                internal1.wtype = DWireType.connector;
+                
+                nor1.input.add(internal1);
+                nor3.output = internal1;
+                
+                DWire internal2 = new DWire("0Wire" + wirecount.getAndIncrement());
+                internal2.wtype = DWireType.connector;
+                
+                nor2.input.add(internal2);
+                nor4.output = internal2;
+                
+                DWire internal3 = new DWire("0Wire" + wirecount.getAndIncrement());
+                internal3.wtype = DWireType.connector;
+                
+                nor4.input.add(internal3);
+                not.output = internal3;
+                
+                not.input.add(gate.input.get(0));
                 
                 comb.add(nor1);
                 comb.add(nor2);
+                comb.add(nor3);
+                comb.add(nor4);
+                comb.add(not);
                 
             }
             else{
