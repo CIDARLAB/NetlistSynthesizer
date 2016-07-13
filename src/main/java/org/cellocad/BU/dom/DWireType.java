@@ -17,6 +17,8 @@ public enum DWireType{
          output,
          coutput,
          foutput,
+         cchannel,
+         fchannel,
          GND,
          Source,
          connector;

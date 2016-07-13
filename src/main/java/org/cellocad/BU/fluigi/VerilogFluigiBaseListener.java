@@ -1,4 +1,4 @@
-// Generated from VerilogFluigi.g4 by ANTLR 4.5.3
+// Generated from VerilogFluigi.g4 by ANTLR 4.5.1
 
     package org.cellocad.BU.fluigi;
 
@@ -253,6 +253,30 @@ public class VerilogFluigiBaseListener implements VerilogFluigiListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitWire(VerilogFluigiParser.WireContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCchannel(VerilogFluigiParser.CchannelContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCchannel(VerilogFluigiParser.CchannelContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFchannel(VerilogFluigiParser.FchannelContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFchannel(VerilogFluigiParser.FchannelContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

@@ -1,4 +1,4 @@
-// Generated from VerilogFluigi.g4 by ANTLR 4.5.3
+// Generated from VerilogFluigi.g4 by ANTLR 4.5.1
 
     package org.cellocad.BU.fluigi;
 
@@ -132,4 +132,16 @@ public interface VerilogFluigiVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitWire(VerilogFluigiParser.WireContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogFluigiParser#cchannel}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCchannel(VerilogFluigiParser.CchannelContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogFluigiParser#fchannel}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFchannel(VerilogFluigiParser.FchannelContext ctx);
 }

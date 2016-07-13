@@ -276,5 +276,35 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
     @Override
     public void exitBufferVar(VerilogFluigiParser.BufferVarContext ctx) {
     }
+
+    @Override
+    public void enterCchannel(VerilogFluigiParser.CchannelContext ctx) {
+        if (!details.wires.contains(ctx.getText())) {
+            details.wires.add(ctx.getText());
+            DWire wire = new DWire();
+            wire.name = ctx.getText();
+            wire.wtype = DWireType.cchannel;
+            wireMap.put(ctx.getText(), wire);
+        }
+    }
+
+    @Override
+    public void exitCchannel(VerilogFluigiParser.CchannelContext ctx) {
+    }
+
+    @Override
+    public void enterFchannel(VerilogFluigiParser.FchannelContext ctx) {
+        if (!details.wires.contains(ctx.getText())) {
+            details.wires.add(ctx.getText());
+            DWire wire = new DWire();
+            wire.name = ctx.getText();
+            wire.wtype = DWireType.fchannel;
+            wireMap.put(ctx.getText(), wire);
+        }
+    }
+
+    @Override
+    public void exitFchannel(VerilogFluigiParser.FchannelContext ctx) {
+    }
     
 }

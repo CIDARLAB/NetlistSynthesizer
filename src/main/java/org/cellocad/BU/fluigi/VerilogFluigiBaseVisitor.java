@@ -1,4 +1,4 @@
-// Generated from VerilogFluigi.g4 by ANTLR 4.5.3
+// Generated from VerilogFluigi.g4 by ANTLR 4.5.1
 
     package org.cellocad.BU.fluigi;
 
@@ -153,4 +153,18 @@ public class VerilogFluigiBaseVisitor<T> extends AbstractParseTreeVisitor<T> imp
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitWire(VerilogFluigiParser.WireContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitCchannel(VerilogFluigiParser.CchannelContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitFchannel(VerilogFluigiParser.FchannelContext ctx) { return visitChildren(ctx); }
 }

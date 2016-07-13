@@ -1,4 +1,4 @@
-// Generated from VerilogFluigi.g4 by ANTLR 4.5.3
+// Generated from VerilogFluigi.g4 by ANTLR 4.5.1
 
     package org.cellocad.BU.fluigi;
 
@@ -209,4 +209,24 @@ public interface VerilogFluigiListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitWire(VerilogFluigiParser.WireContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogFluigiParser#cchannel}.
+	 * @param ctx the parse tree
+	 */
+	void enterCchannel(VerilogFluigiParser.CchannelContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogFluigiParser#cchannel}.
+	 * @param ctx the parse tree
+	 */
+	void exitCchannel(VerilogFluigiParser.CchannelContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogFluigiParser#fchannel}.
+	 * @param ctx the parse tree
+	 */
+	void enterFchannel(VerilogFluigiParser.FchannelContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogFluigiParser#fchannel}.
+	 * @param ctx the parse tree
+	 */
+	void exitFchannel(VerilogFluigiParser.FchannelContext ctx);
 }

@@ -32,7 +32,9 @@ decl
     | 'output' (output | ((output ',')+ output)) ';'
     | 'coutput' (coutput | ((coutput ',')+ coutput)) ';'
     | 'foutput' (foutput | ((foutput ',')+ foutput)) ';'
-    | 'wire' (wire | ((wire ',')+ wire)) ';' 
+    | 'wire' (wire | ((wire ',')+ wire)) ';'
+    | 'cchannel' (cchannel | ((cchannel ',')+ cchannel)) ';'
+    | 'fchannel' (fchannel | ((fchannel ',')+ fchannel)) ';'
     ;
 
 assignStat
@@ -108,6 +110,14 @@ coutput
 
 wire
     : ID 
+    ;
+
+cchannel
+    : ID
+    ;
+
+fchannel
+    : ID
     ;
 
 ID 
