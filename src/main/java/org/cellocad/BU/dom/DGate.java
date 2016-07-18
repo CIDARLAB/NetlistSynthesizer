@@ -7,6 +7,7 @@ package org.cellocad.BU.dom;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONObject;
 /**
  *
  * @author prashantvaidyanathan
@@ -23,7 +24,20 @@ public class DGate implements Serializable{
     
     public String symbol;
     public String picpath;
-            
+    
+    //shane's additions
+    public JSONObject opInfo;   //from UCF, contains all info regarding the microfluidic operation the gate performs
+    public String mintName;     //name used for this gate in mint file
+    public int inTermInd;       //current index of inTerm JSONArray
+    public int outTermInd;      //current index of outTerm JSONArray
+    public int inTermVal = 4;       //by default input terminal is 4th orientation (left) EG: *** ----->IN[(Device)]OUT-----> ***
+    public int outTermVal = 2;      //by default output terminal is 2nd orientation (right)
+    public boolean inTermFlag = false;      //flag that is true if inTerm JSONArray exists (used for gates with nonstandard orientations)
+    public boolean outTermFlag = false;     //flag that is true if outTerm JSONArray exists (used for gates with nonstandard orientations)
+    public boolean isWritten = false;       //flag that is true if gate has been printed to mint file
+    public LayerType layer;
+    //end shane's additions
+    
     public DGate()
     {      
          input = new ArrayList<DWire>();
