@@ -22,8 +22,10 @@ public enum DGateType {
     XOR,
     XNOR,
     
-    //uF Gate
+    //uF Gates
     uF,
+    uF_IN,
+    uF_OUT,
     
     //I/O Gate
     INPUT,
