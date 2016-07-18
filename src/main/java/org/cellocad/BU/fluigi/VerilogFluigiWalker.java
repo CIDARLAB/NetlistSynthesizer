@@ -16,6 +16,7 @@ import org.cellocad.BU.dom.DGate;
 import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.dom.DWireType;
+import org.cellocad.BU.dom.LayerType;
 
 /**
  *
@@ -140,7 +141,10 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             DWire inp = new DWire();
             inp.name = ctx.getText();
             inp.wtype = DWireType.input;
-            wireMap.put(ctx.getText(), inp);
+            currentGate = new DGate();
+            currentGate.gtype = DGateType.uF_IN;
+            currentGate.output = inp;
+            wireMap.put(ctx.getText(), inp);        
         }
     }
 
@@ -152,9 +156,12 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
     public void enterOutput(VerilogFluigiParser.OutputContext ctx) {
         if(!details.outputs.contains(ctx.getText())){
             details.outputs.add(ctx.getText());
-            DWire out = new DWire();
-            out.name = ctx.getText();
+            DWire out = new DWire(); 
+           out.name = ctx.getText();
             out.wtype = DWireType.output;
+            currentGate = new DGate();
+            currentGate.gtype = DGateType.uF_OUT;
+            currentGate.input.add(out);
             wireMap.put(ctx.getText(), out);
         }
     }
@@ -215,6 +222,7 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             DWire inp = new DWire();
             inp.name = ctx.getText();
             inp.wtype = DWireType.finput;
+            inp.layer = LayerType.flow;       //label finput channels as flow layer
             wireMap.put(ctx.getText(), inp);
         }
     }
@@ -230,6 +238,7 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             DWire inp = new DWire();
             inp.name = ctx.getText();
             inp.wtype = DWireType.cinput;
+            inp.layer = LayerType.control;    //label cinput channels as control layer
             wireMap.put(ctx.getText(), inp);
         }
     }
@@ -245,6 +254,7 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             DWire out = new DWire();
             out.name = ctx.getText();
             out.wtype = DWireType.foutput;
+            out.layer = LayerType.flow;   //label foutput channels as flow layer
             wireMap.put(ctx.getText(), out);
         }
     }
@@ -260,6 +270,7 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             DWire out = new DWire();
             out.name = ctx.getText();
             out.wtype = DWireType.coutput;
+            out.layer = LayerType.control;    //label coutput channels as control layer
             wireMap.put(ctx.getText(), out);
         }
     }
@@ -284,6 +295,7 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             DWire wire = new DWire();
             wire.name = ctx.getText();
             wire.wtype = DWireType.cchannel;
+            wire.layer = LayerType.control;   //label cchannel channels as control layer
             wireMap.put(ctx.getText(), wire);
         }
     }
@@ -299,6 +311,7 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             DWire wire = new DWire();
             wire.name = ctx.getText();
             wire.wtype = DWireType.fchannel;
+            wire.layer = LayerType.flow;  //label fchannel channels as flow layer
             wireMap.put(ctx.getText(), wire);
         }
     }
