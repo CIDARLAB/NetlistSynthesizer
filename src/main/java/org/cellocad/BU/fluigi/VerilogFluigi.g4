@@ -51,6 +51,7 @@ lhs
 
 rhs
     : (var) (op (var))+
+    | (var) (op)
     | (bufferVar)
     ;
 
