@@ -32,6 +32,7 @@ public class DGate implements Serializable{
     public int outTermInd;      //current index of outTerm JSONArray
     public int inTermVal = 4;       //by default input terminal is 4th orientation (left) EG: *** ----->IN[(Device)]OUT-----> ***
     public int outTermVal = 2;      //by default output terminal is 2nd orientation (right)
+    public int bankCOunt = -1;
     public boolean inTermFlag = false;      //flag that is true if inTerm JSONArray exists (used for gates with nonstandard orientations)
     public boolean outTermFlag = false;     //flag that is true if outTerm JSONArray exists (used for gates with nonstandard orientations)
     public boolean isWritten = false;       //flag that is true if gate has been printed to mint file
