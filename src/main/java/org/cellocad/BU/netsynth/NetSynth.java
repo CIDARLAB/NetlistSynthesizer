@@ -2874,13 +2874,13 @@ public class NetSynth {
                 DGate nor2 = new DGate();
                 DGate nor3 = new DGate();
                 DGate nor4 = new DGate();
-                DGate not = new DGate();
+                //DGate not = new DGate();
                 
                 nor1.gtype = DGateType.NOR;
                 nor2.gtype = DGateType.NOR;
                 nor3.gtype = DGateType.NOR;
                 nor4.gtype = DGateType.NOR;
-                not.gtype = DGateType.NOT;
+                //not.gtype = DGateType.NOT;
                 
                 
                 nor3.input.add(gate.input.get(0));
@@ -2911,16 +2911,17 @@ public class NetSynth {
                 DWire internal3 = new DWire("0Wire" + wirecount.getAndIncrement());
                 internal3.wtype = DWireType.connector;
                 
-                nor4.input.add(internal3);
-                not.output = internal3;
+                //nor4.input.add(internal3);
+                nor4.input.add(internal1);
+                //not.output = internal3;
                 
-                not.input.add(gate.input.get(0));
+                //not.input.add(gate.input.get(0));
                 
                 comb.add(nor1);
                 comb.add(nor2);
                 comb.add(nor3);
                 comb.add(nor4);
-                comb.add(not);
+                //comb.add(not);
                 
             }
             else{
