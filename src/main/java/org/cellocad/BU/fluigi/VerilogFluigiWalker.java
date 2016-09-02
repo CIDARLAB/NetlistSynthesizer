@@ -16,6 +16,7 @@ import org.cellocad.BU.dom.DGate;
 import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.dom.DWireType;
+import org.cellocad.BU.dom.uFGate;
 
 /**
  *
@@ -25,8 +26,8 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
     
     public FluigiCircuitDetails details;
     public Map<String,DWire> wireMap;
-    public List<DGate> netlist;
-    public DGate currentGate;
+    public List<uFGate> netlist;
+    public uFGate currentGate;
     private boolean inLHS = false;
     private boolean inRHS = false;
     
@@ -78,7 +79,7 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
 
     @Override
     public void enterAssignStat(VerilogFluigiParser.AssignStatContext ctx) {
-        currentGate = new DGate();
+        currentGate = new uFGate();
         currentGate.gtype = DGateType.uF;
     }
 

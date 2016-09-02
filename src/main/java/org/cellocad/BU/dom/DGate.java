@@ -21,9 +21,6 @@ public class DGate implements Serializable{
     public int gatestage;
     public int gindex;
     
-    public String symbol;
-    public String picpath;
-            
     public DGate()
     {      
          input = new ArrayList<DWire>();

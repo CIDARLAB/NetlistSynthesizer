@@ -42,6 +42,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.cellocad.BU.adaptors.ABCAdaptor;
 import org.cellocad.BU.adaptors.EspressoAdaptor;
+import org.cellocad.BU.dom.uFGate;
 import org.cellocad.BU.subcircuit.SubcircuitLibrary;
 import org.cellocad.BU.subcircuit.subCircuitSwap;
 import org.codehaus.plexus.util.FileUtils;
@@ -3304,8 +3305,8 @@ public class NetSynth {
         }
     }
     
-    public static void printuFNetlist(List<DGate> netlist) {
-        for(DGate gate:netlist){
+    public static void printuFNetlist(List<uFGate> netlist) {
+        for(uFGate gate:netlist){
             System.out.println(printuFGate(gate));
         }
     }
@@ -3350,7 +3351,7 @@ public class NetSynth {
     }
     
     
-    public static String printuFGate(DGate g){
+    public static String printuFGate(uFGate g){
         String netbuilder = "";
         netbuilder += g.symbol;
         netbuilder += "(";
