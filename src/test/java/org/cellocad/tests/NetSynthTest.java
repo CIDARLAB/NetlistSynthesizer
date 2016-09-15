@@ -7,6 +7,9 @@ package org.cellocad.tests;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.cellocad.BU.dom.DAGW;
 import org.cellocad.BU.dom.DGate;
 import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.dom.DWire;
@@ -14,6 +17,9 @@ import org.cellocad.BU.dom.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
 import org.cellocad.BU.netsynth.NetSynthSwitch;
 import org.cellocad.BU.simulators.BooleanSimulator;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Test;
 
 /**
@@ -23,7 +29,7 @@ import org.junit.Test;
 public class NetSynthTest {
     
     
-    @Test //Work on this later..
+    //@Test //Work on this later..
     public void testGetNetlistCode(){
         System.out.println("\ntestGetNetlistCode");
         List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
@@ -134,6 +140,78 @@ public class NetSynthTest {
         NetSynth.printNetlist(test6);*/
         
         
+        
+    }
+    
+    @Test
+    public void testGet2inNetlist(){
+        String verilogLines = "module A(output out1, input in1, in2);\n"
+                + "  always@(in1,in2)\n"
+                + "    begin\n"
+                + "      case({in1,in2})\n"
+                + "        2'b00: {out1} = 1'b0;\n"
+                + "        2'b01: {out1} = 1'b1;\n"
+                + "        2'b10: {out1} = 1'b1;\n"
+                + "        2'b11: {out1} = 1'b0;\n"
+                + "      endcase\n"
+                + "    end\n"
+                + "endmodule";
+        NetSynth netsynth = new NetSynth();
+        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();
+   /*     {
+  "outputs": [
+    "y"
+  ],
+  "inputs": [
+    "a",
+    "b",
+    "c"
+  ],
+  "netlist": [
+    "NOT(0Wire44,b)",
+    "NOT(0Wire45,c)",
+    "NOR(n4,0Wire44,0Wire45)",
+    "NOT(0Wire46,a)",
+    "NOT(0Wire47,n4)",
+    "NOR(y,0Wire46,0Wire47)"
+  ],
+  "collection": "motif_library"
+}*/
+        JSONObject motif = new JSONObject();
+        JSONArray collection = new JSONArray();
+        
+        JSONArray outputsJ = new JSONArray();
+        outputsJ.put("y");
+        
+        JSONArray inputsJ = new JSONArray();
+        inputsJ.put("a");
+        inputsJ.put("b");
+        
+        JSONArray netlistJ = new JSONArray();
+        netlistJ.put("XOR(y,a,b)");
+        
+        try {
+            motif.put("outputs", outputsJ);
+            motif.put("inputs", inputsJ);
+            motif.put("netlist", netlistJ);
+            motif.put("collection", "motif_library");
+            collection.put(motif);
+        } catch (JSONException ex) {
+            Logger.getLogger(NetSynthTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        List<DGate> netlist = netsynth.getNetlistCode(verilogLines, switches,collection);
+        System.out.println("\n\nNETLIST ::");
+        NetSynth.printNetlist(netlist);
+        List<String> inputs = new ArrayList<String>();
+        inputs.add("in1");
+        inputs.add("in2");
+        
+        
+        BooleanSimulator.printTruthTable(netlist, inputs);
+        
+        DAGW dag = netsynth.runNetSynthCode(verilogLines, switches, collection);
+        System.out.println(dag.printGraph());
         
     }
     

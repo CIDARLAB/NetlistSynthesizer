@@ -552,12 +552,15 @@ public class NetSynth {
     
     }
     
-    
     public List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
         String verilogCode = Utilities.getFileContentAsString(vfilepath);
         return getNetlistCode(verilogCode,switches);
     }
     
+    public List<DGate> getNetlistCode(String verilogCode,List<NetSynthSwitch> switches, JSONArray subcircuits){
+        initializeSubLibrary(subcircuits);
+        return getNetlistCode(verilogCode,switches);
+    }
     
     public List<DGate> getNetlistCode(String verilogCode,List<NetSynthSwitch> switches){
         List<String> inputnames = new ArrayList<String>();
@@ -604,13 +607,13 @@ public class NetSynth {
             invnetlist = runInvertedEspressoAndABC(inverted,switches);
             
             if(!switches.contains(NetSynthSwitch.noswap)){
-                runSubCircSwap(structNetlist,switches,sublibrary);
+                structNetlist = runSubCircSwap(structNetlist,switches,sublibrary);
                 //structNetlist = subCircuitSwap.implementSwap(structNetlist,switches,sublibrary);
                 
-                runSubCircSwap(dirnetlist, switches, sublibrary);
+                dirnetlist = runSubCircSwap(dirnetlist, switches, sublibrary);
                 //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                 
-                runSubCircSwap(invnetlist, switches, sublibrary);
+                invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
                 //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
             }
             
@@ -651,10 +654,10 @@ public class NetSynth {
                     invnetlist = runInvertedDCEspressoAndABC(inverted, switches);
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
-                        runSubCircSwap(dirnetlist, switches, sublibrary);
+                        dirnetlist = runSubCircSwap(dirnetlist, switches, sublibrary);
                         //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                         
-                        runSubCircSwap(invnetlist, switches, sublibrary);
+                        invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
                         //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
@@ -675,11 +678,9 @@ public class NetSynth {
                     
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
-                        runSubCircSwap(dirnetlist, switches, sublibrary);
-                        //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+                        dirnetlist = runSubCircSwap(dirnetlist, switches, sublibrary);
                         
-                        runSubCircSwap(invnetlist, switches, sublibrary);
-                        //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
+                        invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
                     invsize = getRepressorsCost(invnetlist);
@@ -714,14 +715,12 @@ public class NetSynth {
                     invnetlist = runInvertedEspressoAndABC(inverted, switches);
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
-                        runSubCircSwap(dirnetlist, switches, sublibrary);
+                        dirnetlist = runSubCircSwap(dirnetlist, switches, sublibrary);
                         //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
                         
-                        runSubCircSwap(invnetlist, switches, sublibrary);
+                        invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
                         //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
-                    dirsize = getRepressorsCost(dirnetlist);
-                    invsize = getRepressorsCost(invnetlist);
 
                     if (dirsize < invsize) {
                         return dirnetlist;
@@ -743,7 +742,7 @@ public class NetSynth {
     //</editor-fold>
     
     
-    private void runSubCircSwap(List<DGate> netlist, List<NetSynthSwitch> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
+    private List<DGate> runSubCircSwap(List<DGate> netlist, List<NetSynthSwitch> switches, Map<Integer,Map<Integer,List<SubcircuitLibrary>>> sublibrary){
         int count = swapCount;
         if(count <1){
             count = 1;
@@ -751,7 +750,7 @@ public class NetSynth {
         for(int i=0;i<count;i++){
             netlist = subCircuitSwap.implementSwap(netlist, switches, sublibrary);
         }
-        //if()
+        return netlist;
     } 
 
     //<editor-fold desc="Run ABC & Espresso" defaultstate="collapsed">
@@ -3024,7 +3023,28 @@ public class NetSynth {
 
                 indx++;
                 Gates.add(norg);
-            } else if (netg.gtype.equals(DGateType.OR) && (!netg.output.wtype.equals(DWireType.output))) {
+            } else if (netg.gtype.equals(DGateType.NAND)) {
+                Gate norg = new Gate(indx, GateType.NAND);
+                norg.outW = netg.output;
+
+                indx++;
+                Gates.add(norg);
+            } else if (netg.gtype.equals(DGateType.XOR)) {
+                Gate norg = new Gate(indx, GateType.XOR);
+                norg.outW = netg.output;
+
+                indx++;
+                Gates.add(norg);
+            } else if (netg.gtype.equals(DGateType.XNOR)) {
+                Gate norg = new Gate(indx, GateType.XNOR);
+                norg.outW = netg.output;
+
+                indx++;
+                Gates.add(norg);
+            }
+            
+            
+            else if (netg.gtype.equals(DGateType.OR) && (!netg.output.wtype.equals(DWireType.output))) {
                 Gate norg = new Gate(indx, GateType.OR);
                 norg.outW = netg.output;
 

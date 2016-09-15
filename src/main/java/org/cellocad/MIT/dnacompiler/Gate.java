@@ -18,8 +18,11 @@ public class Gate {
         OUTPUT,
         OUTPUT_OR,
         AND,
+        NAND,
         NOR,
         OR,
+        XOR,
+        XNOR,
         NOT;
     }
     

@@ -101,7 +101,7 @@ public class Allnin1out {
        //switches.add(NetSynthSwitch.outputOR);
        //switches.add(NetSynthSwitch.abc);
        //switches.add(NetSynthSwitch.noswap);
-       int size = 4;
+       int size = 3;
        result = verifyNin1out(switches,size);
        String assertMessage = size + " Input 1 Output Test Failed.";
        assertTrue(assertMessage,result);
