@@ -551,12 +551,15 @@ public class NetSynth {
     
     }
     
-    
     public List<DGate> getNetlist(String vfilepath,List<NetSynthSwitch> switches){
         String verilogCode = Utilities.getFileContentAsString(vfilepath);
         return getNetlistCode(verilogCode,switches);
     }
     
+    public List<DGate> getNetlistCode(String verilogCode,List<NetSynthSwitch> switches, JSONArray subcircuits){
+        initializeSubLibrary(subcircuits);
+        return getNetlistCode(verilogCode,switches);
+    }
     
     public List<DGate> getNetlistCode(String verilogCode,List<NetSynthSwitch> switches){
         List<String> inputnames = new ArrayList<String>();
@@ -675,10 +678,9 @@ public class NetSynth {
                     
                     if (!switches.contains(NetSynthSwitch.noswap)) {
                         dirnetlist = runSubCircSwap(dirnetlist, switches, sublibrary);
-                        //dirnetlist = subCircuitSwap.implementSwap(dirnetlist, switches, sublibrary);
+
                         
                         invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
-                        //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
                     dirsize = getRepressorsCost(dirnetlist);
                     invsize = getRepressorsCost(invnetlist);
@@ -719,8 +721,6 @@ public class NetSynth {
                         invnetlist = runSubCircSwap(invnetlist, switches, sublibrary);
                         //invnetlist = subCircuitSwap.implementSwap(invnetlist, switches, sublibrary);
                     }
-                    dirsize = getRepressorsCost(dirnetlist);
-                    invsize = getRepressorsCost(invnetlist);
 
                     if (dirsize < invsize) {
                         return dirnetlist;
@@ -751,9 +751,8 @@ public class NetSynth {
             netlist = subCircuitSwap.implementSwap(netlist, switches, sublibrary);
             //System.out.println("Swap " + i + " completed");
         }
-        
+
         return netlist;
-        //if()
     } 
 
     //<editor-fold desc="Run ABC & Espresso" defaultstate="collapsed">
@@ -3026,7 +3025,28 @@ public class NetSynth {
 
                 indx++;
                 Gates.add(norg);
-            } else if (netg.gtype.equals(DGateType.OR) && (!netg.output.wtype.equals(DWireType.output))) {
+            } else if (netg.gtype.equals(DGateType.NAND)) {
+                Gate norg = new Gate(indx, GateType.NAND);
+                norg.outW = netg.output;
+
+                indx++;
+                Gates.add(norg);
+            } else if (netg.gtype.equals(DGateType.XOR)) {
+                Gate norg = new Gate(indx, GateType.XOR);
+                norg.outW = netg.output;
+
+                indx++;
+                Gates.add(norg);
+            } else if (netg.gtype.equals(DGateType.XNOR)) {
+                Gate norg = new Gate(indx, GateType.XNOR);
+                norg.outW = netg.output;
+
+                indx++;
+                Gates.add(norg);
+            }
+            
+            
+            else if (netg.gtype.equals(DGateType.OR) && (!netg.output.wtype.equals(DWireType.output))) {
                 Gate norg = new Gate(indx, GateType.OR);
                 norg.outW = netg.output;
 
