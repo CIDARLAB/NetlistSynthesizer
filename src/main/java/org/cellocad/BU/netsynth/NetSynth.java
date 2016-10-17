@@ -1160,6 +1160,20 @@ public class NetSynth {
         return wire.wtype.equals(DWireType.input);
     }
     
+    public static boolean hasCycles(List<DGate> netlist) {
+        for (int i = 1; i < netlist.size(); i++) {
+            for (int j = 0; j <= i; j++) {
+                for (DWire input : netlist.get(j).input) {
+                    if (input.name.equals(netlist.get(i).output.name)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    
     //<editor-fold desc="Netlist operations" defaultstate="collapsed"> 
     
     

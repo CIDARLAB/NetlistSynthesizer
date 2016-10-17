@@ -43,7 +43,7 @@ public class BooleanSimulator {
                         break;
         }
     }
-    
+        
     public static String bpermute(List<DGate> netlist)
     {
         //DWireValue outvalue = DWireValue._x;

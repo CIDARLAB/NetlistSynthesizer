@@ -24,6 +24,7 @@ import org.cellocad.BU.precomputation.genVerilogFile;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -77,6 +78,7 @@ public class Allnin1out {
                 
                 System.out.println("Circuit Size = " + netlist.size()+"\n");
                 
+                assertFalse(NetSynth.hasCycles(netlist));
                 
                 int ttIntVal = Convert.bintoDec(tt);
                 if(ttIntVal != i){

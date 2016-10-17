@@ -143,7 +143,7 @@ public class NetSynthTest {
         
     }
     
-    @Test
+    //@Test
     public void testGet2inNetlist(){
         String verilogLines = "module A(output out1, input in1, in2);\n"
                 + "  always@(in1,in2)\n"
