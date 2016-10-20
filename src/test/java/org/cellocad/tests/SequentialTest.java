@@ -12,6 +12,7 @@ import org.cellocad.BU.dom.DGateType;
 import org.cellocad.BU.dom.DWire;
 import org.cellocad.BU.dom.DWireType;
 import org.cellocad.BU.netsynth.NetSynth;
+import org.cellocad.BU.netsynth.Sequential;
 import org.cellocad.BU.simulators.BooleanSimulator;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -217,6 +218,26 @@ public class SequentialTest {
         assertTrue(NetSynth.hasCycles(SequentialTest.createSRLatch()));
         assertTrue(NetSynth.hasCycles(SequentialTest.createEarleLatch()));
         assertTrue(NetSynth.hasCycles(SequentialTest.createDLatch()));
+        
+    }
+ 
+    @Test
+    public void testOutputWireCombos(){
+        
+        System.out.println("Earle Latch :: ");
+        System.out.println(Sequential.getCyclicalOutputWireNames(SequentialTest.createEarleLatch()));
+        NetSynth.printNetlist(SequentialTest.createEarleLatch());
+        Sequential.truthtable(SequentialTest.createEarleLatch());
+        
+        System.out.println("\n\nD Latch :: ");
+        System.out.println(Sequential.getCyclicalOutputWireNames(SequentialTest.createDLatch()));
+        NetSynth.printNetlist(SequentialTest.createDLatch());
+        Sequential.truthtable(SequentialTest.createDLatch());
+        
+        System.out.println("\n\nSR Latch :: ");
+        System.out.println(Sequential.getCyclicalOutputWireNames(SequentialTest.createSRLatch()));
+        NetSynth.printNetlist(SequentialTest.createSRLatch());
+        Sequential.truthtable(SequentialTest.createSRLatch());
         
     }
     

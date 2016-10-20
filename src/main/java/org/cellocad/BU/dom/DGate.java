@@ -34,14 +34,14 @@ public class DGate implements Serializable{
         output = outputWire;        
         if(!input.isEmpty())
         {
-            int maxStage = input.get(0).wirestage;
+            int maxStage = input.get(0).getWirestage();
             for(DWire w:input)
             {
-                if(maxStage<w.wirestage)
-                    maxStage = w.wirestage;
+                if(maxStage<w.getWirestage())
+                    maxStage = w.getWirestage();
             }
             maxStage++;
-            output.wirestage = maxStage;
+            output.setWirestage(maxStage);
             gatestage = maxStage;
         }
         
@@ -55,15 +55,15 @@ public class DGate implements Serializable{
         gname = gName;
         if(!input.isEmpty())
         {
-            int maxStage = input.get(0).wirestage;
+            int maxStage = input.get(0).getWirestage();
             for(DWire w:input)
             {
              
-                if(maxStage<w.wirestage)
-                    maxStage = w.wirestage;
+                if(maxStage<w.getWirestage())
+                    maxStage = w.getWirestage();
             }
             maxStage++;
-            output.wirestage = maxStage;
+            output.setWirestage(maxStage);;
             gatestage = maxStage;
         }
         
@@ -86,14 +86,14 @@ public class DGate implements Serializable{
     {
         if(!this.input.isEmpty())
         {
-            int maxStage = this.input.get(0).wirestage;
+            int maxStage = this.input.get(0).getWirestage();
             for(DWire w:this.input)
             {
-                if(maxStage<w.wirestage)
-                    maxStage = w.wirestage;
+                if(maxStage<w.getWirestage())
+                    maxStage = w.getWirestage();
             }
             maxStage++;
-            this.output.wirestage = maxStage;
+            this.output.setWirestage(maxStage);
             this.gatestage = maxStage;
         }
         
