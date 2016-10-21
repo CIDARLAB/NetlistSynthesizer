@@ -112,6 +112,9 @@ public class Sequential {
                 }
             }
             
+            System.out.println("INPUTS :: " + inputValues);
+            //Current State
+            System.out.println("Current State");
             for(DGate gate:netlist){
                 for(DWire wire:gate.input){
                     if(inputValues.containsKey(wire.name)){
@@ -124,9 +127,104 @@ public class Sequential {
                     }
                 }
                 BooleanSimulator.bfunction(gate);
-                //System.out.println(gate.output.name + ":" + gate.output.wValue);
+                if(states.contains(gate.output.name) && !inputValues.containsKey(gate.output.name)){
+                    int binVal = -1;
+                    if(gate.output.wValue.equals(DWireValue._0)){
+                        binVal = 0;
+                    }
+                    if(gate.output.wValue.equals(DWireValue._1)){
+                        binVal = 1;
+                    }
+                    currentState.put(gate.output.name, binVal);
+                }
+                if(states.contains(gate.output.name) && inputValues.containsKey(gate.output.name)){
+                    int binVal = -1;
+                    if(gate.output.wValue.equals(DWireValue._0)){
+                        binVal = 0;
+                    }
+                    if(gate.output.wValue.equals(DWireValue._1)){
+                        binVal = 1;
+                    }
+                    nextState.put(gate.output.name, binVal);
+                    inputValues.put(gate.output.name, binVal);
+                }
+                System.out.println(gate.output.name + ":" + gate.output.wValue);
+                
             }
-            //System.out.println("\n\n");
+            System.out.println("Current State :: " + currentState);
+            System.out.println("\n\n");
+            
+            //Next State
+            System.out.println("Next State");
+            for(DGate gate:netlist){
+                for(DWire wire:gate.input){
+                    if(inputValues.containsKey(wire.name)){
+                        if(inputValues.get(wire.name) == 0){
+                            wire.wValue = DWireValue._0;
+                        }
+                        if(inputValues.get(wire.name) == 1){
+                            wire.wValue = DWireValue._1;
+                        }
+                    }
+                }
+                BooleanSimulator.bfunction(gate);
+                if(states.contains(gate.output.name) && !inputValues.containsKey(gate.output.name)){
+                    int binVal = -1;
+                    if(gate.output.wValue.equals(DWireValue._0)){
+                        binVal = 0;
+                    }
+                    if(gate.output.wValue.equals(DWireValue._1)){
+                        binVal = 1;
+                    }
+                    nextState.put(gate.output.name, binVal);
+                }
+                if(states.contains(gate.output.name) && inputValues.containsKey(gate.output.name)){
+                    int binVal = -1;
+                    if(gate.output.wValue.equals(DWireValue._0)){
+                        binVal = 0;
+                    }
+                    if(gate.output.wValue.equals(DWireValue._1)){
+                        binVal = 1;
+                    }
+                    nextToNextState.put(gate.output.name, binVal);
+                    inputValues.put(gate.output.name, binVal);
+                }
+                System.out.println(gate.output.name + ":" + gate.output.wValue);
+            }
+            System.out.println("Next State :: " + nextState);
+            System.out.println("\n\n");
+            
+            
+            //Next to next State
+            System.out.println("Next To Next State");
+            for(DGate gate:netlist){
+                for(DWire wire:gate.input){
+                    if(inputValues.containsKey(wire.name)){
+                        if(inputValues.get(wire.name) == 0){
+                            wire.wValue = DWireValue._0;
+                        }
+                        if(inputValues.get(wire.name) == 1){
+                            wire.wValue = DWireValue._1;
+                        }
+                    }
+                }
+                BooleanSimulator.bfunction(gate);
+                if(states.contains(gate.output.name) && !inputValues.containsKey(gate.output.name)){
+                    int binVal = -1;
+                    if(gate.output.wValue.equals(DWireValue._0)){
+                        binVal = 0;
+                    }
+                    if(gate.output.wValue.equals(DWireValue._1)){
+                        binVal = 1;
+                    }
+                    nextToNextState.put(gate.output.name, binVal);
+                }
+                System.out.println(gate.output.name + ":" + gate.output.wValue);
+            }
+            System.out.println("Next to Next State :: " + nextToNextState);
+            System.out.println("\n\n");
+            
+            
         }
         
     }
