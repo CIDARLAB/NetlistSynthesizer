@@ -48,8 +48,9 @@ public class SequentialTest {
         nor1.gtype = DGateType.NOR;
         nor2.gtype = DGateType.NOR;
         
-        netlist.add(nor1);
         netlist.add(nor2);
+        netlist.add(nor1);
+        
         
         return netlist;
     }

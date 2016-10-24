@@ -64,6 +64,7 @@ public class Sequential {
 
     public static void truthtable(List<DGate> netlist) {
         List<String> inputs = new ArrayList<String>();
+        List<String> outputs = new ArrayList<String>();
         assignWireStage(netlist);
         for (DGate gate : netlist) {
             for (DWire input : gate.input) {
@@ -72,6 +73,9 @@ public class Sequential {
                         inputs.add(input.name);
                     }
                 }
+            }
+            if(gate.output.wtype.equals(DWireType.output)){
+                outputs.add(gate.output.name);
             }
         }
 
@@ -86,16 +90,37 @@ public class Sequential {
                 inputs.add(wireName);
             }
         }
-
+        List<String> statesList = new ArrayList<String>(states);
         System.out.println("INPUTS :: " + inputs);
         System.out.println("STATES :: " + states);
-        
+        List<String> nonInputStates = new ArrayList<String>();
+        System.out.println("TRUTH TABLE");
+        System.out.println("===========================");
         Map<String,Integer> inputValues = new HashMap<String,Integer>();
         Map<String,Integer> currentState = new HashMap<String,Integer>();
         Map<String,Integer> nextState = new HashMap<String,Integer>();
         Map<String,Integer> nextToNextState = new HashMap<String,Integer>();
         
-        
+        for(String input:inputs){
+            System.out.print(input + " ");
+        }
+        for(String state:states){
+            if(!inputs.contains(state)){
+                System.out.print(state + " ");
+                nonInputStates.add(state);
+            }
+        }
+        for(String state:statesList){
+            System.out.print(state + "+1 ");
+        }
+        List<String> nonStateOutputs = new ArrayList<String>();
+        for(String output:outputs){
+            if(!states.contains(output)){
+                System.out.print(output + " ");
+                nonStateOutputs.add(output);
+            }
+        }
+        System.out.println("");
         for(int i =0;i< Math.pow(2, inputs.size());i++){
             
             String bin = Convert.dectoBin(i, inputs.size());
@@ -104,6 +129,11 @@ public class Sequential {
                 binaryVal += bin.charAt(j);
                 int binValue = Integer.valueOf(binaryVal);
                 inputValues.put(inputs.get(j),binValue);
+                String space = "";
+                for(int m =0; m<inputs.get(j).length();m++){
+                    space += " ";
+                }
+                System.out.print(binValue + space);
             }
             
             for(String state:states){
@@ -112,9 +142,11 @@ public class Sequential {
                 }
             }
             
-            System.out.println("INPUTS :: " + inputValues);
+            
+            
+            //System.out.println("INPUTS :: " + inputValues);
             //Current State
-            System.out.println("Current State");
+            //System.out.println("Current State");
             for(DGate gate:netlist){
                 for(DWire wire:gate.input){
                     if(inputValues.containsKey(wire.name)){
@@ -148,14 +180,21 @@ public class Sequential {
                     nextState.put(gate.output.name, binVal);
                     inputValues.put(gate.output.name, binVal);
                 }
-                System.out.println(gate.output.name + ":" + gate.output.wValue);
+                //System.out.println(gate.output.name + ":" + gate.output.wValue);
                 
             }
-            System.out.println("Current State :: " + currentState);
-            System.out.println("\n\n");
+            for(String nonInputState:nonInputStates ){
+                String space = "";
+                for(int m=0;m<nonInputState.length();m++){
+                    space += " ";
+                }
+                System.out.print(currentState.get(nonInputState) + space);
+            }
+           //System.out.println("Current State :: " + currentState);
+            //System.out.println("\n\n");
             
             //Next State
-            System.out.println("Next State");
+            //System.out.println("Next State");
             for(DGate gate:netlist){
                 for(DWire wire:gate.input){
                     if(inputValues.containsKey(wire.name)){
@@ -189,14 +228,20 @@ public class Sequential {
                     nextToNextState.put(gate.output.name, binVal);
                     inputValues.put(gate.output.name, binVal);
                 }
-                System.out.println(gate.output.name + ":" + gate.output.wValue);
+                //System.out.println(gate.output.name + ":" + gate.output.wValue);
             }
-            System.out.println("Next State :: " + nextState);
-            System.out.println("\n\n");
-            
+            //System.out.println("Next State :: " + nextState);
+            //System.out.println("\n\n");
+            for (String state : statesList) {
+                String space = "";
+                for(int m =0;m<state.length() + 2;m++){
+                    space += " ";
+                }
+                System.out.print(nextState.get(state) + space);
+            }
             
             //Next to next State
-            System.out.println("Next To Next State");
+            //System.out.println("Next To Next State");
             for(DGate gate:netlist){
                 for(DWire wire:gate.input){
                     if(inputValues.containsKey(wire.name)){
@@ -219,11 +264,11 @@ public class Sequential {
                     }
                     nextToNextState.put(gate.output.name, binVal);
                 }
-                System.out.println(gate.output.name + ":" + gate.output.wValue);
+                //System.out.println(gate.output.name + ":" + gate.output.wValue);
             }
-            System.out.println("Next to Next State :: " + nextToNextState);
-            System.out.println("\n\n");
-            
+            //System.out.println("Next to Next State :: " + nextToNextState);
+            //System.out.println("\n\n");
+            System.out.println("");
             
         }
         
