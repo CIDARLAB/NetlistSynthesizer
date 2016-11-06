@@ -57,6 +57,40 @@ public class SequentialTest {
         return netlist;
     }
     
+    
+    public static List<DGate> createSRNANDLatch(){
+        List<DGate> netlist = new ArrayList<DGate>();
+        
+        DWire r = new DWire("r",DWireType.input);
+        DWire s = new DWire("s",DWireType.input);
+        
+        DWire q = new DWire("q",DWireType.output);
+        DWire qnot = new DWire("qnot",DWireType.output);
+        
+        DGate nand1 = new DGate();
+        DGate nand2 = new DGate();
+        
+        nand1.input.add(r);
+        nand1.input.add(qnot);
+        
+        nand1.output = q;
+        
+        nand2.input.add(s);
+        nand2.input.add(q);
+        
+        nand2.output = qnot;
+        
+        nand1.gtype = DGateType.NAND;
+        nand2.gtype = DGateType.NAND;
+        
+        netlist.add(nand2);
+        netlist.add(nand1);
+        
+        
+        return netlist;
+    }
+    
+    
     /*
     module A(output Q, input E, A, B);
 
@@ -224,7 +258,7 @@ public class SequentialTest {
         
     }
  
-    @Test
+    //@Test
     public void testTruthTable(){
         
         System.out.println("Print Bistable States");
@@ -243,9 +277,14 @@ public class SequentialTest {
         NetSynth.printNetlist(SequentialTest.createSRLatch());
         Sequential.truthtable(SequentialTest.createSRLatch());
         
+        System.out.println("\n\nSR NAND Latch :: ");
+        //System.out.println(Sequential.getCyclicalOutputWireNamesFromNetlist(SequentialTest.createSRLatch()));
+        NetSynth.printNetlist(SequentialTest.createSRNANDLatch());
+        Sequential.truthtable(SequentialTest.createSRNANDLatch());
+        
     }
     
-    @Test
+    //@Test
     public void testPrintCompleteTruthTable(){
         
         System.out.println("\n\nPrint Complete Truth table\n\n===============================================================================");
@@ -264,8 +303,31 @@ public class SequentialTest {
         NetSynth.printNetlist(SequentialTest.createSRLatch());
         Sequential.printCompleteTruthtable(SequentialTest.createSRLatch());
         
+        System.out.println("\n\nSR NAND Latch :: ");
+        //System.out.println(Sequential.getCyclicalOutputWireNamesFromNetlist(SequentialTest.createSRLatch()));
+        NetSynth.printNetlist(SequentialTest.createSRNANDLatch());
+        Sequential.printCompleteTruthtable(SequentialTest.createSRNANDLatch());
+        
     }
     
+    
+    @Test
+    public void testWaveform(){
+        System.out.println("WAVEFORM!!");
+        List<DGate> sr = SequentialTest.createSRLatch();
+        
+        List<DGate> d = SequentialTest.createDLatch();
+        NetSynth.assignGateIndex(d);
+        
+        List<DGate> earle = SequentialTest.createEarleLatch();
+        NetSynth.assignGateIndex(earle);
+        
+        Sequential.createWaveform(sr);
+        Sequential.createWaveform(d);
+        Sequential.createWaveform(earle);
+        
+        
+    }
     
     //@Test
     public void testSRLatchPresence(){
@@ -302,5 +364,5 @@ public class SequentialTest {
     
     }
     
-    
+ 
 }
