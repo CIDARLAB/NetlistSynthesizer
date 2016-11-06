@@ -98,7 +98,7 @@ public class Allnin1out {
         return result;
     }
     
-    @Test
+    //@Test
     public void testAllCombinations() throws JSONException{
        boolean result;
        List<NetSynthSwitch> switches = new ArrayList<NetSynthSwitch>();

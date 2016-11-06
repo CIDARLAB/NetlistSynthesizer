@@ -82,6 +82,15 @@ public class DGate implements Serializable{
         output = new DWire(gate.output);
     }
     
+    public boolean containsWireAsInput(DWire wire){
+        for(DWire _input: this.input){
+            if(_input.name.equals(wire.name)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void calculateStage()
     {
         if(!this.input.isEmpty())

@@ -5,6 +5,8 @@
  */
 package org.cellocad.tests;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import java.util.ArrayList;
 import java.util.List;
 import org.cellocad.BU.dom.DGate;
@@ -223,23 +225,82 @@ public class SequentialTest {
     }
  
     @Test
-    public void testOutputWireCombos(){
+    public void testTruthTable(){
         
+        System.out.println("Print Bistable States");
         System.out.println("Earle Latch :: ");
-        System.out.println(Sequential.getCyclicalOutputWireNames(SequentialTest.createEarleLatch()));
+        //System.out.println(Sequential.getCyclicalOutputWireNamesFromNetlist(SequentialTest.createEarleLatch()));
         NetSynth.printNetlist(SequentialTest.createEarleLatch());
         Sequential.truthtable(SequentialTest.createEarleLatch());
         
         System.out.println("\n\nD Latch :: ");
-        System.out.println(Sequential.getCyclicalOutputWireNames(SequentialTest.createDLatch()));
+        //System.out.println(Sequential.getCyclicalOutputWireNamesFromNetlist(SequentialTest.createDLatch()));
         NetSynth.printNetlist(SequentialTest.createDLatch());
         Sequential.truthtable(SequentialTest.createDLatch());
         
         System.out.println("\n\nSR Latch :: ");
-        System.out.println(Sequential.getCyclicalOutputWireNames(SequentialTest.createSRLatch()));
+        //System.out.println(Sequential.getCyclicalOutputWireNamesFromNetlist(SequentialTest.createSRLatch()));
         NetSynth.printNetlist(SequentialTest.createSRLatch());
         Sequential.truthtable(SequentialTest.createSRLatch());
         
     }
+    
+    @Test
+    public void testPrintCompleteTruthTable(){
+        
+        System.out.println("\n\nPrint Complete Truth table\n\n===============================================================================");
+        System.out.println("Earle Latch :: ");
+        //System.out.println(Sequential.getCyclicalOutputWireNamesFromNetlist(SequentialTest.createEarleLatch()));
+        NetSynth.printNetlist(SequentialTest.createEarleLatch());
+        Sequential.printCompleteTruthtable(SequentialTest.createEarleLatch());
+        
+        System.out.println("\n\nD Latch :: ");
+        //System.out.println(Sequential.getCyclicalOutputWireNamesFromNetlist(SequentialTest.createDLatch()));
+        NetSynth.printNetlist(SequentialTest.createDLatch());
+        Sequential.printCompleteTruthtable(SequentialTest.createDLatch());
+        
+        System.out.println("\n\nSR Latch :: ");
+        //System.out.println(Sequential.getCyclicalOutputWireNamesFromNetlist(SequentialTest.createSRLatch()));
+        NetSynth.printNetlist(SequentialTest.createSRLatch());
+        Sequential.printCompleteTruthtable(SequentialTest.createSRLatch());
+        
+    }
+    
+    
+    //@Test
+    public void testSRLatchPresence(){
+        
+        List<DGate> sr = SequentialTest.createSRLatch();
+        NetSynth.assignGateIndex(sr);
+        
+        List<DGate> d = SequentialTest.createDLatch();
+        NetSynth.assignGateIndex(d);
+        
+        List<DGate> earle = SequentialTest.createEarleLatch();
+        NetSynth.assignGateIndex(earle);
+        
+        System.out.println("NOR");
+        System.out.println("SR Latch");
+        Sequential.getSRLatchNOR(Sequential.getCyclicalGates(sr));
+        
+        System.out.println("D Latch");
+        Sequential.getSRLatchNOR(Sequential.getCyclicalGates(d));
+        
+        System.out.println("Earle Latch");
+        Sequential.getSRLatchNOR(Sequential.getCyclicalGates(earle));
+        
+//        System.out.println("NAND");
+//        System.out.println("SR Latch");
+//        Sequential.getSRLatchNAND(Sequential.getCyclicalGates(SequentialTest.createSRLatch()));
+//        
+//        System.out.println("D Latch");
+//        Sequential.getSRLatchNAND(Sequential.getCyclicalGates(SequentialTest.createDLatch()));
+//        
+//        System.out.println("Earle Latch");
+//        Sequential.getSRLatchNAND(Sequential.getCyclicalGates(SequentialTest.createEarleLatch()));
+//        
+    
+    }
+    
     
 }
