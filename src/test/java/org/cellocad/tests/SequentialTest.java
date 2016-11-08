@@ -322,9 +322,19 @@ public class SequentialTest {
         List<DGate> earle = SequentialTest.createEarleLatch();
         NetSynth.assignGateIndex(earle);
         
-        Sequential.createWaveform(sr);
-        Sequential.createWaveform(d);
-        Sequential.createWaveform(earle);
+        System.out.println("SR LATCH");
+        for(int i=0;i<3;i++){
+            Sequential.createWaveform(sr);
+        }
+        System.out.println("D LATCH");
+        for(int i=0;i<3;i++){
+            Sequential.createWaveform(d);
+        }
+        
+        System.out.println("Earle LATCH");
+        for(int i=0;i<3;i++){
+            Sequential.createWaveform(earle);
+        }
         
         
     }
