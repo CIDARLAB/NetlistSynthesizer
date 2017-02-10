@@ -5,6 +5,7 @@
 package org.cellocad.BU.dom;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
@@ -17,7 +18,7 @@ public class DWire implements Serializable {
 
     //shane additions start
     public DGate fromGate;
-    public DGate toGate;
+    public List<DGate> toGate;      //for splitting the wire to multiple gates
     public boolean isWritten = false;
     public DWire dupChannel;
     public LayerType layer;
@@ -52,8 +53,6 @@ public class DWire implements Serializable {
     public DWire(String wirename, DWireType wType) {
         if (wType == DWireType.input) {
             this.wirestage = 0;
-            
-
         }
         this.name = wirename;
         this.wtype = wType;
