@@ -21,7 +21,7 @@ public class DWire implements Serializable {
     public List<DGate> toGate;      //for splitting the wire to multiple gates
     public boolean isWritten = false;
     public DWire dupChannel;
-    public LayerType layer;
+    public LayerType layer;   
     //shane additions end
     
     public enum DWireValue {

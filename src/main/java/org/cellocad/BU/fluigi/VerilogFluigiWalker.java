@@ -80,12 +80,14 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
 
     @Override
     public void enterAssignStat(VerilogFluigiParser.AssignStatContext ctx) {
+        //on entering assign statement, create new gate
         currentGate = new DGate();
         currentGate.gtype = DGateType.uF;
     }
 
     @Override
     public void exitAssignStat(VerilogFluigiParser.AssignStatContext ctx) {
+        //add assign enter gate to netlist when done
         netlist.add(currentGate);
     }
 
@@ -119,6 +121,7 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
 
     @Override
     public void enterOp(VerilogFluigiParser.OpContext ctx) {
+        //on seeing operator, add operator to current assign gate
         currentGate.symbol = ctx.getText();
     }
 
@@ -134,10 +137,11 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
     @Override
     public void exitModName(VerilogFluigiParser.ModNameContext ctx) {
     }
-
+  //unnecessary for MM
     @Override
     public void enterInput(VerilogFluigiParser.InputContext ctx) {
-        if(!details.inputs.contains(ctx.getText())){
+        if(!details.inputs.contains(ctx.getText()))     //if input not yet exist
+        {
             details.inputs.add(ctx.getText());
             DWire inp = new DWire();
             inp.name = ctx.getText();
@@ -145,14 +149,15 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             wireMap.put(ctx.getText(), inp);        
         }
     }
-
+  //unnecessary for MM
     @Override
     public void exitInput(VerilogFluigiParser.InputContext ctx) {
     }
-
+  //unnecessary for MM
     @Override
     public void enterOutput(VerilogFluigiParser.OutputContext ctx) {
-        if(!details.outputs.contains(ctx.getText())){
+        if(!details.outputs.contains(ctx.getText()))        //if output not yet exist
+        {
             details.outputs.add(ctx.getText());
             DWire out = new DWire(); 
             out.name = ctx.getText();
@@ -160,14 +165,15 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             wireMap.put(ctx.getText(), out);
         }
     }
-
+  //unnecessary for MM    
     @Override
     public void exitOutput(VerilogFluigiParser.OutputContext ctx) {
     }
-
+  //unnecessary for MM
     @Override
     public void enterWire(VerilogFluigiParser.WireContext ctx) {
-        if(!details.wires.contains(ctx.getText())){
+        if(!details.wires.contains(ctx.getText()))          //if wire not yet exist
+        {
             details.wires.add(ctx.getText());
             DWire wire = new DWire();
             wire.name = ctx.getText();
@@ -175,7 +181,7 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
             wireMap.put(ctx.getText(), wire);
         }
     }
-
+  //unnecessary for MM
     @Override
     public void exitWire(VerilogFluigiParser.WireContext ctx) {
     }
@@ -198,10 +204,13 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
 
     @Override
     public void enterVar(VerilogFluigiParser.VarContext ctx) {
-        if(inLHS){
+        if(inLHS)
+        {           //give current gate an output if see var name in LHS
+                    //CANNOT HANDLE > 1 OUTPUT ATM (any extra outputs will be dropped, must split 'one' output into two after the gate)
             currentGate.output = wireMap.get(ctx.getText());
         }
-        if(inRHS){
+        if(inRHS)
+        {           //add input to current gate's list of inputs if see var name in RHS
             currentGate.input.add(wireMap.get(ctx.getText()));
         }
     }
@@ -212,7 +221,8 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
 
     @Override
     public void enterFinput(VerilogFluigiParser.FinputContext ctx) {
-        if (!details.inputs.contains(ctx.getText())) {
+        if (!details.inputs.contains(ctx.getText()))            //if finput not exist
+        {
             details.inputs.add(ctx.getText());
             DWire inp = new DWire();            //creating input wire
             inp.name = ctx.getText();
@@ -237,7 +247,8 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
 
     @Override
     public void enterCinput(VerilogFluigiParser.CinputContext ctx) {
-        if (!details.inputs.contains(ctx.getText())) {
+        if (!details.inputs.contains(ctx.getText()))            //if cinput not exist
+        {
             details.inputs.add(ctx.getText());
             DWire inp = new DWire();
             inp.name = ctx.getText();
@@ -307,12 +318,12 @@ public class VerilogFluigiWalker implements VerilogFluigiListener {
     @Override
     public void exitCoutput(VerilogFluigiParser.CoutputContext ctx) {
     }
-
+  //unnecessary for MM
     @Override
     public void enterBufferVar(VerilogFluigiParser.BufferVarContext ctx) {
         this.currentGate.gtype = DGateType.BUF;
     }
-
+  //unnecessary for MM
     @Override
     public void exitBufferVar(VerilogFluigiParser.BufferVarContext ctx) {
     }
