@@ -37,16 +37,21 @@ public class DGate implements Serializable{
     public boolean outTermFlag = false;     //flag that is true if outTerm JSONArray exists (used for gates with nonstandard orientations)
     public boolean isWritten = false;       //flag that is true if gate has been printed to mint file
     public LayerType layer;
+    public List<DGate> inputClones;             //DGate with matching input(s) (mutiple outputs of same gate) - for autosplitting channels
+                                                //automerging deals with number of inputs to a gate, so no var for that
+    public boolean isInputClone = false;        //flag for if gate has input clone(s)
     //end shane's additions
     
     public DGate()
     {      
          input = new ArrayList<DWire>();
          output = new DWire();
+         inputClones = new ArrayList<DGate>();
         
     }
     public DGate(DGateType gType, List<DWire> inputWires, DWire outputWire)
     {
+        inputClones = new ArrayList<DGate>();
         input = new ArrayList<DWire>();
         this.input.addAll(inputWires);
         gtype = gType;
@@ -66,6 +71,7 @@ public class DGate implements Serializable{
     }
     public DGate(DGateType gType, String gName, List<DWire> inputWires, DWire outputWire)
     {
+        inputClones = new ArrayList<DGate>();
         input = new ArrayList<DWire>();
         input.addAll(inputWires);
         gtype = gType;
@@ -77,7 +83,7 @@ public class DGate implements Serializable{
             for(DWire w:input)
             {
              
-                if(maxStage<w.wirestage)
+                if(maxStage < w.wirestage)
                     maxStage = w.wirestage;
             }
             maxStage++;
@@ -89,6 +95,7 @@ public class DGate implements Serializable{
     
     public DGate(DGate gate)
     {
+        inputClones = new ArrayList<DGate>();
         gtype = gate.gtype;
         gname = gate.gname;
         gindex = gate.gindex;
@@ -113,8 +120,7 @@ public class DGate implements Serializable{
             maxStage++;
             this.output.wirestage = maxStage;
             this.gatestage = maxStage;
-        }
-        
+        }        
     }
     
     public boolean isuFGate(){
