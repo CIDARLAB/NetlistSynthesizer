@@ -27,10 +27,10 @@ public class Gate {
     }
     
     public DWire outW = new DWire();
-    public int Index;
-    public String Name;
-    public GateType Type;
-    public Wire Outgoing; //toward INPUTS. note that a gate is not aware of its wire(s) going toward OUTPUT
+    public int index;
+    public String name;
+    public GateType type;
+    public Wire outgoing; //toward INPUTS. note that a gate is not aware of its wire(s) going toward OUTPUT
 
     public ArrayList<Integer> logics;
     //public static ArrayList<InputLogic> CIRCUIT_INPUT_LOGICS;
@@ -78,11 +78,11 @@ public class Gate {
     
 
     public Gate(){
-	this.Index = 0;
+	this.index = 0;
         this.stage =0;
-	this.Name = "";
-	this.Type = null;
-        this.Outgoing = null;
+	this.name = "";
+	this.type = null;
+        this.outgoing = null;
 	this.tir_ratio =  -1.0;
 	this.score = -1.0;
 	this.distance_to_input = -1;
@@ -95,24 +95,24 @@ public class Gate {
     ///////////prashant's///////////
     public Gate(int ind,GateType dType)
     {
-        this.Index = ind;
+        this.index = ind;
         this.stage = 0;
-        this.Type = dType;
+        this.type = dType;
         if(dType.equals(GateType.NOR.toString()))
         {
-            this.Name = "~|";
+            this.name = "~|";
         }
         else if(dType.equals(GateType.NOT.toString()))
         {
-            this.Name = "~";
+            this.name = "~";
         }
         else
         { 
-            this.Name = "";
+            this.name = "";
         }
        
         this.outW = new DWire();
-        this.Outgoing = null;
+        this.outgoing = null;
 
 	this.tir_ratio =  -1.0;
 	this.score = -1.0;
@@ -125,21 +125,21 @@ public class Gate {
     public Gate(int ind,GateType dType,Wire de)
     {
         this.stage =0;
-        this.Index = ind;
-        this.Type = dType;
+        this.index = ind;
+        this.type = dType;
         if(dType.equals(GateType.NOR.toString()))
         {
-            this.Name = "~|";
+            this.name = "~|";
         }
         else if(dType.equals(GateType.NOT.toString()))
         {
-            this.Name = "~";
+            this.name = "~";
         }
         else
         { 
-            this.Name = "";
+            this.name = "";
         }
-        this.Outgoing = de;
+        this.outgoing = de;
         
         this.outW = new DWire();
 
@@ -176,10 +176,10 @@ public class Gate {
 	this.simulate_reu = true;
 	this.direction = "+";
         this.stage =0;
-	this.Index = 0;
+	this.index = 0;
 	//this.Name = "";
-	this.Type = null;
-        this.Outgoing = null;
+	this.type = null;
+        this.outgoing = null;
 	this.outW = null;
 
 
@@ -233,10 +233,10 @@ public class Gate {
 	    logics = new ArrayList<Integer>();
 
 	this.outW = gate.outW;
-	this.Index = gate.Index;
-	this.Name = gate.Name;
-	this.Type = gate.Type;
-	this.Outgoing = gate.Outgoing;
+	this.index = gate.index;
+	this.name = gate.name;
+	this.type = gate.type;
+	this.outgoing = gate.outgoing;
 	//this.Outgoing = new Wire(gate.Outgoing);
     }
 
@@ -244,10 +244,10 @@ public ArrayList<Gate> getChildren(){
 
         ArrayList<Gate> children = new ArrayList<Gate>();
 
-        if ( (this.Outgoing != null) && (this.Outgoing.To != null)){
-            children.add(this.Outgoing.To);
+        if ( (this.outgoing != null) && (this.outgoing.To != null)){
+            children.add(this.outgoing.To);
 
-            Wire w = this.Outgoing;
+            Wire w = this.outgoing;
             while(w.Next != null && w.Next.To != null) {
                 children.add(w.Next.To);
                 w = w.Next;

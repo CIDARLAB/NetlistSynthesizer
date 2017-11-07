@@ -40,7 +40,7 @@ public class HeuristicSearch {
         
         System.out.println("\n\n\n\n HEURISTIC DAGW!!!");
         for(int i=0;i<dagCirc.Gates.size();i++)
-            System.out.println(dagCirc.Gates.get(i).Name + ":" + dagCirc.Gates.get(i).Type);
+            System.out.println(dagCirc.Gates.get(i).name + ":" + dagCirc.Gates.get(i).type);
         System.out.println("\n\n\n\n\n");
         
         
@@ -164,26 +164,26 @@ public class HeuristicSearch {
         int no_of_inputs =0;
         //<editor-fold desc="Reconnecting DAGW in memory">
         for (int i = 0; i < dagCirc.Gates.size(); i++) {
-	    if (dagCirc.Gates.get(i).Outgoing != null) {                     //Outgoing is a wire
-		int index = dagCirc.Gates.get(i).Outgoing.Index;
+	    if (dagCirc.Gates.get(i).outgoing != null) {                     //Outgoing is a wire
+		int index = dagCirc.Gates.get(i).outgoing.Index;
 		for(Wire w: dagCirc.Wires) {
-		    if(w.Index == index) { dagCirc.Gates.get(i).Outgoing = w; }
+		    if(w.Index == index) { dagCirc.Gates.get(i).outgoing = w; }
 		}
 	    }
-	if(dagCirc.Gates.get(i).Type.equals(GateType.INPUT.toString()))
+	if(dagCirc.Gates.get(i).type.equals(GateType.INPUT.toString()))
             no_of_inputs++;
         }
 	for (int i = 0; i < dagCirc.Wires.size(); i++) {
 	    if (dagCirc.Wires.get(i).From != null) {                        //From is a gate
-		int index = dagCirc.Wires.get(i).From.Index;
+		int index = dagCirc.Wires.get(i).From.index;
 		for(Gate g: dagCirc.Gates) {
-		    if(g.Index == index) { dagCirc.Wires.get(i).From = g; }
+		    if(g.index == index) { dagCirc.Wires.get(i).From = g; }
 		}
 	    }
 	    if (dagCirc.Wires.get(i).To != null) {                          //To is a gate
-		int index = dagCirc.Wires.get(i).To.Index;
+		int index = dagCirc.Wires.get(i).To.index;
 		for(Gate g: dagCirc.Gates) {
-		    if(g.Index == index) { dagCirc.Wires.get(i).To = g; }
+		    if(g.index == index) { dagCirc.Wires.get(i).To = g; }
 		}
 	    }
 	    if (dagCirc.Wires.get(i).Next != null) {                        //Next is a wire
@@ -207,7 +207,7 @@ public class HeuristicSearch {
             else
             {
                 int max = dagCirc.Gates.get(i).stage;
-                Wire w = dagCirc.Gates.get(i).Outgoing;
+                Wire w = dagCirc.Gates.get(i).outgoing;
                 while(w!=null)
                 {
                     int stg = w.To.stage;
@@ -239,7 +239,7 @@ public class HeuristicSearch {
             {
                 if(bgate.stage == xstage)
                 {
-                    bgate.Index = xindx;
+                    bgate.index = xindx;
                     nodesCirc.put(xindx,bgate);
                     xindx++;
                 }
@@ -271,8 +271,8 @@ public class HeuristicSearch {
         {
             Map.Entry pairs = (Map.Entry)it.next();
             Gate x = (Gate)pairs.getValue();
-            x.Index = (Integer)pairs.getKey();
-            System.out.println(x.Name +":"+pairs.getKey());
+            x.index = (Integer)pairs.getKey();
+            System.out.println(x.name +":"+pairs.getKey());
         }
        
         List<HashMap<Integer,BGateNode>> combinations = new ArrayList<HashMap<Integer,BGateNode>>();
@@ -388,10 +388,10 @@ public class HeuristicSearch {
                     int flag =0;
                     while(runner!= null)
                     {
-                        Wire outw = runner.bgate.Outgoing;
+                        Wire outw = runner.bgate.outgoing;
                         while(outw!=null)
                         {
-                            if(outw.To.Index == next_indx)
+                            if(outw.To.index == next_indx)
                             {
                                 flag =1;
                                 break;
@@ -412,18 +412,18 @@ public class HeuristicSearch {
                     {
                   
                     //<editor-fold desc="Curr node is an input to the OUPUT/OUTPUT_OR Gate " defaultstate="collapsed">
-                    if(runner.bgate.Type.equals(GateType.OUTPUT.toString()) || runner.bgate.Type.equals(GateType.OUTPUT_OR.toString()))
+                    if(runner.bgate.type.equals(GateType.OUTPUT.toString()) || runner.bgate.type.equals(GateType.OUTPUT_OR.toString()))
                     {
                         //Child nodes to be added are of Gatetype NOR
                         
                         //<editor-fold desc="Child nodes to be added are of GateType NOR" defaultstate="collapsed">
-                        if (nodesCirc.get(next_indx).Type.equals(GateType.NOR.toString())) 
+                        if (nodesCirc.get(next_indx).type.equals(GateType.NOR.toString())) 
                         {
                             int inpno = 0;
-                            Wire nextw = nodesCirc.get(next_indx).Outgoing;
+                            Wire nextw = nodesCirc.get(next_indx).outgoing;
                             while (nextw != null) 
                             {
-                                if (nextw.To.Type.equals(GateType.INPUT.toString())) 
+                                if (nextw.To.type.equals(GateType.INPUT.toString())) 
                                 {
                                     inpno++;
                                 }
@@ -831,13 +831,13 @@ public class HeuristicSearch {
                         //</editor-fold>
                         
                         //<editor-fold desc="Child nodes to be added are of GateType NOT" defaultstate="collapsed">
-                        else if(nodesCirc.get(next_indx).Type.equals(GateType.NOT.toString()))
+                        else if(nodesCirc.get(next_indx).type.equals(GateType.NOT.toString()))
                         {
                             int inpno=0;
-                            Wire nextw = nodesCirc.get(next_indx).Outgoing;
+                            Wire nextw = nodesCirc.get(next_indx).outgoing;
                             while(nextw!=null)
                             {
-                                if(nextw.To.Type.equals(GateType.INPUT.toString()))
+                                if(nextw.To.type.equals(GateType.INPUT.toString()))
                                     inpno++;
                                 nextw = nextw.Next;
                             }
@@ -1074,7 +1074,7 @@ public class HeuristicSearch {
                         //</editor-fold>
                         
                         //<editor-fold desc="Child nodes to be added are of GateType INPUT" defaultstate="collapsed">
-                        else if (nodesCirc.get(next_indx).Type.equals(GateType.INPUT.toString())) 
+                        else if (nodesCirc.get(next_indx).type.equals(GateType.INPUT.toString())) 
                         {
                             Iterator itinput = inputNotgates.entrySet().iterator();
                             while (itinput.hasNext()) 
@@ -1236,20 +1236,20 @@ public class HeuristicSearch {
                     {
                         int isInp=0;
                         Gate ginp = nodesCirc.get(next_indx);
-                        if(ginp.Type.equals(GateType.INPUT.toString()))
+                        if(ginp.type.equals(GateType.INPUT.toString()))
                         {
                             isInp =1;
                         }
-                        else if(ginp.Type.equals(GateType.NOR.toString()))
+                        else if(ginp.type.equals(GateType.NOR.toString()))
                         {
                             isInp =2;
                            
                         }
-                        else if(ginp.Type.equals(GateType.NOT.toString()))
+                        else if(ginp.type.equals(GateType.NOT.toString()))
                         {
                             isInp =3;
                         }
-                        if(runner.bgate.Type.equals(GateType.NOR.toString()))
+                        if(runner.bgate.type.equals(GateType.NOR.toString()))
                         {
                             
                             //<editor-fold desc="Current node is an input to a NOR Gate">
@@ -1257,13 +1257,13 @@ public class HeuristicSearch {
                             //System.out.println(outrun);
                             String inp1run = "";
                             int found=0;
-                            if(runner.bgate.Outgoing.To.Index == next_indx)
+                            if(runner.bgate.outgoing.To.index == next_indx)
                             {
                                 BGateNode subrunner = curr;
                                 found =0;
                                 while(subrunner!= null)
                                 {
-                                    if(subrunner.index == runner.bgate.Outgoing.Next.To.Index)
+                                    if(subrunner.index == runner.bgate.outgoing.Next.To.index)
                                     {
                                         found =1;
                                         break;
@@ -1281,7 +1281,7 @@ public class HeuristicSearch {
                                 found =0;
                                 while(subrunner!= null)
                                 {
-                                    if(subrunner.index == runner.bgate.Outgoing.To.Index)
+                                    if(subrunner.index == runner.bgate.outgoing.To.index)
                                     {
                                         found =1;
                                         break;
@@ -1294,11 +1294,11 @@ public class HeuristicSearch {
                                 }
                             }
                             
-                                Wire wcheck = runner.bgate.Outgoing;
+                                Wire wcheck = runner.bgate.outgoing;
                                 int inpno=0;
                                 while(wcheck!=null)
                                 {
-                                    if(wcheck.To.Type.equals(GateType.INPUT.toString()))
+                                    if(wcheck.To.type.equals(GateType.INPUT.toString()))
                                         inpno++; 
                                     wcheck = wcheck.Next;
                                 }
@@ -1640,9 +1640,9 @@ public class HeuristicSearch {
                                             if(isInp == 2) // nodes to be added have gate of type nor
                                             {
                                                 int deepinpno = 0;
-                                                Wire deepw = ginp.Outgoing;
+                                                Wire deepw = ginp.outgoing;
                                                 while (deepw != null) {
-                                                    if (deepw.To.Type.equals(GateType.INPUT.toString())) {
+                                                    if (deepw.To.type.equals(GateType.INPUT.toString())) {
                                                         deepinpno++;
                                                     }
                                                     deepw = deepw.Next;
@@ -2023,10 +2023,10 @@ public class HeuristicSearch {
                                             else if(isInp == 3) //nodes to be added have the gate type not
                                             {
                                                 int deepinpno = 0;
-                                                Wire deepw = ginp.Outgoing;
+                                                Wire deepw = ginp.outgoing;
                                                 while (deepw != null) 
                                                 {
-                                                    if (deepw.To.Type.equals(GateType.INPUT.toString())) 
+                                                    if (deepw.To.type.equals(GateType.INPUT.toString())) 
                                                     {
                                                         deepinpno++;
                                                     }
@@ -2315,10 +2315,10 @@ public class HeuristicSearch {
                                                 if(isInp == 2) // Nor gate
                                                 {
                                                     int deepinpno=0;
-                                                    Wire deepw = ginp.Outgoing;
+                                                    Wire deepw = ginp.outgoing;
                                                     while(deepw!=null)
                                                     {
-                                                        if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                        if(deepw.To.type.equals(GateType.INPUT.toString()))
                                                             deepinpno++;
                                                         deepw = deepw.Next;
                                                     }
@@ -2800,10 +2800,10 @@ public class HeuristicSearch {
                                                 else if(isInp == 3) //Not gate
                                                 {
                                                     int deepinpno=0;
-                                                    Wire deepw = ginp.Outgoing;
+                                                    Wire deepw = ginp.outgoing;
                                                     while(deepw!=null)
                                                     {
-                                                        if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                        if(deepw.To.type.equals(GateType.INPUT.toString()))
                                                             deepinpno++;
                                                         deepw = deepw.Next;
                                                     }
@@ -3105,7 +3105,7 @@ public class HeuristicSearch {
                                 }
                         //</editor-fold>    
                         }
-                        else if(runner.bgate.Type.equals(GateType.NOT.toString()))
+                        else if(runner.bgate.type.equals(GateType.NOT.toString()))
                         {
                             
                             //<editor-fold desc="Current node is an input to a NOT Gate">
@@ -3115,11 +3115,11 @@ public class HeuristicSearch {
                             int found=0;
                             
                             
-                                Wire wcheck = runner.bgate.Outgoing;
+                                Wire wcheck = runner.bgate.outgoing;
                                 int inpno=0;
                                 while(wcheck!=null)
                                 {
-                                    if(wcheck.To.Type.equals(GateType.INPUT.toString()))
+                                    if(wcheck.To.type.equals(GateType.INPUT.toString()))
                                         inpno++; 
                                     wcheck = wcheck.Next;
                                 }
@@ -3257,10 +3257,10 @@ public class HeuristicSearch {
                                                 if(isInp == 2) // Nor gate
                                                 {
                                                     int deepinpno=0;
-                                                    Wire deepw = ginp.Outgoing;
+                                                    Wire deepw = ginp.outgoing;
                                                     while(deepw!=null)
                                                     {
-                                                        if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                        if(deepw.To.type.equals(GateType.INPUT.toString()))
                                                             deepinpno++;
                                                         deepw = deepw.Next;
                                                     }
@@ -3616,10 +3616,10 @@ public class HeuristicSearch {
                                                 else if(isInp == 3) //Not gate
                                                 {
                                                     int deepinpno=0;
-                                                    Wire deepw = ginp.Outgoing;
+                                                    Wire deepw = ginp.outgoing;
                                                     while(deepw!=null)
                                                     {
-                                                        if(deepw.To.Type.equals(GateType.INPUT.toString()))
+                                                        if(deepw.To.type.equals(GateType.INPUT.toString()))
                                                             deepinpno++;
                                                         deepw = deepw.Next;
                                                     }
@@ -3976,9 +3976,9 @@ public class HeuristicSearch {
         for(int i=0; i<dagCirc.Gates.size();i++)
         {
                 reuList.add(0.0);
-                if(dagCirc.Gates.get(i).Type.equals(GateType.INPUT.toString()))
+                if(dagCirc.Gates.get(i).type.equals(GateType.INPUT.toString()))
                 {
-                    indgate.put(dagCirc.Gates.get(i).Index,kk);
+                    indgate.put(dagCirc.Gates.get(i).index,kk);
                     kk++;
                     //System.out.println(dagCirc.Gates.get(i).Name);
                 }
@@ -4001,27 +4001,27 @@ public class HeuristicSearch {
             {
                 Gate xgate = index_gates.get(i);
                 //System.out.println(xgate.Type);
-                int gind = xgate.Index;
-                if(xgate.Type.equals(GateType.INPUT.toString()))
+                int gind = xgate.index;
+                if(xgate.type.equals(GateType.INPUT.toString()))
                 {   
                     if(!gateassign.get(gind).equals("Inducer_Dummy"))
                     {
-                        char hilo = ttval.charAt(indgate.get(xgate.Index));
+                        char hilo = ttval.charAt(indgate.get(xgate.index));
                         if(hilo == '0')
                         {
-                            reuList.set(i, inpfunc.get(gateassign.get(xgate.Index)).pmin);
+                            reuList.set(i, inpfunc.get(gateassign.get(xgate.index)).pmin);
                         }
                         else if(hilo == '1')
                         {
-                            reuList.set(i, inpfunc.get(gateassign.get(xgate.Index)).pmax);
+                            reuList.set(i, inpfunc.get(gateassign.get(xgate.index)).pmax);
                         }
                     }
                 }
-                else if(xgate.Type.equals(GateType.OUTPUT.toString()) || xgate.Type.equals(GateType.OUTPUT_OR.toString()))
+                else if(xgate.type.equals(GateType.OUTPUT.toString()) || xgate.type.equals(GateType.OUTPUT_OR.toString()))
                 {
-                    if(xgate.Type.equals(GateType.OUTPUT.toString()))
+                    if(xgate.type.equals(GateType.OUTPUT.toString()))
                     {
-                        int prevind = xgate.Outgoing.To.Index;
+                        int prevind = xgate.outgoing.To.index;
                         truthList.add(reuList.get(prevind));
                         if(dagCirc.truthtable.get(0).charAt(j) == '0') // CHANGE THIS!!!
                             truthLow.add(reuList.get(prevind));
@@ -4030,8 +4030,8 @@ public class HeuristicSearch {
                     }
                     else
                     {
-                        int prevind1 = xgate.Outgoing.To.Index;
-                        int prevind2 = xgate.Outgoing.Next.To.Index;
+                        int prevind1 = xgate.outgoing.To.index;
+                        int prevind2 = xgate.outgoing.Next.To.index;
                         Double tempscore = reuList.get(prevind1) + reuList.get(prevind2);  
                         truthList.add(tempscore);
                             if(dagCirc.truthtable.get(0).charAt(j) == '0')  //CHANGE THIS!!
@@ -4044,19 +4044,19 @@ public class HeuristicSearch {
                 }
                 else
                 {
-                    if(xgate.Type.equals(GateType.NOT.toString()))
+                    if(xgate.type.equals(GateType.NOT.toString()))
                     {   
-                        int prevind = xgate.Outgoing.To.Index;
+                        int prevind = xgate.outgoing.To.index;
                         TransferFunction tempnot = new TransferFunction();
                         tempnot = gatefunc.get(gateassign.get(gind));
                     
                         double tempscore = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, reuList.get(prevind));
                         reuList.set(gind, tempscore);
                     }
-                    else if(xgate.Type.equals(GateType.NOR.toString()))
+                    else if(xgate.type.equals(GateType.NOR.toString()))
                     {
-                        int prevind1 = xgate.Outgoing.To.Index;
-                        int prevind2 = xgate.Outgoing.Next.To.Index;
+                        int prevind1 = xgate.outgoing.To.index;
+                        int prevind2 = xgate.outgoing.Next.To.index;
                         TransferFunction tempnot = new TransferFunction();
                         tempnot = gatefunc.get(gateassign.get(gind));
                         double tempscore = ScoreGate(tempnot.pmin, tempnot.pmax, tempnot.kd, tempnot.n, (reuList.get(prevind1) + reuList.get(prevind2)));
@@ -4121,24 +4121,24 @@ public class HeuristicSearch {
         
         //<editor-fold desc="Reconnecting DAGW in memory">
         for (int i = 0; i < dagCirc.Gates.size(); i++) {
-	    if (dagCirc.Gates.get(i).Outgoing != null) {                     //Outgoing is a wire
-		int index = dagCirc.Gates.get(i).Outgoing.Index;
+	    if (dagCirc.Gates.get(i).outgoing != null) {                     //Outgoing is a wire
+		int index = dagCirc.Gates.get(i).outgoing.Index;
 		for(Wire w: dagCirc.Wires) {
-		    if(w.Index == index) { dagCirc.Gates.get(i).Outgoing = w; }
+		    if(w.Index == index) { dagCirc.Gates.get(i).outgoing = w; }
 		}
 	    }
 	}
 	for (int i = 0; i < dagCirc.Wires.size(); i++) {
 	    if (dagCirc.Wires.get(i).From != null) {                        //From is a gate
-		int index = dagCirc.Wires.get(i).From.Index;
+		int index = dagCirc.Wires.get(i).From.index;
 		for(Gate g: dagCirc.Gates) {
-		    if(g.Index == index) { dagCirc.Wires.get(i).From = g; }
+		    if(g.index == index) { dagCirc.Wires.get(i).From = g; }
 		}
 	    }
 	    if (dagCirc.Wires.get(i).To != null) {                          //To is a gate
-		int index = dagCirc.Wires.get(i).To.Index;
+		int index = dagCirc.Wires.get(i).To.index;
 		for(Gate g: dagCirc.Gates) {
-		    if(g.Index == index) { dagCirc.Wires.get(i).To = g; }
+		    if(g.index == index) { dagCirc.Wires.get(i).To = g; }
 		}
 	    }
 	    if (dagCirc.Wires.get(i).Next != null) {                        //Next is a wire
@@ -4160,7 +4160,7 @@ public class HeuristicSearch {
             else
             {
                 int max = dagCirc.Gates.get(i).stage;
-                Wire w = dagCirc.Gates.get(i).Outgoing;
+                Wire w = dagCirc.Gates.get(i).outgoing;
                 while(w!=null)
                 {
                     int stg = w.To.stage;
@@ -4188,7 +4188,7 @@ public class HeuristicSearch {
                 if(bgate.stage == xstage)
                 {
                     //nodesCirc.put(xindx,bgate);
-                    bgate.Index = xindx;
+                    bgate.index = xindx;
                     xindx++;
                 }
             }
@@ -4249,11 +4249,11 @@ public class HeuristicSearch {
     public static boolean hasInput(Gate bgate)
     {
         boolean res = false;
-        Wire w = bgate.Outgoing;
+        Wire w = bgate.outgoing;
         
         while(w != null)
         {
-            if(w.To.Type.equals(GateType.INPUT.toString()))
+            if(w.To.type.equals(GateType.INPUT.toString()))
                 return true;
             w = w.Next;
         }
@@ -4263,7 +4263,7 @@ public class HeuristicSearch {
     public static boolean isInput(Gate bgate)
     {
         boolean res = false;
-        if(bgate.Type.equals(GateType.INPUT.toString()))
+        if(bgate.type.equals(GateType.INPUT.toString()))
             return true;
         return res;
     }

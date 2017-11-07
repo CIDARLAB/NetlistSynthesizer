@@ -95,24 +95,24 @@ public class DAGW {
         for (int i = 0; i < Gates.size(); ++i) {
             Gate gi = Gates.get(i);
 
-            s += String.format("%-12s", gi.Type);
+            s += String.format("%-12s", gi.type);
             //s += String.format("%-18s", BooleanLogic.logicString(gi.get_logics()));
-            s += String.format("%-18s", gi.Name);
-            s += String.format("%-3d", gi.Index);
+            s += String.format("%-18s", gi.name);
+            s += String.format("%-3d", gi.index);
 
             String child_indx = "(";
             for(Gate child: gi.getChildren()) {
-                child_indx += child.Index +",";
+                child_indx += child.index +",";
             }
             child_indx = child_indx.substring(0,child_indx.length()-1);
-            if(!gi.Type.equals("INPUT"))
+            if(!gi.type.equals("INPUT"))
                 child_indx += ")";
 
             s += String.format("%-12s", child_indx);
-            s += String.format("%-12s", gi.Type);
+            s += String.format("%-12s", gi.type);
             //s += String.format("%-18s", BooleanLogic.logicString(gi.get_logics()));
-            s += String.format("%-18s", gi.Name);
-            s += String.format("%-3d", gi.Index);
+            s += String.format("%-18s", gi.name);
+            s += String.format("%-3d", gi.index);
             //if(gi.getScores().get_score() != -1.0000) {
             //    s += String.format("%-5.4f", gi.getScores().get_score()); //onoff_ratio or noise_margin
             //}
@@ -141,9 +141,9 @@ public class DAGW {
             int flag =0;
             for(int j=0;j<obj.Gates.size();j++)
             {
-                if(obj.Gates.get(j).Type.equals(GateType.INPUT))
+                if(obj.Gates.get(j).type.equals(GateType.INPUT))
                 {
-                    if(obj.Gates.get(j).Name.trim().equals(inputnames.get(i).trim()))
+                    if(obj.Gates.get(j).name.trim().equals(inputnames.get(i).trim()))
                     {
                         flag =1;
                     }
@@ -152,9 +152,9 @@ public class DAGW {
             if(flag == 0)
             {
                 Gate dangGate = new Gate();
-                dangGate.Index = indx;
-                dangGate.Name = inputnames.get(i).trim();
-                dangGate.Type = GateType.INPUT;
+                dangGate.index = indx;
+                dangGate.name = inputnames.get(i).trim();
+                dangGate.type = GateType.INPUT;
                 indx--;
                 inpGates.add(dangGate);
             }
@@ -185,7 +185,7 @@ public class DAGW {
         HashMap<Integer, Gate> inpGates = new HashMap<Integer, Gate>(); 
         for(int i=0;i<obj.Gates.size();i++)
         {
-            if(obj.Gates.get(i).Type.equals(GateType.INPUT))
+            if(obj.Gates.get(i).type.equals(GateType.INPUT))
             {
                 firstindex = i;
                 break;
@@ -196,7 +196,7 @@ public class DAGW {
         {
             for(int j=0;j<obj.Gates.size();j++)
             {
-                if(inputnames.get(i).trim().equals(obj.Gates.get(j).Name.trim()))
+                if(inputnames.get(i).trim().equals(obj.Gates.get(j).name.trim()))
                 {
                     inpGates.put(firstindex, obj.Gates.get(j));
                     firstindex++;
