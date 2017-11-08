@@ -262,7 +262,7 @@ public class NetSynth {
             espresso = "espresso.mac";
         }
         else if(Utilities.isWindows()){
-            espresso = "expresso.exe";
+            espresso = "espresso.exe";
         }
         if(!fileNotFoundError(resources,slash,espresso)){
             return false;
