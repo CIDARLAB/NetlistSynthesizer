@@ -244,13 +244,13 @@ public ArrayList<Gate> getChildren(){
 
         ArrayList<Gate> children = new ArrayList<Gate>();
 
-        if ( (this.outgoing != null) && (this.outgoing.To != null)){
-            children.add(this.outgoing.To);
+        if ( (this.outgoing != null) && (this.outgoing.to != null)){
+            children.add(this.outgoing.to);
 
             Wire w = this.outgoing;
-            while(w.Next != null && w.Next.To != null) {
-                children.add(w.Next.To);
-                w = w.Next;
+            while(w.next != null && w.next.to != null) {
+                children.add(w.next.to);
+                w = w.next;
             }
         }
 

@@ -2954,10 +2954,10 @@ public class NetSynth {
 
             Wire edge = new Wire();
 
-            edge.From = outb;
-            edge.To = inpb;
-            edge.Index = 0;
-            edge.Next = null;
+            edge.from = outb;
+            edge.to = inpb;
+            edge.index = 0;
+            edge.next = null;
 
             outb.outgoing = edge;
             inpb.outgoing = null;
@@ -3086,17 +3086,17 @@ public class NetSynth {
             DGate netg = netlist.get(i);
             if (netg.gtype.equals(DGateType.BUF)) {
                 Wire bufwire = new Wire();
-                bufwire.Index = windx;
+                bufwire.index = windx;
                 windx++;
-                bufwire.Next = null;
+                bufwire.next = null;
                 int fromindx = 0;
                 for (Gate gout : Gates) {
                     if (gout.name.trim().equals(netg.output.name.trim())) {
-                        bufwire.From = gout;
+                        bufwire.from = gout;
                         fromindx = gout.index;
                     }
                     if (gout.name.trim().equals(netg.input.get(0).name.trim())) {
-                        bufwire.To = gout;
+                        bufwire.to = gout;
                     }
                 }
                 for (Gate gout : Gates) {
@@ -3110,17 +3110,17 @@ public class NetSynth {
                 if (netg.output.wtype.equals(DWireType.output) && !netg.gtype.equals(DGateType.OR)) {
                     Wire outpwire = new Wire();
                     int fromindx = 0;
-                    outpwire.Index = windx;
+                    outpwire.index = windx;
                     windx++;
-                    outpwire.Next = null;
+                    outpwire.next = null;
                     for (Gate gout : Gates) {
                         if (gout.name.trim().equals(netg.output.name.trim())) {
-                            outpwire.From = gout;
+                            outpwire.from = gout;
                             fromindx = gout.index;
 
                         }
                         if (gout.outW.name.trim().equals(netg.output.name.trim())) {
-                            outpwire.To = gout;
+                            outpwire.to = gout;
                         }
                     }
                     for (Gate gout : Gates) {
@@ -3135,20 +3135,20 @@ public class NetSynth {
                     for (int j = netg.input.size() - 1; j >= 0; j--) {
                         DWire gwireinp = netg.input.get(j);
                         Wire connwire = new Wire();
-                        connwire.Index = windx;
+                        connwire.index = windx;
                         windx++;
                         int gfromindx = 0;
                         if (gwireinp.wtype.equals(DWireType.input)) {
                             for (Gate xgate : Gates) {
                                 if (xgate.name.trim().equals(gwireinp.name.trim())) {
-                                    connwire.To = xgate;
+                                    connwire.to = xgate;
                                 }
                                 if (xgate.outW.name.trim().equals(netg.output.name.trim())) {
-                                    connwire.From = xgate;
+                                    connwire.from = xgate;
                                     gfromindx = xgate.index;
                                 }
                             }
-                            connwire.Next = temp;
+                            connwire.next = temp;
 
                             if (j == 0) {
                                 for (Gate xgate : Gates) {
@@ -3162,14 +3162,14 @@ public class NetSynth {
                         } else {
                             for (Gate xgate : Gates) {
                                 if (gwireinp.name.trim().equals(xgate.outW.name.trim())) {
-                                    connwire.To = xgate;
+                                    connwire.to = xgate;
                                 }
                                 if (netg.output.name.trim().equals(xgate.outW.name.trim())) {
-                                    connwire.From = xgate;
+                                    connwire.from = xgate;
                                     gfromindx = xgate.index;
                                 }
                             }
-                            connwire.Next = temp;
+                            connwire.next = temp;
                             if (j == 0) {
                                 for (Gate xgate : Gates) {
                                     if (xgate.index == gfromindx) {
@@ -3187,20 +3187,20 @@ public class NetSynth {
                     for (int j = netg.input.size() - 1; j >= 0; j--) {
                         DWire gwireinp = netg.input.get(j);
                         Wire connwire = new Wire();
-                        connwire.Index = windx;
+                        connwire.index = windx;
                         windx++;
                         int gfromindx = 0;
                         if (gwireinp.wtype.equals(DWireType.input)) {
                             for (Gate xgate : Gates) {
                                 if (xgate.name.trim().equals(gwireinp.name.trim())) {
-                                    connwire.To = xgate;
+                                    connwire.to = xgate;
                                 }
                                 if (xgate.outW.name.trim().equals(netg.output.name.trim())) {
-                                    connwire.From = xgate;
+                                    connwire.from = xgate;
                                     gfromindx = xgate.index;
                                 }
                             }
-                            connwire.Next = temp;
+                            connwire.next = temp;
 
                             if (j == 0) {
                                 for (Gate xgate : Gates) {
@@ -3214,14 +3214,14 @@ public class NetSynth {
                         } else {
                             for (Gate xgate : Gates) {
                                 if (gwireinp.name.trim().equals(xgate.outW.name.trim())) {
-                                    connwire.To = xgate;
+                                    connwire.to = xgate;
                                 }
                                 if (netg.output.name.trim().equals(xgate.outW.name.trim())) {
-                                    connwire.From = xgate;
+                                    connwire.from = xgate;
                                     gfromindx = xgate.index;
                                 }
                             }
-                            connwire.Next = temp;
+                            connwire.next = temp;
 
                             if (j == 0) {
                                 for (Gate xgate : Gates) {
