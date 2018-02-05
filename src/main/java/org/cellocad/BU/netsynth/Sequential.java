@@ -799,15 +799,16 @@ public class Sequential {
         System.out.println("");
         for(int i=prevStates.size()-1;i>=0; i--){
             System.out.println(statelines.get(prevStates.get(i)));
-            waveform += statelines.get(prevStates.get(i));
+            waveform += statelines.get(prevStates.get(i)) + "\n";
         }
+        waveform += "\n";
         for(String state: uniqueStates.get(longestIndex)){
             System.out.println(statelines.get(state));
-            waveform += statelines.get(state);
+            waveform += statelines.get(state) + "\n";
         }
         for(String state: nextStates){
             System.out.println(statelines.get(state));
-            waveform += statelines.get(state);
+            waveform += statelines.get(state) + "\n";
         }
         
         System.out.println("######################################\n\n");
