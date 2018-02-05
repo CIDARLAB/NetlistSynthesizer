@@ -513,6 +513,9 @@ public class NetSynth {
         
         finaldag = createDAGW(netlist);
         //System.out.println(inputnames);
+        if (hasCycles(netlist)) {
+        	finaldag.setWaveform(Sequential.createWaveform(netlist));
+        }
         
         finaldag = DAGW.addDanglingInputs(finaldag, inputnames);
         finaldag = DAGW.reorderinputs(finaldag, inputnames);

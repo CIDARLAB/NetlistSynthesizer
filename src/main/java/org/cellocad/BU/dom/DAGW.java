@@ -19,7 +19,8 @@ public class DAGW {
     public ArrayList<Wire> Wires;
     public ArrayList<Gate> Gates;
     public List<String> truthtable;
-    private Object BooleanLogic;
+    private String waveform;
+	private Object BooleanLogic;
     public DAGW()
     {
         Wires = new ArrayList<Wire>();
@@ -29,6 +30,7 @@ public class DAGW {
     
     public DAGW(List<Gate> dagwGates,List<Wire> dagwWires)
     {
+    	waveform = null;
         Wires = new ArrayList<Wire>();
         Gates = new ArrayList<Gate>();
         truthtable = new ArrayList<String>();
@@ -56,6 +58,7 @@ public class DAGW {
     
     public DAGW(DAGW obj)
     {
+    	waveform = null;
         Wires = new ArrayList<Wire>();
         Gates = new ArrayList<Gate>();
         truthtable = obj.truthtable;
@@ -235,4 +238,12 @@ public class DAGW {
     public static int FindGate(int dv){
         return 0;
     }
+    
+    public String getWaveform() {
+		return waveform;
+	}
+
+	public void setWaveform(String waveform) {
+		this.waveform = waveform;
+	}
 }

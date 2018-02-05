@@ -612,7 +612,7 @@ public class Sequential {
         return map;
     }
 
-    public static void createWaveform(List<DGate> netlist) {
+    public static String createWaveform(List<DGate> netlist) {
         List<String> ttInputs = new ArrayList<String>();
         List<String> inputs = new ArrayList<String>();
         for (DGate gate : netlist) {
@@ -785,25 +785,34 @@ public class Sequential {
         System.out.println("Final Line count :: " + (nextStates.size() + uniqueStates.get(longestIndex).size() + prevStates.size()));
         System.out.println("\n\n");
         
+        String waveform = "";
+        
         System.out.println("FINAL WAVEFORM ########################################");
         for (int i = 0; i < inputs.size(); i++) {
             System.out.print(inputs.get(i) + " ");
+            waveform += inputs.get(i) + " ";
         }
         for (int i = 0; i < states.size(); i++) {
             System.out.print(states.get(i) + " ");
+            waveform += states.get(i) + " ";
         }
         System.out.println("");
         for(int i=prevStates.size()-1;i>=0; i--){
             System.out.println(statelines.get(prevStates.get(i)));
+            waveform += statelines.get(prevStates.get(i));
         }
         for(String state: uniqueStates.get(longestIndex)){
             System.out.println(statelines.get(state));
+            waveform += statelines.get(state);
         }
         for(String state: nextStates){
             System.out.println(statelines.get(state));
+            waveform += statelines.get(state);
         }
         
         System.out.println("######################################\n\n");
+        return waveform;
+
         
     }
 
